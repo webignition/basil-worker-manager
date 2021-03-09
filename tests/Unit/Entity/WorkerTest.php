@@ -32,7 +32,7 @@ class WorkerTest extends TestCase
 
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
 
-        $ipAddresses = ['127.0.0.1', '10.0.0.1',];
+        $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
 
         $worker->setIpAddresses($ipAddresses);
         self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));

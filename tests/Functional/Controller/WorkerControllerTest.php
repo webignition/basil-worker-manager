@@ -6,14 +6,17 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\WorkerController;
 use App\Entity\Worker;
+use App\Message\CreateMessage;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\Services\Asserter\MessengerAsserter;
 use webignition\ObjectReflector\ObjectReflector;
 
 class WorkerControllerTest extends AbstractBaseFunctionalTest
 {
     private WorkerRepository $workerRepository;
+    private MessengerAsserter $messengerAsserter;
 
     protected function setUp(): void
     {
@@ -23,10 +26,17 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         if ($workerRepository instanceof WorkerRepository) {
             $this->workerRepository = $workerRepository;
         }
+
+        $messengerAsserter = self::$container->get(MessengerAsserter::class);
+        if ($messengerAsserter instanceof MessengerAsserter) {
+            $this->messengerAsserter = $messengerAsserter;
+        }
     }
 
     public function testCreateSuccess(): void
     {
+        $this->messengerAsserter->assertQueueIsEmpty();
+
         $label = md5('label content');
 
         $this->client->request(
@@ -48,6 +58,12 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         self::assertInstanceOf(Worker::class, $worker);
         self::assertIsInt(ObjectReflector::getProperty($worker, 'id'));
         self::assertSame($label, ObjectReflector::getProperty($worker, 'label'));
+
+        $this->messengerAsserter->assertQueueCount(1);
+
+        $expectedMessage = new CreateMessage((int) $worker->getId());
+        self::assertGreaterThan(0, $expectedMessage->getWorkerId());
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 
     /**

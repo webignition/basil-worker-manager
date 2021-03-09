@@ -19,6 +19,7 @@ final class Version20210309135939 extends AbstractMigration
         $this->addSql('
             CREATE TABLE worker (
                 id SERIAL NOT NULL, 
+                remote_id INT DEFAULT NULL,
                 label VARCHAR(32) NOT NULL, 
                 state VARCHAR(255) NOT NULL, 
                 provider VARCHAR(255) NOT NULL, 

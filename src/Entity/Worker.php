@@ -29,6 +29,11 @@ class Worker
     private ?int $id = null;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private ?int $remote_id;
+
+    /**
      * @ORM\Column(type="string", length=32, nullable=false, unique=true)
      */
     private string $label;
@@ -60,6 +65,7 @@ class Worker
     public static function create(string $label, string $provider): self
     {
         $worker = new Worker();
+        $worker->remote_id = null;
         $worker->label = $label;
         $worker->state = self::STATE_CREATE_RECEIVED;
         $worker->provider = $provider;
@@ -71,6 +77,13 @@ class Worker
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setRemoteId(int $remoteId): self
+    {
+        $this->remote_id = $remoteId;
+
+        return $this;
     }
 
     /**

@@ -1,4 +1,4 @@
-name: Tests
+name: Unit and Functional Tests
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   unit:
-    name: Unit tests - PHP ${{ matrix.php-versions }} ${{ matrix.operating-system }}
+    name: Unit - PHP ${{ matrix.php-versions }} ${{ matrix.operating-system }}
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
@@ -31,3 +31,46 @@ jobs:
 
       - name: Run PHPUnit unit tests
         run: composer test-unit
+
+  functional:
+    name: Functional - PHP ${{ matrix.php-versions }} ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['8']
+    runs-on: ${{ matrix.operating-system }}
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432/tcp
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: amqp, pgsql
+
+      - name: Download dependencies
+        uses: php-actions/composer@v2
+        with:
+          args: --ignore-platform-reqs --quiet
+
+      - name: Run DB migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:${{ job.services.postgres.ports[5432] }}/postgres?charset=UTF-8
+
+      - name: Run tests
+        run: composer test-functional
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:${{ job.services.postgres.ports[5432] }}/postgres?charset=UTF-8

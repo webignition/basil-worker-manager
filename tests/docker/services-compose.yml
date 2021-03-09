@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: ${WORKER_POSTGRES_CONTAINER_NAME}
+    environment:
+      POSTGRES_PASSWORD: ${WORKER_POSTGRES_PASSWORD}
+    ports:
+      - ${WORKER_POSTGRES_EXPOSED_PORT}:5432

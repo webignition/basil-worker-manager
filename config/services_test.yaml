@@ -5,3 +5,11 @@ services:
 
     App\Services\WorkerFactory:
         public: true
+
+    Symfony\Component\Messenger\Transport\InMemoryTransport:
+        alias: 'messenger.transport.async'
+
+    App\Tests\Services\Asserter\MessengerAsserter:
+        public: true
+        arguments:
+            $transport: '@messenger.transport.async'

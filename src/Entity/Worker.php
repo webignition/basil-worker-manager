@@ -68,6 +68,11 @@ class Worker
         return $worker;
     }
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
     /**
      * @param string[] $ip_addresses
      */

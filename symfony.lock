@@ -8,6 +8,18 @@
     "composer/xdebug-handler": {
         "version": "1.4.5"
     },
+    "dama/doctrine-test-bundle": {
+        "version": "4.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "4.0",
+            "ref": "56eaa387b5e48ebcc7c95a893b47dfa1ad51449c"
+        },
+        "files": [
+            "config/packages/test/dama_doctrine_test_bundle.yaml"
+        ]
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -266,6 +278,9 @@
             "phpcs.xml.dist"
         ]
     },
+    "symfony/browser-kit": {
+        "version": "v5.2.4"
+    },
     "symfony/cache": {
         "version": "v5.2.3"
     },
@@ -294,6 +309,9 @@
         "version": "v2.2.0"
     },
     "symfony/doctrine-bridge": {
+        "version": "v5.2.4"
+    },
+    "symfony/dom-crawler": {
         "version": "v5.2.4"
     },
     "symfony/dotenv": {
@@ -473,6 +491,9 @@
     },
     "theseer/tokenizer": {
         "version": "1.2.0"
+    },
+    "webignition/object-reflector": {
+        "version": "1.0"
     },
     "webmozart/assert": {
         "version": "1.9.1"

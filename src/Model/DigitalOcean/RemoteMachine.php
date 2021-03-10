@@ -5,7 +5,7 @@ namespace App\Model\DigitalOcean;
 use App\Model\RemoteMachineInterface;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
-class DigitalOceanRemoteMachine implements RemoteMachineInterface
+class RemoteMachine implements RemoteMachineInterface
 {
     public function __construct(
         private DropletEntity $droplet
@@ -25,7 +25,7 @@ class DigitalOceanRemoteMachine implements RemoteMachineInterface
         $dropletNetworks = $this->droplet->networks;
         $ipAddresses = [];
         foreach ($dropletNetworks as $dropletNetwork) {
-            $network = new DigitalOceanNetwork($dropletNetwork);
+            $network = new Network($dropletNetwork);
             $networkIp = $network->getPublicIpv4Address();
 
             if (is_string($networkIp)) {

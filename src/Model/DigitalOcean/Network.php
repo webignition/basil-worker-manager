@@ -4,7 +4,7 @@ namespace App\Model\DigitalOcean;
 
 use DigitalOceanV2\Entity\Network as NetworkEntity;
 
-class DigitalOceanNetwork
+class Network
 {
     private const VERSION_IPV4 = 4;
     private const TYPE_PUBLIC = 'public';

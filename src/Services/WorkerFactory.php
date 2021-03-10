@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class WorkerFactory
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private WorkerStore $workerStore
     ) {
     }
 
@@ -19,9 +19,7 @@ class WorkerFactory
     public function create(string $label, string $provider): Worker
     {
         $worker = Worker::create($label, $provider);
-
-        $this->entityManager->persist($worker);
-        $this->entityManager->flush();
+        $this->workerStore->store($worker);
 
         return $worker;
     }

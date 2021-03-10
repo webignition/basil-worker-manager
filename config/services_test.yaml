@@ -29,6 +29,12 @@ services:
             $machineProviders:
                 - '@App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider'
 
+    App\Services\CreateFailureRetryDecider:
+        public: true
+        arguments:
+            $deciders:
+                - '@App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider'
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

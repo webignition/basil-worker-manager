@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\Worker;
 use App\Model\ProviderInterface;
+use App\Tests\Mock\Model\MockRemoteMachine;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -26,26 +27,24 @@ class WorkerTest extends TestCase
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
     }
 
-    public function testSetIpAddresses(): void
+    public function testUpdateFromRemoteMachine(): void
     {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
+        self::assertNull(ObjectReflector::getProperty($worker, 'remote_id'));
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
 
+        $remoteId = 123;
         $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
 
-        $worker->setIpAddresses($ipAddresses);
-        self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
-    }
+        $remoteMachine = (new MockRemoteMachine())
+            ->withGetIdCall($remoteId)
+            ->withGetIpAddressesCall($ipAddresses)
+            ->getMock();
 
-    public function testSetRemoteId(): void
-    {
-        $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        self::assertNull(ObjectReflector::getProperty($worker, 'remote_id'));
+        $worker = $worker->updateFromRemoteMachine($remoteMachine);
 
-        $remoteId = 123;
-
-        $worker->setRemoteId($remoteId);
         self::assertSame($remoteId, ObjectReflector::getProperty($worker, 'remote_id'));
+        self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
     }
 }

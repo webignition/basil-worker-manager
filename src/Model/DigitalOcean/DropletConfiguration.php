@@ -25,4 +25,16 @@ class DropletConfiguration
     {
         return $this->image;
     }
+
+    /**
+     * @return string[]
+     */
+    public function asArray(): array
+    {
+        return [
+            $this->region,
+            $this->size,
+            $this->image,
+        ];
+    }
 }

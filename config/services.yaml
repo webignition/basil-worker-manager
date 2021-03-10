@@ -5,6 +5,9 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     digitalocean_access_token: '%env(DIGITALOCEAN_ACCESS_TOKEN)%'
+    digitalocean_droplet_region: '%env(DIGITALOCEAN_REGION)%'
+    digitalocean_droplet_size: '%env(DIGITALOCEAN_SIZE)%'
+    digitalocean_droplet_image: '%env(DIGITALOCEAN_IMAGE)%'
 
 services:
     # default configuration for services in *this* file
@@ -35,3 +38,14 @@ services:
         class: DigitalOceanV2\Client
         calls:
             - authenticate: ['%digitalocean_access_token%']
+
+    app.digitalocean.droplet_configuration.default:
+        class: App\Model\DigitalOcean\DropletConfiguration
+        arguments:
+            $region: '%digitalocean_droplet_region%'
+            $size: '%digitalocean_droplet_size%'
+            $image: '%digitalocean_droplet_image%'
+
+    App\Services\MachineProvider\DigitalOcean\DropletFactory:
+        arguments:
+            $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'

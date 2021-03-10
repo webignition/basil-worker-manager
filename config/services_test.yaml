@@ -12,6 +12,17 @@ services:
     App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider:
         public: true
 
+    app.digitalocean.droplet_configuration.default:
+        class: App\Model\DigitalOcean\DropletConfiguration
+        arguments:
+            $region: '%digitalocean_droplet_region%'
+            $size: '%digitalocean_droplet_size%'
+            $image: '%digitalocean_droplet_image%'
+
+    App\Services\MachineProvider\DigitalOcean\DropletFactory:
+        arguments:
+            $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

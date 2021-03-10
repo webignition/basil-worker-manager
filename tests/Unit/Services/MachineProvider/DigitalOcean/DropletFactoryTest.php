@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
 use App\Exception\MachineProvider\InvalidCreatedItemException;
+use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
 use App\Tests\Mock\DigitalOcean\MockClient;
@@ -20,6 +21,7 @@ use webignition\ObjectReflector\ObjectReflector;
 class DropletFactoryTest extends TestCase
 {
     private Worker $worker;
+    private DropletConfiguration $dropletConfiguration;
 
     protected function setUp(): void
     {
@@ -28,6 +30,8 @@ class DropletFactoryTest extends TestCase
         $workerId = 123;
         $this->worker = Worker::create('label', ProviderInterface::NAME_DIGITALOCEAN);
         ObjectReflector::setProperty($this->worker, Worker::class, 'id', $workerId);
+
+        $this->dropletConfiguration = new DropletConfiguration('region', 'size', 'image');
     }
 
     public function testCreateSuccess(): void
@@ -37,9 +41,7 @@ class DropletFactoryTest extends TestCase
         $dropletApi = (new MockDropletApi())
             ->withCreateCall(
                 $this->worker->getName(),
-                'lon1',
-                's-1vcpu-1gb',
-                'ubuntu-16-04-x64',
+                $this->dropletConfiguration,
                 $createdItem
             )->getMock();
 
@@ -57,9 +59,7 @@ class DropletFactoryTest extends TestCase
         $dropletApi = (new MockDropletApi())
             ->withCreateCallThrowingException(
                 $this->worker->getName(),
-                'lon1',
-                's-1vcpu-1gb',
-                'ubuntu-16-04-x64',
+                $this->dropletConfiguration,
                 $dropletApiException
             )->getMock();
 
@@ -81,9 +81,7 @@ class DropletFactoryTest extends TestCase
         $dropletApi = (new MockDropletApi())
             ->withCreateCall(
                 $this->worker->getName(),
-                'lon1',
-                's-1vcpu-1gb',
-                'ubuntu-16-04-x64',
+                $this->dropletConfiguration,
                 $createdItem
             )->getMock();
 
@@ -102,6 +100,6 @@ class DropletFactoryTest extends TestCase
             ->withDropletCall($dropletApi)
             ->getMock();
 
-        return new DropletFactory($client);
+        return new DropletFactory($client, $this->dropletConfiguration);
     }
 }

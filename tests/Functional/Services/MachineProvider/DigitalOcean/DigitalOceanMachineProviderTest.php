@@ -10,7 +10,7 @@ use App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider;
 use App\Services\WorkerFactory;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MachineProvider\DigitalOcean\MockDropletFactory;
-use DigitalOceanV2\Entity\Droplet as DropletEntity;
+use App\Tests\Services\DigitalOcean\Entity\DropletEntityFactory;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
@@ -36,24 +36,13 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     public function testCreateSuccess(): void
     {
         $remoteId = 123;
-        $dropletEntity = new DropletEntity([
-            'id' => $remoteId,
-            'networks' => (object) [
-                'v4' => [
-                    (object) [
-                        'ip_address' => '127.0.0.1',
-                        'type' => 'public',
-                    ],
-                    (object) [
-                        'ip_address' => '10.0.0.1',
-                        'type' => 'public',
-                    ],
-                ],
-            ],
-        ]);
+        $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
 
         $dropletFactory = (new MockDropletFactory())
-            ->withCreateCall($this->worker, $dropletEntity)
+            ->withCreateCall(
+                $this->worker,
+                DropletEntityFactory::create($remoteId, $ipAddresses)
+            )
             ->getMock();
 
         ObjectReflector::setProperty(

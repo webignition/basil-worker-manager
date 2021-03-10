@@ -87,6 +87,14 @@ class Worker
         return $this->label;
     }
 
+    /**
+     * @return ProviderInterface::NAME_*
+     */
+    public function getProvider(): string
+    {
+        return $this->provider;
+    }
+
     public function getName(): string
     {
         return sprintf(self::NAME, (int) $this->getId());

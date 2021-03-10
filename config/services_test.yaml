@@ -23,6 +23,12 @@ services:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
 
+    App\Services\MachineProvider:
+        public: true
+        arguments:
+            $machineProviders:
+                - '@App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider'
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

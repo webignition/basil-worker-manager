@@ -14,7 +14,7 @@ class InvalidCreatedItemException extends AbstractCreateForWorkerException
     ) {
         parent::__construct(
             $worker,
-            sprintf(self::MESSAGE, gettype($$this->createdItem)),
+            sprintf(self::MESSAGE, gettype($createdItem)),
         );
     }
 

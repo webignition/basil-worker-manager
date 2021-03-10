@@ -9,6 +9,9 @@ services:
     App\Services\WorkerStore:
         public: true
 
+    App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider:
+        public: true
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

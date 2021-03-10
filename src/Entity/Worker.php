@@ -82,6 +82,11 @@ class Worker
         return $this->id;
     }
 
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
     public function getName(): string
     {
         return sprintf(self::NAME, (int) $this->getId());

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Model\ProviderInterface;
+use App\Model\RemoteMachineInterface;
 use App\Repository\WorkerRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -79,19 +80,10 @@ class Worker
         return $this->id;
     }
 
-    public function setRemoteId(int $remoteId): self
+    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): self
     {
-        $this->remote_id = $remoteId;
-
-        return $this;
-    }
-
-    /**
-     * @param string[] $ip_addresses
-     */
-    public function setIpAddresses(array $ip_addresses): self
-    {
-        $this->ip_addresses = $ip_addresses;
+        $this->remote_id = $remoteMachine->getId();
+        $this->ip_addresses = $remoteMachine->getIpAddresses();
 
         return $this;
     }

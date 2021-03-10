@@ -16,7 +16,6 @@ use webignition\ObjectReflector\ObjectReflector;
 class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 {
     private DigitalOceanMachineProvider $machineProvider;
-    private WorkerFactory $workerFactory;
     private Worker $worker;
 
     protected function setUp(): void
@@ -30,7 +29,6 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         $workerFactory = self::$container->get(WorkerFactory::class);
         if ($workerFactory instanceof WorkerFactory) {
-            $this->workerFactory = $workerFactory;
             $this->worker = $workerFactory->create('label', ProviderInterface::NAME_DIGITALOCEAN);
         }
     }
@@ -53,8 +51,6 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
                 ],
             ],
         ]);
-
-
 
         $dropletFactory = (new MockDropletFactory())
             ->withCreateCall($this->worker, $dropletEntity)

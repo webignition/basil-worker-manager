@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\DigitalOcean;
 
+use App\Model\DigitalOcean\DropletConfiguration;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use Mockery\MockInterface;
 
@@ -23,15 +24,13 @@ class MockDropletApi
 
     public function withCreateCall(
         string $name,
-        string $region,
-        string $size,
-        string $image,
+        DropletConfiguration $dropletConfiguration,
         mixed $createdItem
     ): self {
         if ($this->dropletApi instanceof MockInterface) {
             $this->dropletApi
                 ->shouldReceive('create')
-                ->with($name, $region, $size, $image)
+                ->with($name, ...$dropletConfiguration->asArray())
                 ->andReturn($createdItem);
         }
 
@@ -40,15 +39,13 @@ class MockDropletApi
 
     public function withCreateCallThrowingException(
         string $name,
-        string $region,
-        string $size,
-        string $image,
+        DropletConfiguration $dropletConfiguration,
         \Exception $exception
     ): self {
         if ($this->dropletApi instanceof MockInterface) {
             $this->dropletApi
                 ->shouldReceive('create')
-                ->with($name, $region, $size, $image)
+                ->with($name, ...$dropletConfiguration->asArray())
                 ->andThrow($exception);
         }
 

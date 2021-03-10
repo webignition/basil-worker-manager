@@ -25,6 +25,7 @@ class WorkerTest extends TestCase
         self::assertSame(Worker::STATE_CREATE_RECEIVED, ObjectReflector::getProperty($worker, 'state'));
         self::assertSame($provider, ObjectReflector::getProperty($worker, 'provider'));
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
+        self::assertSame('worker-0', $worker->getName());
     }
 
     public function testUpdateFromRemoteMachine(): void

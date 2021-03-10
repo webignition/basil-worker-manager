@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Worker
 {
+    private const NAME = 'worker-%d';
+
     public const STATE_CREATE_RECEIVED = 'create/received';
     public const STATE_CREATE_PROCESSING = 'create/processing';
     public const STATE_CREATE_REQUESTED = 'create/requested';
@@ -78,6 +80,11 @@ class Worker
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return sprintf(self::NAME, (int) $this->getId());
     }
 
     public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): self

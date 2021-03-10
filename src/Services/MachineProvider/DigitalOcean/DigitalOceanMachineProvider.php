@@ -5,7 +5,7 @@ namespace App\Services\MachineProvider\DigitalOcean;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
 use App\Exception\MachineProvider\InvalidCreatedItemException;
-use App\Model\DigitalOceanRemoteMachine;
+use App\Model\DigitalOcean\DigitalOceanRemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;

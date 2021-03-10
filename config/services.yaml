@@ -54,3 +54,8 @@ services:
         arguments:
             $machineProviders:
                 - '@App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider'
+
+    App\Services\CreateFailureRetryDecider:
+        arguments:
+            $deciders:
+                - '@App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider'

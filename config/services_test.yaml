@@ -6,6 +6,9 @@ services:
     App\Services\WorkerFactory:
         public: true
 
+    App\Services\WorkerStore:
+        public: true
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

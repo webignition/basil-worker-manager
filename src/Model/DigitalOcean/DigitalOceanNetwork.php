@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\DigitalOcean;
 
 use DigitalOceanV2\Entity\Network as NetworkEntity;
 

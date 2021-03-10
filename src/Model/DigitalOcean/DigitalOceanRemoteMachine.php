@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\DigitalOcean;
 
+use App\Model\DigitalOcean\DigitalOceanNetwork;
+use App\Model\RemoteMachineInterface;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
 class DigitalOceanRemoteMachine implements RemoteMachineInterface

@@ -49,3 +49,8 @@ services:
     App\Services\MachineProvider\DigitalOcean\DropletFactory:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
+
+    App\Services\MachineProvider:
+        arguments:
+            $machineProviders:
+                - '@App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider'

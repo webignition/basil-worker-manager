@@ -4,7 +4,6 @@ namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
-use App\Exception\MachineProvider\InvalidCreatedItemException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProviderInterface;
@@ -28,7 +27,6 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
 
     /**
      * @throws CreateException
-     * @throws InvalidCreatedItemException
      */
     public function create(Worker $worker): Worker
     {

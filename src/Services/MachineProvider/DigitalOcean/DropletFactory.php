@@ -4,7 +4,6 @@ namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
-use App\Exception\MachineProvider\InvalidCreatedItemException;
 use App\Model\DigitalOcean\DropletConfiguration;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
@@ -24,7 +23,6 @@ class DropletFactory
 
     /**
      * @throws CreateException
-     * @throws InvalidCreatedItemException
      */
     public function create(Worker $worker): DropletEntity
     {
@@ -37,10 +35,8 @@ class DropletFactory
             throw new CreateException($worker, $exception);
         }
 
-        if (false === $droplet instanceof DropletEntity) {
-            throw new InvalidCreatedItemException($worker, $droplet);
-        }
-
-        return $droplet;
+        return $droplet instanceof DropletEntity
+            ? $droplet
+            : new DropletEntity([]);
     }
 }

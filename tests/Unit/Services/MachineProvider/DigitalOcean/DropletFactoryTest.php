@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
-use App\Exception\MachineProvider\InvalidCreatedItemException;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
@@ -66,28 +65,6 @@ class DropletFactoryTest extends TestCase
         $factory = $this->createFactory($dropletApi);
 
         $expectedException = new CreateException($this->worker, $dropletApiException);
-
-        $this->expectExceptionObject($expectedException);
-
-        $factory->create($this->worker);
-    }
-
-    public function testCreateThrowsInvalidCreatedItemException(): void
-    {
-        $createdItem = [
-            new DropletEntity(),
-        ];
-
-        $dropletApi = (new MockDropletApi())
-            ->withCreateCall(
-                $this->worker->getName(),
-                $this->dropletConfiguration,
-                $createdItem
-            )->getMock();
-
-        $factory = $this->createFactory($dropletApi);
-
-        $expectedException = new InvalidCreatedItemException($this->worker, $createdItem);
 
         $this->expectExceptionObject($expectedException);
 

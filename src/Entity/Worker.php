@@ -17,6 +17,7 @@ class Worker
     public const STATE_CREATE_RECEIVED = 'create/received';
     public const STATE_CREATE_PROCESSING = 'create/processing';
     public const STATE_CREATE_REQUESTED = 'create/requested';
+    public const STATE_CREATE_FAILED = 'create/failed';
     public const STATE_DELETE_RECEIVED = 'delete/received';
     public const STATE_DELETE_PROCESSING = 'delete/processing';
     public const STATE_UP_STARTED = 'up/started';

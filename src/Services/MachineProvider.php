@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
-use App\Exception\MachineProvider\InvalidCreatedItemException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\MachineProvider\MachineProviderInterface;
 
@@ -28,7 +27,6 @@ class MachineProvider
 
     /**
      * @throws CreateException
-     * @throws InvalidCreatedItemException
      * @throws UnsupportedProviderException
      */
     public function create(Worker $worker): Worker

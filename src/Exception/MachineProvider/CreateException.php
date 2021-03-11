@@ -10,13 +10,18 @@ class CreateException extends AbstractCreateForWorkerException
 
     public function __construct(
         Worker $worker,
-        \Throwable $previous
+        private \Throwable $remoteApiException
     ) {
         parent::__construct(
             $worker,
             sprintf(self::MESSAGE, $worker->getId(), $worker->getLabel()),
             0,
-            $previous
+            $remoteApiException
         );
+    }
+
+    public function getRemoteApiException(): \Throwable
+    {
+        return $this->remoteApiException;
     }
 }

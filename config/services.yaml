@@ -8,6 +8,7 @@ parameters:
     digitalocean_droplet_region: '%env(DIGITALOCEAN_REGION)%'
     digitalocean_droplet_size: '%env(DIGITALOCEAN_SIZE)%'
     digitalocean_droplet_image: '%env(DIGITALOCEAN_IMAGE)%'
+    create_retry_limit: '%env(CREATE_RETRY_LIMIT)%'
 
 services:
     # default configuration for services in *this* file
@@ -59,3 +60,7 @@ services:
         arguments:
             $deciders:
                 - '@App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider'
+
+    App\MessageHandler\CreateMessageHandler:
+        arguments:
+            $retryLimit: '%create_retry_limit%'

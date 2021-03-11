@@ -108,4 +108,14 @@ class Worker
 
         return $this;
     }
+
+    /**
+     * @param self::STATE_* $state
+     */
+    public function setState(string $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
 }

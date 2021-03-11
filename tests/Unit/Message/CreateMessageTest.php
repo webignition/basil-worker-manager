@@ -15,5 +15,21 @@ class CreateMessageTest extends TestCase
 
         $message = new CreateMessage($workerId);
         self::assertSame($workerId, $message->getWorkerId());
+        self::assertSame(0, $message->getRetryCount());
+    }
+
+    public function testIncrementRetryCount(): void
+    {
+        $message = new CreateMessage(132);
+        self::assertSame(0, $message->getRetryCount());
+
+        $message->incrementRetryCount();
+        self::assertSame(1, $message->getRetryCount());
+
+        $message->incrementRetryCount();
+        self::assertSame(2, $message->getRetryCount());
+
+        $message->incrementRetryCount();
+        self::assertSame(3, $message->getRetryCount());
     }
 }

@@ -31,7 +31,9 @@ class CreateMessageHandler implements MessageHandlerInterface
 
     public function __invoke(CreateMessage $message): void
     {
-        $worker = $this->workerRepository->find($message->getWorkerId());
+        $request = $message->getRequest();
+
+        $worker = $this->workerRepository->find($request->getWorkerId());
         if (false === $worker instanceof Worker) {
             return;
         }
@@ -44,11 +46,10 @@ class CreateMessageHandler implements MessageHandlerInterface
                 $createException->getRemoteApiException()
             );
 
-            $retryLimitReached = $this->retryLimit <= $message->getRetryCount();
+            $retryLimitReached = $this->retryLimit <= $request->getRetryCount();
 
             if ($exceptionRequiresRetry && false === $retryLimitReached) {
-                $message->incrementRetryCount();
-                $this->messageBus->dispatch($message);
+                $this->messageBus->dispatch(new CreateMessage($request->incrementRetryCount()));
 
                 return;
             }

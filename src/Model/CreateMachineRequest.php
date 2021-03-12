@@ -19,4 +19,12 @@ class CreateMachineRequest
     {
         return $this->retryCount;
     }
+
+    public function incrementRetryCount(): self
+    {
+        $new = clone $this;
+        $new->retryCount++;
+
+        return $new;
+    }
 }

@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\CreateException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\MessageHandler\CreateMessageHandler;
+use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider;
@@ -52,7 +53,8 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
 
     public function testInvokeUnknownWorker(): void
     {
-        $message = new CreateMessage(0);
+        $request = new CreateMachineRequest(0);
+        $message = new CreateMessage($request);
 
         $machineProvider = (new MockMachineProvider())
             ->withoutCreateCall()
@@ -72,7 +74,8 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMessage((int) $worker->getId());
+        $request = new CreateMachineRequest((int) $worker->getId());
+        $message = new CreateMessage($request);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCall($worker)
@@ -95,7 +98,8 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMessage((int) $worker->getId());
+        $request = new CreateMachineRequest((int) $worker->getId());
+        $message = new CreateMessage($request);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($worker, $exception)
@@ -111,7 +115,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(Worker::STATE_CREATE_FAILED, ObjectReflector::getProperty($worker, 'state'));
-        self::assertSame(0, $message->getRetryCount());
+        self::assertSame(0, $request->getRetryCount());
     }
 
     /**
@@ -122,13 +126,16 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         int $currentRetryCount,
     ): void {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMessage((int) $worker->getId());
+
+        $request = new CreateMachineRequest((int) $worker->getId());
         ObjectReflector::setProperty(
-            $message,
-            CreateMessage::class,
+            $request,
+            CreateMachineRequest::class,
             'retryCount',
             $currentRetryCount
         );
+
+        $message = new CreateMessage($request);
 
         $createException = new CreateException($worker, $createExceptionPrevious);
 
@@ -144,10 +151,15 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
 
         ($this->handler)($message);
 
-        self::assertSame($currentRetryCount + 1, $message->getRetryCount());
+        $expectedRequest = new CreateMachineRequest(
+            (int) $worker->getId(),
+            $request->getRetryCount() + 1
+        );
+
+        $expectedMessage = new CreateMessage($expectedRequest);
 
         $this->messengerAsserter->assertQueueCount(1);
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, $message);
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
         self::assertNotSame(Worker::STATE_CREATE_FAILED, ObjectReflector::getProperty($worker, 'state'));
     }
@@ -181,13 +193,16 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         int $currentRetryCount,
     ): void {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMessage((int) $worker->getId());
+
+        $request = new CreateMachineRequest((int) $worker->getId());
         ObjectReflector::setProperty(
-            $message,
-            CreateMessage::class,
+            $request,
+            CreateMachineRequest::class,
             'retryCount',
             $currentRetryCount
         );
+
+        $message = new CreateMessage($request);
 
         $createException = new CreateException($worker, $createExceptionPrevious);
 

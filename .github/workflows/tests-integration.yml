@@ -45,4 +45,4 @@ jobs:
       - name: Run synchronous tests
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-        run: composer test-integration-sync
+        run: DIGITALOCEAN_ACCESS_TOKEN=${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} composer test-integration-sync

@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Controller;
 use App\Controller\WorkerController;
 use App\Entity\Worker;
 use App\Message\CreateMessage;
+use App\Model\CreateMachineRequest;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
@@ -61,8 +62,9 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueCount(1);
 
-        $expectedMessage = new CreateMessage((int) $worker->getId());
-        self::assertGreaterThan(0, $expectedMessage->getWorkerId());
+        $expectedRequest = new CreateMachineRequest((int) $worker->getId());
+        $expectedMessage = new CreateMessage($expectedRequest);
+        self::assertGreaterThan(0, $expectedRequest->getWorkerId());
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 

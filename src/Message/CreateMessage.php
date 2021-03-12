@@ -4,26 +4,17 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Model\CreateMachineRequest;
+
 class CreateMessage
 {
     public function __construct(
-        private int $workerId,
-        private int $retryCount = 0,
+        private CreateMachineRequest $request,
     ) {
     }
 
-    public function getWorkerId(): int
+    public function getRequest(): CreateMachineRequest
     {
-        return $this->workerId;
-    }
-
-    public function getRetryCount(): int
-    {
-        return $this->retryCount;
-    }
-
-    public function incrementRetryCount(): void
-    {
-        ++$this->retryCount;
+        return $this->request;
     }
 }

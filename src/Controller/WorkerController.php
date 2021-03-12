@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Message\CreateMessage;
+use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
 use App\Request\WorkerCreateRequest;
 use App\Response\BadWorkerCreateRequestResponse;
@@ -28,7 +29,9 @@ class WorkerController extends AbstractController
 
         $worker = $factory->create($request->getLabel(), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $messageBus->dispatch(new CreateMessage((int) $worker->getId()));
+        $messageBus->dispatch(new CreateMessage(
+            new CreateMachineRequest((int) $worker->getId())
+        ));
 
         return new JsonResponse();
     }

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\ProviderInterface;
 use App\Services\CreateFailureRetryDecider;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 

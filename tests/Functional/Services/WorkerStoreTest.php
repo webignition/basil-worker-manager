@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Worker;
 use App\Model\ProviderInterface;
 use App\Services\WorkerStore;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 
 class WorkerStoreTest extends AbstractBaseFunctionalTest
 {

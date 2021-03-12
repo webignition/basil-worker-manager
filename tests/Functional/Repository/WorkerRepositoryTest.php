@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Repository;
 use App\Model\ProviderInterface;
 use App\Repository\WorkerRepository;
 use App\Services\WorkerFactory;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 
 class WorkerRepositoryTest extends AbstractBaseFunctionalTest
 {

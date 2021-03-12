@@ -14,7 +14,7 @@ use App\Services\CreateMachineHandler;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider;
 use App\Services\WorkerFactory;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineProvider;
 use App\Tests\Services\Asserter\MessengerAsserter;

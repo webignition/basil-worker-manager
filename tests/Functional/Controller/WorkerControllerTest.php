@@ -12,7 +12,7 @@ use App\Model\ProviderInterface;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
 use App\Services\WorkerFactory;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use webignition\ObjectReflector\ObjectReflector;
 

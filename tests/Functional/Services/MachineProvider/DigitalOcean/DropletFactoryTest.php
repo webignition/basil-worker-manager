@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
 
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 
 class DropletFactoryTest extends AbstractBaseFunctionalTest
 {

@@ -18,8 +18,8 @@ use App\Tests\Functional\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineProvider;
 use App\Tests\Services\Asserter\MessengerAsserter;
+use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
-use DigitalOceanV2\Exception\ValidationFailedException;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -203,7 +203,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         return [
             'does not require retry' => [
-                'createExceptionPrevious' => \Mockery::mock(ValidationFailedException::class),
+                'createExceptionPrevious' => \Mockery::mock(ApiLimitExceededException::class),
                 'currentRetryCount' => 0,
             ],
             'requires retry, retry limit reached (3)' => [

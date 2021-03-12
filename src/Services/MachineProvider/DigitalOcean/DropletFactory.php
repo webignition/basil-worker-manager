@@ -12,11 +12,14 @@ use DigitalOceanV2\Exception\ExceptionInterface;
 
 class DropletFactory
 {
+    private const REMOTE_NAME = '%s-%s';
+
     private DropletApi $dropletApi;
 
     public function __construct(
         Client $client,
-        private DropletConfiguration $dropletConfiguration
+        private DropletConfiguration $dropletConfiguration,
+        private string $environment
     ) {
         $this->dropletApi = $client->droplet();
     }
@@ -28,7 +31,7 @@ class DropletFactory
     {
         try {
             $droplet = $this->dropletApi->create(
-                $worker->getName(),
+                sprintf(self::REMOTE_NAME, $this->environment, $worker->getName()),
                 ...$this->dropletConfiguration->asArray()
             );
         } catch (ExceptionInterface $exception) {

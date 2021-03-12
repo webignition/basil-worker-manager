@@ -80,10 +80,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     {
         $this->client->request('POST', WorkerController::PATH_CREATE, $requestData);
 
-        $response = $this->client->getResponse();
-
-        self::assertSame(400, $response->getStatusCode());
-        self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));
+        $this->assertBadRequestResponse($expectedResponseBody);
     }
 
     /**
@@ -115,23 +112,31 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     {
         $label = md5('label content');
         $workerFactory = self::$container->get(WorkerFactory::class);
-        if  ($workerFactory instanceof WorkerFactory) {
+        if ($workerFactory instanceof WorkerFactory) {
             $workerFactory->create($label, ProviderInterface::NAME_DIGITALOCEAN);
         }
 
-        $requestData = [
-            WorkerCreateRequest::KEY_LABEL => $label,
-        ];
+        $this->client->request(
+            'POST',
+            WorkerController::PATH_CREATE,
+            [
+                WorkerCreateRequest::KEY_LABEL => $label,
+            ]
+        );
 
-        $this->client->request('POST', WorkerController::PATH_CREATE, $requestData);
-
-        $response = $this->client->getResponse();
-
-        $expectedResponseBody = [
+        $this->assertBadRequestResponse([
             'type' => 'worker-create-request',
             'message' => 'label taken',
             'code' => 200,
-        ];
+        ]);
+    }
+
+    /**
+     * @param array<mixed> $expectedResponseBody
+     */
+    private function assertBadRequestResponse(array $expectedResponseBody): void
+    {
+        $response = $this->client->getResponse();
 
         self::assertSame(400, $response->getStatusCode());
         self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));

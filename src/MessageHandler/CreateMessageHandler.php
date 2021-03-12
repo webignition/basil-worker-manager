@@ -5,27 +5,16 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\CreateException;
-use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Repository\WorkerRepository;
-use App\Services\CreateFailureRetryDecider;
-use App\Services\ExceptionLogger;
-use App\Services\MachineProvider;
-use App\Services\WorkerStore;
+use App\Services\CreateMachineHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMessageHandler implements MessageHandlerInterface
 {
     public function __construct(
-        private MachineProvider $machineProvider,
         private WorkerRepository $workerRepository,
-        private CreateFailureRetryDecider $retryDecider,
-        private MessageBusInterface $messageBus,
-        private ExceptionLogger $exceptionLogger,
-        private WorkerStore $workerStore,
-        private int $retryLimit
+        private CreateMachineHandler $createMachineHandler
     ) {
     }
 
@@ -38,32 +27,6 @@ class CreateMessageHandler implements MessageHandlerInterface
             return;
         }
 
-        try {
-            $this->machineProvider->create($worker);
-        } catch (CreateException $createException) {
-            $exceptionRequiresRetry = $this->retryDecider->decide(
-                $worker->getProvider(),
-                $createException->getRemoteApiException()
-            );
-
-            $retryLimitReached = $this->retryLimit <= $request->getRetryCount();
-
-            if ($exceptionRequiresRetry && false === $retryLimitReached) {
-                $this->messageBus->dispatch(new CreateMessage($request->incrementRetryCount()));
-
-                return;
-            }
-
-            $this->setWorkerStateCreateFailed($worker);
-        } catch (UnsupportedProviderException $unsupportedProviderException) {
-            $this->exceptionLogger->log($unsupportedProviderException);
-            $this->setWorkerStateCreateFailed($worker);
-        }
-    }
-
-    private function setWorkerStateCreateFailed(Worker $worker): void
-    {
-        $worker = $worker->setState(Worker::STATE_CREATE_FAILED);
-        $this->workerStore->store($worker);
+        $this->createMachineHandler->create($worker, $request);
     }
 }

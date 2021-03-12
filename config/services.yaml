@@ -61,6 +61,6 @@ services:
             $deciders:
                 - '@App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider'
 
-    App\MessageHandler\CreateMessageHandler:
+    App\Services\CreateMachineHandler:
         arguments:
             $retryLimit: '%create_retry_limit%'

@@ -39,7 +39,7 @@ class DropletFactoryTest extends TestCase
 
         $dropletApi = (new MockDropletApi())
             ->withCreateCall(
-                $this->worker->getName(),
+                'test-' . $this->worker->getName(),
                 $this->dropletConfiguration,
                 $createdItem
             )->getMock();
@@ -57,7 +57,7 @@ class DropletFactoryTest extends TestCase
 
         $dropletApi = (new MockDropletApi())
             ->withCreateCallThrowingException(
-                $this->worker->getName(),
+                'test-' . $this->worker->getName(),
                 $this->dropletConfiguration,
                 $dropletApiException
             )->getMock();
@@ -77,6 +77,6 @@ class DropletFactoryTest extends TestCase
             ->withDropletCall($dropletApi)
             ->getMock();
 
-        return new DropletFactory($client, $this->dropletConfiguration);
+        return new DropletFactory($client, $this->dropletConfiguration, 'test');
     }
 }

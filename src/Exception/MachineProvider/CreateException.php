@@ -6,7 +6,7 @@ use App\Entity\Worker;
 
 class CreateException extends \Exception
 {
-    private const MESSAGE = 'Unable to create remote machine for worker %d %s';
+    private const MESSAGE = 'Unable to create remote machine for worker %s %s';
 
     public function __construct(
         private Worker $worker,

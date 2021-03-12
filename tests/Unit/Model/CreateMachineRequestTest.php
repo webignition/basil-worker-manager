@@ -11,7 +11,7 @@ class CreateMachineRequestTest extends TestCase
 {
     public function testCreate(): void
     {
-        $workerId = 123;
+        $workerId = '123';
 
         $request = new CreateMachineRequest($workerId);
         self::assertSame($workerId, $request->getWorkerId());
@@ -20,7 +20,7 @@ class CreateMachineRequestTest extends TestCase
 
     public function testIncrementRetryCount(): void
     {
-        $request = new CreateMachineRequest(132);
+        $request = new CreateMachineRequest('123');
         self::assertSame(0, $request->getRetryCount());
 
         $request = $request->incrementRetryCount();

@@ -8,7 +8,6 @@ use App\Entity\Worker;
 use App\Model\ProviderInterface;
 use App\Services\WorkerStore;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
-use webignition\ObjectReflector\ObjectReflector;
 
 class WorkerStoreTest extends AbstractBaseFunctionalTest
 {
@@ -27,9 +26,9 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
     public function testStore(): void
     {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        self::assertNull(ObjectReflector::getProperty($worker, 'id'));
+        self::assertSame('', $worker->getId());
 
         $worker = $this->workerStore->store($worker);
-        self::assertIsInt(ObjectReflector::getProperty($worker, 'id'));
+        self::assertNotSame('', $worker->getId());
     }
 }

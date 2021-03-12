@@ -6,6 +6,7 @@ use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use App\Repository\WorkerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 
 /**
  * @ORM\Entity(repositoryClass=WorkerRepository::class)
@@ -27,10 +28,13 @@ class Worker
 
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="ulid", unique=true)
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator(class=UlidGenerator::class)
+     *
+     * @var string
      */
-    private ?int $id = null;
+    private string $id = '';
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -78,7 +82,7 @@ class Worker
         return $worker;
     }
 
-    public function getId(): ?int
+    public function getId(): string
     {
         return $this->id;
     }

@@ -19,11 +19,11 @@ class WorkerTest extends TestCase
 
         $worker = Worker::create($label, $provider);
 
-        self::assertNull(ObjectReflector::getProperty($worker, 'id'));
+        self::assertSame('', $worker->getId());
         self::assertNull(ObjectReflector::getProperty($worker, 'remote_id'));
         self::assertSame($label, $worker->getLabel());
         self::assertSame(Worker::STATE_CREATE_RECEIVED, ObjectReflector::getProperty($worker, 'state'));
-        self::assertSame($provider, ObjectReflector::getProperty($worker, 'provider'));
+        self::assertSame($provider, $worker->getProvider());
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
         self::assertSame('worker-0', $worker->getName());
     }

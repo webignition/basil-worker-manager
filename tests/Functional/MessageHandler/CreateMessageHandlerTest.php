@@ -39,7 +39,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
 
     public function testInvokeUnknownWorker(): void
     {
-        $request = new CreateMachineRequest(0);
+        $request = new CreateMachineRequest('');
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
@@ -54,7 +54,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new CreateMachineRequest((int) $worker->getId());
+        $request = new CreateMachineRequest($worker->getId());
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())

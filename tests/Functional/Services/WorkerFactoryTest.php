@@ -7,7 +7,6 @@ namespace App\Tests\Functional\Services;
 use App\Model\ProviderInterface;
 use App\Services\WorkerFactory;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
-use webignition\ObjectReflector\ObjectReflector;
 
 class WorkerFactoryTest extends AbstractBaseFunctionalTest
 {
@@ -30,6 +29,6 @@ class WorkerFactoryTest extends AbstractBaseFunctionalTest
 
         $worker = $this->workerFactory->create($label, $provider);
 
-        self::assertIsInt(ObjectReflector::getProperty($worker, 'id'));
+        self::assertNotSame('', $worker->getId());
     }
 }

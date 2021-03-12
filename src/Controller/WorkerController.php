@@ -30,7 +30,7 @@ class WorkerController extends AbstractController
         $worker = $factory->create($request->getLabel(), ProviderInterface::NAME_DIGITALOCEAN);
 
         $messageBus->dispatch(new CreateMessage(
-            new CreateMachineRequest((int) $worker->getId())
+            new CreateMachineRequest($worker->getId())
         ));
 
         return new JsonResponse();

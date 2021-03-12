@@ -12,7 +12,7 @@ class CreateMessageTest extends TestCase
 {
     public function testCreate(): void
     {
-        $workerId = 123;
+        $workerId = '123';
         $request = new CreateMachineRequest($workerId);
 
         $message = new CreateMessage($request);

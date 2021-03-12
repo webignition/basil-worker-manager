@@ -5,12 +5,12 @@ namespace App\Model;
 class CreateMachineRequest
 {
     public function __construct(
-        private int $workerId,
+        private string $workerId,
         private int $retryCount = 0,
     ) {
     }
 
-    public function getWorkerId(): int
+    public function getWorkerId(): string
     {
         return $this->workerId;
     }

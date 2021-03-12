@@ -8,7 +8,6 @@ use App\Entity\Worker;
 use App\Model\ProviderInterface;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
-use webignition\ObjectReflector\ObjectReflector;
 
 class WorkerTest extends AbstractBaseFunctionalTest
 {
@@ -31,11 +30,11 @@ class WorkerTest extends AbstractBaseFunctionalTest
 
         $worker = Worker::create($label, $provider);
 
-        self::assertNull(ObjectReflector::getProperty($worker, 'id'));
+        self::assertSame('', $worker->getId());
 
         $this->entityManager->persist($worker);
         $this->entityManager->flush();
 
-        self::assertIsInt(ObjectReflector::getProperty($worker, 'id'));
+        self::assertNotSame('', $worker->getId());
     }
 }

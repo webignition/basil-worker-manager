@@ -7,8 +7,8 @@ namespace App\Tests\Unit\Services;
 use App\Model\ProviderInterface;
 use App\Services\CreateFailureRetryDecider;
 use App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider;
+use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
-use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
 
 class CreateFailureRetryDeciderTest extends TestCase
@@ -44,7 +44,7 @@ class CreateFailureRetryDeciderTest extends TestCase
                     new DigitalOceanCreateFailureRetryDecider(),
                 ]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'exception' => new ValidationFailedException(),
+                'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'has decider, true' => [

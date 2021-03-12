@@ -7,8 +7,8 @@ namespace App\Tests\Functional\Services;
 use App\Model\ProviderInterface;
 use App\Services\CreateFailureRetryDecider;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
+use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
-use DigitalOceanV2\Exception\ValidationFailedException;
 
 class CreateFailureRetryDeciderTest extends AbstractBaseFunctionalTest
 {
@@ -40,9 +40,9 @@ class CreateFailureRetryDeciderTest extends AbstractBaseFunctionalTest
     public function decideDataProvider(): array
     {
         return [
-            'digitalocean ' . ValidationFailedException::class => [
+            'digitalocean ' . ApiLimitExceededException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'exception' => new ValidationFailedException(),
+                'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'digitalocean ' . InvalidArgumentException::class => [

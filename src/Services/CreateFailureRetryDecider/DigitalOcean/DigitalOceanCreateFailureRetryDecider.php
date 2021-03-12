@@ -5,7 +5,7 @@ namespace App\Services\CreateFailureRetryDecider\DigitalOcean;
 use App\Model\ProviderInterface;
 use App\Services\CreateFailureRetryDecider\CreateFailureRetryDeciderInterface;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
-use DigitalOceanV2\Exception\ValidationFailedException;
+use DigitalOceanV2\Exception\RuntimeException;
 
 class DigitalOceanCreateFailureRetryDecider implements CreateFailureRetryDeciderInterface
 {
@@ -23,8 +23,10 @@ class DigitalOceanCreateFailureRetryDecider implements CreateFailureRetryDecider
             return false;
         }
 
-        if ($exception instanceof ValidationFailedException) {
-            return false;
+        if ($exception instanceof RuntimeException) {
+            if (401 === $exception->getCode()) {
+                return false;
+            }
         }
 
         return true;

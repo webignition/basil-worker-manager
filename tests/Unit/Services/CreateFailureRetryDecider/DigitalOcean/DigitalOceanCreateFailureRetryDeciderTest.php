@@ -51,11 +51,15 @@ class DigitalOceanCreateFailureRetryDeciderTest extends TestCase
             ],
             ValidationFailedException::class => [
                 'exception' => new ValidationFailedException(),
-                'expectedDecision' => false,
+                'expectedDecision' => true,
             ],
-            RuntimeException::class => [
+            RuntimeException::class . ' non-401' => [
                 'exception' => new RuntimeException(),
                 'expectedDecision' => true,
+            ],
+            RuntimeException::class . ' 401' => [
+                'exception' => new RuntimeException('message', 401),
+                'expectedDecision' => false,
             ],
             DiscoveryFailedException::class => [
                 'exception' => new DiscoveryFailedException(),

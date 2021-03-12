@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
  */
 class Worker
 {
-    private const NAME = 'worker-%d';
+    private const NAME = 'worker-%s';
 
     public const STATE_CREATE_RECEIVED = 'create/received';
     public const STATE_CREATE_PROCESSING = 'create/processing';
@@ -102,7 +102,7 @@ class Worker
 
     public function getName(): string
     {
-        return sprintf(self::NAME, (int) $this->getId());
+        return sprintf(self::NAME, $this->getId());
     }
 
     public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): self

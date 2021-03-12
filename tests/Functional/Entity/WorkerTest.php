@@ -35,6 +35,6 @@ class WorkerTest extends AbstractBaseFunctionalTest
         $this->entityManager->persist($worker);
         $this->entityManager->flush();
 
-        self::assertNotSame('', $worker->getId());
+        self::assertNotNull($worker->getId());
     }
 }

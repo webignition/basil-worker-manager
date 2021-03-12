@@ -11,7 +11,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 /**
  * @ORM\Entity(repositoryClass=WorkerRepository::class)
  */
-class Worker
+class Worker implements \Stringable
 {
     private const NAME = 'worker-%s';
 
@@ -119,5 +119,10 @@ class Worker
         $this->state = $state;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->id;
     }
 }

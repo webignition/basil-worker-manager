@@ -13,7 +13,7 @@ class CreateException extends \Exception
         private \Throwable $remoteApiException
     ) {
         parent::__construct(
-            sprintf(self::MESSAGE, $worker->getId(), $worker->getLabel()),
+            sprintf(self::MESSAGE, (string) $worker, $worker->getLabel()),
             0,
             $remoteApiException
         );

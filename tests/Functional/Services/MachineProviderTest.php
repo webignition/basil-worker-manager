@@ -9,7 +9,7 @@ use App\Services\MachineProvider;
 use App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
 use App\Services\WorkerFactory;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MachineProvider\DigitalOcean\MockDropletFactory;
 use App\Tests\Services\DigitalOcean\Entity\DropletEntityFactory;
 use webignition\ObjectReflector\ObjectReflector;

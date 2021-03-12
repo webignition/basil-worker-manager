@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Entity;
 
 use App\Entity\Worker;
 use App\Model\ProviderInterface;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
 
 class WorkerTest extends AbstractBaseFunctionalTest

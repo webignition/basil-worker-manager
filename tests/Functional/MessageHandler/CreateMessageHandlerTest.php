@@ -10,7 +10,7 @@ use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
 use App\Services\CreateMachineHandler;
 use App\Services\WorkerFactory;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\MessageHandler\MockCreateMachineHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\ObjectReflector\ObjectReflector;

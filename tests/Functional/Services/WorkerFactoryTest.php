@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\ProviderInterface;
 use App\Services\WorkerFactory;
-use App\Tests\Functional\AbstractBaseFunctionalTest;
+use App\Tests\AbstractBaseFunctionalTest;
 
 class WorkerFactoryTest extends AbstractBaseFunctionalTest
 {

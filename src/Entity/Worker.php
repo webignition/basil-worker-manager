@@ -31,10 +31,8 @@ class Worker
      * @ORM\Column(type="ulid", unique=true)
      * @ORM\GeneratedValue(strategy="CUSTOM")
      * @ORM\CustomIdGenerator(class=UlidGenerator::class)
-     *
-     * @var string
      */
-    private string $id = '';
+    private ?string $id = null;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -82,7 +80,7 @@ class Worker
         return $worker;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }

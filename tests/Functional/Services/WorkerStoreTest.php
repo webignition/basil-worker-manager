@@ -29,6 +29,6 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
         self::assertNull($worker->getId());
 
         $worker = $this->workerStore->store($worker);
-        self::assertNotSame('', $worker->getId());
+        self::assertNotNull($worker->getId());
     }
 }

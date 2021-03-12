@@ -57,12 +57,12 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $worker = current($workers);
         self::assertInstanceOf(Worker::class, $worker);
-        self::assertNotSame('', $worker->getId());
+        self::assertNotNull($worker->getId());
         self::assertSame($label, ObjectReflector::getProperty($worker, 'label'));
 
         $this->messengerAsserter->assertQueueCount(1);
 
-        $expectedRequest = new CreateMachineRequest((string) $worker->getId());
+        $expectedRequest = new CreateMachineRequest((string) $worker);
         $expectedMessage = new CreateMessage($expectedRequest);
         self::assertGreaterThan(0, $expectedRequest->getWorkerId());
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);

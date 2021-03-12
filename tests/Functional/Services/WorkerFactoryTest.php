@@ -29,6 +29,6 @@ class WorkerFactoryTest extends AbstractBaseFunctionalTest
 
         $worker = $this->workerFactory->create($label, $provider);
 
-        self::assertNotSame('', $worker->getId());
+        self::assertNotNull($worker->getId());
     }
 }

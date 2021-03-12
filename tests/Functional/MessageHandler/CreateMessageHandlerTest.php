@@ -54,7 +54,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new CreateMachineRequest($worker->getId());
+        $request = new CreateMachineRequest((string) $worker->getId());
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())

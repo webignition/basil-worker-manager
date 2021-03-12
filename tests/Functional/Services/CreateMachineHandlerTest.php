@@ -54,7 +54,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testCreateSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new CreateMachineRequest($worker->getId());
+        $request = new CreateMachineRequest((string) $worker->getId());
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCall($worker)
@@ -77,7 +77,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new CreateMachineRequest($worker->getId());
+        $request = new CreateMachineRequest((string) $worker->getId());
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($worker, $exception)
@@ -105,7 +105,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     ): void {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new CreateMachineRequest($worker->getId());
+        $request = new CreateMachineRequest((string) $worker->getId());
         ObjectReflector::setProperty(
             $request,
             CreateMachineRequest::class,
@@ -128,7 +128,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->factory->create($worker, $request);
 
         $expectedRequest = new CreateMachineRequest(
-            $worker->getId(),
+            (string) $worker->getId(),
             $request->getRetryCount() + 1
         );
 
@@ -170,7 +170,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     ): void {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new CreateMachineRequest($worker->getId());
+        $request = new CreateMachineRequest((string) $worker->getId());
         ObjectReflector::setProperty(
             $request,
             CreateMachineRequest::class,

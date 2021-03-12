@@ -30,7 +30,7 @@ class WorkerTest extends AbstractBaseFunctionalTest
 
         $worker = Worker::create($label, $provider);
 
-        self::assertSame('', $worker->getId());
+        self::assertNull($worker->getId());
 
         $this->entityManager->persist($worker);
         $this->entityManager->flush();

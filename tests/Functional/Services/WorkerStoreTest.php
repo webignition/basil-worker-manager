@@ -26,7 +26,7 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
     public function testStore(): void
     {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        self::assertSame('', $worker->getId());
+        self::assertNull($worker->getId());
 
         $worker = $this->workerStore->store($worker);
         self::assertNotSame('', $worker->getId());

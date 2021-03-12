@@ -20,7 +20,7 @@ class WorkerTest extends TestCase
         $worker = Worker::create($label, $provider);
 
         self::assertNull($worker->getId());
-        self::assertNull(ObjectReflector::getProperty($worker, 'remote_id'));
+        self::assertNull($worker->getRemoteId());
         self::assertSame($label, $worker->getLabel());
         self::assertSame(Worker::STATE_CREATE_RECEIVED, ObjectReflector::getProperty($worker, 'state'));
         self::assertSame($provider, $worker->getProvider());
@@ -32,7 +32,7 @@ class WorkerTest extends TestCase
     {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        self::assertNull(ObjectReflector::getProperty($worker, 'remote_id'));
+        self::assertNull($worker->getRemoteId());
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
 
         $remoteId = 123;
@@ -45,7 +45,7 @@ class WorkerTest extends TestCase
 
         $worker = $worker->updateFromRemoteMachine($remoteMachine);
 
-        self::assertSame($remoteId, ObjectReflector::getProperty($worker, 'remote_id'));
+        self::assertSame($remoteId, $worker->getRemoteId());
         self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
     }
 }

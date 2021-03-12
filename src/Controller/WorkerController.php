@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Worker;
 use App\Message\CreateMessage;
 use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
+use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
 use App\Response\BadWorkerCreateRequestResponse;
 use App\Services\WorkerFactory;
@@ -21,13 +23,19 @@ class WorkerController extends AbstractController
     public function index(
         WorkerCreateRequest $request,
         WorkerFactory $factory,
-        MessageBusInterface $messageBus
+        MessageBusInterface $messageBus,
+        WorkerRepository $workerRepository
     ): JsonResponse {
-        if ('' === $request->getLabel()) {
+        $label = $request->getLabel();
+        if ('' === $label) {
             return BadWorkerCreateRequestResponse::createLabelMissingResponse();
         }
 
-        $worker = $factory->create($request->getLabel(), ProviderInterface::NAME_DIGITALOCEAN);
+        if ($workerRepository->findOneByLabel($label) instanceof Worker) {
+            return BadWorkerCreateRequestResponse::createLabelTakenResponse();
+        }
+
+        $worker = $factory->create($label, ProviderInterface::NAME_DIGITALOCEAN);
 
         $messageBus->dispatch(new CreateMessage(
             new CreateMachineRequest((string) $worker)

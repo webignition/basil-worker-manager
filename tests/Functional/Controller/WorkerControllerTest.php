@@ -8,8 +8,10 @@ use App\Controller\WorkerController;
 use App\Entity\Worker;
 use App\Message\CreateMessage;
 use App\Model\CreateMachineRequest;
+use App\Model\ProviderInterface;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
+use App\Services\WorkerFactory;
 use App\Tests\Functional\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use webignition\ObjectReflector\ObjectReflector;
@@ -69,12 +71,12 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider createBadRequestDataProvider
+     * @dataProvider createLabelMissingDataProvider
      *
      * @param array[] $requestData
      * @param array[] $expectedResponseBody
      */
-    public function testCreateBadRequest(array $requestData, array $expectedResponseBody): void
+    public function testCreateLabelMissing(array $requestData, array $expectedResponseBody): void
     {
         $this->client->request('POST', WorkerController::PATH_CREATE, $requestData);
 
@@ -87,7 +89,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function createBadRequestDataProvider(): array
+    public function createLabelMissingDataProvider(): array
     {
         $labelMissingExpectedResponseBody = [
             'type' => 'worker-create-request',
@@ -107,5 +109,31 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
                 'expectedResponseBody' => $labelMissingExpectedResponseBody,
             ],
         ];
+    }
+
+    public function testCreateLabelTaken(): void
+    {
+        $label = md5('label content');
+        $workerFactory = self::$container->get(WorkerFactory::class);
+        if  ($workerFactory instanceof WorkerFactory) {
+            $workerFactory->create($label, ProviderInterface::NAME_DIGITALOCEAN);
+        }
+
+        $requestData = [
+            WorkerCreateRequest::KEY_LABEL => $label,
+        ];
+
+        $this->client->request('POST', WorkerController::PATH_CREATE, $requestData);
+
+        $response = $this->client->getResponse();
+
+        $expectedResponseBody = [
+            'type' => 'worker-create-request',
+            'message' => 'label taken',
+            'code' => 200,
+        ];
+
+        self::assertSame(400, $response->getStatusCode());
+        self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));
     }
 }

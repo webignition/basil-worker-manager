@@ -19,7 +19,7 @@ class DropletFactory
     public function __construct(
         Client $client,
         private DropletConfiguration $dropletConfiguration,
-        private string $environment
+        private string $prefix
     ) {
         $this->dropletApi = $client->droplet();
     }
@@ -31,7 +31,7 @@ class DropletFactory
     {
         try {
             $droplet = $this->dropletApi->create(
-                sprintf(self::REMOTE_NAME, $this->environment, $worker->getName()),
+                sprintf(self::REMOTE_NAME, $this->prefix, $worker->getName()),
                 ...$this->dropletConfiguration->asArray()
             );
         } catch (ExceptionInterface $exception) {

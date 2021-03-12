@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     digitalocean_access_token: '%env(DIGITALOCEAN_ACCESS_TOKEN)%'
+    digitalocean_droplet_name_prefix: '%env(DIGITALOCEAN_NAME_PREFIX)%'
     digitalocean_droplet_region: '%env(DIGITALOCEAN_REGION)%'
     digitalocean_droplet_size: '%env(DIGITALOCEAN_SIZE)%'
     digitalocean_droplet_image: '%env(DIGITALOCEAN_IMAGE)%'
@@ -50,7 +51,7 @@ services:
     App\Services\MachineProvider\DigitalOcean\DropletFactory:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
-            $environment: '%env(APP_ENV)%'
+            $prefix: '%digitalocean_droplet_name_prefix%'
 
     App\Services\MachineProvider:
         arguments:

@@ -22,7 +22,7 @@ services:
     App\Services\MachineProvider\DigitalOcean\DropletFactory:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
-            $environment: '%env(APP_ENV)%'
+            $prefix: '%digitalocean_droplet_name_prefix%'
 
     App\Services\MachineProvider:
         public: true

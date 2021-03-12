@@ -52,11 +52,11 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             $dropletFactory
         );
 
-        self::assertNull(ObjectReflector::getProperty($this->worker, 'remote_id'));
+        self::assertNull($this->worker->getRemoteId());
 
         $this->machineProvider->create($this->worker);
 
-        self::assertSame($remoteId, ObjectReflector::getProperty($this->worker, 'remote_id'));
+        self::assertSame($remoteId, $this->worker->getRemoteId());
         self::assertSame(
             ['127.0.0.1', '10.0.0.1', ],
             ObjectReflector::getProperty($this->worker, 'ip_addresses')

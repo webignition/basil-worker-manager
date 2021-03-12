@@ -85,6 +85,11 @@ class Worker implements \Stringable
         return $this->id;
     }
 
+    public function getRemoteId(): ?int
+    {
+        return $this->remote_id;
+    }
+
     public function getLabel(): string
     {
         return $this->label;

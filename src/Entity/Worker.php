@@ -11,7 +11,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 /**
  * @ORM\Entity(repositoryClass=WorkerRepository::class)
  */
-class Worker implements \Stringable
+class Worker implements \Stringable, \JsonSerializable
 {
     private const NAME = 'worker-%s';
 
@@ -129,5 +129,17 @@ class Worker implements \Stringable
     public function __toString(): string
     {
         return (string) $this->id;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'label' => $this->label,
+            'state' => $this->state,
+            'ip_addresses' => $this->ip_addresses,
+        ];
     }
 }

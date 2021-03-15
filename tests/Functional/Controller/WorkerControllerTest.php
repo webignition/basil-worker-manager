@@ -122,6 +122,43 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         );
     }
 
+    public function testStatusWorkerNotFound(): void
+    {
+        $label = md5('label content');
+
+        $request = $this->client->request(
+            'GET',
+            str_replace(WorkerController::PATH_COMPONENT_LABEL, $label, WorkerController::PATH_STATUS)
+        );
+
+        self::assertSame(404, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testStatus(): void
+    {
+        $label = md5('label content');
+        $createResponse = $this->makeCreateRequest($label);
+
+        self::assertSame(202, $createResponse->getStatusCode());
+
+        $this->client->request(
+            'GET',
+            str_replace(WorkerController::PATH_COMPONENT_LABEL, $label, WorkerController::PATH_STATUS)
+        );
+
+        $response = $this->client->getResponse();
+
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode([
+                'label' => $label,
+                'state' => Worker::STATE_CREATE_RECEIVED,
+                'ip_addresses' => [],
+            ]),
+            (string) $response->getContent()
+        );
+    }
+
     /**
      * @param array<mixed> $expectedResponseBody
      */

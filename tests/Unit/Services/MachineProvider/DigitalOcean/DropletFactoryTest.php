@@ -9,7 +9,6 @@ use App\Exception\MachineProvider\CreateException;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
-use App\Tests\Mock\DigitalOcean\MockClient;
 use App\Tests\Mock\DigitalOcean\MockDropletApi;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -73,10 +72,6 @@ class DropletFactoryTest extends TestCase
 
     private function createFactory(DropletApi $dropletApi): DropletFactory
     {
-        $client = (new MockClient())
-            ->withDropletCall($dropletApi)
-            ->getMock();
-
-        return new DropletFactory($client, $this->dropletConfiguration, 'test');
+        return new DropletFactory($dropletApi, $this->dropletConfiguration, 'test');
     }
 }

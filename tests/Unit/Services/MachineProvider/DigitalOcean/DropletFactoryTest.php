@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
+use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
@@ -27,7 +28,15 @@ class DropletFactoryTest extends TestCase
         $this->worker = Worker::create('label', ProviderInterface::NAME_DIGITALOCEAN);
         ObjectReflector::setProperty($this->worker, Worker::class, 'id', $workerId);
 
-        $this->dropletConfiguration = new DropletConfiguration('region', 'size', 'image');
+        $this->dropletConfiguration = new DropletConfiguration(
+            'region',
+            'size',
+            'image',
+            [
+                'tag1',
+                'tag2',
+            ]
+        );
     }
 
     public function testCreateThrowsCreateException(): void
@@ -37,7 +46,12 @@ class DropletFactoryTest extends TestCase
         $dropletApi = \Mockery::mock(DropletApi::class);
         $dropletApi
             ->shouldReceive('create')
-            ->with('test-' . $this->worker->getName(), ...$this->dropletConfiguration->asArray())
+            ->with(
+                ...(new DropletApiCreateCallArguments(
+                    'test-' . $this->worker->getName(),
+                    $this->dropletConfiguration,
+                ))->asArray(),
+            )
             ->andThrow($dropletApiException);
 
         $factory = $this->createFactory($dropletApi);

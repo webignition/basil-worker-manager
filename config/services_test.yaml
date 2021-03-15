@@ -18,6 +18,8 @@ services:
             $region: '%digitalocean_droplet_region%'
             $size: '%digitalocean_droplet_size%'
             $image: '%digitalocean_droplet_image%'
+            $tags:
+                - '%digitalocean_droplet_tag%'
 
     App\Services\MachineProvider\DigitalOcean\DropletFactory:
         arguments:

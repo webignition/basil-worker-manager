@@ -4,6 +4,7 @@ namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
+use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -25,11 +26,13 @@ class DropletFactory
      */
     public function create(Worker $worker): DropletEntity
     {
+        $createArguments = new DropletApiCreateCallArguments(
+            sprintf(self::REMOTE_NAME, $this->prefix, $worker->getName()),
+            $this->dropletConfiguration
+        );
+
         try {
-            $droplet = $this->dropletApi->create(
-                sprintf(self::REMOTE_NAME, $this->prefix, $worker->getName()),
-                ...$this->dropletConfiguration->asArray()
-            );
+            $droplet = $this->dropletApi->create(...$createArguments->asArray());
         } catch (ExceptionInterface $exception) {
             throw new CreateException($worker, $exception);
         }

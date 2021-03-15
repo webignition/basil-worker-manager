@@ -48,4 +48,19 @@ class WorkerTest extends TestCase
         self::assertSame($remoteId, $worker->getRemoteId());
         self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
     }
+
+    public function testJsonSerialize(): void
+    {
+        $label = md5('label content');
+        $worker = Worker::create($label, ProviderInterface::NAME_DIGITALOCEAN);
+
+        self::assertSame(
+            [
+                'label' => $label,
+                'state' => Worker::STATE_CREATE_RECEIVED,
+                'ip_addresses' => [],
+            ],
+            $worker->jsonSerialize()
+        );
+    }
 }

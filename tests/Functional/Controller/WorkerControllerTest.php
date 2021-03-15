@@ -43,16 +43,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $label = md5('label content');
-
-        $this->client->request(
-            'POST',
-            WorkerController::PATH_CREATE,
-            [
-                WorkerCreateRequest::KEY_LABEL => $label,
-            ]
-        );
-
-        $response = $this->client->getResponse();
+        $response = $this->makeCreateRequest($label);
 
         self::assertSame(202, $response->getStatusCode());
         self::assertInstanceOf(Response::class, $response);
@@ -83,7 +74,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     {
         $this->client->request('POST', WorkerController::PATH_CREATE, $requestData);
 
-        $this->assertBadRequestResponse($expectedResponseBody);
+        $this->assertBadRequestResponse($expectedResponseBody, $this->client->getResponse());
     }
 
     /**
@@ -119,6 +110,67 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
             $workerFactory->create($label, ProviderInterface::NAME_DIGITALOCEAN);
         }
 
+        $response = $this->makeCreateRequest($label);
+
+        $this->assertBadRequestResponse(
+            [
+                'type' => 'worker-create-request',
+                'message' => 'label taken',
+                'code' => 200,
+            ],
+            $response
+        );
+    }
+
+    public function testStatusWorkerNotFound(): void
+    {
+        $label = md5('label content');
+
+        $request = $this->client->request(
+            'GET',
+            str_replace(WorkerController::PATH_COMPONENT_LABEL, $label, WorkerController::PATH_STATUS)
+        );
+
+        self::assertSame(404, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testStatus(): void
+    {
+        $label = md5('label content');
+        $createResponse = $this->makeCreateRequest($label);
+
+        self::assertSame(202, $createResponse->getStatusCode());
+
+        $this->client->request(
+            'GET',
+            str_replace(WorkerController::PATH_COMPONENT_LABEL, $label, WorkerController::PATH_STATUS)
+        );
+
+        $response = $this->client->getResponse();
+
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode([
+                'label' => $label,
+                'state' => Worker::STATE_CREATE_RECEIVED,
+                'ip_addresses' => [],
+            ]),
+            (string) $response->getContent()
+        );
+    }
+
+    /**
+     * @param array<mixed> $expectedResponseBody
+     */
+    private function assertBadRequestResponse(array $expectedResponseBody, Response $response): void
+    {
+        self::assertSame(400, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));
+    }
+
+    private function makeCreateRequest(string $label): Response
+    {
         $this->client->request(
             'POST',
             WorkerController::PATH_CREATE,
@@ -127,22 +179,6 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
             ]
         );
 
-        $this->assertBadRequestResponse([
-            'type' => 'worker-create-request',
-            'message' => 'label taken',
-            'code' => 200,
-        ]);
-    }
-
-    /**
-     * @param array<mixed> $expectedResponseBody
-     */
-    private function assertBadRequestResponse(array $expectedResponseBody): void
-    {
-        $response = $this->client->getResponse();
-
-        self::assertSame(400, $response->getStatusCode());
-        self::assertInstanceOf(JsonResponse::class, $response);
-        self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));
+        return $this->client->getResponse();
     }
 }

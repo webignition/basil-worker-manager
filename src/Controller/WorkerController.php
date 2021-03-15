@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class WorkerController extends AbstractController
 {
     public const PATH_CREATE = '/create';
+    public const PATH_STATUS = '/{label}status';
 
     #[Route(self::PATH_CREATE, name: 'create')]
     public function index(
@@ -42,5 +43,12 @@ class WorkerController extends AbstractController
         ));
 
         return new Response('', 202);
+    }
+
+    #[Route(self::PATH_STATUS, name: 'status')]
+    public function status(
+        string $label,
+    ): Response {
+        return new Response();
     }
 }

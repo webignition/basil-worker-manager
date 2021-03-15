@@ -11,7 +11,7 @@ use App\Request\WorkerCreateRequest;
 use App\Response\BadWorkerCreateRequestResponse;
 use App\Services\WorkerFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -25,7 +25,7 @@ class WorkerController extends AbstractController
         WorkerFactory $factory,
         MessageBusInterface $messageBus,
         WorkerRepository $workerRepository
-    ): JsonResponse {
+    ): Response {
         $label = $request->getLabel();
         if ('' === $label) {
             return BadWorkerCreateRequestResponse::createLabelMissingResponse();
@@ -41,6 +41,6 @@ class WorkerController extends AbstractController
             new CreateMachineRequest((string) $worker)
         ));
 
-        return new JsonResponse();
+        return new Response('', 202);
     }
 }

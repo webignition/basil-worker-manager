@@ -6,7 +6,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\CreateException;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
-use DigitalOceanV2\Api\Droplet as DropletApi;
+use DigitalOceanV2\Client;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface;
 
@@ -15,7 +15,7 @@ class DropletFactory
     private const REMOTE_NAME = '%s-%s';
 
     public function __construct(
-        private DropletApi $dropletApi,
+        private Client $client,
         private DropletConfiguration $dropletConfiguration,
         private CreateExceptionFactory $createExceptionFactory,
         private string $prefix
@@ -32,8 +32,10 @@ class DropletFactory
             $this->dropletConfiguration
         );
 
+        $dropletApi = $this->client->droplet();
+
         try {
-            $droplet = $this->dropletApi->create(...$createArguments->asArray());
+            $droplet = $dropletApi->create(...$createArguments->asArray());
         } catch (ExceptionInterface $exception) {
             throw $this->createExceptionFactory->create($worker, $exception);
         }

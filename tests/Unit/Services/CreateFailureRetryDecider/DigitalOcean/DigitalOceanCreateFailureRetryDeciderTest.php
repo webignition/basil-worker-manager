@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services\CreateFailureRetryDecider\DigitalOcean;
 
+use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Model\ProviderInterface;
 use App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -49,15 +50,9 @@ class DigitalOceanCreateFailureRetryDeciderTest extends TestCase
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
-            ValidationFailedException::class . ' generic' => [
+            ValidationFailedException::class => [
                 'exception' => new ValidationFailedException(),
                 'expectedDecision' => true,
-            ],
-            ValidationFailedException::class . ' will exceed droplet limit' => [
-                'exception' => new ValidationFailedException(
-                    'creating this/these droplet(s) will exceed your droplet limit'
-                ),
-                'expectedDecision' => false,
             ],
             RuntimeException::class . ' non-401' => [
                 'exception' => new RuntimeException(),
@@ -82,6 +77,15 @@ class DigitalOceanCreateFailureRetryDeciderTest extends TestCase
             InvalidArgumentException::class => [
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
+            ],
+            DropletLimitExceededException::class => [
+                'exception' => new DropletLimitExceededException(
+                    new ValidationFailedException(
+                        'creating this/these droplet(s) will exceed your droplet limit',
+                        422
+                    )
+                ),
+                'expectedDecision' => false,
             ],
         ];
     }

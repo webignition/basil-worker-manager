@@ -2,11 +2,11 @@
 
 namespace App\Exception\MachineProvider\DigitalOcean;
 
-use App\Exception\MachineProvider\RemoteApiExceptionWrapperInterface;
+use App\Exception\MachineProvider\AbstractRemoteApiWrappingException;
 use DigitalOceanV2\Exception\ExceptionInterface;
 use DigitalOceanV2\Exception\ValidationFailedException;
 
-class DropletLimitExceededException extends \Exception implements RemoteApiExceptionWrapperInterface
+class DropletLimitExceededException extends AbstractRemoteApiWrappingException
 {
     public const MESSAGE_IDENTIFIER = 'exceed your droplet limit';
     private const MESSAGE = 'Droplet limit will be exceeded';
@@ -23,10 +23,5 @@ class DropletLimitExceededException extends \Exception implements RemoteApiExcep
         }
 
         return str_contains($exception->getMessage(), self::MESSAGE_IDENTIFIER);
-    }
-
-    public function getRemoteApiException(): \Throwable
-    {
-        return $this->remoteApiException;
     }
 }

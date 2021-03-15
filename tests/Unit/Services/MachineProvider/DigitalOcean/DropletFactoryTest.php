@@ -12,6 +12,7 @@ use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\CreateExceptionFactory;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
 use DigitalOceanV2\Api\Droplet as DropletApi;
+use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -55,7 +56,12 @@ class DropletFactoryTest extends TestCase
             )
             ->andThrow($dropletApiException);
 
-        $factory = $this->createFactory($dropletApi);
+        $client = \Mockery::mock(Client::class);
+        $client
+            ->shouldReceive('droplet')
+            ->andReturn($dropletApi);
+
+        $factory = $this->createFactory($client);
 
         $expectedException = new CreateException($this->worker, $dropletApiException);
 
@@ -64,12 +70,12 @@ class DropletFactoryTest extends TestCase
         $factory->create($this->worker);
     }
 
-    private function createFactory(DropletApi $dropletApi): DropletFactory
+    private function createFactory(Client $client): DropletFactory
     {
         return new DropletFactory(
-            $dropletApi,
+            $client,
             $this->dropletConfiguration,
-            new CreateExceptionFactory(),
+            new CreateExceptionFactory($client),
             'test'
         );
     }

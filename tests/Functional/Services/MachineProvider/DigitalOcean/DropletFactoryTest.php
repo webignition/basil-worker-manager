@@ -8,9 +8,9 @@ use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
+use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\Psr7\Response;
 
 class DropletFactoryTest extends AbstractBaseFunctionalTest
 {
@@ -40,29 +40,17 @@ class DropletFactoryTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
+        $remoteId = 123;
         $dropletData = [
-            'droplet' => [
-                'id' => 456,
-            ],
+            'id' => $remoteId,
         ];
 
         $expectedDropletEntity = new DropletEntity($dropletData);
-
-        $this->mockHandler->append(
-            new Response(
-                200,
-                [
-                    'content-type' => 'application/json',
-                ],
-                (string) json_encode([
-                    'droplet' => $expectedDropletEntity->toArray(),
-                ])
-            ),
-        );
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
         $createDropletEntity = $this->dropletFactory->create($worker);
 
-        self::assertSame($expectedDropletEntity->id, $createDropletEntity->id);
+        self::assertSame($remoteId, $createDropletEntity->id);
     }
 }

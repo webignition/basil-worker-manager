@@ -6,18 +6,18 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider;
-use App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider;
-use App\Services\MachineProvider\DigitalOcean\DropletFactory;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
-use App\Tests\Mock\Services\MachineProvider\DigitalOcean\MockDropletFactory;
-use App\Tests\Services\DigitalOcean\Entity\DropletEntityFactory;
+use App\Tests\Services\HttpResponseFactory;
+use DigitalOceanV2\Entity\Droplet as DropletEntity;
+use GuzzleHttp\Handler\MockHandler;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineProviderTest extends AbstractBaseFunctionalTest
 {
     private MachineProvider $machineProvider;
     private WorkerFactory $workerFactory;
+    private MockHandler $mockHandler;
 
     protected function setUp(): void
     {
@@ -32,6 +32,11 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         if ($workerFactory instanceof WorkerFactory) {
             $this->workerFactory = $workerFactory;
         }
+
+        $mockHandler = self::$container->get(MockHandler::class);
+        if ($mockHandler instanceof MockHandler) {
+            $this->mockHandler = $mockHandler;
+        }
     }
 
     public function testCreateSuccess(): void
@@ -41,14 +46,24 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         $remoteId = 123;
         $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
 
-        $dropletFactory = (new MockDropletFactory())
-            ->withCreateCall(
-                $worker,
-                DropletEntityFactory::create($remoteId, $ipAddresses)
-            )
-            ->getMock();
+        $dropletData = [
+            'id' => $remoteId,
+            'networks' => (object) [
+                'v4' => [
+                    (object) [
+                        'ip_address' => $ipAddresses[0],
+                        'type' => 'public',
+                    ],
+                    (object) [
+                        'ip_address' => $ipAddresses[1],
+                        'type' => 'public',
+                    ],
+                ],
+            ],
+        ];
 
-        $this->setDropletFactoryOnDigitalOceanMachineProvider($dropletFactory);
+        $expectedDropletEntity = new DropletEntity($dropletData);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
         self::assertNull($worker->getRemoteId());
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
@@ -57,18 +72,5 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
         self::assertSame($remoteId, $worker->getRemoteId());
         self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
-    }
-
-    private function setDropletFactoryOnDigitalOceanMachineProvider(DropletFactory $dropletFactory): void
-    {
-        $digitalOceanMachineProvider = self::$container->get(DigitalOceanMachineProvider::class);
-        if ($digitalOceanMachineProvider instanceof DigitalOceanMachineProvider) {
-            ObjectReflector::setProperty(
-                $digitalOceanMachineProvider,
-                DigitalOceanMachineProvider::class,
-                'dropletFactory',
-                $dropletFactory
-            );
-        }
     }
 }

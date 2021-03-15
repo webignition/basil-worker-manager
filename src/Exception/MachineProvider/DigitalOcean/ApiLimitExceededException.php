@@ -2,20 +2,15 @@
 
 namespace App\Exception\MachineProvider\DigitalOcean;
 
-use App\Exception\MachineProvider\RemoteApiExceptionWrapperInterface;
+use App\Exception\MachineProvider\AbstractRemoteApiWrappingException;
 
-class ApiLimitExceededException extends \Exception implements RemoteApiExceptionWrapperInterface
+class ApiLimitExceededException extends AbstractRemoteApiWrappingException
 {
     public function __construct(
         private int $resetTimestamp,
         private \Throwable $remoteApiException
     ) {
         parent::__construct($this->remoteApiException->getMessage(), 0, $remoteApiException);
-    }
-
-    public function getRemoteApiException(): \Throwable
-    {
-        return $this->remoteApiException;
     }
 
     public function getResetTimestamp(): int

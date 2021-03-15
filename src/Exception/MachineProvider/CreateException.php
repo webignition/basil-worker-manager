@@ -4,7 +4,7 @@ namespace App\Exception\MachineProvider;
 
 use App\Entity\Worker;
 
-class CreateException extends \Exception implements RemoteApiExceptionWrapperInterface
+class CreateException extends AbstractRemoteApiWrappingException implements RemoteApiExceptionWrapperInterface
 {
     private const MESSAGE = 'Unable to create remote machine for worker %s %s';
 
@@ -22,15 +22,5 @@ class CreateException extends \Exception implements RemoteApiExceptionWrapperInt
     public function getWorker(): Worker
     {
         return $this->worker;
-    }
-
-    public function getRemoteApiException(): \Throwable
-    {
-        $remoteApiException = $this->remoteApiException;
-        while ($remoteApiException instanceof RemoteApiExceptionWrapperInterface) {
-            $remoteApiException = $remoteApiException->getRemoteApiException();
-        }
-
-        return $remoteApiException;
     }
 }

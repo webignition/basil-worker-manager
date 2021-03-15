@@ -20,7 +20,7 @@ class WorkerController extends AbstractController
     public const PATH_CREATE = '/create';
 
     #[Route(self::PATH_CREATE, name: 'create')]
-    public function index(
+    public function create(
         WorkerCreateRequest $request,
         WorkerFactory $factory,
         MessageBusInterface $messageBus,

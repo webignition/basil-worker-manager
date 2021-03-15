@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
 
+use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
+use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
+use App\Tests\Services\HttpResponseFactory;
+use DigitalOceanV2\Entity\Droplet as DropletEntity;
+use GuzzleHttp\Handler\MockHandler;
 
 class DropletFactoryTest extends AbstractBaseFunctionalTest
 {
     private DropletFactory $dropletFactory;
+    private WorkerFactory $workerFactory;
+    private MockHandler $mockHandler;
 
     protected function setUp(): void
     {
@@ -19,10 +26,31 @@ class DropletFactoryTest extends AbstractBaseFunctionalTest
         if ($dropletFactory instanceof DropletFactory) {
             $this->dropletFactory = $dropletFactory;
         }
+
+        $workerFactory = self::$container->get(WorkerFactory::class);
+        if ($workerFactory instanceof WorkerFactory) {
+            $this->workerFactory = $workerFactory;
+        }
+
+        $mockHandler = self::$container->get(MockHandler::class);
+        if ($mockHandler instanceof MockHandler) {
+            $this->mockHandler = $mockHandler;
+        }
     }
 
-    public function testVerifyServiceExistsInContainer(): void
+    public function testCreateSuccess(): void
     {
-        self::assertInstanceOf(DropletFactory::class, $this->dropletFactory);
+        $remoteId = 123;
+        $dropletData = [
+            'id' => $remoteId,
+        ];
+
+        $expectedDropletEntity = new DropletEntity($dropletData);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
+
+        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $createDropletEntity = $this->dropletFactory->create($worker);
+
+        self::assertSame($remoteId, $createDropletEntity->id);
     }
 }

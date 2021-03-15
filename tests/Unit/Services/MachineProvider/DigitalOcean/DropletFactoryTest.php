@@ -9,9 +9,7 @@ use App\Exception\MachineProvider\CreateException;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
-use App\Tests\Mock\DigitalOcean\MockDropletApi;
 use DigitalOceanV2\Api\Droplet as DropletApi;
-use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -32,34 +30,15 @@ class DropletFactoryTest extends TestCase
         $this->dropletConfiguration = new DropletConfiguration('region', 'size', 'image');
     }
 
-    public function testCreateSuccess(): void
-    {
-        $createdItem = new DropletEntity();
-
-        $dropletApi = (new MockDropletApi())
-            ->withCreateCall(
-                'test-' . $this->worker->getName(),
-                $this->dropletConfiguration,
-                $createdItem
-            )->getMock();
-
-        $factory = $this->createFactory($dropletApi);
-
-        $createdDropletEntity = $factory->create($this->worker);
-
-        self::assertSame($createdItem, $createdDropletEntity);
-    }
-
     public function testCreateThrowsCreateException(): void
     {
         $dropletApiException = \Mockery::mock(ValidationFailedException::class);
 
-        $dropletApi = (new MockDropletApi())
-            ->withCreateCallThrowingException(
-                'test-' . $this->worker->getName(),
-                $this->dropletConfiguration,
-                $dropletApiException
-            )->getMock();
+        $dropletApi = \Mockery::mock(DropletApi::class);
+        $dropletApi
+            ->shouldReceive('create')
+            ->with('test-' . $this->worker->getName(), ...$this->dropletConfiguration->asArray())
+            ->andThrow($dropletApiException);
 
         $factory = $this->createFactory($dropletApi);
 

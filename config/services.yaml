@@ -9,6 +9,7 @@ parameters:
     digitalocean_droplet_region: '%env(DIGITALOCEAN_REGION)%'
     digitalocean_droplet_size: '%env(DIGITALOCEAN_SIZE)%'
     digitalocean_droplet_image: '%env(DIGITALOCEAN_IMAGE)%'
+    digitalocean_droplet_tag: '%env(DIGITALOCEAN_TAG)%'
     create_retry_limit: '%env(CREATE_RETRY_LIMIT)%'
 
 services:
@@ -65,6 +66,8 @@ services:
             $region: '%digitalocean_droplet_region%'
             $size: '%digitalocean_droplet_size%'
             $image: '%digitalocean_droplet_image%'
+            $tags:
+                - '%digitalocean_droplet_tag%'
 
     App\Services\MachineProvider\DigitalOcean\DropletFactory:
         arguments:

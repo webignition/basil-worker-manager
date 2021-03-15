@@ -4,10 +4,14 @@ namespace App\Model\DigitalOcean;
 
 class DropletConfiguration
 {
+    /**
+     * @param string[] $tags
+     */
     public function __construct(
         private string $region,
         private string $size,
         private string $image,
+        private array $tags,
     ) {
     }
 
@@ -29,12 +33,8 @@ class DropletConfiguration
     /**
      * @return string[]
      */
-    public function asArray(): array
+    public function getTags(): array
     {
-        return [
-            $this->region,
-            $this->size,
-            $this->image,
-        ];
+        return $this->tags;
     }
 }

@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\CreateException;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
+use App\Services\MachineProvider\DigitalOcean\CreateExceptionFactory;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Exception\ValidationFailedException;
@@ -65,6 +66,11 @@ class DropletFactoryTest extends TestCase
 
     private function createFactory(DropletApi $dropletApi): DropletFactory
     {
-        return new DropletFactory($dropletApi, $this->dropletConfiguration, 'test');
+        return new DropletFactory(
+            $dropletApi,
+            $this->dropletConfiguration,
+            new CreateExceptionFactory(),
+            'test'
+        );
     }
 }

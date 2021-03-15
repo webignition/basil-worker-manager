@@ -14,6 +14,8 @@ use App\Request\WorkerCreateRequest;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use webignition\ObjectReflector\ObjectReflector;
 
 class WorkerControllerTest extends AbstractBaseFunctionalTest
@@ -52,7 +54,8 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $response = $this->client->getResponse();
 
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(202, $response->getStatusCode());
+        self::assertInstanceOf(Response::class, $response);
 
         $workers = $this->workerRepository->findAll();
         self::assertCount(1, $workers);
@@ -139,6 +142,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         $response = $this->client->getResponse();
 
         self::assertSame(400, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
         self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));
     }
 }

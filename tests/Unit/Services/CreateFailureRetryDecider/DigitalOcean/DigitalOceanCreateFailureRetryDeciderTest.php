@@ -49,9 +49,15 @@ class DigitalOceanCreateFailureRetryDeciderTest extends TestCase
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
-            ValidationFailedException::class => [
+            ValidationFailedException::class . ' generic' => [
                 'exception' => new ValidationFailedException(),
                 'expectedDecision' => true,
+            ],
+            ValidationFailedException::class . ' will exceed droplet limit' => [
+                'exception' => new ValidationFailedException(
+                    'creating this/these droplet(s) will exceed your droplet limit'
+                ),
+                'expectedDecision' => false,
             ],
             RuntimeException::class . ' non-401' => [
                 'exception' => new RuntimeException(),

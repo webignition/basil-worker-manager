@@ -2,6 +2,7 @@
 
 namespace App\Services\CreateFailureRetryDecider\DigitalOcean;
 
+use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Model\ProviderInterface;
 use App\Services\CreateFailureRetryDecider\CreateFailureRetryDeciderInterface;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -31,7 +32,7 @@ class DigitalOceanCreateFailureRetryDecider implements CreateFailureRetryDecider
         }
 
         if ($exception instanceof ValidationFailedException) {
-            if (str_contains($exception->getMessage(), 'exceed your droplet limit')) {
+            if (str_contains($exception->getMessage(), DropletLimitExceededException::MESSAGE_IDENTIFIER)) {
                 return false;
             }
         }

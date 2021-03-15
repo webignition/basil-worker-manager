@@ -50,8 +50,7 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
         );
 
         $response = $this->client->getResponse();
-
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(202, $response->getStatusCode());
 
         $worker = $this->workerRepository->findOneByLabel($label);
         if (false === $worker instanceof Worker) {

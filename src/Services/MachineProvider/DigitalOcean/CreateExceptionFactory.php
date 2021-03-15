@@ -20,26 +20,22 @@ class CreateExceptionFactory
 
     public function create(Worker $worker, ExceptionInterface $exception): CreateException
     {
+        $wrappedException = $exception;
+
         if (DropletLimitExceededException::is($exception)) {
-            return new CreateException(
-                $worker,
-                new DropletLimitExceededException($exception)
-            );
+            $wrappedException = new DropletLimitExceededException($exception);
         }
 
         if ($exception instanceof VendorApiLimitExceededException) {
             $lastResponse = $this->digitalOceanClient->getLastResponse();
             if ($lastResponse instanceof ResponseInterface) {
-                return new CreateException(
-                    $worker,
-                    new ApiLimitExceededException(
-                        (int) $lastResponse->getHeaderLine('RateLimit-Reset'),
-                        $exception
-                    )
+                $wrappedException = new ApiLimitExceededException(
+                    (int) $lastResponse->getHeaderLine('RateLimit-Reset'),
+                    $exception
                 );
             }
         }
 
-        return new CreateException($worker, $exception);
+        return new CreateException($worker, $wrappedException);
     }
 }

@@ -17,7 +17,7 @@ class DropletFactory
     public function __construct(
         private Client $client,
         private DropletConfiguration $dropletConfiguration,
-        private CreateExceptionFactory $createExceptionFactory,
+        private WorkerApiExceptionFactory $createExceptionFactory,
         private string $prefix
     ) {
     }

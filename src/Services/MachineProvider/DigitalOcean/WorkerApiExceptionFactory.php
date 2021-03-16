@@ -11,7 +11,7 @@ use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceeded
 use DigitalOceanV2\Exception\ExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class CreateExceptionFactory
+class WorkerApiExceptionFactory
 {
     public function __construct(
         private Client $digitalOceanClient,

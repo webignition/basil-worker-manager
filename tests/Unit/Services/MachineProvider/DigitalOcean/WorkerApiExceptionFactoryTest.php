@@ -9,7 +9,7 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\ProviderInterface;
-use App\Services\MachineProvider\DigitalOcean\CreateExceptionFactory;
+use App\Services\MachineProvider\DigitalOcean\WorkerApiExceptionFactory;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededException;
 use DigitalOceanV2\Exception\ExceptionInterface;
@@ -18,7 +18,7 @@ use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
-class CreateExceptionFactoryTest extends TestCase
+class WorkerApiExceptionFactoryTest extends TestCase
 {
     /**
      * @dataProvider createDataProvider
@@ -29,7 +29,7 @@ class CreateExceptionFactoryTest extends TestCase
     ): void {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $factory = new CreateExceptionFactory(\Mockery::mock(Client::class));
+        $factory = new WorkerApiExceptionFactory(\Mockery::mock(Client::class));
 
         self::assertEquals(
             $expectedException,
@@ -100,7 +100,7 @@ class CreateExceptionFactoryTest extends TestCase
         $apiLimitExceededException = new ApiLimitExceededException($resetTimestamp, $vendorApiLimitExceedException);
 
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $factory = new CreateExceptionFactory($client);
+        $factory = new WorkerApiExceptionFactory($client);
 
         self::assertEquals(
             new WorkerApiActionException(

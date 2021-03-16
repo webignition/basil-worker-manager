@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\Worker;
 use App\Model\ProviderInterface;
+use App\Model\RemoteMachineInterface;
 use App\Tests\Mock\Model\MockRemoteMachine;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -28,25 +29,56 @@ class WorkerTest extends TestCase
         self::assertSame('worker-', $worker->getName());
     }
 
-    public function testUpdateFromRemoteMachine(): void
-    {
+    /**
+     * @dataProvider updateFromRemoteMachineDataProvider
+     *
+     * @param Worker::STATE_* $expectedState
+     * @param string[] $expectedIpAddresses
+     */
+    public function testUpdateFromRemoteMachine(
+        RemoteMachineInterface $remoteMachine,
+        int $expectedRemoteId,
+        string $expectedState,
+        array $expectedIpAddresses,
+    ): void {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-
-        self::assertNull($worker->getRemoteId());
-        self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
-
-        $remoteId = 123;
-        $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
-
-        $remoteMachine = (new MockRemoteMachine())
-            ->withGetIdCall($remoteId)
-            ->withGetIpAddressesCall($ipAddresses)
-            ->getMock();
-
         $worker = $worker->updateFromRemoteMachine($remoteMachine);
 
-        self::assertSame($remoteId, $worker->getRemoteId());
-        self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
+        self::assertSame($expectedRemoteId, $worker->getRemoteId());
+        self::assertSame($expectedIpAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
+        self::assertSame($expectedState, $worker->getState());
+    }
+
+    /**
+     * @return array[]
+     */
+    public function updateFromRemoteMachineDataProvider(): array
+    {
+        $remoteId = 123;
+        $ipAddresses = ['127.0.0.1', '10.0.0.1'];
+
+        return [
+            'remoteId and ipAddresses' => [
+                'remoteMachine' => (new MockRemoteMachine())
+                    ->withGetIdCall($remoteId)
+                    ->withGetIpAddressesCall($ipAddresses)
+                    ->withGetStateCall(null)
+                    ->getMock(),
+                'expectedRemoteId' => $remoteId,
+                'expectedState' => Worker::STATE_CREATE_RECEIVED,
+                'expectedIpAddresses' => $ipAddresses,
+            ],
+            'remoteId, ipAddresses and state' => [
+                'remoteMachine' => (new MockRemoteMachine())
+                    ->withGetIdCall($remoteId)
+                    ->withGetIpAddressesCall($ipAddresses)
+                    ->withGetStateCall(Worker::STATE_UP_STARTED)
+                    ->getMock(),
+                'expectedRemoteId' => $remoteId,
+                'expectedState' => Worker::STATE_UP_STARTED,
+                'expectedIpAddresses' => $ipAddresses,
+            ],
+        ];
     }
 
     public function testJsonSerialize(): void

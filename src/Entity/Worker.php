@@ -113,6 +113,11 @@ class Worker implements \Stringable, \JsonSerializable
         $this->remote_id = $remoteMachine->getId();
         $this->ip_addresses = $remoteMachine->getIpAddresses();
 
+        $remoteMachineState = $remoteMachine->getState();
+        if (null !== $remoteMachineState) {
+            $this->state = $remoteMachineState;
+        }
+
         return $this;
     }
 

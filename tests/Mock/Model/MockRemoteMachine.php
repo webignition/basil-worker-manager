@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Model;
 
+use App\Entity\Worker;
 use App\Model\RemoteMachineInterface;
 use Mockery\MockInterface;
 
@@ -41,6 +42,20 @@ class MockRemoteMachine
             $this->mock
                 ->shouldReceive('getIpAddresses')
                 ->andReturn($ipAddresses);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Worker::STATE_UP_STARTED|Worker::STATE_UP_ACTIVE|null $state
+     */
+    public function withGetStateCall(?string $state): self
+    {
+        if ($this->mock instanceof MockInterface) {
+            $this->mock
+                ->shouldReceive('getState')
+                ->andReturn($state);
         }
 
         return $this;

@@ -69,7 +69,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->factory->create($worker, $request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertNotSame(Worker::STATE_CREATE_FAILED, ObjectReflector::getProperty($worker, 'state'));
+        self::assertNotSame(Worker::STATE_CREATE_FAILED, $worker->getState());
     }
 
     public function testInvokeWithNonWorkerApiActionException(): void
@@ -92,7 +92,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->factory->create($worker, $request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(Worker::STATE_CREATE_FAILED, ObjectReflector::getProperty($worker, 'state'));
+        self::assertSame(Worker::STATE_CREATE_FAILED, $worker->getState());
         self::assertSame(0, $request->getRetryCount());
     }
 
@@ -140,7 +140,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
-        self::assertNotSame(Worker::STATE_CREATE_FAILED, ObjectReflector::getProperty($worker, 'state'));
+        self::assertNotSame(Worker::STATE_CREATE_FAILED, $worker->getState());
     }
 
     /**
@@ -199,7 +199,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->factory->create($worker, $request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(Worker::STATE_CREATE_FAILED, ObjectReflector::getProperty($worker, 'state'));
+        self::assertSame(Worker::STATE_CREATE_FAILED, $worker->getState());
     }
 
     /**

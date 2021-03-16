@@ -43,6 +43,9 @@ services:
         arguments:
             $retryLimit: '%create_retry_limit%'
 
+    App\Services\MachineProvider\DigitalOcean\DropletRepository:
+        public: true
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\CreateException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Model\CreateMachineRequest;
@@ -30,10 +30,10 @@ class CreateMachineHandler
             $this->machineProvider->create($worker);
 
             return new CreateMachineResponse(CreateMachineResponse::STATE_SUCCESS);
-        } catch (CreateException $createException) {
+        } catch (WorkerApiActionException $workerApiActionException) {
             $exceptionRequiresRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
-                $createException->getRemoteApiException()
+                $workerApiActionException->getRemoteApiException()
             );
 
             $retryLimitReached = $this->retryLimit <= $request->getRetryCount();

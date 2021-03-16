@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\CreateException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\ProviderInterface;
-use App\Services\MachineProvider\DigitalOcean\CreateExceptionFactory;
+use App\Services\MachineProvider\DigitalOcean\WorkerApiExceptionFactory;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededException;
 use DigitalOceanV2\Exception\ExceptionInterface;
@@ -18,18 +18,23 @@ use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
-class CreateExceptionFactoryTest extends TestCase
+class WorkerApiExceptionFactoryTest extends TestCase
 {
     /**
      * @dataProvider createDataProvider
      */
-    public static function testCreate(ExceptionInterface $exception, CreateException $expectedException): void
-    {
+    public static function testCreate(
+        ExceptionInterface $exception,
+        WorkerApiActionException $expectedException
+    ): void {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $factory = new CreateExceptionFactory(\Mockery::mock(Client::class));
+        $factory = new WorkerApiExceptionFactory(\Mockery::mock(Client::class));
 
-        self::assertEquals($expectedException, $factory->create($worker, $exception));
+        self::assertEquals(
+            $expectedException,
+            $factory->create(WorkerApiActionException::ACTION_CREATE, $worker, $exception)
+        );
     }
 
     /**
@@ -49,15 +54,30 @@ class CreateExceptionFactoryTest extends TestCase
         return [
             RuntimeException::class => [
                 'exception' => $runtimeException,
-                'expectedException' => new CreateException($worker, $runtimeException),
+                'expectedException' => new WorkerApiActionException(
+                    WorkerApiActionException::ACTION_CREATE,
+                    0,
+                    $worker,
+                    $runtimeException
+                ),
             ],
             ValidationFailedException::class . ' generic' => [
                 'exception' => $genericValidationFailedException,
-                'expectedException' => new CreateException($worker, $genericValidationFailedException),
+                'expectedException' => new WorkerApiActionException(
+                    WorkerApiActionException::ACTION_CREATE,
+                    0,
+                    $worker,
+                    $genericValidationFailedException
+                ),
             ],
             ValidationFailedException::class . ' droplet limit will be exceeded' => [
                 'exception' => $dropletLimitValidationFailedException,
-                'expectedException' => new CreateException($worker, $dropletLimitExceededException),
+                'expectedException' => new WorkerApiActionException(
+                    WorkerApiActionException::ACTION_CREATE,
+                    0,
+                    $worker,
+                    $dropletLimitExceededException
+                ),
             ],
         ];
     }
@@ -80,11 +100,16 @@ class CreateExceptionFactoryTest extends TestCase
         $apiLimitExceededException = new ApiLimitExceededException($resetTimestamp, $vendorApiLimitExceedException);
 
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $factory = new CreateExceptionFactory($client);
+        $factory = new WorkerApiExceptionFactory($client);
 
         self::assertEquals(
-            new CreateException($worker, $apiLimitExceededException),
-            $factory->create($worker, $vendorApiLimitExceedException)
+            new WorkerApiActionException(
+                WorkerApiActionException::ACTION_CREATE,
+                0,
+                $worker,
+                $apiLimitExceededException
+            ),
+            $factory->create(WorkerApiActionException::ACTION_CREATE, $worker, $vendorApiLimitExceedException)
         );
     }
 }

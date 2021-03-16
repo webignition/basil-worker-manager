@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\CreateException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
-use App\Services\MachineProvider\DigitalOcean\CreateExceptionFactory;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
+use App\Services\MachineProvider\DigitalOcean\WorkerApiExceptionFactory;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ValidationFailedException;
@@ -41,7 +41,7 @@ class DropletFactoryTest extends TestCase
         );
     }
 
-    public function testCreateThrowsCreateException(): void
+    public function testCreateThrowsWorkerApiActionException(): void
     {
         $dropletApiException = \Mockery::mock(ValidationFailedException::class);
 
@@ -63,7 +63,12 @@ class DropletFactoryTest extends TestCase
 
         $factory = $this->createFactory($client);
 
-        $expectedException = new CreateException($this->worker, $dropletApiException);
+        $expectedException = new WorkerApiActionException(
+            WorkerApiActionException::ACTION_CREATE,
+            0,
+            $this->worker,
+            $dropletApiException
+        );
 
         $this->expectExceptionObject($expectedException);
 
@@ -74,8 +79,8 @@ class DropletFactoryTest extends TestCase
     {
         return new DropletFactory(
             $client,
+            new WorkerApiExceptionFactory($client),
             $this->dropletConfiguration,
-            new CreateExceptionFactory($client),
             'test'
         );
     }

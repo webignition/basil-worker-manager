@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\AbstractWorkerApiActionException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\ProviderInterface;
@@ -63,8 +63,8 @@ class DropletFactoryTest extends TestCase
 
         $factory = $this->createFactory($client);
 
-        $expectedException = new AbstractWorkerApiActionException(
-            AbstractWorkerApiActionException::ACTION_CREATE,
+        $expectedException = new WorkerApiActionException(
+            WorkerApiActionException::ACTION_CREATE,
             0,
             $this->worker,
             $dropletApiException

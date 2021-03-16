@@ -3,7 +3,7 @@
 namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\AbstractWorkerApiActionException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface;
@@ -16,7 +16,7 @@ class DropletRepository
     }
 
     /**
-     * @throws AbstractWorkerApiActionException
+     * @throws WorkerApiActionException
      */
     public function get(Worker $worker): DropletEntity
     {
@@ -25,8 +25,8 @@ class DropletRepository
         try {
             return $dropletApi->getById((int) $worker->getRemoteId());
         } catch (ExceptionInterface $exception) {
-            throw new AbstractWorkerApiActionException(
-                AbstractWorkerApiActionException::ACTION_GET,
+            throw new WorkerApiActionException(
+                WorkerApiActionException::ACTION_GET,
                 0,
                 $worker,
                 $exception

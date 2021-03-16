@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
 
-use App\Exception\MachineProvider\AbstractWorkerApiActionException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletFactory;
 use App\Services\WorkerFactory;
@@ -77,7 +77,7 @@ class DropletFactoryTest extends AbstractBaseFunctionalTest
         try {
             $this->dropletFactory->create($worker);
             self::fail('CreateException not thrown');
-        } catch (AbstractWorkerApiActionException $createException) {
+        } catch (WorkerApiActionException $createException) {
             self::assertSame($worker, $createException->getWorker());
             self::assertEquals(
                 new ValidationFailedException('creating this/these droplet(s) will exceed your droplet limit', 422),

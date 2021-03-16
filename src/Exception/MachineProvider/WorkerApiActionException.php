@@ -4,7 +4,7 @@ namespace App\Exception\MachineProvider;
 
 use App\Entity\Worker;
 
-class AbstractWorkerApiActionException extends AbstractRemoteApiWrappingException implements
+class WorkerApiActionException extends AbstractRemoteApiWrappingException implements
     RemoteApiExceptionWrapperInterface
 {
     public const ACTION_CREATE = 'create';

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\AbstractWorkerApiActionException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Model\CreateMachineRequest;
@@ -113,8 +113,8 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $createException = new AbstractWorkerApiActionException(
-            AbstractWorkerApiActionException::ACTION_CREATE,
+        $createException = new WorkerApiActionException(
+            WorkerApiActionException::ACTION_CREATE,
             0,
             $worker,
             $createExceptionPrevious
@@ -183,8 +183,8 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $createException = new AbstractWorkerApiActionException(
-            AbstractWorkerApiActionException::ACTION_CREATE,
+        $createException = new WorkerApiActionException(
+            WorkerApiActionException::ACTION_CREATE,
             0,
             $worker,
             $createExceptionPrevious

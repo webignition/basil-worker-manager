@@ -3,7 +3,7 @@
 namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\AbstractWorkerApiActionException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use DigitalOceanV2\Client;
@@ -23,7 +23,7 @@ class DropletFactory
     }
 
     /**
-     * @throws AbstractWorkerApiActionException
+     * @throws WorkerApiActionException
      */
     public function create(Worker $worker): DropletEntity
     {
@@ -38,7 +38,7 @@ class DropletFactory
             $droplet = $dropletApi->create(...$createArguments->asArray());
         } catch (ExceptionInterface $exception) {
             throw $this->createExceptionFactory->create(
-                AbstractWorkerApiActionException::ACTION_CREATE,
+                WorkerApiActionException::ACTION_CREATE,
                 $worker,
                 $exception
             );

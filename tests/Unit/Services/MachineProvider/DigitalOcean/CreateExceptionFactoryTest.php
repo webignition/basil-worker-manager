@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\AbstractWorkerApiActionException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\CreateExceptionFactory;
 use DigitalOceanV2\Client;
@@ -25,7 +25,7 @@ class CreateExceptionFactoryTest extends TestCase
      */
     public static function testCreate(
         ExceptionInterface $exception,
-        AbstractWorkerApiActionException $expectedException
+        WorkerApiActionException $expectedException
     ): void {
         $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
@@ -33,7 +33,7 @@ class CreateExceptionFactoryTest extends TestCase
 
         self::assertEquals(
             $expectedException,
-            $factory->create(AbstractWorkerApiActionException::ACTION_CREATE, $worker, $exception)
+            $factory->create(WorkerApiActionException::ACTION_CREATE, $worker, $exception)
         );
     }
 
@@ -54,8 +54,8 @@ class CreateExceptionFactoryTest extends TestCase
         return [
             RuntimeException::class => [
                 'exception' => $runtimeException,
-                'expectedException' => new AbstractWorkerApiActionException(
-                    AbstractWorkerApiActionException::ACTION_CREATE,
+                'expectedException' => new WorkerApiActionException(
+                    WorkerApiActionException::ACTION_CREATE,
                     0,
                     $worker,
                     $runtimeException
@@ -63,8 +63,8 @@ class CreateExceptionFactoryTest extends TestCase
             ],
             ValidationFailedException::class . ' generic' => [
                 'exception' => $genericValidationFailedException,
-                'expectedException' => new AbstractWorkerApiActionException(
-                    AbstractWorkerApiActionException::ACTION_CREATE,
+                'expectedException' => new WorkerApiActionException(
+                    WorkerApiActionException::ACTION_CREATE,
                     0,
                     $worker,
                     $genericValidationFailedException
@@ -72,8 +72,8 @@ class CreateExceptionFactoryTest extends TestCase
             ],
             ValidationFailedException::class . ' droplet limit will be exceeded' => [
                 'exception' => $dropletLimitValidationFailedException,
-                'expectedException' => new AbstractWorkerApiActionException(
-                    AbstractWorkerApiActionException::ACTION_CREATE,
+                'expectedException' => new WorkerApiActionException(
+                    WorkerApiActionException::ACTION_CREATE,
                     0,
                     $worker,
                     $dropletLimitExceededException
@@ -103,13 +103,13 @@ class CreateExceptionFactoryTest extends TestCase
         $factory = new CreateExceptionFactory($client);
 
         self::assertEquals(
-            new AbstractWorkerApiActionException(
-                AbstractWorkerApiActionException::ACTION_CREATE,
+            new WorkerApiActionException(
+                WorkerApiActionException::ACTION_CREATE,
                 0,
                 $worker,
                 $apiLimitExceededException
             ),
-            $factory->create(AbstractWorkerApiActionException::ACTION_CREATE, $worker, $vendorApiLimitExceedException)
+            $factory->create(WorkerApiActionException::ACTION_CREATE, $worker, $vendorApiLimitExceedException)
         );
     }
 }

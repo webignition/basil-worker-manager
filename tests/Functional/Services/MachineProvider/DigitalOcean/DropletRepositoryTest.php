@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
 
-use App\Exception\MachineProvider\AbstractWorkerApiActionException;
+use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletRepository;
 use App\Services\WorkerFactory;
@@ -72,8 +72,8 @@ class DropletRepositoryTest extends AbstractBaseFunctionalTest
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
         $this->mockHandler->append($apiResponse);
 
-        $expectedException = new AbstractWorkerApiActionException(
-            AbstractWorkerApiActionException::ACTION_GET,
+        $expectedException = new WorkerApiActionException(
+            WorkerApiActionException::ACTION_GET,
             0,
             $worker,
             $expectedWrappedException
@@ -82,7 +82,7 @@ class DropletRepositoryTest extends AbstractBaseFunctionalTest
         try {
             $this->dropletRepository->get($worker);
             $this->fail('GetException not thrown');
-        } catch (AbstractWorkerApiActionException $getException) {
+        } catch (WorkerApiActionException $getException) {
             self::assertEquals($expectedException, $getException);
         }
     }

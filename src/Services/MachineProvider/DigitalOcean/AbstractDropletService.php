@@ -21,11 +21,6 @@ abstract class AbstractDropletService
     }
 
     /**
-     * @throws ExceptionInterface
-     */
-    abstract protected function doAction(Worker $worker): DropletEntity;
-
-    /**
      * @param WorkerApiActionException::ACTION_* $type
      */
     protected function createWorkerApiActionException(
@@ -41,10 +36,10 @@ abstract class AbstractDropletService
      *
      * @throws WorkerApiActionException
      */
-    protected function foo(string $action, Worker $worker): DropletEntity
+    protected function performApiAction(string $action, Worker $worker, callable $callable): DropletEntity
     {
         try {
-            return $this->doAction($worker);
+            return $callable($worker);
         } catch (ExceptionInterface $exception) {
             throw $this->createWorkerApiActionException($action, $worker, $exception);
         }

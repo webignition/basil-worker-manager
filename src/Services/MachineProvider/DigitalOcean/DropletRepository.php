@@ -8,16 +8,17 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
 class DropletRepository extends AbstractDropletService
 {
-    protected function doAction(Worker $worker): DropletEntity
-    {
-        return $this->dropletApi->getById((int) $worker->getRemoteId());
-    }
-
     /**
      * @throws WorkerApiActionException
      */
     public function get(Worker $worker): DropletEntity
     {
-        return $this->foo(WorkerApiActionException::ACTION_GET, $worker);
+        return $this->performApiAction(
+            WorkerApiActionException::ACTION_GET,
+            $worker,
+            function (Worker $worker) {
+                return $this->dropletApi->getById((int) $worker->getRemoteId());
+            }
+        );
     }
 }

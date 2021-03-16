@@ -22,25 +22,26 @@ class DropletFactory extends AbstractDropletService
         parent::__construct($client, $workerApiExceptionFactory);
     }
 
-    protected function doAction(Worker $worker): DropletEntity
-    {
-        $createArguments = new DropletApiCreateCallArguments(
-            sprintf(self::REMOTE_NAME, $this->prefix, $worker->getName()),
-            $this->dropletConfiguration
-        );
-
-        $droplet = $this->dropletApi->create(...$createArguments->asArray());
-
-        return $droplet instanceof DropletEntity
-            ? $droplet
-            : new DropletEntity([]);
-    }
-
     /**
      * @throws WorkerApiActionException
      */
     public function create(Worker $worker): DropletEntity
     {
-        return $this->foo(WorkerApiActionException::ACTION_CREATE, $worker);
+        return $this->performApiAction(
+            WorkerApiActionException::ACTION_CREATE,
+            $worker,
+            function (Worker $worker) {
+                $createArguments = new DropletApiCreateCallArguments(
+                    sprintf(self::REMOTE_NAME, $this->prefix, $worker->getName()),
+                    $this->dropletConfiguration
+                );
+
+                $droplet = $this->dropletApi->create(...$createArguments->asArray());
+
+                return $droplet instanceof DropletEntity
+                    ? $droplet
+                    : new DropletEntity([]);
+            }
+        );
     }
 }

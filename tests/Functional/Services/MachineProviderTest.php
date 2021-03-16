@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Entity\Worker;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider;
 use App\Services\WorkerFactory;
@@ -41,6 +42,20 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
+        $this->assertMutateWorker(function (Worker $worker) {
+            $this->machineProvider->create($worker);
+        });
+    }
+
+    public function testUpdateSuccess(): void
+    {
+        $this->assertMutateWorker(function (Worker $worker) {
+            $this->machineProvider->update($worker);
+        });
+    }
+
+    private function assertMutateWorker(callable $callable): void
+    {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         $remoteId = 123;
@@ -68,7 +83,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         self::assertNull($worker->getRemoteId());
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
 
-        $this->machineProvider->create($worker);
+        $callable($worker);
 
         self::assertSame($remoteId, $worker->getRemoteId());
         self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));

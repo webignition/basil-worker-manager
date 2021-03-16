@@ -31,15 +31,22 @@ class MachineProvider
      */
     public function create(Worker $worker): Worker
     {
-        $provider = $this->findProvider($worker);
-        if (false === $provider instanceof MachineProviderInterface) {
-            throw new UnsupportedProviderException($worker->getProvider());
-        }
-
-        return $provider->create($worker);
+        return $this->findProvider($worker)->create($worker);
     }
 
-    private function findProvider(Worker $worker): ?MachineProviderInterface
+    /**
+     * @throws WorkerApiActionException
+     * @throws UnsupportedProviderException
+     */
+    public function update(Worker $worker): Worker
+    {
+        return $this->findProvider($worker)->hydrate($worker);
+    }
+
+    /**
+     * @throws UnsupportedProviderException
+     */
+    private function findProvider(Worker $worker): MachineProviderInterface
     {
         foreach ($this->machineProviders as $machineProvider) {
             if ($machineProvider->handles($worker->getProvider())) {
@@ -47,6 +54,6 @@ class MachineProvider
             }
         }
 
-        return null;
+        throw new UnsupportedProviderException($worker->getProvider());
     }
 }

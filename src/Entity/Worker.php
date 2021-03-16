@@ -117,6 +117,14 @@ class Worker implements \Stringable, \JsonSerializable
     }
 
     /**
+     * @return self::STATE_*
+     */
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    /**
      * @param self::STATE_* $state
      */
     public function setState(string $state): self

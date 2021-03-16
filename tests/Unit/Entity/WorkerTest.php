@@ -22,7 +22,7 @@ class WorkerTest extends TestCase
         self::assertNull($worker->getId());
         self::assertNull($worker->getRemoteId());
         self::assertSame($label, $worker->getLabel());
-        self::assertSame(Worker::STATE_CREATE_RECEIVED, ObjectReflector::getProperty($worker, 'state'));
+        self::assertSame(Worker::STATE_CREATE_RECEIVED, $worker->getState());
         self::assertSame($provider, $worker->getProvider());
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
         self::assertSame('worker-', $worker->getName());

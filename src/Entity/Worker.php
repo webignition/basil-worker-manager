@@ -22,7 +22,6 @@ class Worker implements \Stringable, \JsonSerializable
     public const STATE_DELETE_PROCESSING = 'delete/processing';
     public const STATE_UP_STARTED = 'up/started';
     public const STATE_UP_ACTIVE = 'up/active';
-    public const STATE_UP_STOPPED = 'up/stopped';
     public const STATE_DELETED = 'deleted';
 
     /**

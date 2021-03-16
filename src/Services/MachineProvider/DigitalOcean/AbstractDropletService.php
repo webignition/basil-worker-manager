@@ -6,6 +6,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
+use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface;
 
 abstract class AbstractDropletService
@@ -20,6 +21,11 @@ abstract class AbstractDropletService
     }
 
     /**
+     * @throws ExceptionInterface
+     */
+    abstract protected function doAction(Worker $worker): DropletEntity;
+
+    /**
      * @param WorkerApiActionException::ACTION_* $type
      */
     protected function createWorkerApiActionException(
@@ -28,5 +34,19 @@ abstract class AbstractDropletService
         ExceptionInterface $exception
     ): WorkerApiActionException {
         return $this->workerApiExceptionFactory->create($type, $worker, $exception);
+    }
+
+    /**
+     * @param WorkerApiActionException::ACTION_* $action
+     *
+     * @throws WorkerApiActionException
+     */
+    protected function foo(string $action, Worker $worker): DropletEntity
+    {
+        try {
+            return $this->doAction($worker);
+        } catch (ExceptionInterface $exception) {
+            throw $this->createWorkerApiActionException($action, $worker, $exception);
+        }
     }
 }

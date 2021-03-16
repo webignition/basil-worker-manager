@@ -18,5 +18,9 @@ interface MachineProviderInterface
      */
     public function create(Worker $worker): Worker;
     public function remove(int $remoteId): void;
+
+    /**
+     * @throws WorkerApiActionException
+     */
     public function hydrate(Worker $worker): Worker;
 }

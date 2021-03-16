@@ -72,7 +72,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertNotSame(Worker::STATE_CREATE_FAILED, ObjectReflector::getProperty($worker, 'state'));
     }
 
-    public function testInvokeWithNonCreateException(): void
+    public function testInvokeWithNonWorkerApiActionException(): void
     {
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
@@ -97,12 +97,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider invokeWithCreateExceptionWithRetryDataProvider
+     * @dataProvider invokeWithWorkerApiActionExceptionWithRetryDataProvider
      */
-    public function testInvokeCreateExceptionWithRetry(
-        \Throwable $createExceptionPrevious,
-        int $currentRetryCount,
-    ): void {
+    public function testInvokeWorkerApiActionExceptionWithRetry(\Throwable $previous, int $currentRetryCount): void
+    {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         $request = new CreateMachineRequest((string) $worker);
@@ -113,15 +111,15 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $createException = new WorkerApiActionException(
+        $workerApiActionException = new WorkerApiActionException(
             WorkerApiActionException::ACTION_CREATE,
             0,
             $worker,
-            $createExceptionPrevious
+            $previous
         );
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($worker, $createException)
+            ->withCreateCallThrowingException($worker, $workerApiActionException)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -148,31 +146,29 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function invokeWithCreateExceptionWithRetryDataProvider(): array
+    public function invokeWithWorkerApiActionExceptionWithRetryDataProvider(): array
     {
         return [
             'requires retry, retry limit not reached (0)' => [
-                'createExceptionPrevious' => \Mockery::mock(InvalidArgumentException::class),
+                'previous' => \Mockery::mock(InvalidArgumentException::class),
                 'currentRetryCount' => 0,
             ],
             'requires retry, retry limit not reached (1)' => [
-                'createExceptionPrevious' => \Mockery::mock(InvalidArgumentException::class),
+                'previous' => \Mockery::mock(InvalidArgumentException::class),
                 'currentRetryCount' => 1,
             ],
             'requires retry, retry limit not reached (2)' => [
-                'createExceptionPrevious' => \Mockery::mock(InvalidArgumentException::class),
+                'previous' => \Mockery::mock(InvalidArgumentException::class),
                 'currentRetryCount' => 2,
             ],
         ];
     }
 
     /**
-     * @dataProvider invokeWithCreateExceptionWithoutRetryDataProvider
+     * @dataProvider invokeWithWorkerApiActionExceptionWithoutRetryDataProvider
      */
-    public function testInvokeCreateExceptionWithoutRetry(
-        \Throwable $createExceptionPrevious,
-        int $currentRetryCount,
-    ): void {
+    public function testInvokeWorkerApiActionExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
+    {
         $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         $request = new CreateMachineRequest((string) $worker);
@@ -183,15 +179,15 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $createException = new WorkerApiActionException(
+        $workerApiActionException = new WorkerApiActionException(
             WorkerApiActionException::ACTION_CREATE,
             0,
             $worker,
-            $createExceptionPrevious
+            $previous
         );
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($worker, $createException)
+            ->withCreateCallThrowingException($worker, $workerApiActionException)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -209,15 +205,15 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function invokeWithCreateExceptionWithoutRetryDataProvider(): array
+    public function invokeWithWorkerApiActionExceptionWithoutRetryDataProvider(): array
     {
         return [
             'does not require retry' => [
-                'createExceptionPrevious' => \Mockery::mock(ApiLimitExceededException::class),
+                'previous' => \Mockery::mock(ApiLimitExceededException::class),
                 'currentRetryCount' => 0,
             ],
             'requires retry, retry limit reached (3)' => [
-                'createExceptionPrevious' => \Mockery::mock(InvalidArgumentException::class),
+                'previous' => \Mockery::mock(InvalidArgumentException::class),
                 'currentRetryCount' => 3,
             ],
         ];

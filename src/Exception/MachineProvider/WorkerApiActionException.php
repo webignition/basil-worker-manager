@@ -19,10 +19,10 @@ class WorkerApiActionException extends AbstractRemoteApiWrappingException implem
         private Worker $worker,
         private \Throwable $remoteApiException
     ) {
-        parent::__construct(self::createExceptionMessage($worker, $action), $code, $remoteApiException);
+        parent::__construct(self::createMessage($worker, $action), $code, $remoteApiException);
     }
 
-    private static function createExceptionMessage(Worker $worker, string $action): string
+    private static function createMessage(Worker $worker, string $action): string
     {
         return sprintf(
             'Unable to %s remote machine for worker %s %s',

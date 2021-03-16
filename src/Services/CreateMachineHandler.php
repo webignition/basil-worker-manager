@@ -30,10 +30,10 @@ class CreateMachineHandler
             $this->machineProvider->create($worker);
 
             return new CreateMachineResponse(CreateMachineResponse::STATE_SUCCESS);
-        } catch (WorkerApiActionException $createException) {
+        } catch (WorkerApiActionException $workerApiActionException) {
             $exceptionRequiresRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
-                $createException->getRemoteApiException()
+                $workerApiActionException->getRemoteApiException()
             );
 
             $retryLimitReached = $this->retryLimit <= $request->getRetryCount();

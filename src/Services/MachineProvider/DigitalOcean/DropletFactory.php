@@ -17,7 +17,7 @@ class DropletFactory
     public function __construct(
         private Client $client,
         private DropletConfiguration $dropletConfiguration,
-        private WorkerApiExceptionFactory $createExceptionFactory,
+        private WorkerApiExceptionFactory $workerApiExceptionFactory,
         private string $prefix
     ) {
     }
@@ -37,7 +37,7 @@ class DropletFactory
         try {
             $droplet = $dropletApi->create(...$createArguments->asArray());
         } catch (ExceptionInterface $exception) {
-            throw $this->createExceptionFactory->create(
+            throw $this->workerApiExceptionFactory->create(
                 WorkerApiActionException::ACTION_CREATE,
                 $worker,
                 $exception

@@ -41,7 +41,7 @@ class DropletFactoryTest extends TestCase
         );
     }
 
-    public function testCreateThrowsCreateException(): void
+    public function testCreateThrowsWorkerApiActionException(): void
     {
         $dropletApiException = \Mockery::mock(ValidationFailedException::class);
 

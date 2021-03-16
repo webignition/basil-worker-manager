@@ -26,6 +26,9 @@ class CreateMachineHandler
 
     public function create(Worker $worker, CreateMachineRequest $request): CreateMachineResponse
     {
+        $worker->setState(Worker::STATE_CREATE_PROCESSING);
+        $this->workerStore->store($worker);
+
         try {
             $this->machineProvider->create($worker);
 

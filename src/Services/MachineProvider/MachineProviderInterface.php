@@ -3,7 +3,7 @@
 namespace App\Services\MachineProvider;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\CreateException;
+use App\Exception\MachineProvider\AbstractWorkerApiActionException;
 use App\Model\ProviderInterface;
 
 interface MachineProviderInterface
@@ -14,7 +14,7 @@ interface MachineProviderInterface
     public function handles(string $type): bool;
 
     /**
-     * @throws CreateException
+     * @throws AbstractWorkerApiActionException
      */
     public function create(Worker $worker): Worker;
     public function remove(int $remoteId): void;

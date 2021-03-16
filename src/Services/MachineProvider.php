@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\CreateException;
+use App\Exception\MachineProvider\AbstractWorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\MachineProvider\MachineProviderInterface;
 
@@ -26,7 +26,7 @@ class MachineProvider
     }
 
     /**
-     * @throws CreateException
+     * @throws AbstractWorkerApiActionException
      * @throws UnsupportedProviderException
      */
     public function create(Worker $worker): Worker

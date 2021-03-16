@@ -3,7 +3,7 @@
 namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\CreateException;
+use App\Exception\MachineProvider\AbstractWorkerApiActionException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use DigitalOceanV2\Client;
@@ -18,8 +18,14 @@ class CreateExceptionFactory
     ) {
     }
 
-    public function create(Worker $worker, ExceptionInterface $exception): CreateException
-    {
+    /**
+     * @param AbstractWorkerApiActionException::ACTION_* $action
+     */
+    public function create(
+        string $action,
+        Worker $worker,
+        ExceptionInterface $exception
+    ): AbstractWorkerApiActionException {
         $wrappedException = $exception;
 
         if (DropletLimitExceededException::is($exception)) {
@@ -36,6 +42,6 @@ class CreateExceptionFactory
             }
         }
 
-        return new CreateException($worker, $wrappedException);
+        return new AbstractWorkerApiActionException($action, 0, $worker, $wrappedException);
     }
 }

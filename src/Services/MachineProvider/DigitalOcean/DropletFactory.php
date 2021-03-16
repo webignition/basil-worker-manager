@@ -10,16 +10,17 @@ use DigitalOceanV2\Client;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface;
 
-class DropletFactory
+class DropletFactory extends AbstractDropletService
 {
     private const REMOTE_NAME = '%s-%s';
 
     public function __construct(
-        private Client $client,
+        Client $client,
+        WorkerApiExceptionFactory $workerApiExceptionFactory,
         private DropletConfiguration $dropletConfiguration,
-        private WorkerApiExceptionFactory $workerApiExceptionFactory,
         private string $prefix
     ) {
+        parent::__construct($client, $workerApiExceptionFactory);
     }
 
     /**
@@ -32,16 +33,10 @@ class DropletFactory
             $this->dropletConfiguration
         );
 
-        $dropletApi = $this->client->droplet();
-
         try {
-            $droplet = $dropletApi->create(...$createArguments->asArray());
+            $droplet = $this->dropletApi->create(...$createArguments->asArray());
         } catch (ExceptionInterface $exception) {
-            throw $this->workerApiExceptionFactory->create(
-                WorkerApiActionException::ACTION_CREATE,
-                $worker,
-                $exception
-            );
+            throw $this->createWorkerApiActionException(WorkerApiActionException::ACTION_CREATE, $worker, $exception);
         }
 
         return $droplet instanceof DropletEntity

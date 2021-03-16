@@ -79,8 +79,8 @@ class DropletFactoryTest extends TestCase
     {
         return new DropletFactory(
             $client,
-            $this->dropletConfiguration,
             new WorkerApiExceptionFactory($client),
+            $this->dropletConfiguration,
             'test'
         );
     }

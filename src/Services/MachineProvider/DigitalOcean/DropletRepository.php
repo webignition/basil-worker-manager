@@ -11,7 +11,8 @@ use DigitalOceanV2\Exception\ExceptionInterface;
 class DropletRepository
 {
     public function __construct(
-        private Client $client
+        private Client $client,
+        private WorkerApiExceptionFactory $workerApiExceptionFactory,
     ) {
     }
 
@@ -25,9 +26,8 @@ class DropletRepository
         try {
             return $dropletApi->getById((int) $worker->getRemoteId());
         } catch (ExceptionInterface $exception) {
-            throw new WorkerApiActionException(
+            throw $this->workerApiExceptionFactory->create(
                 WorkerApiActionException::ACTION_GET,
-                0,
                 $worker,
                 $exception
             );

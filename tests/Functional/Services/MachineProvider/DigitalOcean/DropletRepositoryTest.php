@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
 
+use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DropletRepository;
@@ -11,7 +12,7 @@ use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
-use DigitalOceanV2\Exception\ApiLimitExceededException;
+use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededExceptionAlias;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use GuzzleHttp\Handler\MockHandler;
@@ -93,9 +94,17 @@ class DropletRepositoryTest extends AbstractBaseFunctionalTest
     public function getThrowsGetExceptionDataProvider(): array
     {
         return [
-            ApiLimitExceededException::class => [
-                'apiResponse' => new Response(429),
-                'expectedWrappedException' => new ApiLimitExceededException('Too Many Requests', 429),
+            VendorApiLimitExceededExceptionAlias::class => [
+                'apiResponse' => new Response(
+                    429,
+                    [
+                        'RateLimit-Reset' => 123,
+                    ]
+                ),
+                'expectedWrappedException' => new ApiLimitExceededException(
+                    123,
+                    new VendorApiLimitExceededExceptionAlias('Too Many Requests', 429),
+                ),
             ],
             RuntimeException::class . ' HTTP 503' => [
                 'apiResponse' => new Response(503),

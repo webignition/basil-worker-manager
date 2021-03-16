@@ -16,7 +16,6 @@ class Worker implements \Stringable, \JsonSerializable
     private const NAME = 'worker-%s';
 
     public const STATE_CREATE_RECEIVED = 'create/received';
-    public const STATE_CREATE_PROCESSING = 'create/processing';
     public const STATE_CREATE_REQUESTED = 'create/requested';
     public const STATE_CREATE_FAILED = 'create/failed';
     public const STATE_DELETE_RECEIVED = 'delete/received';

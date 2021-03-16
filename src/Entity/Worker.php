@@ -19,7 +19,8 @@ class Worker implements \Stringable, \JsonSerializable
     public const STATE_CREATE_REQUESTED = 'create/requested';
     public const STATE_CREATE_FAILED = 'create/failed';
     public const STATE_DELETE_RECEIVED = 'delete/received';
-    public const STATE_DELETE_PROCESSING = 'delete/processing';
+    public const STATE_DELETE_REQUESTED = 'delete/requested';
+    public const STATE_DELETE_FAILED = 'delete/failed';
     public const STATE_UP_STARTED = 'up/started';
     public const STATE_UP_ACTIVE = 'up/active';
     public const STATE_DELETED = 'deleted';

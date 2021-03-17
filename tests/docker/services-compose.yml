@@ -8,3 +8,12 @@ services:
       POSTGRES_PASSWORD: ${WORKER_POSTGRES_PASSWORD}
     ports:
       - ${WORKER_POSTGRES_EXPOSED_PORT}:5432
+
+  rabbitmq:
+    image: rabbitmq:3
+    container_name: ${WORKER_RABBITMQ_CONTAINER_NAME}
+    environment:
+      RABBITMQ_DEFAULT_USER: ${WORKER_RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${WORKER_RABBITMQ_PASS}
+    ports:
+      - ${WORKER_RABBITMQ_EXPOSED_PORT}:5672

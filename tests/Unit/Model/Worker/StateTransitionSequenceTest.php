@@ -258,4 +258,64 @@ class StateTransitionSequenceTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider containsWithinDataProvider
+     *
+     * @param State::VALUE_* $state
+     */
+    public function testContainsWithin(StateTransitionSequence $sequence, string $state, bool $expectedContains): void
+    {
+        self::assertSame($expectedContains, $sequence->containsWithin($state));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function containsWithinDataProvider(): array
+    {
+        return [
+            'empty' => [
+                'sequence' => new StateTransitionSequence([]),
+                'state' => State::VALUE_CREATE_RECEIVED,
+                'expectedContains' => false,
+            ],
+            'does not contain, not present' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_CREATE_FAILED,
+                ]),
+                'state' => State::VALUE_UP_STARTED,
+                'expectedContains' => false,
+            ],
+            'does contain, first item' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_UP_STARTED,
+                ]),
+                'state' => State::VALUE_CREATE_RECEIVED,
+                'expectedContains' => true,
+            ],
+            'does contain, intermediary item' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_UP_STARTED,
+                ]),
+                'state' => State::VALUE_CREATE_REQUESTED,
+                'expectedContains' => true,
+            ],
+            'does not contain, last item' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_UP_STARTED,
+                ]),
+                'state' => State::VALUE_UP_STARTED,
+                'expectedContains' => false,
+            ],
+        ];
+    }
 }

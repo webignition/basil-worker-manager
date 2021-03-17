@@ -31,6 +31,14 @@ class StateTransitionSequence
     }
 
     /**
+     * @param State::VALUE_* $state
+     */
+    public function containsWithin(string $state): bool
+    {
+        return true === $this->contains($state) && false === $this->endsWith($state);
+    }
+
+    /**
      * @param State::VALUE_* $start
      * @param State::VALUE_* $end
      */

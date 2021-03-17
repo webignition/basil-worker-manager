@@ -54,7 +54,7 @@ class UpdateWorkerMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateWorkerMessage((int) $this->worker->getId(), $stopState)
+            new UpdateWorkerMessage((string) $this->worker->getId(), $stopState)
         );
 
         $this->messengerAsserter->assertEnvelopeContainsStamp(

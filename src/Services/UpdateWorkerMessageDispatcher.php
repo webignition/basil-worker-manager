@@ -21,7 +21,7 @@ class UpdateWorkerMessageDispatcher
     public function dispatchForWorker(Worker $worker, string $stopState): void
     {
         $this->messageBus->dispatch(new Envelope(
-            new UpdateWorkerMessage((int) $worker->getId(), $stopState),
+            new UpdateWorkerMessage((string) $worker->getId(), $stopState),
             [
                 new DelayStamp($this->dispatchDelayInSeconds * 1000)
             ]

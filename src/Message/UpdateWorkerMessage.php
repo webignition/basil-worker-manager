@@ -12,12 +12,12 @@ class UpdateWorkerMessage
      * @param State::VALUE_* $stopState
      */
     public function __construct(
-        private int $workerId,
+        private string $workerId,
         private string $stopState,
     ) {
     }
 
-    public function getWorkerId(): int
+    public function getWorkerId(): string
     {
         return $this->workerId;
     }

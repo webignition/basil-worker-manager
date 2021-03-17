@@ -318,4 +318,90 @@ class StateTransitionSequenceTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider sliceEndingWithReturnsStateTransitionsDataProvider
+     *
+     * @param State::VALUE_* $end
+     */
+    public function testSliceEndingWithReturnsStateTransitions(
+        StateTransitionSequence $sequence,
+        string $end,
+        StateTransitionSequence $expectedTransitions
+    ): void {
+        self::assertEquals($expectedTransitions, $sequence->sliceEndingWith($end));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function sliceEndingWithReturnsStateTransitionsDataProvider(): array
+    {
+        return [
+            'end is last' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_UP_STARTED,
+                ]),
+                'end' => State::VALUE_UP_STARTED,
+                'expectedTransitions' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_UP_STARTED,
+                ]),
+            ],
+            'single state' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                ]),
+                'end' => State::VALUE_CREATE_RECEIVED,
+                'expectedTransitions' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                ]),
+            ],
+            'end is intermediate' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_UP_STARTED,
+                    State::VALUE_UP_ACTIVE,
+                    State::VALUE_DELETE_RECEIVED,
+                    State::VALUE_DELETE_REQUESTED,
+                    State::VALUE_DELETE_DELETED,
+                ]),
+                'end' => State::VALUE_UP_STARTED,
+                'expectedTransitions' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                    State::VALUE_CREATE_REQUESTED,
+                    State::VALUE_UP_STARTED,
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider sliceEndingWithReturnsNullDataProvider
+     *
+     * @param State::VALUE_* $end
+     */
+    public function testSliceEndingWithReturnsNull(StateTransitionSequence $sequence, string $end): void
+    {
+        self::assertNull($sequence->sliceEndingWith($end));
+    }
+
+    /**
+     * @return array[]
+     */
+    public function sliceEndingWithReturnsNullDataProvider(): array
+    {
+        return [
+            'end does not exist' => [
+                'sequence' => new StateTransitionSequence([
+                    State::VALUE_CREATE_RECEIVED,
+                ]),
+                'end' => State::VALUE_UP_ACTIVE,
+            ],
+        ];
+    }
 }

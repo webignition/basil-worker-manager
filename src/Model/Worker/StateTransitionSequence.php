@@ -64,4 +64,21 @@ class StateTransitionSequence
             $endPosition - $startPosition + 1
         ));
     }
+
+    /**
+     * @param State::VALUE_* $end
+     */
+    public function sliceEndingWith(string $end): ?self
+    {
+        $endPosition = array_search($end, $this->states, true);
+        if (!is_int($endPosition)) {
+            return null;
+        }
+
+        return new StateTransitionSequence(array_slice(
+            $this->states,
+            0,
+            $endPosition + 1
+        ));
+    }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Model\DigitalOcean;
 
-use App\Entity\Worker;
 use App\Model\RemoteMachineInterface;
+use App\Model\Worker\State;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
 class RemoteMachine implements RemoteMachineInterface
@@ -41,16 +41,16 @@ class RemoteMachine implements RemoteMachineInterface
     }
 
     /**
-     * @return Worker::STATE_UP_STARTED|Worker::STATE_UP_ACTIVE|null
+     * @return State::VALUE_UP_STARTED|State::VALUE_UP_ACTIVE|null
      */
     public function getState(): ?string
     {
         if (self::STATE_NEW === $this->droplet->status) {
-            return Worker::STATE_UP_STARTED;
+            return State::VALUE_UP_STARTED;
         }
 
         if (self::STATE_ACTIVE === $this->droplet->status) {
-            return Worker::STATE_UP_ACTIVE;
+            return State::VALUE_UP_ACTIVE;
         }
 
         return null;

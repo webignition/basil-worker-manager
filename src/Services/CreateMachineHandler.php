@@ -10,6 +10,7 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Model\CreateMachineRequest;
 use App\Model\CreateMachineResponse;
+use App\Model\Worker\State;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMachineHandler
@@ -26,7 +27,7 @@ class CreateMachineHandler
 
     public function create(Worker $worker, CreateMachineRequest $request): CreateMachineResponse
     {
-        $worker->setState(Worker::STATE_CREATE_REQUESTED);
+        $worker->setState(State::VALUE_CREATE_REQUESTED);
         $this->workerStore->store($worker);
 
         try {
@@ -50,7 +51,7 @@ class CreateMachineHandler
             $this->exceptionLogger->log($unsupportedProviderException);
         }
 
-        $worker = $worker->setState(Worker::STATE_CREATE_FAILED);
+        $worker = $worker->setState(State::VALUE_CREATE_FAILED);
         $this->workerStore->store($worker);
 
         return new CreateMachineResponse(CreateMachineResponse::STATE_FAILED);

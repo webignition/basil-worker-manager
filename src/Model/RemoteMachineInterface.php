@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-use App\Entity\Worker;
+use App\Model\Worker\State;
 
 interface RemoteMachineInterface
 {
@@ -14,7 +14,7 @@ interface RemoteMachineInterface
     public function getIpAddresses(): array;
 
     /**
-     * @return Worker::STATE_UP_STARTED|Worker::STATE_UP_ACTIVE|null
+     * @return State::VALUE_UP_STARTED|State::VALUE_UP_ACTIVE|null
      */
     public function getState(): ?string;
 }

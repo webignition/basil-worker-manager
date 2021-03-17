@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Model;
 
-use App\Entity\Worker;
 use App\Model\RemoteMachineInterface;
+use App\Model\Worker\State;
 use Mockery\MockInterface;
 
 class MockRemoteMachine
@@ -48,7 +48,7 @@ class MockRemoteMachine
     }
 
     /**
-     * @param Worker::STATE_UP_STARTED|Worker::STATE_UP_ACTIVE|null $state
+     * @param State::VALUE_UP_STARTED|State::VALUE_UP_ACTIVE|null $state
      */
     public function withGetStateCall(?string $state): self
     {

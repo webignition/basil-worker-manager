@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
+use App\Model\Worker\State;
 use App\Services\CreateMachineHandler;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider;
@@ -69,7 +69,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->factory->create($worker, $request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertNotSame(Worker::STATE_CREATE_FAILED, $worker->getState());
+        self::assertNotSame(State::VALUE_CREATE_FAILED, $worker->getState());
     }
 
     public function testInvokeWithNonWorkerApiActionException(): void
@@ -92,7 +92,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->factory->create($worker, $request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(Worker::STATE_CREATE_FAILED, $worker->getState());
+        self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
         self::assertSame(0, $request->getRetryCount());
     }
 
@@ -140,7 +140,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
-        self::assertNotSame(Worker::STATE_CREATE_FAILED, $worker->getState());
+        self::assertNotSame(State::VALUE_CREATE_FAILED, $worker->getState());
     }
 
     /**
@@ -199,7 +199,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->factory->create($worker, $request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(Worker::STATE_CREATE_FAILED, $worker->getState());
+        self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
     }
 
     /**

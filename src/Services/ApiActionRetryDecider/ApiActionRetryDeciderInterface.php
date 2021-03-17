@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\CreateFailureRetryDecider;
+namespace App\Services\ApiActionRetryDecider;
 
 use App\Model\ProviderInterface;
 
-interface CreateFailureRetryDeciderInterface
+interface ApiActionRetryDeciderInterface
 {
     /**
      * @param ProviderInterface::NAME_* $type

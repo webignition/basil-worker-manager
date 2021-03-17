@@ -3,23 +3,23 @@
 namespace App\Services;
 
 use App\Model\ProviderInterface;
-use App\Services\CreateFailureRetryDecider\CreateFailureRetryDeciderInterface;
+use App\Services\ApiActionRetryDecider\ApiActionRetryDeciderInterface;
 
-class CreateFailureRetryDecider
+class ApiActionRetryDecider
 {
     /**
-     * @var CreateFailureRetryDeciderInterface[]
+     * @var ApiActionRetryDeciderInterface[]
      */
     private array $deciders;
 
     /**
-     * @param CreateFailureRetryDeciderInterface[] $deciders
+     * @param ApiActionRetryDeciderInterface[] $deciders
      */
     public function __construct(
         array $deciders,
     ) {
         $this->deciders = array_filter($deciders, function ($item) {
-            return $item instanceof CreateFailureRetryDeciderInterface;
+            return $item instanceof ApiActionRetryDeciderInterface;
         });
     }
 

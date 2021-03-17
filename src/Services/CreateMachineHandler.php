@@ -17,7 +17,7 @@ class CreateMachineHandler
 {
     public function __construct(
         private MachineProvider $machineProvider,
-        private CreateFailureRetryDecider $retryDecider,
+        private ApiActionRetryDecider $retryDecider,
         private MessageBusInterface $messageBus,
         private ExceptionLogger $exceptionLogger,
         private WorkerStore $workerStore,

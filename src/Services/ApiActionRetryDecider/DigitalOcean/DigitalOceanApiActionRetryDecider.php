@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Services\CreateFailureRetryDecider\DigitalOcean;
+namespace App\Services\ApiActionRetryDecider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Model\ProviderInterface;
-use App\Services\CreateFailureRetryDecider\CreateFailureRetryDeciderInterface;
+use App\Services\ApiActionRetryDecider\ApiActionRetryDeciderInterface;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\RuntimeException;
 
-class DigitalOceanCreateFailureRetryDecider implements CreateFailureRetryDeciderInterface
+class DigitalOceanApiActionRetryDecider implements ApiActionRetryDeciderInterface
 {
     /**
      * @param ProviderInterface::NAME_* $type

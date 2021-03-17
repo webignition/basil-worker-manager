@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Model\ProviderInterface;
-use App\Services\CreateFailureRetryDecider;
-use App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider;
+use App\Services\ApiActionRetryDecider;
+use App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-class CreateFailureRetryDeciderTest extends TestCase
+class ApiActionRetryDeciderTest extends TestCase
 {
     /**
      * @dataProvider decideDataProvider
@@ -19,7 +19,7 @@ class CreateFailureRetryDeciderTest extends TestCase
      * @param ProviderInterface::NAME_* $provider
      */
     public function testDecide(
-        CreateFailureRetryDecider $decider,
+        ApiActionRetryDecider $decider,
         string $provider,
         \Throwable $exception,
         bool $expectedDecision
@@ -34,22 +34,22 @@ class CreateFailureRetryDeciderTest extends TestCase
     {
         return [
             'no deciders' => [
-                'decider' => new CreateFailureRetryDecider([]),
+                'decider' => new ApiActionRetryDecider([]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
             ],
             'has decider, false' => [
-                'decider' => new CreateFailureRetryDecider([
-                    new DigitalOceanCreateFailureRetryDecider(),
+                'decider' => new ApiActionRetryDecider([
+                    new DigitalOceanApiActionRetryDecider(),
                 ]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'has decider, true' => [
-                'decider' => new CreateFailureRetryDecider([
-                    new DigitalOceanCreateFailureRetryDecider(),
+                'decider' => new ApiActionRetryDecider([
+                    new DigitalOceanApiActionRetryDecider(),
                 ]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'exception' => new InvalidArgumentException(),

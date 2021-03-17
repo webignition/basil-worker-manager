@@ -15,7 +15,7 @@ class UpdateWorkerHandler
 {
     public function __construct(
         private MachineProvider $machineProvider,
-        private CreateFailureRetryDecider $retryDecider,
+        private ApiActionRetryDecider $retryDecider,
         private UpdateWorkerMessageDispatcher $dispatcher,
         private ExceptionLogger $exceptionLogger,
         private WorkerStateTransitionSequences $stateTransitionSequences,

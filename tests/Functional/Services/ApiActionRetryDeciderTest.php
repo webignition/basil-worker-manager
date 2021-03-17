@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Model\ProviderInterface;
-use App\Services\CreateFailureRetryDecider;
+use App\Services\ApiActionRetryDecider;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 
-class CreateFailureRetryDeciderTest extends AbstractBaseFunctionalTest
+class ApiActionRetryDeciderTest extends AbstractBaseFunctionalTest
 {
-    private CreateFailureRetryDecider $decider;
+    private ApiActionRetryDecider $decider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $decider = self::$container->get(CreateFailureRetryDecider::class);
-        if ($decider instanceof CreateFailureRetryDecider) {
+        $decider = self::$container->get(ApiActionRetryDecider::class);
+        if ($decider instanceof ApiActionRetryDecider) {
             $this->decider = $decider;
         }
     }

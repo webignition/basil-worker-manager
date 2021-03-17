@@ -75,10 +75,10 @@ services:
             $machineProviders:
                 - '@App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider'
 
-    App\Services\CreateFailureRetryDecider:
+    App\Services\ApiActionRetryDecider:
         arguments:
             $deciders:
-                - '@App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider'
+                - '@App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider'
 
     App\Services\CreateMachineHandler:
         arguments:

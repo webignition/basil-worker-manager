@@ -6,6 +6,7 @@ namespace App\Tests\Mock\Services;
 
 use App\Services\ExceptionLogger;
 use Mockery\MockInterface;
+use PHPUnit\Framework\TestCase;
 
 class MockExceptionLogger
 {
@@ -21,12 +22,18 @@ class MockExceptionLogger
         return $this->mock;
     }
 
-    public function withLogCall(\Throwable $exception): self
+    public function withLogCall(\Throwable $expectedException): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive('log')
-                ->with($exception);
+                ->withArgs(function (\Throwable $exception) use ($expectedException) {
+                    TestCase::assertSame($expectedException::class, $exception::class);
+                    TestCase::assertSame($expectedException->getMessage(), $exception->getMessage());
+                    TestCase::assertSame($expectedException->getCode(), $exception->getCode());
+
+                    return true;
+                });
         }
 
         return $this;

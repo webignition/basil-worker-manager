@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
+use App\Message\UpdateWorkerMessage;
 use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
@@ -68,7 +69,12 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->factory->create($worker, $request);
 
-        $this->messengerAsserter->assertQueueIsEmpty();
+        $this->messengerAsserter->assertQueueCount(1);
+        $this->messengerAsserter->assertMessageAtPositionEquals(
+            0,
+            new UpdateWorkerMessage((string) $worker, State::VALUE_UP_ACTIVE)
+        );
+
         self::assertNotSame(State::VALUE_CREATE_FAILED, $worker->getState());
     }
 

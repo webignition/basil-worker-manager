@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Services\CreateFailureRetryDecider\DigitalOcean;
+namespace App\Tests\Unit\Services\ApiActionRetryDecider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Model\ProviderInterface;
-use App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider;
+use App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\DiscoveryFailedException;
 use DigitalOceanV2\Exception\ErrorException;
@@ -16,15 +16,15 @@ use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
 
-class DigitalOceanCreateFailureRetryDeciderTest extends TestCase
+class DigitalOceanApiActionRetryDeciderTest extends TestCase
 {
-    private DigitalOceanCreateFailureRetryDecider $decider;
+    private DigitalOceanApiActionRetryDecider $decider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->decider = new DigitalOceanCreateFailureRetryDecider();
+        $this->decider = new DigitalOceanApiActionRetryDecider();
     }
 
     public function testHandles(): void

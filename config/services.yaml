@@ -11,6 +11,7 @@ parameters:
     digitalocean_droplet_image: '%env(DIGITALOCEAN_IMAGE)%'
     digitalocean_droplet_tag: '%env(DIGITALOCEAN_TAG)%'
     create_retry_limit: '%env(CREATE_RETRY_LIMIT)%'
+    update_worker_dispatch_delay: '%env(UPDATE_WORKER_DISPATCH_DELAY)%'
 
 services:
     # default configuration for services in *this* file
@@ -74,10 +75,10 @@ services:
             $machineProviders:
                 - '@App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider'
 
-    App\Services\CreateFailureRetryDecider:
+    App\Services\ApiActionRetryDecider:
         arguments:
             $deciders:
-                - '@App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider'
+                - '@App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider'
 
     App\Services\CreateMachineHandler:
         arguments:
@@ -121,3 +122,7 @@ services:
                 create_failed: '@app.services.worker_state_transition_sequence.create_failed'
                 delete_failed: '@app.services.worker_state_transition_sequence.delete_failed'
                 delete_deleted: '@app.services.worker_state_transition_sequence.delete_deleted'
+
+    App\Services\UpdateWorkerMessageDispatcher:
+        arguments:
+            $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'

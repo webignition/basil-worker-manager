@@ -8,8 +8,8 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
+use App\Model\ApiRequestOutcome;
 use App\Model\CreateMachineRequest;
-use App\Model\CreateMachineResponse;
 use App\Model\Worker\State;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -17,23 +17,25 @@ class CreateMachineHandler
 {
     public function __construct(
         private MachineProvider $machineProvider,
-        private CreateFailureRetryDecider $retryDecider,
+        private ApiActionRetryDecider $retryDecider,
         private MessageBusInterface $messageBus,
         private ExceptionLogger $exceptionLogger,
         private WorkerStore $workerStore,
-        private int $retryLimit
+        private int $retryLimit,
+        private UpdateWorkerMessageDispatcher $updateWorkerMessageDispatcher,
     ) {
     }
 
-    public function create(Worker $worker, CreateMachineRequest $request): CreateMachineResponse
+    public function create(Worker $worker, CreateMachineRequest $request): ApiRequestOutcome
     {
         $worker->setState(State::VALUE_CREATE_REQUESTED);
         $this->workerStore->store($worker);
 
         try {
             $this->machineProvider->create($worker);
+            $this->updateWorkerMessageDispatcher->dispatchForWorker($worker, State::VALUE_UP_ACTIVE);
 
-            return new CreateMachineResponse(CreateMachineResponse::STATE_SUCCESS);
+            return ApiRequestOutcome::success();
         } catch (WorkerApiActionException $workerApiActionException) {
             $exceptionRequiresRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
@@ -45,7 +47,7 @@ class CreateMachineHandler
             if ($exceptionRequiresRetry && false === $retryLimitReached) {
                 $this->messageBus->dispatch(new CreateMessage($request->incrementRetryCount()));
 
-                return new CreateMachineResponse(CreateMachineResponse::STATE_RETRYING);
+                return ApiRequestOutcome::retrying();
             }
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             $this->exceptionLogger->log($unsupportedProviderException);
@@ -54,6 +56,6 @@ class CreateMachineHandler
         $worker = $worker->setState(State::VALUE_CREATE_FAILED);
         $this->workerStore->store($worker);
 
-        return new CreateMachineResponse(CreateMachineResponse::STATE_FAILED);
+        return ApiRequestOutcome::failed();
     }
 }

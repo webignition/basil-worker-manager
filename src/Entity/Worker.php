@@ -95,7 +95,7 @@ class Worker implements \Stringable, \JsonSerializable
 
     public function getName(): string
     {
-        return sprintf(self::NAME, $this->getId());
+        return sprintf(self::NAME, (string) $this);
     }
 
     public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): self

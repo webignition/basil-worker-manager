@@ -63,3 +63,11 @@ services:
         factory: ['GuzzleHttp\HandlerStack', 'create']
         arguments:
             $handler: '@GuzzleHttp\Handler\MockHandler'
+
+    App\Services\WorkerStateTransitionSequences:
+        public: true
+        arguments:
+            $sequences:
+                create_failed: '@app.services.worker_state_transition_sequence.create_failed'
+                delete_failed: '@app.services.worker_state_transition_sequence.delete_failed'
+                delete_deleted: '@app.services.worker_state_transition_sequence.delete_deleted'

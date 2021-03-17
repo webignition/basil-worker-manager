@@ -82,3 +82,42 @@ services:
     App\Services\CreateMachineHandler:
         arguments:
             $retryLimit: '%create_retry_limit%'
+
+    app.services.worker_state_transition_sequence.create_failed:
+        class: App\Model\Worker\StateTransitionSequence
+        arguments:
+            $states:
+                - !php/const App\Model\Worker\State::VALUE_CREATE_RECEIVED
+                - !php/const App\Model\Worker\State::VALUE_CREATE_REQUESTED
+                - !php/const App\Model\Worker\State::VALUE_CREATE_FAILED
+
+    app.services.worker_state_transition_sequence.delete_failed:
+        class: App\Model\Worker\StateTransitionSequence
+        arguments:
+            $states:
+                - !php/const App\Model\Worker\State::VALUE_CREATE_RECEIVED
+                - !php/const App\Model\Worker\State::VALUE_CREATE_REQUESTED
+                - !php/const App\Model\Worker\State::VALUE_UP_STARTED
+                - !php/const App\Model\Worker\State::VALUE_UP_ACTIVE
+                - !php/const App\Model\Worker\State::VALUE_DELETE_RECEIVED
+                - !php/const App\Model\Worker\State::VALUE_DELETE_REQUESTED
+                - !php/const App\Model\Worker\State::VALUE_DELETE_FAILED
+
+    app.services.worker_state_transition_sequence.delete_deleted:
+        class: App\Model\Worker\StateTransitionSequence
+        arguments:
+            $states:
+                - !php/const App\Model\Worker\State::VALUE_CREATE_RECEIVED
+                - !php/const App\Model\Worker\State::VALUE_CREATE_REQUESTED
+                - !php/const App\Model\Worker\State::VALUE_UP_STARTED
+                - !php/const App\Model\Worker\State::VALUE_UP_ACTIVE
+                - !php/const App\Model\Worker\State::VALUE_DELETE_RECEIVED
+                - !php/const App\Model\Worker\State::VALUE_DELETE_REQUESTED
+                - !php/const App\Model\Worker\State::VALUE_DELETE_DELETED
+
+    App\Services\WorkerStateTransitionSequences:
+        arguments:
+            $sequences:
+                create_failed: '@app.services.worker_state_transition_sequence.create_failed'
+                delete_failed: '@app.services.worker_state_transition_sequence.delete_failed'
+                delete_deleted: '@app.services.worker_state_transition_sequence.delete_deleted'

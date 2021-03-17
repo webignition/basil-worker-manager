@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\Worker;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
+use App\Model\Worker\State;
 use App\Tests\Mock\Model\MockRemoteMachine;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
@@ -23,7 +24,7 @@ class WorkerTest extends TestCase
         self::assertNull($worker->getId());
         self::assertNull($worker->getRemoteId());
         self::assertSame($label, $worker->getLabel());
-        self::assertSame(Worker::STATE_CREATE_RECEIVED, $worker->getState());
+        self::assertSame(State::VALUE_CREATE_RECEIVED, $worker->getState());
         self::assertSame($provider, $worker->getProvider());
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
         self::assertSame('worker-', $worker->getName());
@@ -32,7 +33,7 @@ class WorkerTest extends TestCase
     /**
      * @dataProvider updateFromRemoteMachineDataProvider
      *
-     * @param Worker::STATE_* $expectedState
+     * @param State::VALUE_* $expectedState
      * @param string[] $expectedIpAddresses
      */
     public function testUpdateFromRemoteMachine(
@@ -65,17 +66,17 @@ class WorkerTest extends TestCase
                     ->withGetStateCall(null)
                     ->getMock(),
                 'expectedRemoteId' => $remoteId,
-                'expectedState' => Worker::STATE_CREATE_RECEIVED,
+                'expectedState' => State::VALUE_CREATE_RECEIVED,
                 'expectedIpAddresses' => $ipAddresses,
             ],
             'remoteId, ipAddresses and state' => [
                 'remoteMachine' => (new MockRemoteMachine())
                     ->withGetIdCall($remoteId)
                     ->withGetIpAddressesCall($ipAddresses)
-                    ->withGetStateCall(Worker::STATE_UP_STARTED)
+                    ->withGetStateCall(State::VALUE_UP_STARTED)
                     ->getMock(),
                 'expectedRemoteId' => $remoteId,
-                'expectedState' => Worker::STATE_UP_STARTED,
+                'expectedState' => State::VALUE_UP_STARTED,
                 'expectedIpAddresses' => $ipAddresses,
             ],
         ];
@@ -89,7 +90,7 @@ class WorkerTest extends TestCase
         self::assertSame(
             [
                 'label' => $label,
-                'state' => Worker::STATE_CREATE_RECEIVED,
+                'state' => State::VALUE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ],
             $worker->jsonSerialize()

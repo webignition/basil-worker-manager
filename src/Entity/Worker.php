@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
+use App\Model\Worker\State;
 use App\Repository\WorkerRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
@@ -14,16 +15,6 @@ use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 class Worker implements \Stringable, \JsonSerializable
 {
     private const NAME = 'worker-%s';
-
-    public const STATE_CREATE_RECEIVED = 'create/received';
-    public const STATE_CREATE_REQUESTED = 'create/requested';
-    public const STATE_CREATE_FAILED = 'create/failed';
-    public const STATE_DELETE_RECEIVED = 'delete/received';
-    public const STATE_DELETE_REQUESTED = 'delete/requested';
-    public const STATE_DELETE_FAILED = 'delete/failed';
-    public const STATE_UP_STARTED = 'up/started';
-    public const STATE_UP_ACTIVE = 'up/active';
-    public const STATE_DELETED = 'deleted';
 
     /**
      * @ORM\Id
@@ -46,7 +37,7 @@ class Worker implements \Stringable, \JsonSerializable
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * @var self::STATE_*
+     * @var State::VALUE_*
      */
     private string $state;
 
@@ -72,7 +63,7 @@ class Worker implements \Stringable, \JsonSerializable
         $worker = new Worker();
         $worker->remote_id = null;
         $worker->label = $label;
-        $worker->state = self::STATE_CREATE_RECEIVED;
+        $worker->state = STATE::VALUE_CREATE_RECEIVED;
         $worker->provider = $provider;
         $worker->ip_addresses = [];
 
@@ -121,7 +112,7 @@ class Worker implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return self::STATE_*
+     * @return State::VALUE_*
      */
     public function getState(): string
     {
@@ -129,7 +120,7 @@ class Worker implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @param self::STATE_* $state
+     * @param  State::VALUE_* $state
      */
     public function setState(string $state): self
     {

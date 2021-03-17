@@ -9,6 +9,7 @@ use App\Entity\Worker;
 use App\Message\CreateMessage;
 use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
+use App\Model\Worker\State;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
 use App\Services\WorkerFactory;
@@ -126,7 +127,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     {
         $label = md5('label content');
 
-        $request = $this->client->request(
+        $this->client->request(
             'GET',
             str_replace(WorkerController::PATH_COMPONENT_LABEL, $label, WorkerController::PATH_STATUS)
         );
@@ -152,7 +153,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'label' => $label,
-                'state' => Worker::STATE_CREATE_RECEIVED,
+                'state' => State::VALUE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ]),
             (string) $response->getContent()

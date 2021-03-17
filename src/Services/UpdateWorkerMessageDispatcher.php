@@ -23,7 +23,7 @@ class UpdateWorkerMessageDispatcher
     {
         if ($this->enabled) {
             $this->messageBus->dispatch(new Envelope(
-                new UpdateWorkerMessage((string) $worker->getId(), $stopState),
+                new UpdateWorkerMessage((string) $worker, $stopState),
                 [
                     new DelayStamp($this->dispatchDelayInSeconds * 1000)
                 ]

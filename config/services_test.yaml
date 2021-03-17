@@ -3,49 +3,6 @@ services:
         autowire: true
         autoconfigure: true
 
-    App\Services\WorkerFactory:
-        public: true
-
-    App\Services\WorkerStore:
-        public: true
-
-    App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider:
-        public: true
-
-    app.digitalocean.droplet_configuration.default:
-        class: App\Model\DigitalOcean\DropletConfiguration
-        arguments:
-            $region: '%digitalocean_droplet_region%'
-            $size: '%digitalocean_droplet_size%'
-            $image: '%digitalocean_droplet_image%'
-            $tags:
-                - '%digitalocean_droplet_tag%'
-
-    App\Services\MachineProvider\DigitalOcean\DropletFactory:
-        arguments:
-            $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
-            $prefix: '%digitalocean_droplet_name_prefix%'
-
-    App\Services\MachineProvider:
-        public: true
-        arguments:
-            $machineProviders:
-                - '@App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider'
-
-    App\Services\CreateFailureRetryDecider:
-        public: true
-        arguments:
-            $deciders:
-                - '@App\Services\CreateFailureRetryDecider\DigitalOcean\DigitalOceanCreateFailureRetryDecider'
-
-    App\Services\CreateMachineHandler:
-        public: true
-        arguments:
-            $retryLimit: '%create_retry_limit%'
-
-    App\Services\MachineProvider\DigitalOcean\DropletRepository:
-        public: true
-
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

@@ -8,8 +8,8 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
-use App\Model\CreateMachineRequest;
 use App\Model\ApiRequestOutcome;
+use App\Model\CreateMachineRequest;
 use App\Model\Worker\State;
 use Symfony\Component\Messenger\MessageBusInterface;
 

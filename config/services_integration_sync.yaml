@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Services\UpdateWorkerMessageDispatcher:
+        arguments:
+            $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'
+            $enabled: false

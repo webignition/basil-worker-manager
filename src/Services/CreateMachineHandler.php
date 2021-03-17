@@ -21,7 +21,8 @@ class CreateMachineHandler
         private MessageBusInterface $messageBus,
         private ExceptionLogger $exceptionLogger,
         private WorkerStore $workerStore,
-        private int $retryLimit
+        private int $retryLimit,
+        private UpdateWorkerMessageDispatcher $updateWorkerMessageDispatcher,
     ) {
     }
 
@@ -32,6 +33,7 @@ class CreateMachineHandler
 
         try {
             $this->machineProvider->create($worker);
+            $this->updateWorkerMessageDispatcher->dispatchForWorker($worker, State::VALUE_UP_ACTIVE);
 
             return ApiRequestOutcome::success();
         } catch (WorkerApiActionException $workerApiActionException) {

@@ -15,16 +15,19 @@ class UpdateWorkerMessageDispatcher
     public function __construct(
         private MessageBusInterface $messageBus,
         private int $dispatchDelayInSeconds,
+        private bool $enabled = true
     ) {
     }
 
     public function dispatchForWorker(Worker $worker, string $stopState): void
     {
-        $this->messageBus->dispatch(new Envelope(
-            new UpdateWorkerMessage((string) $worker->getId(), $stopState),
-            [
-                new DelayStamp($this->dispatchDelayInSeconds * 1000)
-            ]
-        ));
+        if ($this->enabled) {
+            $this->messageBus->dispatch(new Envelope(
+                new UpdateWorkerMessage((string) $worker->getId(), $stopState),
+                [
+                    new DelayStamp($this->dispatchDelayInSeconds * 1000)
+                ]
+            ));
+        }
     }
 }

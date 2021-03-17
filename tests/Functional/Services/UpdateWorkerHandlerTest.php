@@ -7,28 +7,20 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
-use App\Message\CreateMessage;
-use App\Model\CreateMachineRequest;
+use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
-use App\Model\UpdateWorkerResponse;
 use App\Model\Worker\State;
-use App\Services\CreateMachineHandler;
 use App\Services\ExceptionLogger;
-use App\Services\MachineProvider;
 use App\Services\UpdateWorkerHandler;
 use App\Services\WorkerFactory;
 use App\Services\WorkerStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
-use App\Tests\Mock\Services\MockMachineProvider;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
-use DigitalOceanV2\Exception\ApiLimitExceededException;
-use DigitalOceanV2\Exception\InvalidArgumentException;
 use DigitalOceanV2\Exception\RuntimeException;
-use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -86,7 +78,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         array $httpFixtures,
         string $currentState,
         string $stopState,
-        UpdateWorkerResponse $expectedResponse,
+        ApiRequestOutcome $expectedOutcome,
         int $expectedMessageQueueCount
     ): void {
         $this->setExceptionLoggerOnHandler(
@@ -102,7 +94,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $response = $this->handler->update($this->worker, $stopState);
 
-        self::assertEquals($expectedResponse, $response);
+        self::assertEquals($expectedOutcome, $response);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
     }
 
@@ -117,7 +109,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                 'httpFixtures' => [],
                 'currentState' => $endState,
                 'stopState' => State::VALUE_CREATE_RECEIVED,
-                'expectedResponse' => new UpdateWorkerResponse(UpdateWorkerResponse::STATE_SUCCESS),
+                'expectedOutcome' => ApiRequestOutcome::success(),
                 'expectedMessageQueueCount' => 0,
             ];
         }
@@ -128,14 +120,14 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
                     'stopState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedResponse' => new UpdateWorkerResponse(UpdateWorkerResponse::STATE_SUCCESS),
+                    'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'current state not end state, current state not stop state, current state past stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_DELETE_RECEIVED,
                     'stopState' => State::VALUE_UP_ACTIVE,
-                    'expectedResponse' => new UpdateWorkerResponse(UpdateWorkerResponse::STATE_SUCCESS),
+                    'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, worker is updated to stop state' => [
@@ -149,7 +141,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
                     'stopState' => State::VALUE_UP_STARTED,
-                    'expectedResponse' => new UpdateWorkerResponse(UpdateWorkerResponse::STATE_SUCCESS),
+                    'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, worker is updated past stop state' => [
@@ -163,7 +155,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
                     'stopState' => State::VALUE_UP_STARTED,
-                    'expectedResponse' => new UpdateWorkerResponse(UpdateWorkerResponse::STATE_SUCCESS),
+                    'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, worker is updated to before stop state' => [
@@ -177,7 +169,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
                     'stopState' => State::VALUE_UP_ACTIVE,
-                    'expectedResponse' => new UpdateWorkerResponse(UpdateWorkerResponse::STATE_RETRYING),
+                    'expectedOutcome' => ApiRequestOutcome::retrying(),
                     'expectedMessageQueueCount' => 1,
                 ],
                 'WorkerApiActionException (HTTP 503), requires retry' => [
@@ -186,7 +178,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
                     'stopState' => State::VALUE_UP_ACTIVE,
-                    'expectedResponse' => new UpdateWorkerResponse(UpdateWorkerResponse::STATE_RETRYING),
+                    'expectedOutcome' => ApiRequestOutcome::retrying(),
                     'expectedMessageQueueCount' => 1,
                 ],
             ],
@@ -211,9 +203,9 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $response = $this->handler->update($this->worker, State::VALUE_UP_ACTIVE);
+        $outcome = $this->handler->update($this->worker, State::VALUE_UP_ACTIVE);
 
-        self::assertEquals(new UpdateWorkerResponse(UpdateWorkerResponse::STATE_FAILED), $response);
+        self::assertEquals(ApiRequestOutcome::failed(), $outcome);
     }
 
     public function testUpdateThrowsUnknownProviderException(): void
@@ -230,9 +222,9 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $response = $this->handler->update($this->worker, State::VALUE_UP_ACTIVE);
+        $outcome = $this->handler->update($this->worker, State::VALUE_UP_ACTIVE);
 
-        self::assertEquals(new UpdateWorkerResponse(UpdateWorkerResponse::STATE_FAILED), $response);
+        self::assertEquals(ApiRequestOutcome::failed(), $outcome);
     }
 
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void

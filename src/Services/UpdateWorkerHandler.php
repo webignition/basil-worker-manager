@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
-use App\Model\UpdateWorkerResponse;
+use App\Model\ApiRequestOutcome;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
 
@@ -26,10 +26,10 @@ class UpdateWorkerHandler
      * @param Worker $worker
      * @param State::VALUE_* $stopState
      */
-    public function update(Worker $worker, string $stopState): UpdateWorkerResponse
+    public function update(Worker $worker, string $stopState): ApiRequestOutcome
     {
         if ($this->hasReachedStopStateOrEndState($worker->getState(), $stopState)) {
-            return new UpdateWorkerResponse(UpdateWorkerResponse::STATE_SUCCESS);
+            return ApiRequestOutcome::success();
         }
 
         $shouldRetry = true;
@@ -39,7 +39,7 @@ class UpdateWorkerHandler
             $worker = $this->machineProvider->update($worker);
 
             if ($this->hasReachedStopStateOrEndState($worker->getState(), $stopState)) {
-                return new UpdateWorkerResponse(UpdateWorkerResponse::STATE_SUCCESS);
+                return ApiRequestOutcome::success();
             }
         } catch (WorkerApiActionException $workerApiActionException) {
             $shouldRetry = $this->retryDecider->decide(
@@ -56,14 +56,14 @@ class UpdateWorkerHandler
         if ($shouldRetry) {
             $this->dispatcher->dispatchForWorker($worker, $stopState);
 
-            return new UpdateWorkerResponse(UpdateWorkerResponse::STATE_RETRYING);
+            return ApiRequestOutcome::retrying();
         }
 
         if ($lastException instanceof \Throwable) {
             $this->exceptionLogger->log($lastException);
         }
 
-        return new UpdateWorkerResponse(UpdateWorkerResponse::STATE_FAILED);
+        return ApiRequestOutcome::failed();
     }
 
     /**

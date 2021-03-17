@@ -8,8 +8,8 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
 class RemoteMachine implements RemoteMachineInterface
 {
-    private const STATE_NEW = 'new';
-    private const STATE_ACTIVE = 'active';
+    public const STATE_NEW = 'new';
+    public const STATE_ACTIVE = 'active';
 
     public function __construct(
         private DropletEntity $droplet

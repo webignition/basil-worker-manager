@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Worker;
 use App\Message\UpdateWorkerMessage;
+use App\MessageDispatcher\UpdateWorkerMessageDispatcher;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
-use App\Services\UpdateWorkerMessageDispatcher;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;

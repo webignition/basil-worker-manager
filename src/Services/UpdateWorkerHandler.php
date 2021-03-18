@@ -8,6 +8,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\UpdateWorkerMessage;
+use App\MessageDispatcher\UpdateWorkerMessageDispatcher;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\Worker\State;

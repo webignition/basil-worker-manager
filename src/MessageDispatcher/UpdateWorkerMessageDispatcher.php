@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\MessageDispatcher;
 
 use App\Message\UpdateWorkerMessage;
 use Symfony\Component\Messenger\Envelope;

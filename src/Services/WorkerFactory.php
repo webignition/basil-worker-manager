@@ -15,10 +15,10 @@ class WorkerFactory
     /**
      * @param ProviderInterface::NAME_* $provider
      */
-    public function create(string $label, string $provider): Worker
+    public function create(string $id, string $provider): Worker
     {
         return $this->workerStore->store(
-            Worker::create($label, $provider)
+            Worker::create($id, $provider)
         );
     }
 }

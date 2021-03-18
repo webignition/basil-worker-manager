@@ -12,14 +12,14 @@ class WorkerCreateRequestTest extends TestCase
 {
     public function testCreate(): void
     {
-        $label = md5('label source');
+        $id = md5('id content');
 
         $request = new Request([], [
-            WorkerCreateRequest::KEY_LABEL => $label,
+            WorkerCreateRequest::KEY_ID => $id,
         ]);
 
         $jobCreateRequest = new WorkerCreateRequest($request);
 
-        self::assertSame($label, $jobCreateRequest->getLabel());
+        self::assertSame($id, $jobCreateRequest->getId());
     }
 }

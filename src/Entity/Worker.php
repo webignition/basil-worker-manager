@@ -7,7 +7,6 @@ use App\Model\RemoteMachineInterface;
 use App\Model\Worker\State;
 use App\Repository\WorkerRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\IdGenerator\UlidGenerator;
 
 /**
  * @ORM\Entity(repositoryClass=WorkerRepository::class)
@@ -18,21 +17,14 @@ class Worker implements \Stringable, \JsonSerializable
 
     /**
      * @ORM\Id
-     * @ORM\Column(type="ulid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=UlidGenerator::class)
+     * @ORM\Column(type="string", length=64)
      */
-    private ?string $id = null;
+    private string $id;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private ?int $remote_id;
-
-    /**
-     * @ORM\Column(type="string", length=32, nullable=false, unique=true)
-     */
-    private string $label;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -58,11 +50,11 @@ class Worker implements \Stringable, \JsonSerializable
     /**
      * @param ProviderInterface::NAME_* $provider
      */
-    public static function create(string $label, string $provider): self
+    public static function create(string $id, string $provider): self
     {
         $worker = new Worker();
+        $worker->id = $id;
         $worker->remote_id = null;
-        $worker->label = $label;
         $worker->state = STATE::VALUE_CREATE_RECEIVED;
         $worker->provider = $provider;
         $worker->ip_addresses = [];
@@ -70,7 +62,7 @@ class Worker implements \Stringable, \JsonSerializable
         return $worker;
     }
 
-    public function getId(): ?string
+    public function getId(): string
     {
         return $this->id;
     }
@@ -78,11 +70,6 @@ class Worker implements \Stringable, \JsonSerializable
     public function getRemoteId(): ?int
     {
         return $this->remote_id;
-    }
-
-    public function getLabel(): string
-    {
-        return $this->label;
     }
 
     /**
@@ -140,7 +127,7 @@ class Worker implements \Stringable, \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'label' => $this->label,
+            'id' => $this->id,
             'state' => $this->state,
             'ip_addresses' => $this->ip_addresses,
         ];

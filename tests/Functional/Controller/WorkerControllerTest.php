@@ -17,7 +17,6 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use webignition\ObjectReflector\ObjectReflector;
 
 class WorkerControllerTest extends AbstractBaseFunctionalTest
 {
@@ -43,8 +42,8 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $label = md5('label content');
-        $response = $this->makeCreateRequest($label);
+        $id = md5('id content');
+        $response = $this->makeCreateRequest($id);
 
         self::assertSame(202, $response->getStatusCode());
         self::assertInstanceOf(Response::class, $response);
@@ -54,8 +53,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $worker = current($workers);
         self::assertInstanceOf(Worker::class, $worker);
-        self::assertNotNull($worker->getId());
-        self::assertSame($label, ObjectReflector::getProperty($worker, 'label'));
+        self::assertSame($id, $worker->getId());
 
         $this->messengerAsserter->assertQueueCount(1);
 
@@ -66,12 +64,12 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider createLabelMissingDataProvider
+     * @dataProvider createIdMissingDataProvider
      *
      * @param array[] $requestData
      * @param array[] $expectedResponseBody
      */
-    public function testCreateLabelMissing(array $requestData, array $expectedResponseBody): void
+    public function testCreateIdMissing(array $requestData, array $expectedResponseBody): void
     {
         $this->client->request('POST', WorkerController::PATH_CREATE, $requestData);
 
@@ -81,42 +79,42 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function createLabelMissingDataProvider(): array
+    public function createIdMissingDataProvider(): array
     {
-        $labelMissingExpectedResponseBody = [
+        $idMissingExpectedResponseBody = [
             'type' => 'worker-create-request',
-            'message' => 'label missing',
+            'message' => 'id missing',
             'code' => 100,
         ];
 
         return [
             'empty' => [
                 'requestData' => [],
-                'expectedResponseBody' => $labelMissingExpectedResponseBody,
+                'expectedResponseBody' => $idMissingExpectedResponseBody,
             ],
-            'label empty' => [
+            'id empty' => [
                 'requestData' => [
-                    WorkerCreateRequest::KEY_LABEL => '',
+                    WorkerCreateRequest::KEY_ID => '',
                 ],
-                'expectedResponseBody' => $labelMissingExpectedResponseBody,
+                'expectedResponseBody' => $idMissingExpectedResponseBody,
             ],
         ];
     }
 
-    public function testCreateLabelTaken(): void
+    public function testCreateIdTaken(): void
     {
-        $label = md5('label content');
+        $id = md5('id content');
         $workerFactory = self::$container->get(WorkerFactory::class);
         if ($workerFactory instanceof WorkerFactory) {
-            $workerFactory->create($label, ProviderInterface::NAME_DIGITALOCEAN);
+            $workerFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
         }
 
-        $response = $this->makeCreateRequest($label);
+        $response = $this->makeCreateRequest($id);
 
         $this->assertBadRequestResponse(
             [
                 'type' => 'worker-create-request',
-                'message' => 'label taken',
+                'message' => 'id taken',
                 'code' => 200,
             ],
             $response
@@ -125,11 +123,11 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
     public function testStatusWorkerNotFound(): void
     {
-        $label = md5('label content');
+        $id = md5('id content');
 
         $this->client->request(
             'GET',
-            str_replace(WorkerController::PATH_COMPONENT_LABEL, $label, WorkerController::PATH_STATUS)
+            str_replace(WorkerController::PATH_COMPONENT_ID, $id, WorkerController::PATH_STATUS)
         );
 
         self::assertSame(404, $this->client->getResponse()->getStatusCode());
@@ -137,14 +135,14 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
     public function testStatus(): void
     {
-        $label = md5('label content');
-        $createResponse = $this->makeCreateRequest($label);
+        $id = md5('id content');
+        $createResponse = $this->makeCreateRequest($id);
 
         self::assertSame(202, $createResponse->getStatusCode());
 
         $this->client->request(
             'GET',
-            str_replace(WorkerController::PATH_COMPONENT_LABEL, $label, WorkerController::PATH_STATUS)
+            str_replace(WorkerController::PATH_COMPONENT_ID, $id, WorkerController::PATH_STATUS)
         );
 
         $response = $this->client->getResponse();
@@ -152,7 +150,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         self::assertInstanceOf(JsonResponse::class, $response);
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
-                'label' => $label,
+                'id' => $id,
                 'state' => State::VALUE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ]),
@@ -170,13 +168,13 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));
     }
 
-    private function makeCreateRequest(string $label): Response
+    private function makeCreateRequest(string $id): Response
     {
         $this->client->request(
             'POST',
             WorkerController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_LABEL => $label,
+                WorkerCreateRequest::KEY_ID => $id,
             ]
         );
 

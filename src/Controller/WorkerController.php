@@ -19,8 +19,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class WorkerController extends AbstractController
 {
     public const PATH_CREATE = '/create';
-    public const PATH_COMPONENT_LABEL = '{label}';
-    public const PATH_STATUS = '/' . self::PATH_COMPONENT_LABEL . '/status';
+    public const PATH_COMPONENT_ID = '{id}';
+    public const PATH_STATUS = '/' . self::PATH_COMPONENT_ID . '/status';
 
     #[Route(self::PATH_CREATE, name: 'create')]
     public function create(
@@ -29,16 +29,16 @@ class WorkerController extends AbstractController
         MessageBusInterface $messageBus,
         WorkerRepository $workerRepository
     ): Response {
-        $label = $request->getLabel();
-        if ('' === $label) {
-            return BadWorkerCreateRequestResponse::createLabelMissingResponse();
+        $id = $request->getId();
+        if ('' === $id) {
+            return BadWorkerCreateRequestResponse::createIdMissingResponse();
         }
 
-        if ($workerRepository->findOneByLabel($label) instanceof Worker) {
-            return BadWorkerCreateRequestResponse::createLabelTakenResponse();
+        if ($workerRepository->find($id) instanceof Worker) {
+            return BadWorkerCreateRequestResponse::createIdTakenResponse();
         }
 
-        $worker = $factory->create($label, ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         $messageBus->dispatch(new CreateMessage(
             new CreateMachineRequest((string) $worker)
@@ -49,10 +49,10 @@ class WorkerController extends AbstractController
 
     #[Route(self::PATH_STATUS, name: 'status')]
     public function status(
-        string $label,
+        string $id,
         WorkerRepository $workerRepository,
     ): Response {
-        $worker = $workerRepository->findOneByLabel($label);
+        $worker = $workerRepository->find($id);
         if (false === $worker instanceof Worker) {
             return new Response('', 404);
         }

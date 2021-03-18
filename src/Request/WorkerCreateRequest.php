@@ -8,19 +8,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 class WorkerCreateRequest extends AbstractEncapsulatingRequest
 {
-    public const KEY_LABEL = 'label';
+    public const KEY_ID = 'id';
 
-    private string $label = '';
+    private string $id = '';
 
     public function processRequest(Request $request): void
     {
         $requestData = $request->request;
 
-        $this->label = (string) $requestData->get(self::KEY_LABEL);
+        $this->id = (string) $requestData->get(self::KEY_ID);
     }
 
-    public function getLabel(): string
+    public function getId(): string
     {
-        return $this->label;
+        return $this->id;
     }
 }

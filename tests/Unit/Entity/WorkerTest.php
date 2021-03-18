@@ -16,18 +16,17 @@ class WorkerTest extends TestCase
 {
     public function testCreate(): void
     {
-        $label = md5('label content');
+        $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $worker = Worker::create($label, $provider);
+        $worker = Worker::create($id, $provider);
 
-        self::assertNull($worker->getId());
+        self::assertSame($id, $worker->getId());
         self::assertNull($worker->getRemoteId());
-        self::assertSame($label, $worker->getLabel());
         self::assertSame(State::VALUE_CREATE_RECEIVED, $worker->getState());
         self::assertSame($provider, $worker->getProvider());
         self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
-        self::assertSame('worker-', $worker->getName());
+        self::assertSame('worker-' . $id, $worker->getName());
     }
 
     /**
@@ -42,7 +41,7 @@ class WorkerTest extends TestCase
         string $expectedState,
         array $expectedIpAddresses,
     ): void {
-        $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $worker = $worker->updateFromRemoteMachine($remoteMachine);
 
         self::assertSame($expectedRemoteId, $worker->getRemoteId());
@@ -84,12 +83,12 @@ class WorkerTest extends TestCase
 
     public function testJsonSerialize(): void
     {
-        $label = md5('label content');
-        $worker = Worker::create($label, ProviderInterface::NAME_DIGITALOCEAN);
+        $id = md5('id content');
+        $worker = Worker::create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         self::assertSame(
             [
-                'label' => $label,
+                'id' => $id,
                 'state' => State::VALUE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ],

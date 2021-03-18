@@ -7,7 +7,7 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20210312123145 extends AbstractMigration
+final class Version20210318103427 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -18,16 +18,14 @@ final class Version20210312123145 extends AbstractMigration
     {
         $this->addSql('
             CREATE TABLE worker (
-                id UUID NOT NULL, 
+                id VARCHAR(64) NOT NULL, 
                 remote_id INT DEFAULT NULL, 
-                label VARCHAR(32) NOT NULL, 
                 state VARCHAR(255) NOT NULL, 
                 provider VARCHAR(255) NOT NULL, 
-                ip_addresses TEXT DEFAULT NULL, PRIMARY KEY(id)
+                ip_addresses TEXT DEFAULT NULL, 
+                PRIMARY KEY(id)
             )
         ');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_9FB2BF62EA750E8 ON worker (label)');
-        $this->addSql('COMMENT ON COLUMN worker.id IS \'(DC2Type:ulid)\'');
         $this->addSql('COMMENT ON COLUMN worker.ip_addresses IS \'(DC2Type:simple_array)\'');
     }
 

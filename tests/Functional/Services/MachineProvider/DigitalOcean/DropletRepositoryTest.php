@@ -55,7 +55,7 @@ class DropletRepositoryTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         self::assertNull($worker->getRemoteId());
 
         $dropletEntity = $this->dropletRepository->get($worker);
@@ -70,7 +70,7 @@ class DropletRepositoryTest extends AbstractBaseFunctionalTest
         ResponseInterface $apiResponse,
         \Exception $expectedWrappedException
     ): void {
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $this->mockHandler->append($apiResponse);
 
         $expectedException = new WorkerApiActionException(

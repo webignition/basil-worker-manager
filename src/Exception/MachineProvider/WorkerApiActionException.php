@@ -25,10 +25,9 @@ class WorkerApiActionException extends AbstractRemoteApiWrappingException implem
     private static function createMessage(Worker $worker, string $action): string
     {
         return sprintf(
-            'Unable to %s remote machine for worker %s %s',
+            'Unable to %s remote machine for worker %s ',
             $action,
-            (string) $worker,
-            $worker->getLabel()
+            (string) $worker
         );
     }
 

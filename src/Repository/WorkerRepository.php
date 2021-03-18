@@ -18,11 +18,4 @@ class WorkerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Worker::class);
     }
-
-    public function findOneByLabel(string $label): ?Worker
-    {
-        return $this->findOneBy([
-            'label' => $label,
-        ]);
-    }
 }

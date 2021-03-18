@@ -8,29 +8,29 @@ class BadWorkerCreateRequestResponse extends ErrorResponse
 {
     private const TYPE = 'worker-create-request';
 
-    private const CODE_LABEL_MISSING = 100;
-    private const CODE_LABEL_TAKEN = 200;
-    private const MESSAGE_LABEL_MISSING = 'label missing';
-    private const MESSAGE_LABEL_TAKEN = 'label taken';
+    private const CODE_ID_MISSING = 100;
+    private const CODE_ID_TAKEN = 200;
+    private const MESSAGE_ID_MISSING = 'id missing';
+    private const MESSAGE_ID_TAKEN = 'id taken';
 
     public function __construct(string $message, int $code, int $status = self::HTTP_BAD_REQUEST)
     {
         parent::__construct(self::TYPE, $message, $code, $status);
     }
 
-    public static function createLabelMissingResponse(): self
+    public static function createIdMissingResponse(): self
     {
         return new BadWorkerCreateRequestResponse(
-            self::MESSAGE_LABEL_MISSING,
-            self::CODE_LABEL_MISSING
+            self::MESSAGE_ID_MISSING,
+            self::CODE_ID_MISSING
         );
     }
 
-    public static function createLabelTakenResponse(): self
+    public static function createIdTakenResponse(): self
     {
         return new BadWorkerCreateRequestResponse(
-            self::MESSAGE_LABEL_TAKEN,
-            self::CODE_LABEL_TAKEN
+            self::MESSAGE_ID_TAKEN,
+            self::CODE_ID_TAKEN
         );
     }
 }

@@ -7,11 +7,13 @@ namespace App\Tests\Functional\Entity;
 use App\Entity\Worker;
 use App\Model\ProviderInterface;
 use App\Tests\AbstractBaseFunctionalTest;
+use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
 class WorkerTest extends AbstractBaseFunctionalTest
 {
     private EntityManagerInterface $entityManager;
+    private EntityRefresher $entityRefresher;
 
     protected function setUp(): void
     {
@@ -21,20 +23,27 @@ class WorkerTest extends AbstractBaseFunctionalTest
         if ($entityManager instanceof EntityManagerInterface) {
             $this->entityManager = $entityManager;
         }
+
+        $entityRefresher = self::$container->get(EntityRefresher::class);
+        if ($entityRefresher instanceof EntityRefresher) {
+            $this->entityRefresher = $entityRefresher;
+        }
     }
 
     public function testPersist(): void
     {
-        $label = md5('label content');
+        $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $worker = Worker::create($label, $provider);
-
-        self::assertNull($worker->getId());
+        $worker = Worker::create($id, $provider);
 
         $this->entityManager->persist($worker);
         $this->entityManager->flush();
 
-        self::assertNotNull($worker->getId());
+        $this->entityRefresher->refreshForEntity(Worker::class);
+
+        $retrievedWorker = $this->entityManager->find(Worker::class, $worker->getId());
+
+        self::assertEquals($worker, $retrievedWorker);
     }
 }

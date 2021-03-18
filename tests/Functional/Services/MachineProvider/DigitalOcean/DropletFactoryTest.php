@@ -51,7 +51,7 @@ class DropletFactoryTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $createDropletEntity = $this->dropletFactory->create($worker);
 
         self::assertSame($remoteId, $createDropletEntity->id);
@@ -72,7 +72,7 @@ class DropletFactoryTest extends AbstractBaseFunctionalTest
             )
         );
 
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         try {
             $this->dropletFactory->create($worker);

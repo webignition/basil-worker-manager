@@ -27,7 +27,7 @@ class DropletFactoryTest extends TestCase
         parent::setUp();
 
         $workerId = 123;
-        $this->worker = Worker::create('label', ProviderInterface::NAME_DIGITALOCEAN);
+        $this->worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         ObjectReflector::setProperty($this->worker, Worker::class, 'id', $workerId);
 
         $this->dropletConfiguration = new DropletConfiguration(

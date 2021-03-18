@@ -54,7 +54,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $request = new CreateMachineRequest((string) $worker);
 
         $machineProvider = (new MockMachineProvider())
@@ -82,7 +82,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $request = new CreateMachineRequest((string) $worker);
 
         $machineProvider = (new MockMachineProvider())
@@ -107,7 +107,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeWorkerApiActionExceptionWithRetry(\Throwable $previous, int $currentRetryCount): void
     {
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         $request = new CreateMachineRequest((string) $worker);
         ObjectReflector::setProperty(
@@ -175,7 +175,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeWorkerApiActionExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
     {
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         $request = new CreateMachineRequest((string) $worker);
         ObjectReflector::setProperty(

@@ -16,7 +16,7 @@ class MachineProviderTest extends TestCase
     {
         $machineProvider = new MachineProvider([]);
 
-        $worker = Worker::create('label content', ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         self::expectExceptionObject(
             new UnsupportedProviderException(ProviderInterface::NAME_DIGITALOCEAN)

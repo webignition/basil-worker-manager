@@ -10,11 +10,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BadWorkerCreateRequestResponseTest extends TestCase
 {
-    public function testCreateLabelMissingResponse(): void
+    public function testCreateIdMissingResponse(): void
     {
-        $response = BadWorkerCreateRequestResponse::createLabelMissingResponse();
+        $response = BadWorkerCreateRequestResponse::createIdMissingResponse();
 
-        self::assertResponse('label missing', 100, $response);
+        self::assertResponse('id missing', 100, $response);
     }
 
     private static function assertResponse(string $expectedMessage, int $expectedCode, Response $response): void

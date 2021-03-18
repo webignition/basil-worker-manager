@@ -39,20 +39,20 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
     {
         self::assertTrue(true);
 
-        $label = md5('label content');
+        $id = md5('id content');
 
         $this->client->request(
             'POST',
             WorkerController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_LABEL => $label,
+                WorkerCreateRequest::KEY_ID => $id,
             ]
         );
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->workerRepository->findOneByLabel($label);
+        $worker = $this->workerRepository->find($id);
         if (false === $worker instanceof Worker) {
             throw new \RuntimeException('Worker entity not created. Verify test droplet has not been created');
         }

@@ -65,7 +65,7 @@ services:
             $tags:
                 - '%digitalocean_droplet_tag%'
 
-    App\Services\MachineProvider\DigitalOcean\DropletFactory:
+    App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
             $prefix: '%digitalocean_droplet_name_prefix%'

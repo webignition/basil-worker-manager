@@ -29,8 +29,5 @@ services:
                 delete_failed: '@app.services.worker_state_transition_sequence.delete_failed'
                 delete_deleted: '@app.services.worker_state_transition_sequence.delete_deleted'
 
-    App\Services\MachineProvider\DigitalOcean\DropletDeleter:
-        public: true
-
     App\Tests\Services\EntityRefresher:
         public: true

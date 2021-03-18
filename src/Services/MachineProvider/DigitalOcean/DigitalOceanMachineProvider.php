@@ -4,6 +4,8 @@ namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Model\DigitalOcean\DropletApiCreateCallArguments;
+use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProviderInterface;
@@ -20,8 +22,9 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     public function __construct(
         Client $client,
         private WorkerApiExceptionFactory $workerApiExceptionFactory,
-        private DropletFactory $dropletFactory,
         private WorkerStore $workerStore,
+        private DropletConfiguration $dropletConfiguration,
+        private string $prefix,
     ) {
         $this->dropletApi = $client->droplet();
     }
@@ -39,7 +42,24 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function create(Worker $worker): Worker
     {
-        return $this->updateWorker($worker, $this->dropletFactory->create($worker));
+        $createArguments = new DropletApiCreateCallArguments(
+            sprintf('%s-%s', $this->prefix, $worker->getName()),
+            $this->dropletConfiguration
+        );
+
+        try {
+            $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
+        } catch (ExceptionInterface $exception) {
+            throw $this->workerApiExceptionFactory->create(
+                WorkerApiActionException::ACTION_CREATE,
+                $worker,
+                $exception
+            );
+        }
+
+        $dropletEntity = $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([]);
+
+        return $this->updateWorker($worker, $dropletEntity);
     }
 
     public function remove(Worker $worker): Worker

@@ -15,6 +15,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     public function __construct(
         private DropletFactory $dropletFactory,
         private DropletRepository $dropletRepository,
+        private DropletDeleter $dropletDeleter,
         private WorkerStore $workerStore,
     ) {
     }
@@ -35,8 +36,11 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return $this->updateWorker($worker, $this->dropletFactory->create($worker));
     }
 
-    public function remove(int $remoteId): void
+    public function remove(Worker $worker): Worker
     {
+        $this->dropletDeleter->delete($worker);
+
+        return $worker;
     }
 
     /**

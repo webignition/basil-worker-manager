@@ -13,7 +13,7 @@ class DropletRepository extends AbstractDropletService
      */
     public function get(Worker $worker): DropletEntity
     {
-        return $this->performApiAction(
+        return $this->performDropletApiAction(
             WorkerApiActionException::ACTION_GET,
             $worker,
             function (Worker $worker) {

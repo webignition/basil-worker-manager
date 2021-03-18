@@ -36,10 +36,24 @@ abstract class AbstractDropletService
      *
      * @throws WorkerApiActionException
      */
-    protected function performApiAction(string $action, Worker $worker, callable $callable): DropletEntity
+    protected function performDropletApiAction(string $action, Worker $worker, callable $callable): DropletEntity
     {
         try {
             return $callable($worker);
+        } catch (ExceptionInterface $exception) {
+            throw $this->createWorkerApiActionException($action, $worker, $exception);
+        }
+    }
+
+    /**
+     * @param WorkerApiActionException::ACTION_* $action
+     *
+     * @throws WorkerApiActionException
+     */
+    protected function performApiAction(string $action, Worker $worker, callable $callable): void
+    {
+        try {
+            $callable($worker);
         } catch (ExceptionInterface $exception) {
             throw $this->createWorkerApiActionException($action, $worker, $exception);
         }

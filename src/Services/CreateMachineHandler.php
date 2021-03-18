@@ -26,7 +26,7 @@ class CreateMachineHandler
     ) {
     }
 
-    public function create(Worker $worker, CreateMachineRequest $request): ApiRequestOutcome
+    public function create(Worker $worker, int $retryCount): ApiRequestOutcome
     {
         $worker->setState(State::VALUE_CREATE_REQUESTED);
         $this->workerStore->store($worker);
@@ -42,10 +42,13 @@ class CreateMachineHandler
                 $workerApiActionException->getRemoteApiException()
             );
 
-            $retryLimitReached = $this->retryLimit <= $request->getRetryCount();
+            $retryLimitReached = $this->retryLimit <= $retryCount;
 
             if ($exceptionRequiresRetry && false === $retryLimitReached) {
-                $this->messageBus->dispatch(new CreateMessage($request->incrementRetryCount()));
+                $request = new CreateMachineRequest((string) $worker, $retryCount + 1);
+                $message = new CreateMessage($request);
+
+                $this->messageBus->dispatch($message);
 
                 return ApiRequestOutcome::retrying();
             }

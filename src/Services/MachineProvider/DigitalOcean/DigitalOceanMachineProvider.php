@@ -8,16 +8,23 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;
+use DigitalOceanV2\Api\Droplet as DropletApi;
+use DigitalOceanV2\Client;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 class DigitalOceanMachineProvider implements MachineProviderInterface
 {
+    private DropletApi $dropletApi;
+
     public function __construct(
+        Client $client,
+        private WorkerApiExceptionFactory $workerApiExceptionFactory,
         private DropletFactory $dropletFactory,
         private DropletRepository $dropletRepository,
-        private DropletDeleter $dropletDeleter,
         private WorkerStore $workerStore,
     ) {
+        $this->dropletApi = $client->droplet();
     }
 
     /**
@@ -38,7 +45,15 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
 
     public function remove(Worker $worker): Worker
     {
-        $this->dropletDeleter->delete($worker);
+        try {
+            $this->dropletApi->remove((int) $worker->getRemoteId());
+        } catch (ExceptionInterface $exception) {
+            throw $this->workerApiExceptionFactory->create(
+                WorkerApiActionException::ACTION_DELETE,
+                $worker,
+                $exception
+            );
+        }
 
         return $worker;
     }
@@ -56,5 +71,19 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         $worker = $worker->updateFromRemoteMachine(new RemoteMachine($droplet));
 
         return $this->workerStore->store($worker);
+    }
+
+    /**
+     * @param WorkerApiActionException::ACTION_* $action
+     *
+     * @throws WorkerApiActionException
+     */
+    protected function performApiAction(string $action, Worker $worker, callable $callable): void
+    {
+        try {
+            $callable($worker);
+        } catch (ExceptionInterface $exception) {
+            throw $this->workerApiExceptionFactory->create($action, $worker, $exception);
+        }
     }
 }

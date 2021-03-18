@@ -4,19 +4,24 @@ namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Model\DigitalOcean\DropletApiCreateCallArguments;
+use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;
+use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 class DigitalOceanMachineProvider implements MachineProviderInterface
 {
     public function __construct(
-        private DropletFactory $dropletFactory,
-        private DropletRepository $dropletRepository,
-        private DropletDeleter $dropletDeleter,
+        private DropletApi $dropletApi,
+        private WorkerApiExceptionFactory $workerApiExceptionFactory,
         private WorkerStore $workerStore,
+        private DropletConfiguration $dropletConfiguration,
+        private string $prefix,
     ) {
     }
 
@@ -33,12 +38,37 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function create(Worker $worker): Worker
     {
-        return $this->updateWorker($worker, $this->dropletFactory->create($worker));
+        $createArguments = new DropletApiCreateCallArguments(
+            sprintf('%s-%s', $this->prefix, $worker->getName()),
+            $this->dropletConfiguration
+        );
+
+        try {
+            $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
+        } catch (ExceptionInterface $exception) {
+            throw $this->workerApiExceptionFactory->create(
+                WorkerApiActionException::ACTION_CREATE,
+                $worker,
+                $exception
+            );
+        }
+
+        $dropletEntity = $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([]);
+
+        return $this->updateWorker($worker, $dropletEntity);
     }
 
     public function remove(Worker $worker): Worker
     {
-        $this->dropletDeleter->delete($worker);
+        try {
+            $this->dropletApi->remove((int) $worker->getRemoteId());
+        } catch (ExceptionInterface $exception) {
+            throw $this->workerApiExceptionFactory->create(
+                WorkerApiActionException::ACTION_DELETE,
+                $worker,
+                $exception
+            );
+        }
 
         return $worker;
     }
@@ -48,7 +78,17 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function hydrate(Worker $worker): Worker
     {
-        return $this->updateWorker($worker, $this->dropletRepository->get($worker));
+        try {
+            $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
+        } catch (ExceptionInterface $exception) {
+            throw $this->workerApiExceptionFactory->create(
+                WorkerApiActionException::ACTION_GET,
+                $worker,
+                $exception
+            );
+        }
+
+        return $this->updateWorker($worker, $dropletEntity);
     }
 
     private function updateWorker(Worker $worker, DropletEntity $droplet): Worker

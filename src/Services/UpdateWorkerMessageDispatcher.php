@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entity\Worker;
 use App\Message\UpdateWorkerMessage;
+use App\Model\UpdateWorkerRequest;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -19,11 +19,11 @@ class UpdateWorkerMessageDispatcher
     ) {
     }
 
-    public function dispatchForWorker(Worker $worker, string $stopState): void
+    public function dispatchForWorker(UpdateWorkerRequest $request): void
     {
         if ($this->enabled) {
             $this->messageBus->dispatch(new Envelope(
-                new UpdateWorkerMessage((string) $worker, $stopState),
+                new UpdateWorkerMessage($request),
                 [
                     new DelayStamp($this->dispatchDelayInSeconds * 1000)
                 ]

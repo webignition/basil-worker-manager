@@ -8,6 +8,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
+use App\Model\UpdateWorkerRequest;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
 
@@ -19,6 +20,7 @@ class UpdateWorkerHandler
         private UpdateWorkerMessageDispatcher $dispatcher,
         private ExceptionLogger $exceptionLogger,
         private WorkerStateTransitionSequences $stateTransitionSequences,
+        private int $retryLimit
     ) {
     }
 
@@ -26,7 +28,7 @@ class UpdateWorkerHandler
      * @param Worker $worker
      * @param State::VALUE_* $stopState
      */
-    public function update(Worker $worker, string $stopState): ApiRequestOutcome
+    public function update(Worker $worker, string $stopState, int $retryCount): ApiRequestOutcome
     {
         if ($this->hasReachedStopStateOrEndState($worker->getState(), $stopState)) {
             return ApiRequestOutcome::success();
@@ -42,10 +44,13 @@ class UpdateWorkerHandler
                 return ApiRequestOutcome::success();
             }
         } catch (WorkerApiActionException $workerApiActionException) {
-            $shouldRetry = $this->retryDecider->decide(
+            $exceptionRequiresRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
                 $workerApiActionException->getRemoteApiException()
             );
+
+            $retryLimitReached = $this->retryLimit <= $retryCount;
+            $shouldRetry = $exceptionRequiresRetry && false === $retryLimitReached;
 
             $lastException = $workerApiActionException;
         } catch (UnsupportedProviderException $unsupportedProviderException) {
@@ -54,7 +59,8 @@ class UpdateWorkerHandler
         }
 
         if ($shouldRetry) {
-            $this->dispatcher->dispatchForWorker($worker, $stopState);
+            $request = new UpdateWorkerRequest((string) $worker, $stopState, $retryCount + 1);
+            $this->dispatcher->dispatchForWorker($request);
 
             return ApiRequestOutcome::retrying();
         }

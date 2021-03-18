@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Message\UpdateWorkerMessage;
 use App\MessageHandler\UpdateWorkerMessageHandler;
 use App\Model\ProviderInterface;
+use App\Model\UpdateWorkerRequest;
 use App\Model\Worker\State;
 use App\Services\UpdateWorkerHandler;
 use App\Services\WorkerFactory;
@@ -39,7 +40,8 @@ class UpdateWorkerMessageHandlerTest extends AbstractBaseFunctionalTest
 
     public function testInvokeUnknownWorker(): void
     {
-        $message = new UpdateWorkerMessage('', State::VALUE_UP_ACTIVE);
+        $request = new UpdateWorkerRequest('invalid-worker-id', State::VALUE_UP_ACTIVE, 0);
+        $message = new UpdateWorkerMessage($request);
 
         $updateWorkerHandler = (new MockUpdateWorkerHandler())
             ->withoutUpdateCall()
@@ -53,10 +55,11 @@ class UpdateWorkerMessageHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new UpdateWorkerMessage((string) $worker, State::VALUE_UP_ACTIVE);
+        $request = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE, 0);
+        $message = new UpdateWorkerMessage($request);
 
         $updateWorkerHandler = (new MockUpdateWorkerHandler())
-            ->withUpdateCall($worker, State::VALUE_UP_ACTIVE)
+            ->withUpdateCall($worker, State::VALUE_UP_ACTIVE, 0)
             ->getMock();
 
         $this->setUpdateWorkerHandler($updateWorkerHandler);

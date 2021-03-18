@@ -22,12 +22,12 @@ class MockUpdateWorkerHandler
         return $this->mock;
     }
 
-    public function withUpdateCall(Worker $worker, string $stopState): self
+    public function withUpdateCall(Worker $worker, string $stopState, int $retryCount): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive('update')
-                ->with($worker, $stopState);
+                ->with($worker, $stopState, $retryCount);
         }
 
         return $this;

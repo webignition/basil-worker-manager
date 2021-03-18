@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Worker;
 use App\Message\UpdateWorkerMessage;
 use App\Model\ProviderInterface;
+use App\Model\UpdateWorkerRequest;
 use App\Model\Worker\State;
 use App\Services\UpdateWorkerMessageDispatcher;
 use App\Services\WorkerFactory;
@@ -49,12 +50,16 @@ class UpdateWorkerMessageDispatcherTest extends AbstractBaseFunctionalTest
 
         $stopState = State::VALUE_UP_ACTIVE;
 
-        $this->dispatcher->dispatchForWorker($this->worker, $stopState);
+        $this->dispatcher->dispatchForWorker(
+            new UpdateWorkerRequest((string) $this->worker, $stopState, 0)
+        );
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateWorkerMessage((string) $this->worker, $stopState)
+            new UpdateWorkerMessage(
+                new UpdateWorkerRequest((string) $this->worker, $stopState, 0)
+            )
         );
 
         $this->messengerAsserter->assertEnvelopeContainsStamp(

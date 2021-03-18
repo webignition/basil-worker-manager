@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Model\ApiRequestOutcome;
+use App\Model\UpdateWorkerRequest;
 use App\Model\Worker\State;
 use App\Model\WorkerActionRequest;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -33,7 +34,9 @@ class CreateMachineHandler
 
         try {
             $this->machineProvider->create($worker);
-            $this->updateWorkerMessageDispatcher->dispatchForWorker($worker, State::VALUE_UP_ACTIVE);
+
+            $updateWorkerRequest = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE);
+            $this->updateWorkerMessageDispatcher->dispatchForWorker($updateWorkerRequest);
 
             return ApiRequestOutcome::success();
         } catch (WorkerApiActionException $workerApiActionException) {
@@ -45,7 +48,7 @@ class CreateMachineHandler
             $retryLimitReached = $this->retryLimit <= $retryCount;
 
             if ($exceptionRequiresRetry && false === $retryLimitReached) {
-                $request = new CreateMachineRequest((string) $worker, $retryCount + 1);
+                $request = new WorkerActionRequest((string) $worker, $retryCount + 1);
                 $message = new CreateMessage($request);
 
                 $this->messageBus->dispatch($message);

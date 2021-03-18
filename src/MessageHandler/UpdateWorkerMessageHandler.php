@@ -20,11 +20,13 @@ class UpdateWorkerMessageHandler implements MessageHandlerInterface
 
     public function __invoke(UpdateWorkerMessage $message): void
     {
-        $worker = $this->workerRepository->find($message->getWorkerId());
+        $request = $message->getRequest();
+
+        $worker = $this->workerRepository->find($request->getWorkerId());
         if (false === $worker instanceof Worker) {
             return;
         }
 
-        $this->updateWorkerHandler->update($worker, $message->getStopState());
+        $this->updateWorkerHandler->update($worker, $request->getStopState(), $request->getRetryCount());
     }
 }

@@ -12,6 +12,7 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineProviderTest extends AbstractBaseFunctionalTest
@@ -52,6 +53,17 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         $this->assertMutateWorker(function (Worker $worker) {
             $this->machineProvider->update($worker);
         });
+    }
+
+    public function testDeleteSuccess(): void
+    {
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        ObjectReflector::setProperty($worker, Worker::class, 'remote_id', 123);
+
+        $this->mockHandler->append(new Response(204));
+
+        $this->machineProvider->delete($worker);
+        self::expectNotToPerformAssertions();
     }
 
     private function assertMutateWorker(callable $callable): void

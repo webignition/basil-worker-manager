@@ -44,6 +44,15 @@ class MachineProvider
     }
 
     /**
+     * @throws WorkerApiActionException
+     * @throws UnsupportedProviderException
+     */
+    public function delete(Worker $worker): Worker
+    {
+        return $this->findProvider($worker)->remove($worker);
+    }
+
+    /**
      * @throws UnsupportedProviderException
      */
     private function findProvider(Worker $worker): MachineProviderInterface

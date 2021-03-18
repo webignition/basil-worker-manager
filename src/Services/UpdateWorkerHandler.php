@@ -47,9 +47,9 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
                 return ApiRequestOutcome::success();
             }
 
-            $retryLimitReached = $this->retryLimit <= $retryCount;
-
-            $outcome = $retryLimitReached ? ApiRequestOutcome::failed() : ApiRequestOutcome::retrying();
+            $outcome = $this->retryLimit <= $retryCount
+                ? ApiRequestOutcome::failed()
+                : ApiRequestOutcome::retrying();
         }
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {

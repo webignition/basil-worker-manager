@@ -29,7 +29,6 @@ abstract class AbstractApiActionHandler
 
     protected function doHandle(Worker $worker, int $retryCount): ApiRequestOutcome
     {
-        $shouldRetry = true;
         $lastException = null;
 
         try {

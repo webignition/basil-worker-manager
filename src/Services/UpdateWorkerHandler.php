@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
+use App\Message\UpdateWorkerMessage;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\Worker\State;
@@ -60,7 +61,9 @@ class UpdateWorkerHandler
 
         if ($shouldRetry) {
             $request = new UpdateWorkerRequest((string) $worker, $stopState, $retryCount + 1);
-            $this->dispatcher->dispatchForWorker($request);
+            $this->dispatcher->dispatchForWorker(
+                new UpdateWorkerMessage($request)
+            );
 
             return ApiRequestOutcome::retrying();
         }

@@ -8,6 +8,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
+use App\Message\UpdateWorkerMessage;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
@@ -36,7 +37,9 @@ class CreateMachineHandler
             $this->machineProvider->create($worker);
 
             $updateWorkerRequest = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE);
-            $this->updateWorkerMessageDispatcher->dispatchForWorker($updateWorkerRequest);
+            $this->updateWorkerMessageDispatcher->dispatchForWorker(
+                new UpdateWorkerMessage($updateWorkerRequest)
+            );
 
             return ApiRequestOutcome::success();
         } catch (WorkerApiActionException $workerApiActionException) {

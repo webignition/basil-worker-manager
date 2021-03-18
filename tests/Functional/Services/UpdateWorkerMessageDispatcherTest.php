@@ -51,7 +51,9 @@ class UpdateWorkerMessageDispatcherTest extends AbstractBaseFunctionalTest
         $stopState = State::VALUE_UP_ACTIVE;
 
         $this->dispatcher->dispatchForWorker(
-            new UpdateWorkerRequest((string) $this->worker, $stopState, 0)
+            new UpdateWorkerMessage(
+                new UpdateWorkerRequest((string) $this->worker, $stopState, 0)
+            )
         );
 
         $this->messengerAsserter->assertQueueCount(1);

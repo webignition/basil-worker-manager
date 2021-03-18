@@ -106,6 +106,30 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         }
     }
 
+    /**
+     * @dataProvider apiActionThrowsWorkerApiActionExceptionDataProvider
+     */
+    public function testCreateThrowsWorkApiActonException(
+        ResponseInterface $apiResponse,
+        \Exception $expectedWrappedException
+    ): void {
+        $this->mockHandler->append($apiResponse);
+
+        $expectedException = new WorkerApiActionException(
+            WorkerApiActionException::ACTION_CREATE,
+            0,
+            $this->worker,
+            $expectedWrappedException
+        );
+
+        try {
+            $this->machineProvider->create($this->worker);
+            $this->fail('WorkerApiActionException not thrown');
+        } catch (WorkerApiActionException $getException) {
+            self::assertEquals($expectedException, $getException);
+        }
+    }
+
     public function testHydrateSuccess(): void
     {
         $remoteId = 123;
@@ -140,7 +164,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider hydrateThrowsWorkerApiActionExceptionDataProvider
+     * @dataProvider apiActionThrowsWorkerApiActionExceptionDataProvider
      */
     public function testHydrateThrowsWorkApiActonException(
         ResponseInterface $apiResponse,
@@ -163,39 +187,6 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         }
     }
 
-    /**
-     * @return array[]
-     */
-    public function hydrateThrowsWorkerApiActionExceptionDataProvider(): array
-    {
-        return [
-            VendorApiLimitExceededExceptionAlias::class => [
-                'apiResponse' => new Response(
-                    429,
-                    [
-                        'RateLimit-Reset' => 123,
-                    ]
-                ),
-                'expectedWrappedException' => new ApiLimitExceededException(
-                    123,
-                    new VendorApiLimitExceededExceptionAlias('Too Many Requests', 429),
-                ),
-            ],
-            RuntimeException::class . ' HTTP 503' => [
-                'apiResponse' => new Response(503),
-                'expectedWrappedException' => new RuntimeException('Service Unavailable', 503),
-            ],
-            ValidationFailedException::class => [
-                'apiResponse' => new Response(400),
-                'expectedWrappedException' => new ValidationFailedException('Bad Request', 400),
-            ],
-            'droplet does not exist' => [
-                'apiResponse' => new Response(404),
-                'expectedWrappedException' => new RuntimeException('Not Found', 404),
-            ],
-        ];
-    }
-
     public function testRemoveSuccess(): void
     {
         $this->mockHandler->append(new Response(204));
@@ -205,7 +196,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider removeThrowsWorkerApiActionExceptionDataProvider
+     * @dataProvider apiActionThrowsWorkerApiActionExceptionDataProvider
      */
     public function testRemoveThrowsWorkerApiActionException(
         ResponseInterface $apiResponse,
@@ -231,7 +222,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function removeThrowsWorkerApiActionExceptionDataProvider(): array
+    public function apiActionThrowsWorkerApiActionExceptionDataProvider(): array
     {
         return [
             VendorApiLimitExceededExceptionAlias::class => [

@@ -17,7 +17,11 @@ interface MachineProviderInterface
      * @throws WorkerApiActionException
      */
     public function create(Worker $worker): Worker;
-    public function remove(int $remoteId): void;
+
+    /**
+     * @throws WorkerApiActionException
+     */
+    public function remove(Worker $worker): Worker;
 
     /**
      * @throws WorkerApiActionException

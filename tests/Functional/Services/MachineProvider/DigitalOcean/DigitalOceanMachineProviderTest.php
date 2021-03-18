@@ -12,6 +12,7 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
@@ -103,5 +104,13 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         self::assertSame($remoteId, $this->worker->getRemoteId());
         self::assertSame($ipAddresses, ObjectReflector::getProperty($this->worker, 'ip_addresses'));
+    }
+
+    public function testRemoveSuccess(): void
+    {
+        $this->mockHandler->append(new Response(204));
+        $this->machineProvider->remove($this->worker);
+
+        self::expectNotToPerformAssertions();
     }
 }

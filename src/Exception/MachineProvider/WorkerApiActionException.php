@@ -9,6 +9,7 @@ class WorkerApiActionException extends AbstractRemoteApiWrappingException implem
 {
     public const ACTION_CREATE = 'create';
     public const ACTION_GET = 'get';
+    public const ACTION_DELETE = 'delete';
 
     /**
      * @param self::ACTION_* $action

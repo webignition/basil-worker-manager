@@ -27,7 +27,7 @@ class DropletFactory extends AbstractDropletService
      */
     public function create(Worker $worker): DropletEntity
     {
-        return $this->performApiAction(
+        return $this->performDropletApiAction(
             WorkerApiActionException::ACTION_CREATE,
             $worker,
             function (Worker $worker) {

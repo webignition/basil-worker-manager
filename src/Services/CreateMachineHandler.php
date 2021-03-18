@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\WorkerApiActionException;
-use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
@@ -29,53 +27,38 @@ class CreateMachineHandler extends AbstractApiActionHandler
         parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger, $retryLimit);
     }
 
+    protected function doAction(Worker $worker): Worker
+    {
+        return $this->machineProvider->create($worker);
+    }
+
     public function handle(Worker $worker, int $retryCount): ApiRequestOutcome
     {
         $worker->setState(State::VALUE_CREATE_REQUESTED);
         $this->workerStore->store($worker);
 
-        $shouldRetry = true;
-        $lastException = null;
+        $outcome = $this->doHandle($worker, $retryCount);
 
-        try {
-            $this->machineProvider->create($worker);
-
-            $updateWorkerRequest = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE);
-            $this->updateWorkerDispatcher->dispatch(
-                new UpdateWorkerMessage($updateWorkerRequest)
-            );
-
-            return ApiRequestOutcome::success();
-        } catch (WorkerApiActionException $workerApiActionException) {
-            $exceptionRequiresRetry = $this->retryDecider->decide(
-                $worker->getProvider(),
-                $workerApiActionException->getRemoteApiException()
-            );
-
-            $retryLimitReached = $this->retryLimit <= $retryCount;
-            $shouldRetry = $exceptionRequiresRetry && false === $retryLimitReached;
-
-            $lastException = $workerApiActionException;
-        } catch (UnsupportedProviderException $unsupportedProviderException) {
-            $lastException = $unsupportedProviderException;
-            $shouldRetry = false;
-        }
-
-        if ($shouldRetry) {
+        if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $request = new WorkerRequest((string) $worker, $retryCount + 1);
             $message = new CreateMessage($request);
             $this->createDispatcher->dispatch($message);
 
-            return ApiRequestOutcome::retrying();
+            return $outcome;
         }
 
-        if ($lastException instanceof \Throwable) {
-            $this->exceptionLogger->log($lastException);
+        if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
+            $worker = $worker->setState(State::VALUE_CREATE_FAILED);
+            $this->workerStore->store($worker);
+
+            return $outcome;
         }
 
-        $worker = $worker->setState(State::VALUE_CREATE_FAILED);
-        $this->workerStore->store($worker);
+        $updateWorkerRequest = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE);
+        $this->updateWorkerDispatcher->dispatch(
+            new UpdateWorkerMessage($updateWorkerRequest)
+        );
 
-        return ApiRequestOutcome::failed();
+        return ApiRequestOutcome::success();
     }
 }

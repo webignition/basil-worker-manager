@@ -44,7 +44,7 @@ class UpdateWorkerMessageHandlerTest extends AbstractBaseFunctionalTest
         $message = new UpdateWorkerMessage($request);
 
         $updateWorkerHandler = (new MockUpdateWorkerHandler())
-            ->withoutUpdateCall()
+            ->withoutHandleCall()
             ->getMock();
 
         $this->setUpdateWorkerHandler($updateWorkerHandler);
@@ -59,7 +59,7 @@ class UpdateWorkerMessageHandlerTest extends AbstractBaseFunctionalTest
         $message = new UpdateWorkerMessage($request);
 
         $updateWorkerHandler = (new MockUpdateWorkerHandler())
-            ->withUpdateCall($worker, State::VALUE_UP_ACTIVE, 0)
+            ->withHandleCall($worker, State::VALUE_UP_ACTIVE, 0)
             ->getMock();
 
         $this->setUpdateWorkerHandler($updateWorkerHandler);

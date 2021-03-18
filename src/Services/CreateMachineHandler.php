@@ -29,7 +29,7 @@ class CreateMachineHandler extends AbstractApiActionHandler
         parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger, $retryLimit);
     }
 
-    public function create(Worker $worker, int $retryCount): ApiRequestOutcome
+    public function handle(Worker $worker, int $retryCount): ApiRequestOutcome
     {
         $worker->setState(State::VALUE_CREATE_REQUESTED);
         $this->workerStore->store($worker);

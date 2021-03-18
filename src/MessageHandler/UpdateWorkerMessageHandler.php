@@ -23,7 +23,7 @@ class UpdateWorkerMessageHandler extends AbstractWorkerRequestHandler implements
     {
         $this->doInvoke($message, function (UpdateWorkerMessage $message, Worker $worker) {
             $request = $message->getRequest();
-            $this->updateWorkerHandler->update($worker, $request->getStopState(), $request->getRetryCount());
+            $this->updateWorkerHandler->handle($worker, $request->getStopState(), $request->getRetryCount());
         });
     }
 }

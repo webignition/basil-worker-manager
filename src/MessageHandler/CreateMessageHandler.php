@@ -23,7 +23,7 @@ class CreateMessageHandler extends AbstractWorkerRequestHandler implements Messa
     {
         $this->doInvoke($message, function (CreateMessage $message, Worker $worker) {
             $request = $message->getRequest();
-            $this->createMachineHandler->create($worker, $request->getRetryCount());
+            $this->createMachineHandler->handle($worker, $request->getRetryCount());
         });
     }
 }

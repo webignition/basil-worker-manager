@@ -68,13 +68,13 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider updateDataProvider
+     * @dataProvider handleDataProvider
      *
      * @param array<ResponseInterface|\Throwable> $httpFixtures
      * @param State::VALUE_* $currentState
      * @param State::VALUE_* $stopState
      */
-    public function testUpdate(
+    public function testHandle(
         array $httpFixtures,
         string $currentState,
         string $stopState,
@@ -92,7 +92,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $this->worker->setState($currentState);
         $this->workerStore->store($this->worker);
 
-        $response = $this->handler->update($this->worker, $stopState, 0);
+        $response = $this->handler->handle($this->worker, $stopState, 0);
 
         self::assertEquals($expectedOutcome, $response);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
@@ -101,7 +101,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function updateDataProvider(): array
+    public function handleDataProvider(): array
     {
         $endStateCases = [];
         foreach (State::END_STATES as $endState) {
@@ -187,9 +187,9 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider updateThrowsWorkerApiActionExceptionWithoutRetryDataProvider
+     * @dataProvider handleThrowsWorkerApiActionExceptionWithoutRetryDataProvider
      */
-    public function testUpdateThrowsWorkerApiActionExceptionWithoutRetry(
+    public function testHandleThrowsWorkerApiActionExceptionWithoutRetry(
         ResponseInterface $apiResponse,
         int $retryCount,
         \Exception $expectedWrappedLoggedException
@@ -209,7 +209,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->update($this->worker, State::VALUE_UP_ACTIVE, $retryCount);
+        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, $retryCount);
 
         self::assertEquals(ApiRequestOutcome::failed(), $outcome);
     }
@@ -217,7 +217,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function updateThrowsWorkerApiActionExceptionWithoutRetryDataProvider(): array
+    public function handleThrowsWorkerApiActionExceptionWithoutRetryDataProvider(): array
     {
         return [
             'WorkerApiActionException (HTTP 401), does not require retry' => [
@@ -233,7 +233,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         ];
     }
 
-    public function testUpdateThrowsUnknownProviderException(): void
+    public function testHandleThrowsUnknownProviderException(): void
     {
         $invalidProvider = 'invalid';
         $expectedLoggedException = new UnsupportedProviderException($invalidProvider);
@@ -247,7 +247,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->update($this->worker, State::VALUE_UP_ACTIVE, 0);
+        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 0);
 
         self::assertEquals(ApiRequestOutcome::failed(), $outcome);
     }

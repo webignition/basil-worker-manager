@@ -31,7 +31,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
      * @param Worker $worker
      * @param State::VALUE_* $stopState
      */
-    public function update(Worker $worker, string $stopState, int $retryCount): ApiRequestOutcome
+    public function handle(Worker $worker, string $stopState, int $retryCount): ApiRequestOutcome
     {
         if ($this->hasReachedStopStateOrEndState($worker->getState(), $stopState)) {
             return ApiRequestOutcome::success();

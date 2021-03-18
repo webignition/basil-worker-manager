@@ -21,8 +21,8 @@ class UpdateWorkerHandler
         private ApiActionRetryDecider $retryDecider,
         private WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         private ExceptionLogger $exceptionLogger,
+        private int $retryLimit,
         private WorkerStateTransitionSequences $stateTransitionSequences,
-        private int $retryLimit
     ) {
     }
 

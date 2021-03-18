@@ -20,11 +20,11 @@ class CreateMachineHandler
     public function __construct(
         private MachineProvider $machineProvider,
         private ApiActionRetryDecider $retryDecider,
-        private WorkerRequestMessageDispatcherInterface $createDispatcher,
-        private ExceptionLogger $exceptionLogger,
-        private WorkerStore $workerStore,
-        private int $retryLimit,
         private WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        private ExceptionLogger $exceptionLogger,
+        private int $retryLimit,
+        private WorkerRequestMessageDispatcherInterface $createDispatcher,
+        private WorkerStore $workerStore,
     ) {
     }
 

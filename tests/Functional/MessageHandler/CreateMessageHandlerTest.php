@@ -58,7 +58,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
-            ->withCreateCall($worker, $request)
+            ->withCreateCall($worker, $request->getRetryCount())
             ->getMock();
 
         $this->setCreateMachineHandler($createMachineHandler);

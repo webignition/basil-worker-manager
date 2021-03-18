@@ -67,7 +67,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->factory->create($worker, $request);
+        $this->factory->create($worker, $request->getRetryCount());
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
@@ -95,7 +95,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->factory->create($worker, $request);
+        $this->factory->create($worker, $request->getRetryCount());
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
@@ -134,7 +134,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->factory->create($worker, $request);
+        $this->factory->create($worker, $request->getRetryCount());
 
         $expectedRequest = new CreateMachineRequest(
             (string) $worker,
@@ -202,7 +202,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->factory->create($worker, $request);
+        $this->factory->create($worker, $request->getRetryCount());
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());

@@ -27,6 +27,6 @@ class CreateMessageHandler implements MessageHandlerInterface
             return;
         }
 
-        $this->createMachineHandler->create($worker, $request);
+        $this->createMachineHandler->create($worker, $request->getRetryCount());
     }
 }

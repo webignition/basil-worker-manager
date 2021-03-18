@@ -17,19 +17,4 @@ class CreateMachineRequestTest extends TestCase
         self::assertSame($workerId, $request->getWorkerId());
         self::assertSame(0, $request->getRetryCount());
     }
-
-    public function testIncrementRetryCount(): void
-    {
-        $request = new CreateMachineRequest('123');
-        self::assertSame(0, $request->getRetryCount());
-
-        $request = $request->incrementRetryCount();
-        self::assertSame(1, $request->getRetryCount());
-
-        $request = $request->incrementRetryCount();
-        self::assertSame(2, $request->getRetryCount());
-
-        $request = $request->incrementRetryCount();
-        self::assertSame(3, $request->getRetryCount());
-    }
 }

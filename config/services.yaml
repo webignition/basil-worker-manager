@@ -84,12 +84,23 @@ services:
             $deciders:
                 - '@App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider'
 
+    app.message_dispatcher.create:
+        class: App\MessageDispatcher\WorkerRequestMessageDispatcher
+
+    app.message_dispatcher.update_worker:
+        class: App\MessageDispatcher\WorkerRequestMessageDispatcher
+        arguments:
+            $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'
+
     App\Services\CreateMachineHandler:
         arguments:
+            $createDispatcher: '@app.message_dispatcher.create'
+            $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
             $retryLimit: '%create_retry_limit%'
 
     App\Services\UpdateWorkerHandler:
         arguments:
+            $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
             $retryLimit: '%update_retry_limit%'
 
     app.services.worker_state_transition_sequence.create_failed:
@@ -130,7 +141,3 @@ services:
                 create_failed: '@app.services.worker_state_transition_sequence.create_failed'
                 delete_failed: '@app.services.worker_state_transition_sequence.delete_failed'
                 delete_deleted: '@app.services.worker_state_transition_sequence.delete_deleted'
-
-    App\MessageDispatcher\UpdateWorkerMessageDispatcher:
-        arguments:
-            $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'

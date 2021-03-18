@@ -8,7 +8,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\UpdateWorkerMessage;
-use App\MessageDispatcher\UpdateWorkerMessageDispatcher;
+use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\Worker\State;
@@ -19,7 +19,7 @@ class UpdateWorkerHandler
     public function __construct(
         private MachineProvider $machineProvider,
         private ApiActionRetryDecider $retryDecider,
-        private UpdateWorkerMessageDispatcher $dispatcher,
+        private WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         private ExceptionLogger $exceptionLogger,
         private WorkerStateTransitionSequences $stateTransitionSequences,
         private int $retryLimit
@@ -62,7 +62,7 @@ class UpdateWorkerHandler
 
         if ($shouldRetry) {
             $request = new UpdateWorkerRequest((string) $worker, $stopState, $retryCount + 1);
-            $this->dispatcher->dispatchForWorker(
+            $this->updateWorkerDispatcher->dispatch(
                 new UpdateWorkerMessage($request)
             );
 

@@ -4,7 +4,7 @@ namespace App\Model\ApiRequest;
 
 use App\Model\Worker\State;
 
-class UpdateWorkerRequest extends WorkerActionRequest
+class UpdateWorkerRequest extends WorkerRequest
 {
     /**
      * @param State::VALUE_* $stopState

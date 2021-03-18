@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Worker;
 use App\Message\CreateMessage;
-use App\Model\ApiRequest\WorkerActionRequest;
+use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
@@ -41,7 +41,7 @@ class WorkerController extends AbstractController
         $worker = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         $messageBus->dispatch(new CreateMessage(
-            new WorkerActionRequest((string) $worker)
+            new WorkerRequest((string) $worker)
         ));
 
         return new Response('', 202);

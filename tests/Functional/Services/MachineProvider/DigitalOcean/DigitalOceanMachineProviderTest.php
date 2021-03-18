@@ -113,21 +113,14 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         ResponseInterface $apiResponse,
         \Exception $expectedWrappedException
     ): void {
-        $this->mockHandler->append($apiResponse);
-
-        $expectedException = new WorkerApiActionException(
+        $this->doActionThrowsWorkApiActonExceptionTest(
+            function () {
+                $this->machineProvider->create($this->worker);
+            },
             WorkerApiActionException::ACTION_CREATE,
-            0,
-            $this->worker,
+            $apiResponse,
             $expectedWrappedException
         );
-
-        try {
-            $this->machineProvider->create($this->worker);
-            $this->fail('WorkerApiActionException not thrown');
-        } catch (WorkerApiActionException $getException) {
-            self::assertEquals($expectedException, $getException);
-        }
     }
 
     public function testHydrateSuccess(): void
@@ -170,21 +163,14 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         ResponseInterface $apiResponse,
         \Exception $expectedWrappedException
     ): void {
-        $this->mockHandler->append($apiResponse);
-
-        $expectedException = new WorkerApiActionException(
+        $this->doActionThrowsWorkApiActonExceptionTest(
+            function () {
+                $this->machineProvider->hydrate($this->worker);
+            },
             WorkerApiActionException::ACTION_GET,
-            0,
-            $this->worker,
+            $apiResponse,
             $expectedWrappedException
         );
-
-        try {
-            $this->machineProvider->hydrate($this->worker);
-            $this->fail('WorkerApiActionException not thrown');
-        } catch (WorkerApiActionException $getException) {
-            self::assertEquals($expectedException, $getException);
-        }
     }
 
     public function testRemoveSuccess(): void
@@ -202,17 +188,36 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         ResponseInterface $apiResponse,
         \Exception $expectedWrappedException
     ): void {
+        $this->doActionThrowsWorkApiActonExceptionTest(
+            function () {
+                $this->machineProvider->remove($this->worker);
+            },
+            WorkerApiActionException::ACTION_DELETE,
+            $apiResponse,
+            $expectedWrappedException
+        );
+    }
+
+    /**
+     * @param WorkerApiActionException::ACTION_* $action
+     */
+    private function doActionThrowsWorkApiActonExceptionTest(
+        callable $callable,
+        string $action,
+        ResponseInterface $apiResponse,
+        \Exception $expectedWrappedException
+    ): void {
         $this->mockHandler->append($apiResponse);
 
         $expectedException = new WorkerApiActionException(
-            WorkerApiActionException::ACTION_DELETE,
+            $action,
             0,
             $this->worker,
             $expectedWrappedException
         );
 
         try {
-            $this->machineProvider->remove($this->worker);
+            $callable();
             $this->fail('WorkerApiActionException not thrown');
         } catch (WorkerApiActionException $getException) {
             self::assertEquals($expectedException, $getException);

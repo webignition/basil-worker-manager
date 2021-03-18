@@ -11,22 +11,18 @@ use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;
 use DigitalOceanV2\Api\Droplet as DropletApi;
-use DigitalOceanV2\Client;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface;
 
 class DigitalOceanMachineProvider implements MachineProviderInterface
 {
-    private DropletApi $dropletApi;
-
     public function __construct(
-        Client $client,
+        private DropletApi $dropletApi,
         private WorkerApiExceptionFactory $workerApiExceptionFactory,
         private WorkerStore $workerStore,
         private DropletConfiguration $dropletConfiguration,
         private string $prefix,
     ) {
-        $this->dropletApi = $client->droplet();
     }
 
     /**

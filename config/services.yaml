@@ -56,6 +56,9 @@ services:
         calls:
             - authenticate: ['%digitalocean_access_token%']
 
+    DigitalOceanV2\Api\Droplet:
+        class: DigitalOceanV2\Api\Droplet
+
     app.digitalocean.droplet_configuration.default:
         class: App\Model\DigitalOcean\DropletConfiguration
         arguments:

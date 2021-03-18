@@ -15,7 +15,17 @@ abstract class AbstractWorkerRequestHandler
     ) {
     }
 
-    protected function getWorker(WorkerRequestMessageInterface $message): ?Worker
+    protected function doInvoke(WorkerRequestMessageInterface $message, callable $inner): void
+    {
+        $worker = $this->getWorker($message);
+        if (false === $worker instanceof Worker) {
+            return;
+        }
+
+        $inner($message, $worker);
+    }
+
+    private function getWorker(WorkerRequestMessageInterface $message): ?Worker
     {
         $request = $message->getRequest();
 

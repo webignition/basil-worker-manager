@@ -21,7 +21,6 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         Client $client,
         private WorkerApiExceptionFactory $workerApiExceptionFactory,
         private DropletFactory $dropletFactory,
-        private DropletRepository $dropletRepository,
         private WorkerStore $workerStore,
     ) {
         $this->dropletApi = $client->droplet();
@@ -63,7 +62,17 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function hydrate(Worker $worker): Worker
     {
-        return $this->updateWorker($worker, $this->dropletRepository->get($worker));
+        try {
+            $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
+        } catch (ExceptionInterface $exception) {
+            throw $this->workerApiExceptionFactory->create(
+                WorkerApiActionException::ACTION_GET,
+                $worker,
+                $exception
+            );
+        }
+
+        return $this->updateWorker($worker, $dropletEntity);
     }
 
     private function updateWorker(Worker $worker, DropletEntity $droplet): Worker
@@ -71,19 +80,5 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         $worker = $worker->updateFromRemoteMachine(new RemoteMachine($droplet));
 
         return $this->workerStore->store($worker);
-    }
-
-    /**
-     * @param WorkerApiActionException::ACTION_* $action
-     *
-     * @throws WorkerApiActionException
-     */
-    protected function performApiAction(string $action, Worker $worker, callable $callable): void
-    {
-        try {
-            $callable($worker);
-        } catch (ExceptionInterface $exception) {
-            throw $this->workerApiExceptionFactory->create($action, $worker, $exception);
-        }
     }
 }

@@ -9,8 +9,8 @@ use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
-use App\MessageDispatcher\CreateMessageDispatcher;
 use App\MessageDispatcher\UpdateWorkerMessageDispatcher;
+use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
@@ -21,7 +21,7 @@ class CreateMachineHandler
     public function __construct(
         private MachineProvider $machineProvider,
         private ApiActionRetryDecider $retryDecider,
-        private CreateMessageDispatcher $createMessageDispatcher,
+        private WorkerRequestMessageDispatcher $messageDispatcher,
         private ExceptionLogger $exceptionLogger,
         private WorkerStore $workerStore,
         private int $retryLimit,
@@ -55,7 +55,7 @@ class CreateMachineHandler
                 $request = new WorkerRequest((string) $worker, $retryCount + 1);
                 $message = new CreateMessage($request);
 
-                $this->createMessageDispatcher->dispatch($message);
+                $this->messageDispatcher->dispatch($message);
 
                 return ApiRequestOutcome::retrying();
             }

@@ -7,8 +7,8 @@ namespace App\Services;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
+use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequestOutcome;
-use App\Model\UpdateWorkerRequest;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
 

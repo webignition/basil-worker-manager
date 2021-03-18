@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Message\CreateMessage;
 use App\MessageHandler\CreateMessageHandler;
+use App\Model\ApiRequest\WorkerActionRequest;
 use App\Model\ProviderInterface;
-use App\Model\WorkerActionRequest;
 use App\Services\CreateMachineHandler;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;

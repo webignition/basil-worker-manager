@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Message;
 
 use App\Message\CreateMessage;
-use App\Model\WorkerActionRequest;
+use App\Model\ApiRequest\WorkerActionRequest;
 use PHPUnit\Framework\TestCase;
 
 class CreateMessageTest extends TestCase

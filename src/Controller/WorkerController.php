@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Worker;
 use App\Message\CreateMessage;
+use App\Model\ApiRequest\WorkerActionRequest;
 use App\Model\ProviderInterface;
-use App\Model\WorkerActionRequest;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
 use App\Response\BadWorkerCreateRequestResponse;

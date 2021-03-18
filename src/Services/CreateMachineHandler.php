@@ -8,10 +8,10 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
+use App\Model\ApiRequest\UpdateWorkerRequest;
+use App\Model\ApiRequest\WorkerActionRequest;
 use App\Model\ApiRequestOutcome;
-use App\Model\UpdateWorkerRequest;
 use App\Model\Worker\State;
-use App\Model\WorkerActionRequest;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class CreateMachineHandler

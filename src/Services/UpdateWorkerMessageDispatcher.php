@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Message\UpdateWorkerMessage;
-use App\Model\UpdateWorkerRequest;
+use App\Model\ApiRequest\UpdateWorkerRequest;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;

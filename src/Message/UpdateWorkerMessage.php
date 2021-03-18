@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\UpdateWorkerRequest;
+use App\Model\ApiRequest\UpdateWorkerRequest;
 
 class UpdateWorkerMessage
 {

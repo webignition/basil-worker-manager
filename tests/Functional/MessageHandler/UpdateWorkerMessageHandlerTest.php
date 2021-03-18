@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Message\UpdateWorkerMessage;
 use App\MessageHandler\UpdateWorkerMessageHandler;
+use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ProviderInterface;
-use App\Model\UpdateWorkerRequest;
 use App\Model\Worker\State;
 use App\Services\UpdateWorkerHandler;
 use App\Services\WorkerFactory;

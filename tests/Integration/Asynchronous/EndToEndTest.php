@@ -22,7 +22,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     private WorkerRepository $workerRepository;
     private DropletApi $dropletApi;
     private EntityRefresher $entityRefresher;
-    private string $workerLabel = '';
+    private string $workerId = '';
     private Worker $worker;
 
     protected function setUp(): void
@@ -44,7 +44,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             $this->entityRefresher = $entityRefresher;
         }
 
-        $this->workerLabel = md5('label content');
+        $this->workerId = md5('id content');
 
         echo "\n" . $this->getObfuscatedDigitalOceanAccessToken(2, 2) . "\n\n";
     }
@@ -56,14 +56,14 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             'POST',
             WorkerController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_LABEL => $this->workerLabel,
+                WorkerCreateRequest::KEY_ID => $this->workerId,
             ]
         );
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->workerRepository->findOneByLabel($this->workerLabel);
+        $worker = $this->workerRepository->find($this->workerId);
         if ($worker instanceof Worker) {
             $this->worker = $worker;
         }

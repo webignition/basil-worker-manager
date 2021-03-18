@@ -56,7 +56,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     private function assertMutateWorker(callable $callable): void
     {
-        $worker = $this->workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         $remoteId = 123;
         $ipAddresses = ['127.0.0.1', '10.0.0.1', ];

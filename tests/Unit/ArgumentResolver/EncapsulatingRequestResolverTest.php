@@ -73,7 +73,7 @@ class EncapsulatingRequestResolverTest extends TestCase
      */
     public function resolveWorkerCreateRequestDataProvider(): array
     {
-        $label = md5('label content');
+        $id = md5('id content');
 
         $argumentMetadata = (new MockArgumentMetadata())
             ->withGetTypeCall(WorkerCreateRequest::class)
@@ -85,13 +85,13 @@ class EncapsulatingRequestResolverTest extends TestCase
                 'argumentMetadata' => $argumentMetadata,
                 'expectedEncapsulatingRequest' => new WorkerCreateRequest(new Request()),
             ],
-            'JobCreateRequest: label present' => [
+            'JobCreateRequest: id present' => [
                 'request' => new Request([], [
-                    WorkerCreateRequest::KEY_LABEL => $label,
+                    WorkerCreateRequest::KEY_ID => $id,
                 ]),
                 'argumentMetadata' => $argumentMetadata,
                 'expectedEncapsulatingRequest' => new WorkerCreateRequest(new Request([], [
-                    WorkerCreateRequest::KEY_LABEL => $label,
+                    WorkerCreateRequest::KEY_ID => $id,
                 ])),
             ],
         ];

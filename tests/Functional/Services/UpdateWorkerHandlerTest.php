@@ -48,7 +48,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $workerFactory = self::$container->get(WorkerFactory::class);
         if ($workerFactory instanceof WorkerFactory) {
-            $this->worker = $workerFactory->create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+            $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $mockHandler = self::$container->get(MockHandler::class);

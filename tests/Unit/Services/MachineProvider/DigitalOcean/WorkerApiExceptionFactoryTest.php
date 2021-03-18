@@ -27,7 +27,7 @@ class WorkerApiExceptionFactoryTest extends TestCase
         ExceptionInterface $exception,
         WorkerApiActionException $expectedException
     ): void {
-        $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         $factory = new WorkerApiExceptionFactory(\Mockery::mock(Client::class));
 
@@ -42,7 +42,7 @@ class WorkerApiExceptionFactoryTest extends TestCase
      */
     public function createDataProvider(): array
     {
-        $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $runtimeException = new RuntimeException('runtime exception message');
         $genericValidationFailedException = new ValidationFailedException('generic');
         $dropletLimitValidationFailedException = new ValidationFailedException(
@@ -99,7 +99,7 @@ class WorkerApiExceptionFactoryTest extends TestCase
         $vendorApiLimitExceedException = new VendorApiLimitExceededException();
         $apiLimitExceededException = new ApiLimitExceededException($resetTimestamp, $vendorApiLimitExceedException);
 
-        $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $factory = new WorkerApiExceptionFactory($client);
 
         self::assertEquals(

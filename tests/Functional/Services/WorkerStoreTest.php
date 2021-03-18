@@ -8,10 +8,14 @@ use App\Entity\Worker;
 use App\Model\ProviderInterface;
 use App\Services\WorkerStore;
 use App\Tests\AbstractBaseFunctionalTest;
+use App\Tests\Services\EntityRefresher;
+use Doctrine\ORM\EntityManagerInterface;
 
 class WorkerStoreTest extends AbstractBaseFunctionalTest
 {
     private WorkerStore $workerStore;
+    private EntityManagerInterface $entityManager;
+    private EntityRefresher $entityRefresher;
 
     protected function setUp(): void
     {
@@ -21,14 +25,27 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
         if ($workerStore instanceof WorkerStore) {
             $this->workerStore = $workerStore;
         }
+
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+        if ($entityManager instanceof EntityManagerInterface) {
+            $this->entityManager = $entityManager;
+        }
+
+        $entityRefresher = self::$container->get(EntityRefresher::class);
+        if ($entityRefresher instanceof EntityRefresher) {
+            $this->entityRefresher = $entityRefresher;
+        }
     }
 
     public function testStore(): void
     {
-        $worker = Worker::create(md5('label content'), ProviderInterface::NAME_DIGITALOCEAN);
-        self::assertNull($worker->getId());
-
+        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $worker = $this->workerStore->store($worker);
-        self::assertNotNull($worker->getId());
+
+        $this->entityRefresher->refreshForEntity(Worker::class);
+
+        $retrievedWorker = $this->entityManager->find(Worker::class, $worker->getId());
+
+        self::assertEquals($worker, $retrievedWorker);
     }
 }

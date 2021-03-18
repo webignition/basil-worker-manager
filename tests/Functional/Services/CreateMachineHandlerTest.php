@@ -200,7 +200,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
-            ->withoutLogCall()
+            ->withLogCall($workerApiActionException)
             ->getMock();
 
         $this->prepareFactory($machineProvider, $exceptionLogger);

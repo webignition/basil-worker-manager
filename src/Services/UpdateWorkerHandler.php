@@ -14,16 +14,17 @@ use App\Model\ApiRequestOutcome;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
 
-class UpdateWorkerHandler
+class UpdateWorkerHandler extends AbstractApiActionHandler
 {
     public function __construct(
-        private MachineProvider $machineProvider,
-        private ApiActionRetryDecider $retryDecider,
-        private WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
-        private ExceptionLogger $exceptionLogger,
-        private int $retryLimit,
+        MachineProvider $machineProvider,
+        ApiActionRetryDecider $retryDecider,
+        WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        ExceptionLogger $exceptionLogger,
+        int $retryLimit,
         private WorkerStateTransitionSequences $stateTransitionSequences,
     ) {
+        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger, $retryLimit);
     }
 
     /**

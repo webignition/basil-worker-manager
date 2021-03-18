@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Model\ApiRequest\WorkerRequest;
 
-class CreateMessage
+class CreateMessage implements WorkerRequestMessageInterface
 {
     public function __construct(
         private WorkerRequest $request,

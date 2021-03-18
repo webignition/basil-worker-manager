@@ -94,6 +94,8 @@
         "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors=always tests/Functional",
         "test-integration-sync": "./vendor/bin/phpunit -c phpunit.integration_sync.xml",
+        "test-integration-async": "./vendor/bin/phpunit -c phpunit.integration_async.xml",
+        "test-integration-listen": "php bin/console --env=integration_async messenger:consume async -vv",
         "test": [
             "@test-unit",
             "@test-functional"

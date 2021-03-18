@@ -46,3 +46,11 @@ jobs:
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
         run: composer test-integration-sync
+
+      - name: Run asynchronous tests
+        env:
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
+        run: |
+          php bin/console --env=integration_async messenger:consume async > /dev/null &
+          composer test-integration-async
+          php bin/console --env=integration_async messenger:stop

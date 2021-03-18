@@ -4,7 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Worker;
 use App\Message\CreateMessage;
-use App\Model\CreateMachineRequest;
+use App\MessageDispatcher\WorkerRequestMessageDispatcher;
+use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
@@ -13,7 +14,6 @@ use App\Services\WorkerFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class WorkerController extends AbstractController
@@ -26,7 +26,7 @@ class WorkerController extends AbstractController
     public function create(
         WorkerCreateRequest $request,
         WorkerFactory $factory,
-        MessageBusInterface $messageBus,
+        WorkerRequestMessageDispatcher $messageDispatcher,
         WorkerRepository $workerRepository
     ): Response {
         $id = $request->getId();
@@ -40,8 +40,8 @@ class WorkerController extends AbstractController
 
         $worker = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
-        $messageBus->dispatch(new CreateMessage(
-            new CreateMachineRequest((string) $worker)
+        $messageDispatcher->dispatch(new CreateMessage(
+            new WorkerRequest((string) $worker)
         ));
 
         return new Response('', 202);

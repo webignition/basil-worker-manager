@@ -22,22 +22,22 @@ class MockCreateMachineHandler
         return $this->mock;
     }
 
-    public function withCreateCall(Worker $worker, int $retryCount): self
+    public function withHandleCall(Worker $worker, int $retryCount): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
-                ->shouldReceive('create')
+                ->shouldReceive('handle')
                 ->with($worker, $retryCount);
         }
 
         return $this;
     }
 
-    public function withoutCreateCall(): self
+    public function withoutHandleCall(): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
-                ->shouldNotReceive('create');
+                ->shouldNotReceive('handle');
         }
 
         return $this;

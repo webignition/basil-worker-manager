@@ -4,29 +4,17 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\Worker\State;
+use App\Model\ApiRequest\UpdateWorkerRequest;
 
-class UpdateWorkerMessage
+class UpdateWorkerMessage implements WorkerRequestMessageInterface
 {
-    /**
-     * @param State::VALUE_* $stopState
-     */
     public function __construct(
-        private string $workerId,
-        private string $stopState,
+        private UpdateWorkerRequest $request
     ) {
     }
 
-    public function getWorkerId(): string
+    public function getRequest(): UpdateWorkerRequest
     {
-        return $this->workerId;
-    }
-
-    /**
-     * @return State::VALUE_*
-     */
-    public function getStopState(): string
-    {
-        return $this->stopState;
+        return $this->request;
     }
 }

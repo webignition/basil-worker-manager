@@ -10,23 +10,20 @@ use App\Repository\WorkerRepository;
 use App\Services\CreateMachineHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class CreateMessageHandler implements MessageHandlerInterface
+class CreateMessageHandler extends AbstractWorkerRequestHandler implements MessageHandlerInterface
 {
     public function __construct(
-        private WorkerRepository $workerRepository,
+        WorkerRepository $workerRepository,
         private CreateMachineHandler $createMachineHandler
     ) {
+        parent::__construct($workerRepository);
     }
 
     public function __invoke(CreateMessage $message): void
     {
-        $request = $message->getRequest();
-
-        $worker = $this->workerRepository->find($request->getWorkerId());
-        if (false === $worker instanceof Worker) {
-            return;
-        }
-
-        $this->createMachineHandler->create($worker, $request->getRetryCount());
+        $this->doInvoke($message, function (CreateMessage $message, Worker $worker) {
+            $request = $message->getRequest();
+            $this->createMachineHandler->handle($worker, $request->getRetryCount());
+        });
     }
 }

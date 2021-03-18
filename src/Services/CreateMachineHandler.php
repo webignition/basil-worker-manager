@@ -5,60 +5,60 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\WorkerApiActionException;
-use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
+use App\Message\UpdateWorkerMessage;
+use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
+use App\Model\ApiRequest\UpdateWorkerRequest;
+use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
-use App\Model\CreateMachineRequest;
 use App\Model\Worker\State;
-use Symfony\Component\Messenger\MessageBusInterface;
 
-class CreateMachineHandler
+class CreateMachineHandler extends AbstractApiActionHandler
 {
     public function __construct(
-        private MachineProvider $machineProvider,
-        private ApiActionRetryDecider $retryDecider,
-        private MessageBusInterface $messageBus,
-        private ExceptionLogger $exceptionLogger,
+        MachineProvider $machineProvider,
+        ApiActionRetryDecider $retryDecider,
+        WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        ExceptionLogger $exceptionLogger,
+        int $retryLimit,
+        private WorkerRequestMessageDispatcherInterface $createDispatcher,
         private WorkerStore $workerStore,
-        private int $retryLimit,
-        private UpdateWorkerMessageDispatcher $updateWorkerMessageDispatcher,
     ) {
+        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger, $retryLimit);
     }
 
-    public function create(Worker $worker, int $retryCount): ApiRequestOutcome
+    protected function doAction(Worker $worker): Worker
+    {
+        return $this->machineProvider->create($worker);
+    }
+
+    public function handle(Worker $worker, int $retryCount): ApiRequestOutcome
     {
         $worker->setState(State::VALUE_CREATE_REQUESTED);
         $this->workerStore->store($worker);
 
-        try {
-            $this->machineProvider->create($worker);
-            $this->updateWorkerMessageDispatcher->dispatchForWorker($worker, State::VALUE_UP_ACTIVE);
+        $outcome = $this->doHandle($worker, $retryCount);
 
-            return ApiRequestOutcome::success();
-        } catch (WorkerApiActionException $workerApiActionException) {
-            $exceptionRequiresRetry = $this->retryDecider->decide(
-                $worker->getProvider(),
-                $workerApiActionException->getRemoteApiException()
-            );
+        if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
+            $request = new WorkerRequest((string) $worker, $retryCount + 1);
+            $message = new CreateMessage($request);
+            $this->createDispatcher->dispatch($message);
 
-            $retryLimitReached = $this->retryLimit <= $retryCount;
-
-            if ($exceptionRequiresRetry && false === $retryLimitReached) {
-                $request = new CreateMachineRequest((string) $worker, $retryCount + 1);
-                $message = new CreateMessage($request);
-
-                $this->messageBus->dispatch($message);
-
-                return ApiRequestOutcome::retrying();
-            }
-        } catch (UnsupportedProviderException $unsupportedProviderException) {
-            $this->exceptionLogger->log($unsupportedProviderException);
+            return $outcome;
         }
 
-        $worker = $worker->setState(State::VALUE_CREATE_FAILED);
-        $this->workerStore->store($worker);
+        if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
+            $worker = $worker->setState(State::VALUE_CREATE_FAILED);
+            $this->workerStore->store($worker);
 
-        return ApiRequestOutcome::failed();
+            return $outcome;
+        }
+
+        $updateWorkerRequest = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE);
+        $this->updateWorkerDispatcher->dispatch(
+            new UpdateWorkerMessage($updateWorkerRequest)
+        );
+
+        return ApiRequestOutcome::success();
     }
 }

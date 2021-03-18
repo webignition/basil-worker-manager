@@ -27,7 +27,8 @@ class MockMachineProvider
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive('create')
-                ->with($worker);
+                ->with($worker)
+                ->andReturn($worker);
         }
 
         return $this;

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\CreateMachineRequest;
+use App\Model\ApiRequest\WorkerRequest;
 
-class CreateMessage
+class CreateMessage implements WorkerRequestMessageInterface
 {
     public function __construct(
-        private CreateMachineRequest $request,
+        private WorkerRequest $request,
     ) {
     }
 
-    public function getRequest(): CreateMachineRequest
+    public function getRequest(): WorkerRequest
     {
         return $this->request;
     }

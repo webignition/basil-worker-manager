@@ -3,7 +3,8 @@ services:
         autowire: true
         autoconfigure: true
 
-    App\Services\UpdateWorkerMessageDispatcher:
+    app.message_dispatcher.update_worker:
+        class: App\MessageDispatcher\WorkerRequestMessageDispatcher
         arguments:
             $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'
             $enabled: false

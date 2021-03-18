@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\ApiRequest;
 
-class CreateMachineRequest
+class WorkerRequest implements WorkerRequestInterface
 {
     public function __construct(
         private string $workerId,

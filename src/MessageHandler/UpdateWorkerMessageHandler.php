@@ -10,21 +10,20 @@ use App\Repository\WorkerRepository;
 use App\Services\UpdateWorkerHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class UpdateWorkerMessageHandler implements MessageHandlerInterface
+class UpdateWorkerMessageHandler extends AbstractWorkerRequestHandler implements MessageHandlerInterface
 {
     public function __construct(
-        private WorkerRepository $workerRepository,
+        WorkerRepository $workerRepository,
         private UpdateWorkerHandler $updateWorkerHandler,
     ) {
+        parent::__construct($workerRepository);
     }
 
     public function __invoke(UpdateWorkerMessage $message): void
     {
-        $worker = $this->workerRepository->find($message->getWorkerId());
-        if (false === $worker instanceof Worker) {
-            return;
-        }
-
-        $this->updateWorkerHandler->update($worker, $message->getStopState());
+        $this->doInvoke($message, function (UpdateWorkerMessage $message, Worker $worker) {
+            $request = $message->getRequest();
+            $this->updateWorkerHandler->handle($worker, $request->getStopState(), $request->getRetryCount());
+        });
     }
 }

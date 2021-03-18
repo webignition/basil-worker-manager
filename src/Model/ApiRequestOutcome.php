@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class ApiRequestOutcome
+class ApiRequestOutcome implements \Stringable
 {
     public const STATE_SUCCESS = 'success';
     public const STATE_FAILED = 'failed';
@@ -34,7 +34,7 @@ class ApiRequestOutcome
     /**
      * @return self::STATE_*
      */
-    public function getState(): string
+    public function __toString(): string
     {
         return $this->state;
     }

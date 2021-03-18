@@ -8,9 +8,9 @@ use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
-use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
+use App\Model\WorkerActionRequest;
 use App\Services\CreateMachineHandler;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider;
@@ -55,7 +55,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testCreateSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new CreateMachineRequest((string) $worker);
+        $request = new WorkerActionRequest((string) $worker);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCall($worker)
@@ -83,7 +83,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new CreateMachineRequest((string) $worker);
+        $request = new WorkerActionRequest((string) $worker);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($worker, $exception)
@@ -109,10 +109,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new CreateMachineRequest((string) $worker);
+        $request = new WorkerActionRequest((string) $worker);
         ObjectReflector::setProperty(
             $request,
-            CreateMachineRequest::class,
+            WorkerActionRequest::class,
             'retryCount',
             $currentRetryCount
         );
@@ -136,7 +136,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->factory->create($worker, $request->getRetryCount());
 
-        $expectedRequest = new CreateMachineRequest(
+        $expectedRequest = new WorkerActionRequest(
             (string) $worker,
             $request->getRetryCount() + 1
         );
@@ -177,10 +177,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new CreateMachineRequest((string) $worker);
+        $request = new WorkerActionRequest((string) $worker);
         ObjectReflector::setProperty(
             $request,
-            CreateMachineRequest::class,
+            WorkerActionRequest::class,
             'retryCount',
             $currentRetryCount
         );

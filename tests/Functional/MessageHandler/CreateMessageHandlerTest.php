@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Message\CreateMessage;
 use App\MessageHandler\CreateMessageHandler;
-use App\Model\CreateMachineRequest;
 use App\Model\ProviderInterface;
+use App\Model\WorkerActionRequest;
 use App\Services\CreateMachineHandler;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -39,7 +39,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
 
     public function testInvokeUnknownWorker(): void
     {
-        $request = new CreateMachineRequest('');
+        $request = new WorkerActionRequest('');
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
@@ -54,7 +54,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new CreateMachineRequest((string) $worker);
+        $request = new WorkerActionRequest((string) $worker);
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())

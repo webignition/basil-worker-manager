@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class CreateMachineRequest
+class WorkerActionRequest
 {
     public function __construct(
         private string $workerId,

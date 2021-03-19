@@ -3,8 +3,6 @@
 namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\Exception;
-use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -35,9 +33,6 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return ProviderInterface::NAME_DIGITALOCEAN === $type;
     }
 
-    /**
-     * @throws ExceptionInterface
-     */
     public function create(Worker $worker): Worker
     {
         $createArguments = new DropletApiCreateCallArguments(
@@ -75,9 +70,6 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return $worker;
     }
 
-    /**
-     * @throws Exception
-     */
     public function hydrate(Worker $worker): Worker
     {
         try {

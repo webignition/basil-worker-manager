@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Services\MachineProvider\MachineProviderInterface;
 
@@ -26,7 +26,7 @@ class MachineProvider
     }
 
     /**
-     * @throws Exception
+     * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
     public function create(Worker $worker): Worker
@@ -35,7 +35,7 @@ class MachineProvider
     }
 
     /**
-     * @throws Exception
+     * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
     public function update(Worker $worker): Worker
@@ -44,7 +44,7 @@ class MachineProvider
     }
 
     /**
-     * @throws Exception
+     * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
     public function delete(Worker $worker): Worker

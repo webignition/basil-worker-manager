@@ -6,6 +6,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\MachineProviderActionInterface;
@@ -30,9 +31,11 @@ class ExceptionFactory
         Worker $worker,
         VendorExceptionInterface $exception
     ): ExceptionInterface {
-        if ($exception instanceof RuntimeException) {
-            if (401 === $exception->getCode()) {
-                return new AuthenticationException(
+        if ($exception instanceof VendorApiLimitExceededException) {
+            $lastResponse = $this->digitalOceanClient->getLastResponse();
+            if ($lastResponse instanceof ResponseInterface) {
+                return new ApiLimitExceededException(
+                    (int) $lastResponse->getHeaderLine('RateLimit-Reset'),
                     (string) $worker,
                     $action,
                     0,
@@ -45,17 +48,22 @@ class ExceptionFactory
             return new DropletLimitExceededException((string) $worker, $action, 0, $exception);
         }
 
-        if ($exception instanceof VendorApiLimitExceededException) {
-            $lastResponse = $this->digitalOceanClient->getLastResponse();
-            if ($lastResponse instanceof ResponseInterface) {
-                return new ApiLimitExceededException(
-                    (int) $lastResponse->getHeaderLine('RateLimit-Reset'),
+        if ($exception instanceof RuntimeException) {
+            if (401 === $exception->getCode()) {
+                return new AuthenticationException(
                     (string) $worker,
                     $action,
                     0,
                     $exception
                 );
             }
+
+            return new HttpException(
+                (string) $worker,
+                $action,
+                0,
+                $exception
+            );
         }
 
         return new Exception((string) $worker, $action, 0, $exception);

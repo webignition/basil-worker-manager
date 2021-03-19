@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
-use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -211,16 +211,16 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider handleThrowsExceptionWithoutRetryDataProvider
+     * @dataProvider handleThrowsHttpExceptionWithoutRetryDataProvider
      */
-    public function testHandleThrowsExceptionWithoutRetry(
+    public function testHandleThrowsHttpExceptionWithoutRetry(
         ResponseInterface $apiResponse,
         int $retryCount,
-        \Exception $expectedRemoteException
+        RuntimeException $expectedRemoteException
     ): void {
         $this->mockHandler->append($apiResponse);
 
-        $expectedLoggedException = new Exception(
+        $expectedLoggedException = new HttpException(
             (string) $this->worker,
             MachineProviderActionInterface::ACTION_GET,
             0,
@@ -241,7 +241,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function handleThrowsExceptionWithoutRetryDataProvider(): array
+    public function handleThrowsHttpExceptionWithoutRetryDataProvider(): array
     {
         return [
             'HTTP 503, does not require retry, retry limit reached' => [

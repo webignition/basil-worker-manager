@@ -36,7 +36,7 @@ class ExceptionFactoryTest extends TestCase
 
         self::assertEquals(
             $expectedException,
-            $factory->create(MachineProviderActionInterface::ACTION_CREATE, $worker, $exception)
+            $factory->create(MachineProviderActionInterface::ACTION_CREATE, (string) $worker, $exception)
         );
     }
 
@@ -123,7 +123,11 @@ class ExceptionFactoryTest extends TestCase
 
         self::assertEquals(
             $expectedException,
-            $factory->create(MachineProviderActionInterface::ACTION_CREATE, $worker, $vendorApiLimitExceedException)
+            $factory->create(
+                MachineProviderActionInterface::ACTION_CREATE,
+                (string) $worker,
+                $vendorApiLimitExceedException
+            )
         );
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Exception\MachineProvider;
 
-interface UnprocessableRequestExceptionInterface extends HttpExceptionInterface
+interface UnprocessableRequestExceptionInterface
 {
-    public function getStatusCode(): int;
 }

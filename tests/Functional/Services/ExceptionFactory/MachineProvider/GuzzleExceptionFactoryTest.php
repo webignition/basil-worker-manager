@@ -5,35 +5,39 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\CurlException;
-use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\MachineProviderActionInterface;
-use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
+use App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory;
 use App\Tests\AbstractBaseFunctionalTest;
-use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\RequestInterface;
 
-class ExceptionFactoryTest extends AbstractBaseFunctionalTest
+class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
     private const RESOURCE_ID = 'resource_id';
 
-    private ExceptionFactory $factory;
+    private GuzzleExceptionFactory $factory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $factory = self::$container->get(ExceptionFactory::class);
-        if ($factory instanceof ExceptionFactory) {
+        $factory = self::$container->get(GuzzleExceptionFactory::class);
+        if ($factory instanceof GuzzleExceptionFactory) {
             $this->factory = $factory;
         }
+    }
+
+    public function testHandles(): void
+    {
+        self::assertTrue($this->factory->handles(new ConnectException('', \Mockery::mock(RequestInterface::class))));
+        self::assertFalse($this->factory->handles(new \Exception()));
     }
 
     /**
      * @dataProvider createDataProvider
      */
-    public function testCreate(\Throwable $exception, ExceptionInterface $expectedException): void
+    public function testCreate(ConnectException $exception, ExceptionInterface $expectedException): void
     {
         self::assertEquals(
             $expectedException,
@@ -46,30 +50,37 @@ class ExceptionFactoryTest extends AbstractBaseFunctionalTest
      */
     public function createDataProvider(): array
     {
-        $runtimeException = new RuntimeException('message', 400);
-        $connectException = new ConnectException(
+        $request = \Mockery::mock(RequestInterface::class);
+
+        $curl7ConnectException = new ConnectException(
             'cURL error 7: Further non-relevant information including "cURL error: 88"',
-            \Mockery::mock(RequestInterface::class)
+            $request
+        );
+
+        $curl28ConnectException = new ConnectException(
+            'cURL error 28: Further non-relevant information',
+            $request
         );
 
         return [
-            RuntimeException::class . ' 400' => [
-                'exception' => $runtimeException,
-                'expectedException' => new HttpException(
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $runtimeException
-                ),
-            ],
-            ConnectException::class => [
-                'exception' => $connectException,
+            'curl 7' => [
+                'exception' => $curl7ConnectException,
                 'expectedException' => new CurlException(
                     7,
                     self::RESOURCE_ID,
                     MachineProviderActionInterface::ACTION_CREATE,
                     0,
-                    $connectException
+                    $curl7ConnectException
+                ),
+            ],
+            'curl 28' => [
+                'exception' => $curl28ConnectException,
+                'expectedException' => new CurlException(
+                    28,
+                    self::RESOURCE_ID,
+                    MachineProviderActionInterface::ACTION_CREATE,
+                    0,
+                    $curl28ConnectException
                 ),
             ],
         ];

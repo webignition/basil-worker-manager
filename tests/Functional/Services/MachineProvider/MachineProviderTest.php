@@ -5,20 +5,29 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\MachineProvider;
 
 use App\Entity\Worker;
+use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
+use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\ExceptionInterface;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
+use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededExceptionAlias;
+use DigitalOceanV2\Exception\RuntimeException;
+use DigitalOceanV2\Exception\ValidationFailedException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineProviderTest extends AbstractBaseFunctionalTest
 {
     private MachineProvider $machineProvider;
-    private WorkerFactory $workerFactory;
+    private Worker $worker;
     private MockHandler $mockHandler;
 
     protected function setUp(): void
@@ -32,7 +41,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
         $workerFactory = self::$container->get(WorkerFactory::class);
         if ($workerFactory instanceof WorkerFactory) {
-            $this->workerFactory = $workerFactory;
+            $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $mockHandler = self::$container->get(MockHandler::class);
@@ -48,6 +57,55 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         });
     }
 
+    /**
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param ResponseInterface $apiResponse
+     * @param class-string $expectedExceptionClass
+     * @param \Exception $expectedRemoveException
+     */
+    public function testCreateThrowsException(
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
+    ): void {
+        $this->doActionThrowsExceptionTest(
+            function () {
+                $this->machineProvider->create($this->worker);
+            },
+            MachineProviderActionInterface::ACTION_CREATE,
+            $apiResponse,
+            $expectedExceptionClass,
+            $expectedRemoveException
+        );
+    }
+
+    public function testCreateThrowsDropletLimitException(): void
+    {
+        $this->mockHandler->append(
+            new Response(
+                422,
+                [
+                    'content-type' => 'application/json',
+                ],
+                (string) json_encode([
+                    'id' => 'unprocessable_entity',
+                    'message' => 'creating this/these droplet(s) will exceed your droplet limit',
+                ])
+            )
+        );
+
+        try {
+            $this->machineProvider->create($this->worker);
+            self::fail(ExceptionInterface::class . ' not thrown');
+        } catch (ExceptionInterface $exception) {
+            self::assertEquals(
+                new ValidationFailedException('creating this/these droplet(s) will exceed your droplet limit', 422),
+                $exception->getRemoteException()
+            );
+        }
+    }
+
     public function testUpdateSuccess(): void
     {
         $this->assertMutateWorker(function (Worker $worker) {
@@ -55,21 +113,62 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         });
     }
 
+    /**
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param ResponseInterface $apiResponse
+     * @param class-string $expectedExceptionClass
+     * @param \Exception $expectedRemoveException
+     */
+    public function testUpdateThrowsException(
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
+    ): void {
+        $this->doActionThrowsExceptionTest(
+            function () {
+                $this->machineProvider->update($this->worker);
+            },
+            MachineProviderActionInterface::ACTION_GET,
+            $apiResponse,
+            $expectedExceptionClass,
+            $expectedRemoveException
+        );
+    }
+
     public function testDeleteSuccess(): void
     {
-        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        ObjectReflector::setProperty($worker, Worker::class, 'remote_id', 123);
+        ObjectReflector::setProperty($this->worker, Worker::class, 'remote_id', 123);
 
         $this->mockHandler->append(new Response(204));
 
-        $this->machineProvider->delete($worker);
+        $this->machineProvider->delete($this->worker);
         self::expectNotToPerformAssertions();
+    }
+
+    /**
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param class-string $expectedExceptionClass
+     */
+    public function testDeleteThrowsException(
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
+    ): void {
+        $this->doActionThrowsExceptionTest(
+            function () {
+                $this->machineProvider->delete($this->worker);
+            },
+            MachineProviderActionInterface::ACTION_DELETE,
+            $apiResponse,
+            $expectedExceptionClass,
+            $expectedRemoveException
+        );
     }
 
     private function assertMutateWorker(callable $callable): void
     {
-        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-
         $remoteId = 123;
         $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
 
@@ -92,12 +191,69 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        self::assertNull($worker->getRemoteId());
-        self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
+        self::assertNull($this->worker->getRemoteId());
+        self::assertSame([], ObjectReflector::getProperty($this->worker, 'ip_addresses'));
 
-        $callable($worker);
+        $callable($this->worker);
 
-        self::assertSame($remoteId, $worker->getRemoteId());
-        self::assertSame($ipAddresses, ObjectReflector::getProperty($worker, 'ip_addresses'));
+        self::assertSame($remoteId, $this->worker->getRemoteId());
+        self::assertSame($ipAddresses, ObjectReflector::getProperty($this->worker, 'ip_addresses'));
+    }
+
+    /**
+     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param class-string $expectedExceptionClass
+     */
+    private function doActionThrowsExceptionTest(
+        callable $callable,
+        string $action,
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Throwable $expectedRemoteException
+    ): void {
+        $this->mockHandler->append($apiResponse);
+
+        try {
+            $callable();
+            self::fail(ExceptionInterface::class . ' not thrown');
+        } catch (Exception $exception) {
+            self::assertSame($expectedExceptionClass, $exception::class);
+            self::assertSame($action, $exception->getAction());
+            self::assertEquals($expectedRemoteException, $exception->getRemoteException());
+        }
+    }
+
+    /**
+     * @return array[]
+     */
+    public function apiActionThrowsExceptionDataProvider(): array
+    {
+        return [
+            VendorApiLimitExceededExceptionAlias::class => [
+                'apiResponse' => new Response(
+                    429,
+                    [
+                        'RateLimit-Reset' => 123,
+                    ]
+                ),
+                'expectedExceptionClass' => ApiLimitExceededException::class,
+                'expectedRemoteException' => new VendorApiLimitExceededExceptionAlias('Too Many Requests', 429),
+            ],
+            RuntimeException::class . ' HTTP 503' => [
+                'apiResponse' => new Response(503),
+                'expectedExceptionClass' => HttpException::class,
+                'expectedRemoteException' => new RuntimeException('Service Unavailable', 503),
+            ],
+            ValidationFailedException::class => [
+                'apiResponse' => new Response(400),
+                'expectedExceptionClass' => Exception::class,
+                'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
+            ],
+            'droplet does not exist' => [
+                'apiResponse' => new Response(404),
+                'expectedExceptionClass' => HttpException::class,
+                'expectedRemoteException' => new RuntimeException('Not Found', 404),
+            ],
+        ];
     }
 }

@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\MachineProviderActionInterface;
@@ -117,7 +118,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         string $expectedExceptionClass,
         \Exception $expectedRemoveException
     ): void {
-        $this->doActionThrowsWorkApiActonExceptionTest(
+        $this->doActionThrowsExceptionTest(
             function () {
                 $this->machineProvider->create($this->worker);
             },
@@ -166,12 +167,12 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
      *
      * @param class-string $expectedExceptionClass
      */
-    public function testHydrateThrowsWorkApiActonException(
+    public function testHydrateThrowsException(
         ResponseInterface $apiResponse,
         string $expectedExceptionClass,
         \Exception $expectedRemoveException
     ): void {
-        $this->doActionThrowsWorkApiActonExceptionTest(
+        $this->doActionThrowsExceptionTest(
             function () {
                 $this->machineProvider->hydrate($this->worker);
             },
@@ -200,7 +201,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         string $expectedExceptionClass,
         \Exception $expectedRemoveException
     ): void {
-        $this->doActionThrowsWorkApiActonExceptionTest(
+        $this->doActionThrowsExceptionTest(
             function () {
                 $this->machineProvider->remove($this->worker);
             },
@@ -215,7 +216,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
      * @param MachineProviderActionInterface::ACTION_* $action
      * @param class-string $expectedExceptionClass
      */
-    private function doActionThrowsWorkApiActonExceptionTest(
+    private function doActionThrowsExceptionTest(
         callable $callable,
         string $action,
         ResponseInterface $apiResponse,
@@ -252,7 +253,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             ],
             RuntimeException::class . ' HTTP 503' => [
                 'apiResponse' => new Response(503),
-                'expectedExceptionClass' => Exception::class,
+                'expectedExceptionClass' => HttpException::class,
                 'expectedRemoteException' => new RuntimeException('Service Unavailable', 503),
             ],
             ValidationFailedException::class => [
@@ -262,7 +263,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             ],
             'droplet does not exist' => [
                 'apiResponse' => new Response(404),
-                'expectedExceptionClass' => Exception::class,
+                'expectedExceptionClass' => HttpException::class,
                 'expectedRemoteException' => new RuntimeException('Not Found', 404),
             ],
         ];

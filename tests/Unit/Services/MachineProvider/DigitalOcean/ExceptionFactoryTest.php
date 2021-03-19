@@ -8,6 +8,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
@@ -45,7 +46,7 @@ class ExceptionFactoryTest extends TestCase
     public function createDataProvider(): array
     {
         $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $runtimeExceptionGeneric = new RuntimeException('runtime exception message');
+        $runtimeException400 = new RuntimeException('message', 400);
         $runtimeException401 = new RuntimeException('message', 401);
         $genericValidationFailedException = new ValidationFailedException('generic');
         $dropletLimitValidationFailedException = new ValidationFailedException(
@@ -54,13 +55,13 @@ class ExceptionFactoryTest extends TestCase
         );
 
         return [
-            RuntimeException::class . ' generic' => [
-                'exception' => $runtimeExceptionGeneric,
-                'expectedException' => new Exception(
+            RuntimeException::class . ' 400' => [
+                'exception' => $runtimeException400,
+                'expectedException' => new HttpException(
                     (string) $worker,
                     MachineProviderActionInterface::ACTION_CREATE,
                     0,
-                    $runtimeExceptionGeneric
+                    $runtimeException400
                 ),
             ],
             RuntimeException::class . ' 401' => [

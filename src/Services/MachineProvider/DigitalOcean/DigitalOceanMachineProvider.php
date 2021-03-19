@@ -8,6 +8,7 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;
@@ -48,7 +49,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
             $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
-                Exception::ACTION_CREATE,
+                MachineProviderActionInterface::ACTION_CREATE,
                 $worker,
                 $exception
             );
@@ -65,7 +66,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
             $this->dropletApi->remove((int) $worker->getRemoteId());
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
-                Exception::ACTION_DELETE,
+                MachineProviderActionInterface::ACTION_DELETE,
                 $worker,
                 $exception
             );
@@ -83,7 +84,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
             $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
-                Exception::ACTION_GET,
+                MachineProviderActionInterface::ACTION_GET,
                 $worker,
                 $exception
             );

@@ -7,6 +7,7 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
+use App\Model\MachineProviderActionInterface;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededException;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
@@ -20,7 +21,7 @@ class ExceptionFactory
     }
 
     /**
-     * @param ExceptionInterface::ACTION_* $action
+     * @param MachineProviderActionInterface::ACTION_* $action
      */
     public function create(
         string $action,

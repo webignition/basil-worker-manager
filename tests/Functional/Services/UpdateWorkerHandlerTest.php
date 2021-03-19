@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
@@ -198,7 +199,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedLoggedException = new Exception(
             (string) $this->worker,
-            Exception::ACTION_GET,
+            MachineProviderActionInterface::ACTION_GET,
             0,
             $expectedWrappedLoggedException
         );

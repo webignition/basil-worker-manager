@@ -8,6 +8,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\Exception;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\ExceptionFactory;
 use DigitalOceanV2\Client;
@@ -33,7 +34,7 @@ class ExceptionFactoryTest extends TestCase
 
         self::assertEquals(
             $expectedException,
-            $factory->create(Exception::ACTION_CREATE, $worker, $exception)
+            $factory->create(MachineProviderActionInterface::ACTION_CREATE, $worker, $exception)
         );
     }
 
@@ -55,7 +56,7 @@ class ExceptionFactoryTest extends TestCase
                 'exception' => $runtimeException,
                 'expectedException' => new Exception(
                     (string) $worker,
-                    Exception::ACTION_CREATE,
+                    MachineProviderActionInterface::ACTION_CREATE,
                     0,
                     $runtimeException
                 ),
@@ -64,7 +65,7 @@ class ExceptionFactoryTest extends TestCase
                 'exception' => $genericValidationFailedException,
                 'expectedException' => new Exception(
                     (string) $worker,
-                    Exception::ACTION_CREATE,
+                    MachineProviderActionInterface::ACTION_CREATE,
                     0,
                     $genericValidationFailedException
                 ),
@@ -73,7 +74,7 @@ class ExceptionFactoryTest extends TestCase
                 'exception' => $dropletLimitValidationFailedException,
                 'expectedException' => new DropletLimitExceededException(
                     (string) $worker,
-                    Exception::ACTION_CREATE,
+                    MachineProviderActionInterface::ACTION_CREATE,
                     0,
                     $dropletLimitValidationFailedException
                 ),
@@ -103,14 +104,14 @@ class ExceptionFactoryTest extends TestCase
         $expectedException = new ApiLimitExceededException(
             $resetTimestamp,
             (string) $worker,
-            Exception::ACTION_CREATE,
+            MachineProviderActionInterface::ACTION_CREATE,
             0,
             $vendorApiLimitExceedException
         );
 
         self::assertEquals(
             $expectedException,
-            $factory->create(Exception::ACTION_CREATE, $worker, $vendorApiLimitExceedException)
+            $factory->create(MachineProviderActionInterface::ACTION_CREATE, $worker, $vendorApiLimitExceedException)
         );
     }
 }

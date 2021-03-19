@@ -10,6 +10,7 @@ use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\CreateMachineHandler;
@@ -122,7 +123,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $exception = new Exception(
             (string) $worker,
-            Exception::ACTION_CREATE,
+            MachineProviderActionInterface::ACTION_CREATE,
             0,
             $previous
         );
@@ -190,7 +191,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $exception = new Exception(
             (string) $worker,
-            Exception::ACTION_CREATE,
+            MachineProviderActionInterface::ACTION_CREATE,
             0,
             $previous
         );

@@ -14,7 +14,8 @@ use Psr\Http\Message\RequestInterface;
 
 class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
-    private const RESOURCE_ID = 'resource_id';
+    private const ID = 'resource_id';
+    private const ACTION = MachineProviderActionInterface::ACTION_CREATE;
 
     private GuzzleExceptionFactory $factory;
 
@@ -41,7 +42,7 @@ class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
     {
         self::assertEquals(
             $expectedException,
-            $this->factory->create(self::RESOURCE_ID, MachineProviderActionInterface::ACTION_CREATE, $exception)
+            $this->factory->create(self::ID, MachineProviderActionInterface::ACTION_CREATE, $exception)
         );
     }
 
@@ -65,23 +66,11 @@ class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
         return [
             'curl 7' => [
                 'exception' => $curl7ConnectException,
-                'expectedException' => new CurlException(
-                    7,
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $curl7ConnectException
-                ),
+                'expectedException' => new CurlException(7, self::ID, self::ACTION, $curl7ConnectException),
             ],
             'curl 28' => [
                 'exception' => $curl28ConnectException,
-                'expectedException' => new CurlException(
-                    28,
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $curl28ConnectException
-                ),
+                'expectedException' => new CurlException(28, self::ID, self::ACTION, $curl28ConnectException),
             ],
         ];
     }

@@ -22,7 +22,7 @@ class GuzzleExceptionFactory
      */
     public function create(string $resourceId, string $action, ConnectException $exception): ExceptionInterface
     {
-        return new CurlException($this->findCurlCode($exception), $resourceId, $action, 0, $exception);
+        return new CurlException($this->findCurlCode($exception), $resourceId, $action, $exception);
     }
 
     private function findCurlCode(ConnectException $exception): int

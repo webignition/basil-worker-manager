@@ -16,7 +16,8 @@ use Psr\Http\Message\RequestInterface;
 
 class ExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
-    private const RESOURCE_ID = 'resource_id';
+    private const ID = 'resource_id';
+    private const ACTION = MachineProviderActionInterface::ACTION_CREATE;
 
     private ExceptionFactory $factory;
 
@@ -37,7 +38,7 @@ class ExceptionFactoryTest extends AbstractBaseFunctionalTest
     {
         self::assertEquals(
             $expectedException,
-            $this->factory->create(self::RESOURCE_ID, MachineProviderActionInterface::ACTION_CREATE, $exception)
+            $this->factory->create(self::ID, self::ACTION, $exception)
         );
     }
 
@@ -55,22 +56,11 @@ class ExceptionFactoryTest extends AbstractBaseFunctionalTest
         return [
             RuntimeException::class . ' 400' => [
                 'exception' => $runtimeException,
-                'expectedException' => new HttpException(
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $runtimeException
-                ),
+                'expectedException' => new HttpException(self::ID, self::ACTION, $runtimeException),
             ],
             ConnectException::class => [
                 'exception' => $connectException,
-                'expectedException' => new CurlException(
-                    7,
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $connectException
-                ),
+                'expectedException' => new CurlException(7, self::ID, self::ACTION, $connectException),
             ],
         ];
     }

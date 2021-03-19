@@ -12,10 +12,9 @@ class Exception extends \Exception implements ExceptionInterface
     public function __construct(
         private string $resourceId,
         private string $action,
-        int $code,
         private \Throwable $remoteException
     ) {
-        parent::__construct(self::createMessage($resourceId, $action), $code, $remoteException);
+        parent::__construct(self::createMessage($resourceId, $action), 0, $remoteException);
     }
 
     public function getAction(): string

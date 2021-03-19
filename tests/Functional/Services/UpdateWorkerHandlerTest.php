@@ -195,7 +195,6 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $expectedLoggedException = new AuthenticationException(
             (string) $this->worker,
             MachineProviderActionInterface::ACTION_GET,
-            0,
             new RuntimeException('Unauthorized', 401)
         );
 
@@ -223,7 +222,6 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $expectedLoggedException = new HttpException(
             (string) $this->worker,
             MachineProviderActionInterface::ACTION_GET,
-            0,
             $expectedRemoteException
         );
 

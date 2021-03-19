@@ -23,7 +23,8 @@ use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
-    private const RESOURCE_ID = 'resource_id';
+    private const ID = 'resource_id';
+    private const ACTION = MachineProviderActionInterface::ACTION_CREATE;
 
     private DigitalOceanExceptionFactory $factory;
 
@@ -52,7 +53,7 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
     {
         self::assertEquals(
             $expectedException,
-            $this->factory->create(self::RESOURCE_ID, MachineProviderActionInterface::ACTION_CREATE, $exception)
+            $this->factory->create(self::ID, MachineProviderActionInterface::ACTION_CREATE, $exception)
         );
     }
 
@@ -72,37 +73,21 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
         return [
             RuntimeException::class . ' 400' => [
                 'exception' => $runtimeException400,
-                'expectedException' => new HttpException(
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $runtimeException400
-                ),
+                'expectedException' => new HttpException(self::ID, self::ACTION, $runtimeException400),
             ],
             RuntimeException::class . ' 401' => [
                 'exception' => $runtimeException401,
-                'expectedException' => new AuthenticationException(
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $runtimeException401
-                ),
+                'expectedException' => new AuthenticationException(self::ID, self::ACTION, $runtimeException401),
             ],
             ValidationFailedException::class . ' generic' => [
                 'exception' => $genericValidationFailedException,
-                'expectedException' => new Exception(
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
-                    $genericValidationFailedException
-                ),
+                'expectedException' => new Exception(self::ID, self::ACTION, $genericValidationFailedException),
             ],
             ValidationFailedException::class . ' droplet limit will be exceeded' => [
                 'exception' => $dropletLimitValidationFailedException,
                 'expectedException' => new DropletLimitExceededException(
-                    self::RESOURCE_ID,
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    0,
+                    self::ID,
+                    self::ACTION,
                     $dropletLimitValidationFailedException
                 ),
             ],
@@ -134,16 +119,15 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
 
         $expectedException = new ApiLimitExceededException(
             $resetTimestamp,
-            self::RESOURCE_ID,
-            MachineProviderActionInterface::ACTION_CREATE,
-            0,
+            self::ID,
+            self::ACTION,
             $vendorApiLimitExceedException
         );
 
         self::assertEquals(
             $expectedException,
             $this->factory->create(
-                self::RESOURCE_ID,
+                self::ID,
                 MachineProviderActionInterface::ACTION_CREATE,
                 $vendorApiLimitExceedException
             )

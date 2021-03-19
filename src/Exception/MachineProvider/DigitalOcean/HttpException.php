@@ -15,10 +15,9 @@ class HttpException extends Exception implements HttpExceptionInterface
     public function __construct(
         string $resourceId,
         string $action,
-        int $code,
         RuntimeException $remoteException
     ) {
-        parent::__construct($resourceId, $action, $code, $remoteException);
+        parent::__construct($resourceId, $action, $remoteException);
     }
 
     public function getStatusCode(): int

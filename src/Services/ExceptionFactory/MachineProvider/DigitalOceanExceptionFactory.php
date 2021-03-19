@@ -39,34 +39,23 @@ class DigitalOceanExceptionFactory
                     (int) $lastResponse->getHeaderLine('RateLimit-Reset'),
                     $resourceId,
                     $action,
-                    0,
                     $exception
                 );
             }
         }
 
         if (DropletLimitExceededException::is($exception)) {
-            return new DropletLimitExceededException($resourceId, $action, 0, $exception);
+            return new DropletLimitExceededException($resourceId, $action, $exception);
         }
 
         if ($exception instanceof RuntimeException) {
             if (401 === $exception->getCode()) {
-                return new AuthenticationException(
-                    $resourceId,
-                    $action,
-                    0,
-                    $exception
-                );
+                return new AuthenticationException($resourceId, $action, $exception);
             }
 
-            return new HttpException(
-                $resourceId,
-                $action,
-                0,
-                $exception
-            );
+            return new HttpException($resourceId, $action, $exception);
         }
 
-        return new Exception($resourceId, $action, 0, $exception);
+        return new Exception($resourceId, $action, $exception);
     }
 }

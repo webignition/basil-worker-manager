@@ -29,6 +29,6 @@ class ExceptionFactory
             return $this->guzzleExceptionFactory->create($resourceId, $action, $exception);
         }
 
-        return new UnknownException($resourceId, $action, 0, $exception);
+        return new UnknownException($resourceId, $action, $exception);
     }
 }

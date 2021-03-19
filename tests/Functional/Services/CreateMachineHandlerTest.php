@@ -121,12 +121,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $exception = new Exception(
-            (string) $worker,
-            MachineProviderActionInterface::ACTION_CREATE,
-            0,
-            $previous
-        );
+        $exception = new Exception((string) $worker, MachineProviderActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($worker, $exception)
@@ -189,12 +184,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $exception = new Exception(
-            (string) $worker,
-            MachineProviderActionInterface::ACTION_CREATE,
-            0,
-            $previous
-        );
+        $exception = new Exception((string) $worker, MachineProviderActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($worker, $exception)

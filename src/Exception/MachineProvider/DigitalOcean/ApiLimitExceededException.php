@@ -15,10 +15,9 @@ class ApiLimitExceededException extends Exception implements ApiLimitExceptionIn
         private int $resetTimestamp,
         string $resourceId,
         string $action,
-        int $code,
         \Throwable $remoteException
     ) {
-        parent::__construct($resourceId, $action, $code, $remoteException);
+        parent::__construct($resourceId, $action, $remoteException);
     }
 
     public function getResetTimestamp(): int

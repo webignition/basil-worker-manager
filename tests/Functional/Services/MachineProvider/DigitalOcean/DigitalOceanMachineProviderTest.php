@@ -8,6 +8,7 @@ use App\Entity\Worker;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider;
 use App\Services\WorkerFactory;
@@ -120,7 +121,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineProvider->create($this->worker);
             },
-            Exception::ACTION_CREATE,
+            MachineProviderActionInterface::ACTION_CREATE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -174,7 +175,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineProvider->hydrate($this->worker);
             },
-            Exception::ACTION_GET,
+            MachineProviderActionInterface::ACTION_GET,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -203,7 +204,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineProvider->remove($this->worker);
             },
-            Exception::ACTION_DELETE,
+            MachineProviderActionInterface::ACTION_DELETE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -211,7 +212,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @param Exception::ACTION_* $action
+     * @param MachineProviderActionInterface::ACTION_* $action
      * @param class-string $expectedExceptionClass
      */
     private function doActionThrowsWorkApiActonExceptionTest(

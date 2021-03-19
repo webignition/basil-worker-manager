@@ -146,6 +146,27 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         self::expectNotToPerformAssertions();
     }
 
+    /**
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param class-string $expectedExceptionClass
+     */
+    public function testDeleteThrowsException(
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
+    ): void {
+        $this->doActionThrowsExceptionTest(
+            function () {
+                $this->machineProvider->delete($this->worker);
+            },
+            MachineProviderActionInterface::ACTION_DELETE,
+            $apiResponse,
+            $expectedExceptionClass,
+            $expectedRemoveException
+        );
+    }
+
     private function assertMutateWorker(callable $callable): void
     {
         $remoteId = 123;

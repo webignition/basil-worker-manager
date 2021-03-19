@@ -6,7 +6,6 @@ use App\Entity\Worker;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use App\Services\WorkerStore;
@@ -49,17 +48,12 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return $this->updateWorker($worker, $dropletEntity);
     }
 
+    /**
+     * @throws VendorExceptionInterface
+     */
     public function remove(Worker $worker): Worker
     {
-        try {
-            $this->dropletApi->remove((int) $worker->getRemoteId());
-        } catch (VendorExceptionInterface $exception) {
-            throw $this->exceptionFactory->create(
-                (string) $worker,
-                MachineProviderActionInterface::ACTION_DELETE,
-                $exception
-            );
-        }
+        $this->dropletApi->remove((int) $worker->getRemoteId());
 
         return $worker;
     }

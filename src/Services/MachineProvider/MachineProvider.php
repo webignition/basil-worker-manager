@@ -63,7 +63,13 @@ class MachineProvider
      */
     public function delete(Worker $worker): Worker
     {
-        return $this->findProvider($worker)->remove($worker);
+        return $this->handle(
+            $worker,
+            MachineProviderActionInterface::ACTION_DELETE,
+            function (MachineProviderInterface $provider, Worker $worker) {
+                return $provider->remove($worker);
+            }
+        );
     }
 
     /**
@@ -82,11 +88,7 @@ class MachineProvider
         try {
             return $callable($provider, $worker);
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create(
-                (string) $worker,
-                $action,
-                $exception
-            );
+            throw $this->exceptionFactory->create((string) $worker, $action, $exception);
         }
     }
 

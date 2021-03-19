@@ -2,41 +2,57 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
+namespace App\Tests\Functional\Services\ExceptionFactory\MachineProvider;
 
-use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\MachineProviderActionInterface;
-use App\Model\ProviderInterface;
-use App\Services\MachineProvider\DigitalOcean\ExceptionFactory;
+use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
+use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededException;
-use DigitalOceanV2\Exception\ExceptionInterface;
+use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use webignition\ObjectReflector\ObjectReflector;
 
-class ExceptionFactoryTest extends TestCase
+class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
+    private const RESOURCE_ID = 'resource_id';
+
+    private DigitalOceanExceptionFactory $factory;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $factory = self::$container->get(DigitalOceanExceptionFactory::class);
+        if ($factory instanceof DigitalOceanExceptionFactory) {
+            $this->factory = $factory;
+        }
+    }
+
+    public function testHandles(): void
+    {
+        self::assertTrue($this->factory->handles(new VendorApiLimitExceededException()));
+        self::assertTrue($this->factory->handles(new RuntimeException()));
+        self::assertTrue($this->factory->handles(new ValidationFailedException()));
+        self::assertFalse($this->factory->handles(new \Exception()));
+    }
+
     /**
      * @dataProvider createDataProvider
      */
-    public static function testCreate(
-        ExceptionInterface $exception,
-        Exception $expectedException
-    ): void {
-        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-
-        $factory = new ExceptionFactory(\Mockery::mock(Client::class));
-
+    public function testCreate(VendorExceptionInterface $exception, ExceptionInterface $expectedException): void
+    {
         self::assertEquals(
             $expectedException,
-            $factory->create(MachineProviderActionInterface::ACTION_CREATE, (string) $worker, $exception)
+            $this->factory->create(self::RESOURCE_ID, MachineProviderActionInterface::ACTION_CREATE, $exception)
         );
     }
 
@@ -45,7 +61,6 @@ class ExceptionFactoryTest extends TestCase
      */
     public function createDataProvider(): array
     {
-        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $runtimeException400 = new RuntimeException('message', 400);
         $runtimeException401 = new RuntimeException('message', 401);
         $genericValidationFailedException = new ValidationFailedException('generic');
@@ -58,7 +73,7 @@ class ExceptionFactoryTest extends TestCase
             RuntimeException::class . ' 400' => [
                 'exception' => $runtimeException400,
                 'expectedException' => new HttpException(
-                    (string) $worker,
+                    self::RESOURCE_ID,
                     MachineProviderActionInterface::ACTION_CREATE,
                     0,
                     $runtimeException400
@@ -67,7 +82,7 @@ class ExceptionFactoryTest extends TestCase
             RuntimeException::class . ' 401' => [
                 'exception' => $runtimeException401,
                 'expectedException' => new AuthenticationException(
-                    (string) $worker,
+                    self::RESOURCE_ID,
                     MachineProviderActionInterface::ACTION_CREATE,
                     0,
                     $runtimeException401
@@ -76,7 +91,7 @@ class ExceptionFactoryTest extends TestCase
             ValidationFailedException::class . ' generic' => [
                 'exception' => $genericValidationFailedException,
                 'expectedException' => new Exception(
-                    (string) $worker,
+                    self::RESOURCE_ID,
                     MachineProviderActionInterface::ACTION_CREATE,
                     0,
                     $genericValidationFailedException
@@ -85,7 +100,7 @@ class ExceptionFactoryTest extends TestCase
             ValidationFailedException::class . ' droplet limit will be exceeded' => [
                 'exception' => $dropletLimitValidationFailedException,
                 'expectedException' => new DropletLimitExceededException(
-                    (string) $worker,
+                    self::RESOURCE_ID,
                     MachineProviderActionInterface::ACTION_CREATE,
                     0,
                     $dropletLimitValidationFailedException
@@ -108,14 +123,18 @@ class ExceptionFactoryTest extends TestCase
             ->shouldReceive('getLastResponse')
             ->andReturn($lastResponse);
 
-        $vendorApiLimitExceedException = new VendorApiLimitExceededException();
+        ObjectReflector::setProperty(
+            $this->factory,
+            DigitalOceanExceptionFactory::class,
+            'digitalOceanClient',
+            $client
+        );
 
-        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $factory = new ExceptionFactory($client);
+        $vendorApiLimitExceedException = new VendorApiLimitExceededException();
 
         $expectedException = new ApiLimitExceededException(
             $resetTimestamp,
-            (string) $worker,
+            self::RESOURCE_ID,
             MachineProviderActionInterface::ACTION_CREATE,
             0,
             $vendorApiLimitExceedException
@@ -123,9 +142,9 @@ class ExceptionFactoryTest extends TestCase
 
         self::assertEquals(
             $expectedException,
-            $factory->create(
+            $this->factory->create(
+                self::RESOURCE_ID,
                 MachineProviderActionInterface::ACTION_CREATE,
-                (string) $worker,
                 $vendorApiLimitExceedException
             )
         );

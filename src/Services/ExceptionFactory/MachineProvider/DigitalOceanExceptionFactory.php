@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\MachineProvider\DigitalOcean;
+namespace App\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
@@ -15,17 +15,22 @@ use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use DigitalOceanV2\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 
-class ExceptionFactory
+class DigitalOceanExceptionFactory
 {
     public function __construct(
         private Client $digitalOceanClient,
     ) {
     }
 
+    public function handles(\Throwable $exception): bool
+    {
+        return $exception instanceof VendorExceptionInterface;
+    }
+
     /**
      * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function create(string $action, string $resourceId, VendorExceptionInterface $exception): ExceptionInterface
+    public function create(string $resourceId, string $action, VendorExceptionInterface $exception): ExceptionInterface
     {
         if ($exception instanceof VendorApiLimitExceededException) {
             $lastResponse = $this->digitalOceanClient->getLastResponse();

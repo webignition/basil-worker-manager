@@ -8,6 +8,7 @@ use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;
 use DigitalOceanV2\Api\Droplet as DropletApi;
@@ -18,7 +19,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
 {
     public function __construct(
         private DropletApi $dropletApi,
-        private ExceptionFactory $exceptionFactory,
+        private DigitalOceanExceptionFactory $exceptionFactory,
         private WorkerStore $workerStore,
         private DropletConfiguration $dropletConfiguration,
         private string $prefix,
@@ -44,8 +45,8 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
             $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
+                (string) $worker,
                 MachineProviderActionInterface::ACTION_CREATE,
-                $worker,
                 $exception
             );
         }
@@ -61,8 +62,8 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
             $this->dropletApi->remove((int) $worker->getRemoteId());
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
+                (string) $worker,
                 MachineProviderActionInterface::ACTION_DELETE,
-                $worker,
                 $exception
             );
         }
@@ -76,8 +77,8 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
             $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
+                (string) $worker,
                 MachineProviderActionInterface::ACTION_GET,
-                $worker,
                 $exception
             );
         }

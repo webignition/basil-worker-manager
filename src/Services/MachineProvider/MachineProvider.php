@@ -48,7 +48,13 @@ class MachineProvider
      */
     public function update(Worker $worker): Worker
     {
-        return $this->findProvider($worker)->hydrate($worker);
+        return $this->handle(
+            $worker,
+            MachineProviderActionInterface::ACTION_GET,
+            function (MachineProviderInterface $provider, Worker $worker) {
+                return $provider->hydrate($worker);
+            }
+        );
     }
 
     /**

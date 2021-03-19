@@ -115,27 +115,6 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         self::assertSame($ipAddresses, ObjectReflector::getProperty($this->worker, 'ip_addresses'));
     }
 
-    /**
-     * @dataProvider apiActionThrowsExceptionDataProvider
-     *
-     * @param class-string $expectedExceptionClass
-     */
-    public function testHydrateThrowsException(
-        ResponseInterface $apiResponse,
-        string $expectedExceptionClass,
-        \Exception $expectedRemoveException
-    ): void {
-        $this->doActionThrowsExceptionTest(
-            function () {
-                $this->machineProvider->hydrate($this->worker);
-            },
-            MachineProviderActionInterface::ACTION_GET,
-            $apiResponse,
-            $expectedExceptionClass,
-            $expectedRemoveException
-        );
-    }
-
     public function testRemoveSuccess(): void
     {
         $this->mockHandler->append(new Response(204));

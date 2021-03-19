@@ -113,6 +113,29 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         });
     }
 
+    /**
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param ResponseInterface $apiResponse
+     * @param class-string $expectedExceptionClass
+     * @param \Exception $expectedRemoveException
+     */
+    public function testUpdateThrowsException(
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
+    ): void {
+        $this->doActionThrowsExceptionTest(
+            function () {
+                $this->machineProvider->update($this->worker);
+            },
+            MachineProviderActionInterface::ACTION_GET,
+            $apiResponse,
+            $expectedExceptionClass,
+            $expectedRemoveException
+        );
+    }
+
     public function testDeleteSuccess(): void
     {
         ObjectReflector::setProperty($this->worker, Worker::class, 'remote_id', 123);

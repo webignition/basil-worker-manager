@@ -64,17 +64,12 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return $worker;
     }
 
+    /**
+     * @throws VendorExceptionInterface
+     */
     public function hydrate(Worker $worker): Worker
     {
-        try {
-            $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
-        } catch (VendorExceptionInterface $exception) {
-            throw $this->exceptionFactory->create(
-                (string) $worker,
-                MachineProviderActionInterface::ACTION_GET,
-                $exception
-            );
-        }
+        $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
 
         return $this->updateWorker($worker, $dropletEntity);
     }

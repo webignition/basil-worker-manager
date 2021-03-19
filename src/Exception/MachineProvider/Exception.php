@@ -25,12 +25,7 @@ class Exception extends \Exception implements ExceptionInterface
 
     public function getRemoteException(): \Throwable
     {
-        $remoteException = $this->remoteException;
-        while ($remoteException instanceof ExceptionInterface) {
-            $remoteException = $remoteException->getRemoteException();
-        }
-
-        return $remoteException;
+        return $this->remoteException;
     }
 
     private static function createMessage(string $resourceId, string $action): string

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Worker;
+use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
@@ -187,13 +188,35 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         );
     }
 
+    public function testHandleThrowsAuthenticationExceptionWithoutRetry(): void
+    {
+        $this->mockHandler->append(new Response(401));
+
+        $expectedLoggedException = new AuthenticationException(
+            (string) $this->worker,
+            MachineProviderActionInterface::ACTION_GET,
+            0,
+            new RuntimeException('Unauthorized', 401)
+        );
+
+        $exceptionLogger = (new MockExceptionLogger())
+            ->withLogCall($expectedLoggedException)
+            ->getMock();
+
+        $this->setExceptionLoggerOnHandler($exceptionLogger);
+
+        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 0);
+
+        self::assertEquals(ApiRequestOutcome::failed(), $outcome);
+    }
+
     /**
      * @dataProvider handleThrowsExceptionWithoutRetryDataProvider
      */
     public function testHandleThrowsExceptionWithoutRetry(
         ResponseInterface $apiResponse,
         int $retryCount,
-        \Exception $expectedWrappedLoggedException
+        \Exception $expectedRemoteException
     ): void {
         $this->mockHandler->append($apiResponse);
 
@@ -201,7 +224,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
             (string) $this->worker,
             MachineProviderActionInterface::ACTION_GET,
             0,
-            $expectedWrappedLoggedException
+            $expectedRemoteException
         );
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -221,11 +244,6 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     public function handleThrowsExceptionWithoutRetryDataProvider(): array
     {
         return [
-            'HTTP 401, does not require retry' => [
-                'apiResponse' => new Response(401),
-                'retryCount' => 0,
-                'expectedWrappedLoggedException' => new RuntimeException('Unauthorized', 401),
-            ],
             'HTTP 503, does not require retry, retry limit reached' => [
                 'apiResponse' => new Response(503),
                 'retryCount' => 10,

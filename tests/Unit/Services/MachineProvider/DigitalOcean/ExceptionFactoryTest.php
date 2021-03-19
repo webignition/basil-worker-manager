@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
+use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\Exception;
@@ -44,7 +45,8 @@ class ExceptionFactoryTest extends TestCase
     public function createDataProvider(): array
     {
         $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $runtimeException = new RuntimeException('runtime exception message');
+        $runtimeExceptionGeneric = new RuntimeException('runtime exception message');
+        $runtimeException401 = new RuntimeException('message', 401);
         $genericValidationFailedException = new ValidationFailedException('generic');
         $dropletLimitValidationFailedException = new ValidationFailedException(
             'creating this/these droplet(s) will exceed your droplet limit',
@@ -52,13 +54,22 @@ class ExceptionFactoryTest extends TestCase
         );
 
         return [
-            RuntimeException::class => [
-                'exception' => $runtimeException,
+            RuntimeException::class . ' generic' => [
+                'exception' => $runtimeExceptionGeneric,
                 'expectedException' => new Exception(
                     (string) $worker,
                     MachineProviderActionInterface::ACTION_CREATE,
                     0,
-                    $runtimeException
+                    $runtimeExceptionGeneric
+                ),
+            ],
+            RuntimeException::class . ' 401' => [
+                'exception' => $runtimeException401,
+                'expectedException' => new AuthenticationException(
+                    (string) $worker,
+                    MachineProviderActionInterface::ACTION_CREATE,
+                    0,
+                    $runtimeException401
                 ),
             ],
             ValidationFailedException::class . ' generic' => [

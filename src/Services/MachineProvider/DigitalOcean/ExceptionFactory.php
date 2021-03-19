@@ -3,6 +3,7 @@
 namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
+use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\Exception;
@@ -11,6 +12,7 @@ use App\Model\MachineProviderActionInterface;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededException;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
+use DigitalOceanV2\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 
 class ExceptionFactory
@@ -28,6 +30,17 @@ class ExceptionFactory
         Worker $worker,
         VendorExceptionInterface $exception
     ): ExceptionInterface {
+        if ($exception instanceof RuntimeException) {
+            if (401 === $exception->getCode()) {
+                return new AuthenticationException(
+                    (string) $worker,
+                    $action,
+                    0,
+                    $exception
+                );
+            }
+        }
+
         if (DropletLimitExceededException::is($exception)) {
             return new DropletLimitExceededException((string) $worker, $action, 0, $exception);
         }

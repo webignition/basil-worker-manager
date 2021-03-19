@@ -98,7 +98,6 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             $this->machineProvider->create($this->worker);
             self::fail('WorkerApiActionException not thrown');
         } catch (WorkerApiActionException $workerApiActionException) {
-            self::assertSame($this->worker, $workerApiActionException->getWorker());
             self::assertEquals(
                 new ValidationFailedException('creating this/these droplet(s) will exceed your droplet limit', 422),
                 $workerApiActionException->getRemoteApiException()
@@ -212,7 +211,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         $expectedException = new WorkerApiActionException(
             $action,
             0,
-            $this->worker,
+            (string) $this->worker,
             $expectedWrappedException
         );
 

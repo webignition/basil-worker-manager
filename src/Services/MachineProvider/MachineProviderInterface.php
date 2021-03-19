@@ -3,7 +3,7 @@
 namespace App\Services\MachineProvider;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\ProviderInterface;
 
 interface MachineProviderInterface
@@ -14,17 +14,17 @@ interface MachineProviderInterface
     public function handles(string $type): bool;
 
     /**
-     * @throws WorkerApiActionException
+     * @throws ExceptionInterface
      */
     public function create(Worker $worker): Worker;
 
     /**
-     * @throws WorkerApiActionException
+     * @throws ExceptionInterface
      */
     public function remove(Worker $worker): Worker;
 
     /**
-     * @throws WorkerApiActionException
+     * @throws ExceptionInterface
      */
     public function hydrate(Worker $worker): Worker;
 }

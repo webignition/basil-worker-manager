@@ -2,26 +2,26 @@
 
 namespace App\Exception\MachineProvider\DigitalOcean;
 
-use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\HttpExceptionInterface;
 use App\Model\MachineProviderActionInterface;
+use DigitalOceanV2\Exception\RuntimeException;
 
-class ApiLimitExceededException extends Exception implements ApiLimitExceptionInterface
+class HttpException extends Exception implements HttpExceptionInterface
 {
     /**
      * @param MachineProviderActionInterface::ACTION_* $action
      */
     public function __construct(
-        private int $resetTimestamp,
         string $resourceId,
         string $action,
-        \Throwable $remoteException
+        RuntimeException $remoteException
     ) {
         parent::__construct($resourceId, $action, $remoteException);
     }
 
-    public function getResetTimestamp(): int
+    public function getStatusCode(): int
     {
-        return $this->resetTimestamp;
+        return $this->getRemoteException()->getCode();
     }
 }

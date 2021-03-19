@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Exception\MachineProvider\AuthenticationException;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
@@ -172,7 +174,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                     'expectedOutcome' => ApiRequestOutcome::retrying(),
                     'expectedMessageQueueCount' => 1,
                 ],
-                'WorkerApiActionException (HTTP 503), requires retry' => [
+                'HTTP 503, requires retry' => [
                     'httpFixtures' => [
                         new Response(503),
                     ],
@@ -186,21 +188,41 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         );
     }
 
+    public function testHandleThrowsAuthenticationExceptionWithoutRetry(): void
+    {
+        $this->mockHandler->append(new Response(401));
+
+        $expectedLoggedException = new AuthenticationException(
+            (string) $this->worker,
+            MachineProviderActionInterface::ACTION_GET,
+            new RuntimeException('Unauthorized', 401)
+        );
+
+        $exceptionLogger = (new MockExceptionLogger())
+            ->withLogCall($expectedLoggedException)
+            ->getMock();
+
+        $this->setExceptionLoggerOnHandler($exceptionLogger);
+
+        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 0);
+
+        self::assertEquals(ApiRequestOutcome::failed(), $outcome);
+    }
+
     /**
-     * @dataProvider handleThrowsWorkerApiActionExceptionWithoutRetryDataProvider
+     * @dataProvider handleThrowsHttpExceptionWithoutRetryDataProvider
      */
-    public function testHandleThrowsWorkerApiActionExceptionWithoutRetry(
+    public function testHandleThrowsHttpExceptionWithoutRetry(
         ResponseInterface $apiResponse,
         int $retryCount,
-        \Exception $expectedWrappedLoggedException
+        RuntimeException $expectedRemoteException
     ): void {
         $this->mockHandler->append($apiResponse);
 
-        $expectedLoggedException = new WorkerApiActionException(
-            WorkerApiActionException::ACTION_GET,
-            0,
-            $this->worker,
-            $expectedWrappedLoggedException
+        $expectedLoggedException = new HttpException(
+            (string) $this->worker,
+            MachineProviderActionInterface::ACTION_GET,
+            $expectedRemoteException
         );
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -217,15 +239,10 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function handleThrowsWorkerApiActionExceptionWithoutRetryDataProvider(): array
+    public function handleThrowsHttpExceptionWithoutRetryDataProvider(): array
     {
         return [
-            'WorkerApiActionException (HTTP 401), does not require retry' => [
-                'apiResponse' => new Response(401),
-                'retryCount' => 0,
-                'expectedWrappedLoggedException' => new RuntimeException('Unauthorized', 401),
-            ],
-            'WorkerApiActionException (HTTP 503), does not require retry, retry limit reached' => [
+            'HTTP 503, does not require retry, retry limit reached' => [
                 'apiResponse' => new Response(503),
                 'retryCount' => 10,
                 'expectedWrappedLoggedException' => new RuntimeException('Service Unavailable', 503),

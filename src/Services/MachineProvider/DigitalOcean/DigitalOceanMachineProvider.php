@@ -3,22 +3,23 @@
 namespace App\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\WorkerApiActionException;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
-use DigitalOceanV2\Exception\ExceptionInterface;
+use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 
 class DigitalOceanMachineProvider implements MachineProviderInterface
 {
     public function __construct(
         private DropletApi $dropletApi,
-        private WorkerApiExceptionFactory $workerApiExceptionFactory,
+        private DigitalOceanExceptionFactory $exceptionFactory,
         private WorkerStore $workerStore,
         private DropletConfiguration $dropletConfiguration,
         private string $prefix,
@@ -33,9 +34,6 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return ProviderInterface::NAME_DIGITALOCEAN === $type;
     }
 
-    /**
-     * @throws WorkerApiActionException
-     */
     public function create(Worker $worker): Worker
     {
         $createArguments = new DropletApiCreateCallArguments(
@@ -45,10 +43,10 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
 
         try {
             $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
-        } catch (ExceptionInterface $exception) {
-            throw $this->workerApiExceptionFactory->create(
-                WorkerApiActionException::ACTION_CREATE,
-                $worker,
+        } catch (VendorExceptionInterface $exception) {
+            throw $this->exceptionFactory->create(
+                (string) $worker,
+                MachineProviderActionInterface::ACTION_CREATE,
                 $exception
             );
         }
@@ -62,10 +60,10 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     {
         try {
             $this->dropletApi->remove((int) $worker->getRemoteId());
-        } catch (ExceptionInterface $exception) {
-            throw $this->workerApiExceptionFactory->create(
-                WorkerApiActionException::ACTION_DELETE,
-                $worker,
+        } catch (VendorExceptionInterface $exception) {
+            throw $this->exceptionFactory->create(
+                (string) $worker,
+                MachineProviderActionInterface::ACTION_DELETE,
                 $exception
             );
         }
@@ -73,17 +71,14 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return $worker;
     }
 
-    /**
-     * @throws WorkerApiActionException
-     */
     public function hydrate(Worker $worker): Worker
     {
         try {
             $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
-        } catch (ExceptionInterface $exception) {
-            throw $this->workerApiExceptionFactory->create(
-                WorkerApiActionException::ACTION_GET,
-                $worker,
+        } catch (VendorExceptionInterface $exception) {
+            throw $this->exceptionFactory->create(
+                (string) $worker,
+                MachineProviderActionInterface::ACTION_GET,
                 $exception
             );
         }

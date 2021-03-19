@@ -79,12 +79,7 @@ class DigitalOceanApiActionRetryDeciderTest extends TestCase
                 'expectedDecision' => true,
             ],
             DropletLimitExceededException::class => [
-                'exception' => new DropletLimitExceededException(
-                    new ValidationFailedException(
-                        'creating this/these droplet(s) will exceed your droplet limit',
-                        422
-                    )
-                ),
+                'exception' => \Mockery::mock(DropletLimitExceededException::class),
                 'expectedDecision' => false,
             ],
         ];

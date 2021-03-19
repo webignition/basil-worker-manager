@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\CreateMachineHandler;
@@ -81,7 +82,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertNotSame(State::VALUE_CREATE_FAILED, $worker->getState());
     }
 
-    public function testHandleWithNonWorkerApiActionException(): void
+    public function testHandleWithUnsupportedProviderException(): void
     {
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
@@ -106,9 +107,9 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider handleWithWorkerApiActionExceptionWithRetryDataProvider
+     * @dataProvider handleWithExceptionWithRetryDataProvider
      */
-    public function testHandleWorkerApiActionExceptionWithRetry(\Throwable $previous, int $currentRetryCount): void
+    public function testHandleExceptionWithRetry(\Throwable $previous, int $currentRetryCount): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
@@ -120,15 +121,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $workerApiActionException = new WorkerApiActionException(
-            WorkerApiActionException::ACTION_CREATE,
-            0,
-            $worker,
-            $previous
-        );
+        $exception = new Exception((string) $worker, MachineProviderActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($worker, $workerApiActionException)
+            ->withCreateCallThrowingException($worker, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -155,7 +151,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function handleWithWorkerApiActionExceptionWithRetryDataProvider(): array
+    public function handleWithExceptionWithRetryDataProvider(): array
     {
         return [
             'requires retry, retry limit not reached (0)' => [
@@ -174,9 +170,9 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider handleWithWorkerApiActionExceptionWithoutRetryDataProvider
+     * @dataProvider handleWithExceptionWithoutRetryDataProvider
      */
-    public function testHandleWorkerApiActionExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
+    public function testHandleExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
@@ -188,19 +184,14 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $workerApiActionException = new WorkerApiActionException(
-            WorkerApiActionException::ACTION_CREATE,
-            0,
-            $worker,
-            $previous
-        );
+        $exception = new Exception((string) $worker, MachineProviderActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($worker, $workerApiActionException)
+            ->withCreateCallThrowingException($worker, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
-            ->withLogCall($workerApiActionException)
+            ->withLogCall($exception)
             ->getMock();
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
@@ -214,7 +205,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function handleWithWorkerApiActionExceptionWithoutRetryDataProvider(): array
+    public function handleWithExceptionWithoutRetryDataProvider(): array
     {
         return [
             'does not require retry' => [

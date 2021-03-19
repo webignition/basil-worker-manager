@@ -2,21 +2,16 @@
 
 namespace App\Exception\MachineProvider\DigitalOcean;
 
-use App\Exception\MachineProvider\AbstractRemoteApiWrappingException;
-use DigitalOceanV2\Exception\ExceptionInterface;
+use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
+use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use DigitalOceanV2\Exception\ValidationFailedException;
 
-class DropletLimitExceededException extends AbstractRemoteApiWrappingException
+class DropletLimitExceededException extends Exception implements UnprocessableRequestExceptionInterface
 {
     public const MESSAGE_IDENTIFIER = 'exceed your droplet limit';
-    private const MESSAGE = 'Droplet limit will be exceeded';
 
-    public function __construct(private \Throwable $remoteApiException)
-    {
-        parent::__construct(self::MESSAGE, 0, $remoteApiException);
-    }
-
-    public static function is(ExceptionInterface $exception): bool
+    public static function is(VendorExceptionInterface $exception): bool
     {
         if (false === $exception instanceof ValidationFailedException) {
             return false;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
@@ -23,7 +23,7 @@ abstract class AbstractApiActionHandler
 
     /**
      * @throws UnsupportedProviderException
-     * @throws WorkerApiActionException
+     * @throws ExceptionInterface
      */
     abstract protected function doAction(Worker $worker): Worker;
 
@@ -35,16 +35,16 @@ abstract class AbstractApiActionHandler
             $this->doAction($worker);
 
             return ApiRequestOutcome::success();
-        } catch (WorkerApiActionException $workerApiActionException) {
+        } catch (ExceptionInterface $exception) {
             $exceptionRequiresRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
-                $workerApiActionException->getRemoteApiException()
+                $exception->getRemoteException()
             );
 
             $retryLimitReached = $this->retryLimit <= $retryCount;
             $shouldRetry = $exceptionRequiresRetry && false === $retryLimitReached;
 
-            $lastException = $workerApiActionException;
+            $lastException = $exception;
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             $lastException = $unsupportedProviderException;
             $shouldRetry = false;

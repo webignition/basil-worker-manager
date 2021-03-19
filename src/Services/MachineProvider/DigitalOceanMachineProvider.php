@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\MachineProvider\DigitalOcean;
+namespace App\Services\MachineProvider;
 
 use App\Entity\Worker;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
@@ -9,7 +9,6 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
-use App\Services\MachineProvider\MachineProviderInterface;
 use App\Services\WorkerStore;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;

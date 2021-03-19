@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\MachineProvider;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\Services\MachineProvider\MachineProviderInterface;
 
 class MachineProvider
 {

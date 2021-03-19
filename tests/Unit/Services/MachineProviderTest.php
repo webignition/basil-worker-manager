@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Services;
 use App\Entity\Worker;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ProviderInterface;
-use App\Services\MachineProvider;
+use App\Services\MachineProvider\MachineProvider;
 use PHPUnit\Framework\TestCase;
 
 class MachineProviderTest extends TestCase

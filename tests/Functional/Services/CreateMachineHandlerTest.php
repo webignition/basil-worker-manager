@@ -15,7 +15,7 @@ use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\CreateMachineHandler;
 use App\Services\ExceptionLogger;
-use App\Services\MachineProvider;
+use App\Services\MachineProvider\MachineProvider;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;

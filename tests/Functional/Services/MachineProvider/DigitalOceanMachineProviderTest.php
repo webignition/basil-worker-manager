@@ -82,53 +82,6 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         self::assertSame($ipAddresses, ObjectReflector::getProperty($this->worker, 'ip_addresses'));
     }
 
-    public function testCreateThrowsDropletLimitException(): void
-    {
-        $this->mockHandler->append(
-            new Response(
-                422,
-                [
-                    'content-type' => 'application/json',
-                ],
-                (string) json_encode([
-                    'id' => 'unprocessable_entity',
-                    'message' => 'creating this/these droplet(s) will exceed your droplet limit',
-                ])
-            )
-        );
-
-        try {
-            $this->machineProvider->create($this->worker);
-            self::fail(ExceptionInterface::class . ' not thrown');
-        } catch (ExceptionInterface $exception) {
-            self::assertEquals(
-                new ValidationFailedException('creating this/these droplet(s) will exceed your droplet limit', 422),
-                $exception->getRemoteException()
-            );
-        }
-    }
-
-    /**
-     * @dataProvider apiActionThrowsExceptionDataProvider
-     *
-     * @param class-string $expectedExceptionClass
-     */
-    public function testCreateThrowsWorkApiActonException(
-        ResponseInterface $apiResponse,
-        string $expectedExceptionClass,
-        \Exception $expectedRemoveException
-    ): void {
-        $this->doActionThrowsExceptionTest(
-            function () {
-                $this->machineProvider->create($this->worker);
-            },
-            MachineProviderActionInterface::ACTION_CREATE,
-            $apiResponse,
-            $expectedExceptionClass,
-            $expectedRemoveException
-        );
-    }
-
     public function testHydrateSuccess(): void
     {
         $remoteId = 123;

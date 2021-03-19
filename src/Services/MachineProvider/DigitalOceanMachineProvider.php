@@ -33,6 +33,9 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return ProviderInterface::NAME_DIGITALOCEAN === $type;
     }
 
+    /**
+     * @throws VendorExceptionInterface
+     */
     public function create(Worker $worker): Worker
     {
         $createArguments = new DropletApiCreateCallArguments(
@@ -40,16 +43,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
             $this->dropletConfiguration
         );
 
-        try {
-            $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
-        } catch (VendorExceptionInterface $exception) {
-            throw $this->exceptionFactory->create(
-                (string) $worker,
-                MachineProviderActionInterface::ACTION_CREATE,
-                $exception
-            );
-        }
-
+        $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
         $dropletEntity = $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([]);
 
         return $this->updateWorker($worker, $dropletEntity);

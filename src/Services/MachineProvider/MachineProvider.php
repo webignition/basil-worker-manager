@@ -5,6 +5,8 @@ namespace App\Services\MachineProvider;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
+use App\Model\MachineProviderActionInterface;
+use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 
 class MachineProvider
 {
@@ -18,6 +20,7 @@ class MachineProvider
      */
     public function __construct(
         array $machineProviders,
+        private ExceptionFactory $exceptionFactory,
     ) {
         $this->machineProviders = array_filter($machineProviders, function ($item) {
             return $item instanceof MachineProviderInterface;
@@ -30,7 +33,13 @@ class MachineProvider
      */
     public function create(Worker $worker): Worker
     {
-        return $this->findProvider($worker)->create($worker);
+        return $this->handle(
+            $worker,
+            MachineProviderActionInterface::ACTION_CREATE,
+            function (MachineProviderInterface $provider, Worker $worker) {
+                return $provider->create($worker);
+            }
+        );
     }
 
     /**
@@ -49,6 +58,30 @@ class MachineProvider
     public function delete(Worker $worker): Worker
     {
         return $this->findProvider($worker)->remove($worker);
+    }
+
+    /**
+     * @param MachineProviderActionInterface::ACTION_* $action
+     *
+     * @throws UnsupportedProviderException
+     * @throws ExceptionInterface
+     */
+    private function handle(
+        Worker $worker,
+        string $action,
+        callable $callable
+    ): Worker {
+        $provider = $this->findProvider($worker);
+
+        try {
+            return $callable($provider, $worker);
+        } catch (\Exception $exception) {
+            throw $this->exceptionFactory->create(
+                (string) $worker,
+                $action,
+                $exception
+            );
+        }
     }
 
     /**

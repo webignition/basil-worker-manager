@@ -2,8 +2,6 @@
 
 namespace App\Exception\MachineProvider;
 
-use App\Entity\Worker;
-
 class WorkerApiActionException extends AbstractRemoteApiWrappingException implements
     RemoteApiExceptionWrapperInterface
 {
@@ -17,23 +15,18 @@ class WorkerApiActionException extends AbstractRemoteApiWrappingException implem
     public function __construct(
         private string $action,
         int $code,
-        private Worker $worker,
+        string $resourceId,
         private \Throwable $remoteApiException
     ) {
-        parent::__construct(self::createMessage($worker, $action), $code, $remoteApiException);
+        parent::__construct(self::createMessage($resourceId, $action), $code, $remoteApiException);
     }
 
-    private static function createMessage(Worker $worker, string $action): string
+    private static function createMessage(string $resourceId, string $action): string
     {
         return sprintf(
-            'Unable to %s remote machine for worker %s ',
+            'Unable to perform action %s for resource %s ',
             $action,
-            (string) $worker
+            (string) $resourceId
         );
-    }
-
-    public function getWorker(): Worker
-    {
-        return $this->worker;
     }
 }

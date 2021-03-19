@@ -199,7 +199,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $expectedLoggedException = new WorkerApiActionException(
             WorkerApiActionException::ACTION_GET,
             0,
-            $this->worker,
+            (string) $this->worker,
             $expectedWrappedLoggedException
         );
 

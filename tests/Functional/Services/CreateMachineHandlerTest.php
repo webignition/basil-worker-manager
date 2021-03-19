@@ -123,7 +123,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $workerApiActionException = new WorkerApiActionException(
             WorkerApiActionException::ACTION_CREATE,
             0,
-            $worker,
+            (string) $worker,
             $previous
         );
 
@@ -191,7 +191,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $workerApiActionException = new WorkerApiActionException(
             WorkerApiActionException::ACTION_CREATE,
             0,
-            $worker,
+            (string) $worker,
             $previous
         );
 

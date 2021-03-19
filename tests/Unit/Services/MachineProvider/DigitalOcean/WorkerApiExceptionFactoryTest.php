@@ -57,7 +57,7 @@ class WorkerApiExceptionFactoryTest extends TestCase
                 'expectedException' => new WorkerApiActionException(
                     WorkerApiActionException::ACTION_CREATE,
                     0,
-                    $worker,
+                    (string) $worker,
                     $runtimeException
                 ),
             ],
@@ -66,7 +66,7 @@ class WorkerApiExceptionFactoryTest extends TestCase
                 'expectedException' => new WorkerApiActionException(
                     WorkerApiActionException::ACTION_CREATE,
                     0,
-                    $worker,
+                    (string) $worker,
                     $genericValidationFailedException
                 ),
             ],
@@ -75,7 +75,7 @@ class WorkerApiExceptionFactoryTest extends TestCase
                 'expectedException' => new WorkerApiActionException(
                     WorkerApiActionException::ACTION_CREATE,
                     0,
-                    $worker,
+                    (string) $worker,
                     $dropletLimitExceededException
                 ),
             ],
@@ -106,7 +106,7 @@ class WorkerApiExceptionFactoryTest extends TestCase
             new WorkerApiActionException(
                 WorkerApiActionException::ACTION_CREATE,
                 0,
-                $worker,
+                (string) $worker,
                 $apiLimitExceededException
             ),
             $factory->create(WorkerApiActionException::ACTION_CREATE, $worker, $vendorApiLimitExceedException)

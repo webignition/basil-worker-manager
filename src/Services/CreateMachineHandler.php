@@ -12,6 +12,7 @@ use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\Worker\State;
+use App\Services\MachineProvider\MachineProvider;
 
 class CreateMachineHandler extends AbstractApiActionHandler
 {

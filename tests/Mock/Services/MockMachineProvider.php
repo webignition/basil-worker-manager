@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Mock\Services;
 
 use App\Entity\Worker;
-use App\Services\MachineProvider;
+use App\Services\MachineProvider\MachineProvider;
 use Mockery\MockInterface;
 
 class MockMachineProvider

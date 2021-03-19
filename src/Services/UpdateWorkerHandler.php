@@ -11,6 +11,7 @@ use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
+use App\Services\MachineProvider\MachineProvider;
 
 class UpdateWorkerHandler extends AbstractApiActionHandler
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\MachineProvider;
 
 use App\Entity\Worker;
 use App\Model\ProviderInterface;
-use App\Services\MachineProvider;
+use App\Services\MachineProvider\MachineProvider;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;

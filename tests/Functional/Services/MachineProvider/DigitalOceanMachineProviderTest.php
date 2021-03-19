@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
+namespace App\Tests\Functional\Services\MachineProvider;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
@@ -11,7 +11,7 @@ use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
-use App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider;
+use App\Services\MachineProvider\DigitalOceanMachineProvider;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;

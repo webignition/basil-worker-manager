@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
+use App\Services\MachineProvider\MachineProvider;
 
 abstract class AbstractApiActionHandler
 {

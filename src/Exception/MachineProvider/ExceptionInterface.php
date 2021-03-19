@@ -2,7 +2,7 @@
 
 namespace App\Exception\MachineProvider;
 
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
     public const ACTION_CREATE = 'create';
     public const ACTION_GET = 'get';

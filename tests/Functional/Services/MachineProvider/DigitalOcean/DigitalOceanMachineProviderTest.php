@@ -6,7 +6,8 @@ namespace App\Tests\Functional\Services\MachineProvider\DigitalOcean;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
-use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOcean\DigitalOceanMachineProvider;
 use App\Services\WorkerFactory;
@@ -96,29 +97,33 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         try {
             $this->machineProvider->create($this->worker);
-            self::fail('WorkerApiActionException not thrown');
-        } catch (WorkerApiActionException $workerApiActionException) {
+            self::fail(ExceptionInterface::class . ' not thrown');
+        } catch (ExceptionInterface $exception) {
             self::assertEquals(
                 new ValidationFailedException('creating this/these droplet(s) will exceed your droplet limit', 422),
-                $workerApiActionException->getRemoteApiException()
+                $exception->getRemoteException()
             );
         }
     }
 
     /**
-     * @dataProvider apiActionThrowsWorkerApiActionExceptionDataProvider
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param class-string $expectedExceptionClass
      */
     public function testCreateThrowsWorkApiActonException(
         ResponseInterface $apiResponse,
-        \Exception $expectedWrappedException
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
     ): void {
         $this->doActionThrowsWorkApiActonExceptionTest(
             function () {
                 $this->machineProvider->create($this->worker);
             },
-            WorkerApiActionException::ACTION_CREATE,
+            Exception::ACTION_CREATE,
             $apiResponse,
-            $expectedWrappedException
+            $expectedExceptionClass,
+            $expectedRemoveException
         );
     }
 
@@ -156,19 +161,23 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider apiActionThrowsWorkerApiActionExceptionDataProvider
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param class-string $expectedExceptionClass
      */
     public function testHydrateThrowsWorkApiActonException(
         ResponseInterface $apiResponse,
-        \Exception $expectedWrappedException
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
     ): void {
         $this->doActionThrowsWorkApiActonExceptionTest(
             function () {
                 $this->machineProvider->hydrate($this->worker);
             },
-            WorkerApiActionException::ACTION_GET,
+            Exception::ACTION_GET,
             $apiResponse,
-            $expectedWrappedException
+            $expectedExceptionClass,
+            $expectedRemoveException
         );
     }
 
@@ -181,52 +190,53 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider apiActionThrowsWorkerApiActionExceptionDataProvider
+     * @dataProvider apiActionThrowsExceptionDataProvider
+     *
+     * @param class-string $expectedExceptionClass
      */
-    public function testRemoveThrowsWorkerApiActionException(
+    public function testRemoveThrowsException(
         ResponseInterface $apiResponse,
-        \Exception $expectedWrappedException
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
     ): void {
         $this->doActionThrowsWorkApiActonExceptionTest(
             function () {
                 $this->machineProvider->remove($this->worker);
             },
-            WorkerApiActionException::ACTION_DELETE,
+            Exception::ACTION_DELETE,
             $apiResponse,
-            $expectedWrappedException
+            $expectedExceptionClass,
+            $expectedRemoveException
         );
     }
 
     /**
-     * @param WorkerApiActionException::ACTION_* $action
+     * @param Exception::ACTION_* $action
+     * @param class-string $expectedExceptionClass
      */
     private function doActionThrowsWorkApiActonExceptionTest(
         callable $callable,
         string $action,
         ResponseInterface $apiResponse,
-        \Exception $expectedWrappedException
+        string $expectedExceptionClass,
+        \Throwable $expectedRemoteException
     ): void {
         $this->mockHandler->append($apiResponse);
 
-        $expectedException = new WorkerApiActionException(
-            $action,
-            0,
-            (string) $this->worker,
-            $expectedWrappedException
-        );
-
         try {
             $callable();
-            $this->fail('WorkerApiActionException not thrown');
-        } catch (WorkerApiActionException $getException) {
-            self::assertEquals($expectedException, $getException);
+            self::fail(ExceptionInterface::class . ' not thrown');
+        } catch (Exception $exception) {
+            self::assertSame($expectedExceptionClass, $exception::class);
+            self::assertSame($action, $exception->getAction());
+            self::assertEquals($expectedRemoteException, $exception->getRemoteException());
         }
     }
 
     /**
      * @return array[]
      */
-    public function apiActionThrowsWorkerApiActionExceptionDataProvider(): array
+    public function apiActionThrowsExceptionDataProvider(): array
     {
         return [
             VendorApiLimitExceededExceptionAlias::class => [
@@ -236,22 +246,23 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
                         'RateLimit-Reset' => 123,
                     ]
                 ),
-                'expectedWrappedException' => new ApiLimitExceededException(
-                    123,
-                    new VendorApiLimitExceededExceptionAlias('Too Many Requests', 429),
-                ),
+                'expectedExceptionClass' => ApiLimitExceededException::class,
+                'expectedRemoteException' => new VendorApiLimitExceededExceptionAlias('Too Many Requests', 429),
             ],
             RuntimeException::class . ' HTTP 503' => [
                 'apiResponse' => new Response(503),
-                'expectedWrappedException' => new RuntimeException('Service Unavailable', 503),
+                'expectedExceptionClass' => Exception::class,
+                'expectedRemoteException' => new RuntimeException('Service Unavailable', 503),
             ],
             ValidationFailedException::class => [
                 'apiResponse' => new Response(400),
-                'expectedWrappedException' => new ValidationFailedException('Bad Request', 400),
+                'expectedExceptionClass' => Exception::class,
+                'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
             ],
             'droplet does not exist' => [
                 'apiResponse' => new Response(404),
-                'expectedWrappedException' => new RuntimeException('Not Found', 404),
+                'expectedExceptionClass' => Exception::class,
+                'expectedRemoteException' => new RuntimeException('Not Found', 404),
             ],
         ];
     }

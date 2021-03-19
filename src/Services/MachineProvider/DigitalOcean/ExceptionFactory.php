@@ -5,13 +5,14 @@ namespace App\Services\MachineProvider\DigitalOcean;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
-use App\Exception\MachineProvider\WorkerApiActionException;
+use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\ExceptionInterface;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededException;
-use DigitalOceanV2\Exception\ExceptionInterface;
+use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class WorkerApiExceptionFactory
+class ExceptionFactory
 {
     public function __construct(
         private Client $digitalOceanClient,
@@ -19,29 +20,30 @@ class WorkerApiExceptionFactory
     }
 
     /**
-     * @param WorkerApiActionException::ACTION_* $action
+     * @param ExceptionInterface::ACTION_* $action
      */
     public function create(
         string $action,
         Worker $worker,
-        ExceptionInterface $exception
-    ): WorkerApiActionException {
-        $wrappedException = $exception;
-
+        VendorExceptionInterface $exception
+    ): ExceptionInterface {
         if (DropletLimitExceededException::is($exception)) {
-            $wrappedException = new DropletLimitExceededException($exception);
+            return new DropletLimitExceededException((string) $worker, $action, 0, $exception);
         }
 
         if ($exception instanceof VendorApiLimitExceededException) {
             $lastResponse = $this->digitalOceanClient->getLastResponse();
             if ($lastResponse instanceof ResponseInterface) {
-                $wrappedException = new ApiLimitExceededException(
+                return new ApiLimitExceededException(
                     (int) $lastResponse->getHeaderLine('RateLimit-Reset'),
+                    (string) $worker,
+                    $action,
+                    0,
                     $exception
                 );
             }
         }
 
-        return new WorkerApiActionException($action, 0, $worker, $wrappedException);
+        return new Exception((string) $worker, $action, 0, $exception);
     }
 }

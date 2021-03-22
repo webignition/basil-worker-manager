@@ -45,12 +45,14 @@ class ApiActionRetryDeciderTest extends TestCase
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
             ],
-            'has decider, false' => [
+            'has decider, decider: false, retry limit not reached' => [
                 'decider' => new ApiActionRetryDecider(
                     [
                         new DigitalOceanApiActionRetryDecider(),
                     ],
-                    []
+                    [
+                        MachineProviderActionInterface::ACTION_GET => 10,
+                    ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
@@ -58,18 +60,35 @@ class ApiActionRetryDeciderTest extends TestCase
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
-            'has decider, true' => [
+            'has decider, decider: true, retry limit not reached' => [
                 'decider' => new ApiActionRetryDecider(
                     [
                         new DigitalOceanApiActionRetryDecider(),
                     ],
-                    []
+                    [
+                        MachineProviderActionInterface::ACTION_GET => 10,
+                    ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
                 'retryCount' => 0,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
+            ],
+            'has decider, decider: true, retry limit reached' => [
+                'decider' => new ApiActionRetryDecider(
+                    [
+                        new DigitalOceanApiActionRetryDecider(),
+                    ],
+                    [
+                        MachineProviderActionInterface::ACTION_GET => 1,
+                    ]
+                ),
+                'provider' => ProviderInterface::NAME_DIGITALOCEAN,
+                'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 1,
+                'exception' => new InvalidArgumentException(),
+                'expectedDecision' => false,
             ],
         ];
     }

@@ -43,9 +43,11 @@ class ApiActionRetryDecider
      */
     public function decide(string $provider, string $action, int $retryCount, \Throwable $exception): bool
     {
+        $retryLimit = $this->retryLimits[$action] ?? 0;
+
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {
-                return $decider->decide($action, $exception);
+                return $retryCount < $retryLimit && $decider->decide($action, $exception);
             }
         }
 

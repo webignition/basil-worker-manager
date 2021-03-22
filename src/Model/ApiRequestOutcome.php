@@ -12,7 +12,8 @@ class ApiRequestOutcome implements \Stringable
      * @param self::STATE_* $state
      */
     public function __construct(
-        private string $state
+        private string $state,
+        private ?\Throwable $exception = null
     ) {
     }
 
@@ -21,9 +22,9 @@ class ApiRequestOutcome implements \Stringable
         return new ApiRequestOutcome(self::STATE_SUCCESS);
     }
 
-    public static function failed(): self
+    public static function failed(?\Throwable $exception = null): self
     {
-        return new ApiRequestOutcome(self::STATE_FAILED);
+        return new ApiRequestOutcome(self::STATE_FAILED, $exception);
     }
 
     public static function retrying(): self
@@ -37,5 +38,10 @@ class ApiRequestOutcome implements \Stringable
     public function __toString(): string
     {
         return $this->state;
+    }
+
+    public function getException(): ?\Throwable
+    {
+        return $this->exception;
     }
 }

@@ -7,7 +7,7 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\MachineProviderActionInterface;
 use GuzzleHttp\Exception\ConnectException;
 
-class GuzzleExceptionFactory
+class GuzzleExceptionFactory implements ExceptionFactoryInterface
 {
     public const CURL_CODE_UNKNOWN = -1;
     private const CURL_ERROR_PREFIX = 'cURL error ';
@@ -20,8 +20,12 @@ class GuzzleExceptionFactory
     /**
      * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function create(string $resourceId, string $action, ConnectException $exception): ExceptionInterface
+    public function create(string $resourceId, string $action, \Throwable $exception): ?ExceptionInterface
     {
+        if (!$exception instanceof ConnectException) {
+            return null;
+        }
+
         return new CurlException($this->findCurlCode($exception), $resourceId, $action, $exception);
     }
 

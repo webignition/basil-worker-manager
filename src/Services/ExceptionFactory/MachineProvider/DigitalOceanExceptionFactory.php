@@ -15,7 +15,7 @@ use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use DigitalOceanV2\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 
-class DigitalOceanExceptionFactory
+class DigitalOceanExceptionFactory implements ExceptionFactoryInterface
 {
     public function __construct(
         private Client $digitalOceanClient,
@@ -30,8 +30,12 @@ class DigitalOceanExceptionFactory
     /**
      * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function create(string $resourceId, string $action, VendorExceptionInterface $exception): ExceptionInterface
+    public function create(string $resourceId, string $action, \Throwable $exception): ?ExceptionInterface
     {
+        if (!$exception instanceof VendorExceptionInterface) {
+            return null;
+        }
+
         if ($exception instanceof VendorApiLimitExceededException) {
             $lastResponse = $this->digitalOceanClient->getLastResponse();
             if ($lastResponse instanceof ResponseInterface) {

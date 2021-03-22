@@ -3,9 +3,6 @@ services:
         autowire: true
         autoconfigure: true
 
-    App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
-        public: true
-
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

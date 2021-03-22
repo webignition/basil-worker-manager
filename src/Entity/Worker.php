@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Model\ProviderInterface;
-use App\Model\RemoteMachineInterface;
 use App\Model\Worker\State;
 use App\Repository\WorkerRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -114,19 +113,6 @@ class Worker implements \Stringable, \JsonSerializable
         sort($ipAddresses);
 
         $this->ip_addresses = $ipAddresses;
-
-        return $this;
-    }
-
-    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): self
-    {
-        $this->remote_id = $remoteMachine->getId();
-        $this->ip_addresses = $remoteMachine->getIpAddresses();
-
-        $remoteMachineState = $remoteMachine->getState();
-        if (null !== $remoteMachineState) {
-            $this->state = $remoteMachineState;
-        }
 
         return $this;
     }

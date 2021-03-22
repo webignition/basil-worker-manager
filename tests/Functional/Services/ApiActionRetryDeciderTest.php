@@ -31,9 +31,14 @@ class ApiActionRetryDeciderTest extends AbstractBaseFunctionalTest
      * @param ProviderInterface::NAME_* $provider
      * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function testDecide(string $provider, string $action, \Throwable $exception, bool $expectedDecision): void
-    {
-        self::assertSame($expectedDecision, $this->decider->decide($provider, $action, $exception));
+    public function testDecide(
+        string $provider,
+        string $action,
+        int $retryCount,
+        \Throwable $exception,
+        bool $expectedDecision
+    ): void {
+        self::assertSame($expectedDecision, $this->decider->decide($provider, $action, $retryCount, $exception));
     }
 
     /**
@@ -45,12 +50,14 @@ class ApiActionRetryDeciderTest extends AbstractBaseFunctionalTest
             'digitalocean ' . ApiLimitExceededException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 0,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'digitalocean ' . InvalidArgumentException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 0,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
             ],

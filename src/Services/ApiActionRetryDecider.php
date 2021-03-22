@@ -41,11 +41,11 @@ class ApiActionRetryDecider
      * @param ProviderInterface::NAME_* $provider
      * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function decide(string $provider, string $action, \Throwable $exception): bool
+    public function decide(string $provider, string $action, int $retryCount, \Throwable $exception): bool
     {
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {
-                return $decider->decide($action, $exception);
+                return $decider->decide($action, $retryCount, $exception);
             }
         }
 

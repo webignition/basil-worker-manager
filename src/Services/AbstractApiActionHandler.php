@@ -47,6 +47,7 @@ abstract class AbstractApiActionHandler
             $exceptionRequiresRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
                 $action,
+                $retryCount,
                 $exception->getRemoteException()
             );
 

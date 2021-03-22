@@ -24,10 +24,11 @@ class ApiActionRetryDeciderTest extends TestCase
         ApiActionRetryDecider $decider,
         string $provider,
         string $action,
+        int $retryCount,
         \Throwable $exception,
         bool $expectedDecision
     ): void {
-        self::assertSame($expectedDecision, $decider->decide($provider, $action, $exception));
+        self::assertSame($expectedDecision, $decider->decide($provider, $action, $retryCount, $exception));
     }
 
     /**
@@ -40,6 +41,7 @@ class ApiActionRetryDeciderTest extends TestCase
                 'decider' => new ApiActionRetryDecider([], []),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 0,
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
             ],
@@ -52,6 +54,7 @@ class ApiActionRetryDeciderTest extends TestCase
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 0,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
@@ -64,6 +67,7 @@ class ApiActionRetryDeciderTest extends TestCase
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 0,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
             ],

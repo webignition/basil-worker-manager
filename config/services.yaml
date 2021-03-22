@@ -141,3 +141,9 @@ services:
                 create_failed: '@app.services.worker_state_transition_sequence.create_failed'
                 delete_failed: '@app.services.worker_state_transition_sequence.delete_failed'
                 delete_deleted: '@app.services.worker_state_transition_sequence.delete_deleted'
+
+    App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
+        arguments:
+            $factories:
+                - '@App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory'
+                - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'

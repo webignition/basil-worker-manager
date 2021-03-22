@@ -133,4 +133,15 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
             )
         );
     }
+
+    public function testCreateForUnhandledException(): void
+    {
+        self::assertNull(
+            $this->factory->create(
+                self::ID,
+                MachineProviderActionInterface::ACTION_GET,
+                new \Exception()
+            )
+        );
+    }
 }

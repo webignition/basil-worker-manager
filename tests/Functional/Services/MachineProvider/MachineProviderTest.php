@@ -171,7 +171,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     private function assertMutateWorker(callable $callable): void
     {
         $remoteId = 123;
-        $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
+        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
 
         $dropletData = [
             'id' => $remoteId,

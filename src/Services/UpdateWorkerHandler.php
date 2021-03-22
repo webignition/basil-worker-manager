@@ -21,10 +21,9 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
-        int $retryLimit,
         private WorkerStateTransitionSequences $stateTransitionSequences,
     ) {
-        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger, $retryLimit);
+        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger);
     }
 
     protected function doAction(Worker $worker): Worker
@@ -53,9 +52,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
                 return ApiRequestOutcome::success();
             }
 
-            $outcome = $this->retryLimit <= $retryCount
-                ? ApiRequestOutcome::failed()
-                : ApiRequestOutcome::retrying();
+            $outcome = ApiRequestOutcome::retrying();
         }
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {

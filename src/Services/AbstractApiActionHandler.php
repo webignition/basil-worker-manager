@@ -19,7 +19,6 @@ abstract class AbstractApiActionHandler
         protected ApiActionRetryDecider $retryDecider,
         protected WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         protected ExceptionLogger $exceptionLogger,
-        protected int $retryLimit,
     ) {
     }
 
@@ -44,15 +43,12 @@ abstract class AbstractApiActionHandler
 
             return ApiRequestOutcome::success();
         } catch (ExceptionInterface $exception) {
-            $exceptionRequiresRetry = $this->retryDecider->decide(
+            $shouldRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
                 $action,
                 $retryCount,
                 $exception->getRemoteException()
             );
-
-            $retryLimitReached = $this->retryLimit <= $retryCount;
-            $shouldRetry = $exceptionRequiresRetry && false === $retryLimitReached;
 
             $lastException = $exception;
         } catch (UnsupportedProviderException $unsupportedProviderException) {

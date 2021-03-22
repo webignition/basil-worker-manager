@@ -22,11 +22,10 @@ class CreateMachineHandler extends AbstractApiActionHandler
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
-        int $retryLimit,
         private WorkerRequestMessageDispatcherInterface $createDispatcher,
         private WorkerStore $workerStore,
     ) {
-        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger, $retryLimit);
+        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger);
     }
 
     protected function doAction(Worker $worker): Worker

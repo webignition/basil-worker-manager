@@ -12,6 +12,16 @@ class WorkerUpdater
     ) {
     }
 
+    public function updateRemoteId(Worker $worker, int $remoteId): Worker
+    {
+        if ($remoteId !== $worker->getRemoteId()) {
+            $worker->setRemoteId($remoteId);
+            $this->workerStore->store($worker);
+        }
+
+        return $worker;
+    }
+
     /**
      * @param State::VALUE_* $state
      */

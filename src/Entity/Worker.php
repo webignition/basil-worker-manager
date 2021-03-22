@@ -72,6 +72,13 @@ class Worker implements \Stringable, \JsonSerializable
         return $this->remote_id;
     }
 
+    public function setRemoteId(int $remoteId): self
+    {
+        $this->remote_id = $remoteId;
+
+        return $this;
+    }
+
     /**
      * @return ProviderInterface::NAME_*
      */

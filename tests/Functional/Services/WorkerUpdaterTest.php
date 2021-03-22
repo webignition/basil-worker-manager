@@ -31,6 +31,21 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
         }
     }
 
+    public function testUpdateRemoteId(): void
+    {
+        $worker = Worker::create('id', ProviderInterface::NAME_DIGITALOCEAN);
+        self::assertNull($worker->getRemoteId());
+
+        $worker = $this->workerUpdater->updateRemoteId($worker, 1);
+        self::assertSame(1, $worker->getRemoteId());
+
+        $worker = $this->workerUpdater->updateRemoteId($worker, 2);
+        self::assertSame(2, $worker->getRemoteId());
+
+        $this->entityRefresher->refreshForEntity(Worker::class);
+        self::assertSame(2, $worker->getRemoteId());
+    }
+
     public function testSetState(): void
     {
         $worker = Worker::create('id', ProviderInterface::NAME_DIGITALOCEAN);

@@ -15,5 +15,5 @@ interface ApiActionRetryDeciderInterface
     /**
      * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function decide(string $action, int $retryCount, \Throwable $exception): bool;
+    public function decide(string $action, \Throwable $exception): bool;
 }

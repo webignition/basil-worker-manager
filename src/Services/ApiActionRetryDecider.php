@@ -45,7 +45,7 @@ class ApiActionRetryDecider
     {
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {
-                return $decider->decide($action, $retryCount, $exception);
+                return $decider->decide($action, $exception);
             }
         }
 

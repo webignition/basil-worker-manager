@@ -95,4 +95,74 @@ class WorkerTest extends TestCase
             $worker->jsonSerialize()
         );
     }
+
+    /**
+     * @dataProvider setGetIpAddressesDataProvider
+     *
+     * @param string[] $ipAddresses
+     * @param string[] $expectedIpAddresses
+     */
+    public function testSetGetIpAddresses(Worker $worker, array $ipAddresses, array $expectedIpAddresses): void
+    {
+        $worker = $worker->setIpAddresses($ipAddresses);
+
+        self::assertSame($expectedIpAddresses, $worker->getIpAddresses());
+    }
+
+    /**
+     * @return array[]
+     */
+    public function setGetIpAddressesDataProvider(): array
+    {
+        return [
+            'worker has no ip addresses, empty set' => [
+                'worker' => new Worker(),
+                'ipAddresses' => [],
+                'expectedIpAddresses' => [],
+            ],
+            'worker has no ip address, non-repeating, alphabetical order' => [
+                'worker' => new Worker(),
+                'ipAddresses' => [
+                    'a',
+                    'b',
+                    'c',
+                ],
+                'expectedIpAddresses' => [
+                    'a',
+                    'b',
+                    'c',
+                ],
+            ],
+            'worker has no ip address, non-repeating, reverse-alphabetical order' => [
+                'worker' => new Worker(),
+                'ipAddresses' => [
+                    'c',
+                    'b',
+                    'a',
+                ],
+                'expectedIpAddresses' => [
+                    'a',
+                    'b',
+                    'c',
+                ],
+            ],
+            'worker has no ip address, repeating' => [
+                'worker' => new Worker(),
+                'ipAddresses' => [
+                    'a',
+                    'a',
+                    'b',
+                    'c',
+                    'b',
+                    'a',
+                    'b',
+                ],
+                'expectedIpAddresses' => [
+                    'a',
+                    'b',
+                    'c',
+                ],
+            ],
+        ];
+    }
 }

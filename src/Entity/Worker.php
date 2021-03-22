@@ -85,6 +85,32 @@ class Worker implements \Stringable, \JsonSerializable
         return sprintf(self::NAME, (string) $this);
     }
 
+    /**
+     * @return string[]
+     */
+    public function getIpAddresses(): array
+    {
+        return $this->ip_addresses;
+    }
+
+    /**
+     * @param string[] $ipAddresses
+     */
+    public function setIpAddresses(array $ipAddresses): self
+    {
+        $ipAddresses = array_filter($ipAddresses, function ($value) {
+            return is_string($value) && '' !== trim($value);
+        });
+
+        $ipAddresses = array_unique($ipAddresses);
+
+        sort($ipAddresses);
+
+        $this->ip_addresses = $ipAddresses;
+
+        return $this;
+    }
+
     public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): self
     {
         $this->remote_id = $remoteMachine->getId();

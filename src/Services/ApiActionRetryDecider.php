@@ -14,14 +14,27 @@ class ApiActionRetryDecider
     private array $deciders;
 
     /**
+     * @var array<MachineProviderActionInterface::ACTION_*, int>
+     */
+    private array $retryLimits = [];
+
+    /**
      * @param ApiActionRetryDeciderInterface[] $deciders
+     * @param array<MachineProviderActionInterface::ACTION_*, int> $retryLimits
      */
     public function __construct(
         array $deciders,
+        array $retryLimits,
     ) {
         $this->deciders = array_filter($deciders, function ($item) {
             return $item instanceof ApiActionRetryDeciderInterface;
         });
+
+        foreach ($retryLimits as $key => $value) {
+            if (in_array($key, MachineProviderActionInterface::ALL)) {
+                $this->retryLimits[$key] = $value;
+            }
+        }
     }
 
     /**

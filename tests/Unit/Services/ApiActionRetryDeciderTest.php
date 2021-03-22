@@ -37,25 +37,31 @@ class ApiActionRetryDeciderTest extends TestCase
     {
         return [
             'no deciders' => [
-                'decider' => new ApiActionRetryDecider([]),
+                'decider' => new ApiActionRetryDecider([], []),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
             ],
             'has decider, false' => [
-                'decider' => new ApiActionRetryDecider([
-                    new DigitalOceanApiActionRetryDecider(),
-                ]),
+                'decider' => new ApiActionRetryDecider(
+                    [
+                        new DigitalOceanApiActionRetryDecider(),
+                    ],
+                    []
+                ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'has decider, true' => [
-                'decider' => new ApiActionRetryDecider([
-                    new DigitalOceanApiActionRetryDecider(),
-                ]),
+                'decider' => new ApiActionRetryDecider(
+                    [
+                        new DigitalOceanApiActionRetryDecider(),
+                    ],
+                    []
+                ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'action' => MachineProviderActionInterface::ACTION_GET,
                 'exception' => new InvalidArgumentException(),

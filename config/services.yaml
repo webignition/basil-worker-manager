@@ -83,6 +83,9 @@ services:
         arguments:
             $deciders:
                 - '@App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider'
+            $retryLimits:
+              !php/const App\Model\MachineProviderActionInterface::ACTION_CREATE: '%create_retry_limit%'
+              !php/const App\Model\MachineProviderActionInterface::ACTION_GET: '%update_retry_limit%'
 
     app.message_dispatcher.create:
         class: App\MessageDispatcher\WorkerRequestMessageDispatcher

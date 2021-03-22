@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
+use App\Model\MachineProviderActionInterface;
 use App\Services\MachineProvider\MachineProvider;
 
 abstract class AbstractApiActionHandler
@@ -28,7 +29,13 @@ abstract class AbstractApiActionHandler
      */
     abstract protected function doAction(Worker $worker): Worker;
 
-    protected function doHandle(Worker $worker, int $retryCount): ApiRequestOutcome
+    /**
+     * @param Worker $worker
+     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param int $retryCount
+     * @return ApiRequestOutcome
+     */
+    protected function doHandle(Worker $worker, string $action, int $retryCount): ApiRequestOutcome
     {
         $lastException = null;
 
@@ -39,6 +46,7 @@ abstract class AbstractApiActionHandler
         } catch (ExceptionInterface $exception) {
             $exceptionRequiresRetry = $this->retryDecider->decide(
                 $worker->getProvider(),
+                $action,
                 $exception->getRemoteException()
             );
 

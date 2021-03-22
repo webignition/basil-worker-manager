@@ -9,6 +9,7 @@ use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequestOutcome;
+use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
 use App\Services\MachineProvider\MachineProvider;
@@ -41,7 +42,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
             return ApiRequestOutcome::success();
         }
 
-        $outcome = $this->doHandle($worker, $retryCount);
+        $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_GET, $retryCount);
 
         if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
             return $outcome;

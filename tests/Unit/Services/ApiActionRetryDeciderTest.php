@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider;
@@ -17,14 +18,16 @@ class ApiActionRetryDeciderTest extends TestCase
      * @dataProvider decideDataProvider
      *
      * @param ProviderInterface::NAME_* $provider
+     * @param MachineProviderActionInterface::ACTION_* $action
      */
     public function testDecide(
         ApiActionRetryDecider $decider,
         string $provider,
+        string $action,
         \Throwable $exception,
         bool $expectedDecision
     ): void {
-        self::assertSame($expectedDecision, $decider->decide($provider, $exception));
+        self::assertSame($expectedDecision, $decider->decide($provider, $action, $exception));
     }
 
     /**
@@ -36,6 +39,7 @@ class ApiActionRetryDeciderTest extends TestCase
             'no deciders' => [
                 'decider' => new ApiActionRetryDecider([]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
             ],
@@ -44,6 +48,7 @@ class ApiActionRetryDeciderTest extends TestCase
                     new DigitalOceanApiActionRetryDecider(),
                 ]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
@@ -52,6 +57,7 @@ class ApiActionRetryDeciderTest extends TestCase
                     new DigitalOceanApiActionRetryDecider(),
                 ]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
             ],

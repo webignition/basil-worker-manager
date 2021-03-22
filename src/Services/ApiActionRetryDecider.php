@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ApiActionRetryDecider\ApiActionRetryDeciderInterface;
 
@@ -25,12 +26,13 @@ class ApiActionRetryDecider
 
     /**
      * @param ProviderInterface::NAME_* $provider
+     * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function decide(string $provider, \Throwable $exception): bool
+    public function decide(string $provider, string $action, \Throwable $exception): bool
     {
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {
-                return $decider->decide($exception);
+                return $decider->decide($action, $exception);
             }
         }
 

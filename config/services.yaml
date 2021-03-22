@@ -83,6 +83,9 @@ services:
         arguments:
             $deciders:
                 - '@App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider'
+            $retryLimits:
+              !php/const App\Model\MachineProviderActionInterface::ACTION_CREATE: '%create_retry_limit%'
+              !php/const App\Model\MachineProviderActionInterface::ACTION_GET: '%update_retry_limit%'
 
     app.message_dispatcher.create:
         class: App\MessageDispatcher\WorkerRequestMessageDispatcher
@@ -96,12 +99,10 @@ services:
         arguments:
             $createDispatcher: '@app.message_dispatcher.create'
             $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
-            $retryLimit: '%create_retry_limit%'
 
     App\Services\UpdateWorkerHandler:
         arguments:
             $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
-            $retryLimit: '%update_retry_limit%'
 
     app.services.worker_state_transition_sequence.create_failed:
         class: App\Model\Worker\StateTransitionSequence

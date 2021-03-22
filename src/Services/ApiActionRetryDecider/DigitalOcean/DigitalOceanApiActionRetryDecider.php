@@ -18,7 +18,7 @@ class DigitalOceanApiActionRetryDecider implements ApiActionRetryDeciderInterfac
         return ProviderInterface::NAME_DIGITALOCEAN === $type;
     }
 
-    public function decide(\Throwable $exception): bool
+    public function decide(string $action, \Throwable $exception): bool
     {
         if ($exception instanceof ApiLimitExceededException) {
             return false;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\ApiActionRetryDecider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -34,10 +35,12 @@ class DigitalOceanApiActionRetryDeciderTest extends TestCase
 
     /**
      * @dataProvider decideDataProvider
+     *
+     * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function testDecide(\Throwable $exception, bool $expectedDecision): void
+    public function testDecide(\Throwable $exception, string $action, bool $expectedDecision): void
     {
-        self::assertSame($expectedDecision, $this->decider->decide($exception));
+        self::assertSame($expectedDecision, $this->decider->decide($action, $exception));
     }
 
     /**
@@ -48,38 +51,47 @@ class DigitalOceanApiActionRetryDeciderTest extends TestCase
         return [
             ApiLimitExceededException::class => [
                 'exception' => new ApiLimitExceededException(),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => false,
             ],
             ValidationFailedException::class => [
                 'exception' => new ValidationFailedException(),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             RuntimeException::class . ' non-401' => [
                 'exception' => new RuntimeException(),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             RuntimeException::class . ' 401' => [
                 'exception' => new RuntimeException('message', 401),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => false,
             ],
             DiscoveryFailedException::class => [
                 'exception' => new DiscoveryFailedException(),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             ErrorException::class => [
                 'exception' => new ErrorException(),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             InvalidRecordException::class => [
                 'exception' => new InvalidRecordException(),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             InvalidArgumentException::class => [
                 'exception' => new InvalidArgumentException(),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             DropletLimitExceededException::class => [
                 'exception' => \Mockery::mock(DropletLimitExceededException::class),
+                'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => false,
             ],
         ];

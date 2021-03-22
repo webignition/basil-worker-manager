@@ -11,6 +11,7 @@ use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
+use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
 use App\Services\MachineProvider\MachineProvider;
 
@@ -21,11 +22,10 @@ class CreateMachineHandler extends AbstractApiActionHandler
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
-        int $retryLimit,
         private WorkerRequestMessageDispatcherInterface $createDispatcher,
         private WorkerStore $workerStore,
     ) {
-        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger, $retryLimit);
+        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger);
     }
 
     protected function doAction(Worker $worker): Worker
@@ -38,7 +38,7 @@ class CreateMachineHandler extends AbstractApiActionHandler
         $worker->setState(State::VALUE_CREATE_REQUESTED);
         $this->workerStore->store($worker);
 
-        $outcome = $this->doHandle($worker, $retryCount);
+        $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $request = new WorkerRequest((string) $worker, $retryCount + 1);

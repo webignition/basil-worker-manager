@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ApiActionRetryDecider;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -28,10 +29,16 @@ class ApiActionRetryDeciderTest extends AbstractBaseFunctionalTest
      * @dataProvider decideDataProvider
      *
      * @param ProviderInterface::NAME_* $provider
+     * @param MachineProviderActionInterface::ACTION_* $action
      */
-    public function testDecide(string $provider, \Throwable $exception, bool $expectedDecision): void
-    {
-        self::assertSame($expectedDecision, $this->decider->decide($provider, $exception));
+    public function testDecide(
+        string $provider,
+        string $action,
+        int $retryCount,
+        \Throwable $exception,
+        bool $expectedDecision
+    ): void {
+        self::assertSame($expectedDecision, $this->decider->decide($provider, $action, $retryCount, $exception));
     }
 
     /**
@@ -42,11 +49,15 @@ class ApiActionRetryDeciderTest extends AbstractBaseFunctionalTest
         return [
             'digitalocean ' . ApiLimitExceededException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
+                'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 0,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'digitalocean ' . InvalidArgumentException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
+                'action' => MachineProviderActionInterface::ACTION_GET,
+                'retryCount' => 0,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
             ],

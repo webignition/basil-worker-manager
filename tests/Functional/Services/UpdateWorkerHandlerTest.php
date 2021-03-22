@@ -278,6 +278,17 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         );
     }
 
+    public function testHandleThrowsUnknownRemoteMachineException(): void
+    {
+        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
+
+        $this->mockHandler->append(new Response(404));
+
+        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 11);
+        self::assertEquals(ApiRequestOutcome::success(), $outcome);
+        self::assertSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
+    }
+
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void
     {
         ObjectReflector::setProperty(

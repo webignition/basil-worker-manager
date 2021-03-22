@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Model\ProviderInterface;
-use App\Model\RemoteMachineInterface;
 use App\Model\Worker\State;
 use App\Repository\WorkerRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -72,6 +71,13 @@ class Worker implements \Stringable, \JsonSerializable
         return $this->remote_id;
     }
 
+    public function setRemoteId(int $remoteId): self
+    {
+        $this->remote_id = $remoteId;
+
+        return $this;
+    }
+
     /**
      * @return ProviderInterface::NAME_*
      */
@@ -85,15 +91,28 @@ class Worker implements \Stringable, \JsonSerializable
         return sprintf(self::NAME, (string) $this);
     }
 
-    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): self
+    /**
+     * @return string[]
+     */
+    public function getIpAddresses(): array
     {
-        $this->remote_id = $remoteMachine->getId();
-        $this->ip_addresses = $remoteMachine->getIpAddresses();
+        return $this->ip_addresses;
+    }
 
-        $remoteMachineState = $remoteMachine->getState();
-        if (null !== $remoteMachineState) {
-            $this->state = $remoteMachineState;
-        }
+    /**
+     * @param string[] $ipAddresses
+     */
+    public function setIpAddresses(array $ipAddresses): self
+    {
+        $ipAddresses = array_filter($ipAddresses, function ($value) {
+            return is_string($value) && '' !== trim($value);
+        });
+
+        $ipAddresses = array_unique($ipAddresses);
+
+        sort($ipAddresses);
+
+        $this->ip_addresses = $ipAddresses;
 
         return $this;
     }

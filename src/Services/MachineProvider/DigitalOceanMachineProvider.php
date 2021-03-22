@@ -8,7 +8,7 @@ use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
-use App\Services\WorkerStore;
+use App\Services\WorkerUpdater;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
@@ -18,7 +18,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     public function __construct(
         private DropletApi $dropletApi,
         private DigitalOceanExceptionFactory $exceptionFactory,
-        private WorkerStore $workerStore,
+        private WorkerUpdater $workerUpdater,
         private DropletConfiguration $dropletConfiguration,
         private string $prefix,
     ) {
@@ -70,8 +70,14 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
 
     private function updateWorker(Worker $worker, DropletEntity $droplet): Worker
     {
-        $worker = $worker->updateFromRemoteMachine(new RemoteMachine($droplet));
+        $remoteMachine = new RemoteMachine($droplet);
+        $this->workerUpdater->updateRemoteId($worker, $remoteMachine->getId());
 
-        return $this->workerStore->store($worker);
+        $state = $remoteMachine->getState();
+        if (is_string($state)) {
+            $worker = $this->workerUpdater->updateState($worker, $state);
+        }
+
+        return $this->workerUpdater->updateIpAddresses($worker, $remoteMachine->getIpAddresses());
     }
 }

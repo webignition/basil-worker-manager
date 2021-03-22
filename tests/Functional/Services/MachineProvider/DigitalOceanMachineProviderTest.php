@@ -44,7 +44,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     public function testCreateSuccess(): void
     {
         $remoteId = 123;
-        $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
+        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
 
         $dropletData = [
             'id' => $remoteId,
@@ -76,7 +76,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     public function testHydrateSuccess(): void
     {
         $remoteId = 123;
-        $ipAddresses = ['127.0.0.1', '10.0.0.1', ];
+        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
 
         self::assertNull($this->worker->getRemoteId());
         self::assertSame([], ObjectReflector::getProperty($this->worker, 'ip_addresses'));

@@ -206,7 +206,10 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 0);
 
-        self::assertEquals(ApiRequestOutcome::failed(), $outcome);
+        self::assertEquals(
+            ApiRequestOutcome::failed($expectedLoggedException),
+            $outcome
+        );
     }
 
     /**
@@ -233,7 +236,10 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, $retryCount);
 
-        self::assertEquals(ApiRequestOutcome::failed(), $outcome);
+        self::assertEquals(
+            ApiRequestOutcome::failed($expectedLoggedException),
+            $outcome
+        );
     }
 
     /**
@@ -266,7 +272,10 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 0);
 
-        self::assertEquals(ApiRequestOutcome::failed(), $outcome);
+        self::assertEquals(
+            ApiRequestOutcome::failed($expectedLoggedException),
+            $outcome
+        );
     }
 
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void

@@ -59,6 +59,6 @@ abstract class AbstractApiActionHandler
             $this->exceptionLogger->log($lastException);
         }
 
-        return ApiRequestOutcome::failed();
+        return ApiRequestOutcome::failed($lastException);
     }
 }

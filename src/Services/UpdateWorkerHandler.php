@@ -43,6 +43,10 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
 
         $outcome = $this->doHandle($worker, $retryCount);
 
+        if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
+            return $outcome;
+        }
+
         if (ApiRequestOutcome::STATE_SUCCESS === (string) $outcome) {
             if ($this->hasReachedStopStateOrEndState($worker->getState(), $stopState)) {
                 return ApiRequestOutcome::success();

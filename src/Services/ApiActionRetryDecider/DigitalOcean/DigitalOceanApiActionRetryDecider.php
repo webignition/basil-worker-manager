@@ -3,6 +3,7 @@
 namespace App\Services\ApiActionRetryDecider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ApiActionRetryDecider\ApiActionRetryDeciderInterface;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -27,6 +28,10 @@ class DigitalOceanApiActionRetryDecider implements ApiActionRetryDeciderInterfac
         if ($exception instanceof RuntimeException) {
             if (401 === $exception->getCode()) {
                 return false;
+            }
+
+            if (404 === $exception->getCode()) {
+                return MachineProviderActionInterface::ACTION_GET === $action;
             }
         }
 

@@ -69,6 +69,16 @@ class DigitalOceanApiActionRetryDeciderTest extends TestCase
                 'action' => MachineProviderActionInterface::ACTION_GET,
                 'expectedDecision' => false,
             ],
+            RuntimeException::class . ' 404, CREATE' => [
+                'exception' => new RuntimeException('message', 404),
+                'action' => MachineProviderActionInterface::ACTION_CREATE,
+                'expectedDecision' => false,
+            ],
+            RuntimeException::class . ' 404, GET' => [
+                'exception' => new RuntimeException('message', 404),
+                'action' => MachineProviderActionInterface::ACTION_GET,
+                'expectedDecision' => true,
+            ],
             DiscoveryFailedException::class => [
                 'exception' => new DiscoveryFailedException(),
                 'action' => MachineProviderActionInterface::ACTION_GET,

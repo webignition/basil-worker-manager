@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
+use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\MachineProvider;
@@ -249,9 +250,9 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
                 'expectedExceptionClass' => Exception::class,
                 'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
             ],
-            'droplet does not exist' => [
+            'remote machine does not exist' => [
                 'apiResponse' => new Response(404),
-                'expectedExceptionClass' => HttpException::class,
+                'expectedExceptionClass' => UnknownRemoteMachineException::class,
                 'expectedRemoteException' => new RuntimeException('Not Found', 404),
             ],
         ];

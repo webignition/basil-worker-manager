@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Model\Worker;
+namespace App\Tests\Unit\Model\Machine;
 
 use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;

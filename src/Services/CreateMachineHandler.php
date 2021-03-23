@@ -55,7 +55,7 @@ class CreateMachineHandler extends AbstractApiActionHandler
             return $outcome;
         }
 
-        $updateWorkerRequest = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE);
+        $updateWorkerRequest = new UpdateWorkerRequest((string) $worker);
         $this->updateWorkerDispatcher->dispatch(
             new UpdateWorkerMessage($updateWorkerRequest)
         );

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Response;
 
-class BadWorkerCreateRequestResponse extends ErrorResponse
+class BadMachineCreateRequestResponse extends ErrorResponse
 {
     private const TYPE = 'worker-create-request';
 
@@ -20,7 +20,7 @@ class BadWorkerCreateRequestResponse extends ErrorResponse
 
     public static function createIdMissingResponse(): self
     {
-        return new BadWorkerCreateRequestResponse(
+        return new BadMachineCreateRequestResponse(
             self::MESSAGE_ID_MISSING,
             self::CODE_ID_MISSING
         );
@@ -28,7 +28,7 @@ class BadWorkerCreateRequestResponse extends ErrorResponse
 
     public static function createIdTakenResponse(): self
     {
-        return new BadWorkerCreateRequestResponse(
+        return new BadMachineCreateRequestResponse(
             self::MESSAGE_ID_TAKEN,
             self::CODE_ID_TAKEN
         );

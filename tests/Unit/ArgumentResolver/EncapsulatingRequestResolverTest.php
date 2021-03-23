@@ -6,7 +6,7 @@ namespace App\Tests\Unit\ArgumentResolver;
 
 use App\ArgumentResolver\EncapsulatingRequestResolver;
 use App\Request\EncapsulatingRequestInterface;
-use App\Request\WorkerCreateRequest;
+use App\Request\MachineCreateRequest;
 use App\Tests\Mock\MockArgumentMetadata;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +41,7 @@ class EncapsulatingRequestResolverTest extends TestCase
         return [
             'does support' => [
                 'argumentMetadata' => (new MockArgumentMetadata())
-                    ->withGetTypeCall(WorkerCreateRequest::class)
+                    ->withGetTypeCall(MachineCreateRequest::class)
                     ->getMock(),
                 'expectedSupports' => true,
             ],
@@ -76,22 +76,22 @@ class EncapsulatingRequestResolverTest extends TestCase
         $id = md5('id content');
 
         $argumentMetadata = (new MockArgumentMetadata())
-            ->withGetTypeCall(WorkerCreateRequest::class)
+            ->withGetTypeCall(MachineCreateRequest::class)
             ->getMock();
 
         return [
             'WorkerCreateRequest: empty' => [
                 'request' => new Request(),
                 'argumentMetadata' => $argumentMetadata,
-                'expectedEncapsulatingRequest' => new WorkerCreateRequest(new Request()),
+                'expectedEncapsulatingRequest' => new MachineCreateRequest(new Request()),
             ],
             'JobCreateRequest: id present' => [
                 'request' => new Request([], [
-                    WorkerCreateRequest::KEY_ID => $id,
+                    MachineCreateRequest::KEY_ID => $id,
                 ]),
                 'argumentMetadata' => $argumentMetadata,
-                'expectedEncapsulatingRequest' => new WorkerCreateRequest(new Request([], [
-                    WorkerCreateRequest::KEY_ID => $id,
+                'expectedEncapsulatingRequest' => new MachineCreateRequest(new Request([], [
+                    MachineCreateRequest::KEY_ID => $id,
                 ])),
             ],
         ];

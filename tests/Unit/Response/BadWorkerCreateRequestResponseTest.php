@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Response;
 
-use App\Response\BadWorkerCreateRequestResponse;
+use App\Response\BadMachineCreateRequestResponse;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -12,7 +12,7 @@ class BadWorkerCreateRequestResponseTest extends TestCase
 {
     public function testCreateIdMissingResponse(): void
     {
-        $response = BadWorkerCreateRequestResponse::createIdMissingResponse();
+        $response = BadMachineCreateRequestResponse::createIdMissingResponse();
 
         self::assertResponse('id missing', 100, $response);
     }

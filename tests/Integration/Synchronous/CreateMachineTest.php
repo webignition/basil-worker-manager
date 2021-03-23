@@ -7,7 +7,7 @@ namespace App\Tests\Integration\Synchronous;
 use App\Controller\WorkerController;
 use App\Entity\Machine;
 use App\Repository\MachineRepository;
-use App\Request\WorkerCreateRequest;
+use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
@@ -45,7 +45,7 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
             'POST',
             WorkerController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_ID => $id,
+                MachineCreateRequest::KEY_ID => $id,
             ]
         );
 

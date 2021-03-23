@@ -11,7 +11,7 @@ use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Repository\MachineRepository;
-use App\Request\WorkerCreateRequest;
+use App\Request\MachineCreateRequest;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -94,7 +94,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
             ],
             'id empty' => [
                 'requestData' => [
-                    WorkerCreateRequest::KEY_ID => '',
+                    MachineCreateRequest::KEY_ID => '',
                 ],
                 'expectedResponseBody' => $idMissingExpectedResponseBody,
             ],
@@ -174,7 +174,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
             'POST',
             WorkerController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_ID => $id,
+                MachineCreateRequest::KEY_ID => $id,
             ]
         );
 

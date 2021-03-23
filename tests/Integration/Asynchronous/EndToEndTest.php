@@ -8,7 +8,7 @@ use App\Controller\WorkerController;
 use App\Entity\Machine;
 use App\Model\Worker\State;
 use App\Repository\MachineRepository;
-use App\Request\WorkerCreateRequest;
+use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Services\EntityRefresher;
 use DigitalOceanV2\Api\Droplet as DropletApi;
@@ -56,7 +56,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             'POST',
             WorkerController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_ID => $this->workerId,
+                MachineCreateRequest::KEY_ID => $this->workerId,
             ]
         );
 

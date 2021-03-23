@@ -8,8 +8,8 @@ use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
-use App\Request\WorkerCreateRequest;
-use App\Response\BadWorkerCreateRequestResponse;
+use App\Request\MachineCreateRequest;
+use App\Response\BadMachineCreateRequestResponse;
 use App\Services\WorkerFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,18 +24,18 @@ class WorkerController extends AbstractController
 
     #[Route(self::PATH_CREATE, name: 'create')]
     public function create(
-        WorkerCreateRequest $request,
+        MachineCreateRequest $request,
         WorkerFactory $factory,
         MachineRequestMessageDispatcher $messageDispatcher,
         MachineRepository $machineRepository
     ): Response {
         $id = $request->getId();
         if ('' === $id) {
-            return BadWorkerCreateRequestResponse::createIdMissingResponse();
+            return BadMachineCreateRequestResponse::createIdMissingResponse();
         }
 
         if ($machineRepository->find($id) instanceof Machine) {
-            return BadWorkerCreateRequestResponse::createIdTakenResponse();
+            return BadMachineCreateRequestResponse::createIdTakenResponse();
         }
 
         $worker = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);

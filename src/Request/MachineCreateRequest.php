@@ -6,7 +6,7 @@ namespace App\Request;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class WorkerCreateRequest extends AbstractEncapsulatingRequest
+class MachineCreateRequest extends AbstractEncapsulatingRequest
 {
     public const KEY_ID = 'id';
 

@@ -8,7 +8,6 @@ use App\Entity\Worker;
 use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -55,8 +54,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->defaultDispatcher->dispatch(
-            new WorkerRequestMessage(
-                MachineProviderActionInterface::ACTION_CREATE,
+            WorkerRequestMessage::createCreate(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );
@@ -64,8 +62,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new WorkerRequestMessage(
-                MachineProviderActionInterface::ACTION_CREATE,
+            WorkerRequestMessage::createCreate(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );
@@ -81,8 +78,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->updateWorkerMessageDispatcher->dispatch(
-            new WorkerRequestMessage(
-                MachineProviderActionInterface::ACTION_GET,
+            WorkerRequestMessage::createGet(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );
@@ -90,8 +86,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new WorkerRequestMessage(
-                MachineProviderActionInterface::ACTION_GET,
+            WorkerRequestMessage::createGet(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );

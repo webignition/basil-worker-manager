@@ -72,10 +72,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $this->updateWorkerDispatcher->dispatch(
-                new WorkerRequestMessage(
-                    MachineProviderActionInterface::ACTION_GET,
-                    $request->incrementRetryCount()
-                )
+                WorkerRequestMessage::createGet($request->incrementRetryCount())
             );
 
             return ApiRequestOutcome::retrying();

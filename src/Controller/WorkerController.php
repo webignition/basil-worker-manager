@@ -6,7 +6,6 @@ use App\Entity\Worker;
 use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
@@ -41,10 +40,11 @@ class WorkerController extends AbstractController
 
         $worker = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
-        $messageDispatcher->dispatch(new WorkerRequestMessage(
-            MachineProviderActionInterface::ACTION_CREATE,
-            new WorkerRequest((string) $worker)
-        ));
+        $messageDispatcher->dispatch(
+            WorkerRequestMessage::createCreate(
+                new WorkerRequest((string) $worker)
+            )
+        );
 
         return new Response('', 202);
     }

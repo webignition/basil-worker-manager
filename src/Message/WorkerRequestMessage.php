@@ -12,7 +12,7 @@ class WorkerRequestMessage implements WorkerRequestMessageInterface
     /**
      * @param MachineProviderActionInterface::ACTION_* $type
      */
-    public function __construct(
+    private function __construct(
         private string $type,
         private WorkerRequestInterface $request
     ) {

@@ -11,7 +11,7 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
-class WorkerStoreTest extends AbstractBaseFunctionalTest
+class MachineStoreTest extends AbstractBaseFunctionalTest
 {
     private MachineStore $workerStore;
     private EntityManagerInterface $entityManager;
@@ -21,9 +21,9 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $workerStore = self::$container->get(MachineStore::class);
-        if ($workerStore instanceof MachineStore) {
-            $this->workerStore = $workerStore;
+        $machineStore = self::$container->get(MachineStore::class);
+        if ($machineStore instanceof MachineStore) {
+            $this->workerStore = $machineStore;
         }
 
         $entityManager = self::$container->get(EntityManagerInterface::class);

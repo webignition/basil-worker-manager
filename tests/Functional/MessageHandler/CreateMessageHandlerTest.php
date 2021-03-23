@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Message\CreateMessage;
+use App\Message\WorkerRequestMessage;
 use App\MessageHandler\CreateMessageHandler;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
@@ -42,7 +42,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $request = new WorkerRequest((string) $worker);
-        $message = new CreateMessage(
+        $message = new WorkerRequestMessage(
             MachineProviderActionInterface::ACTION_CREATE,
             $request
         );

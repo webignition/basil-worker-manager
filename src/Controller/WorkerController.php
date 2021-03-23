@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Worker;
-use App\Message\CreateMessage;
+use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
@@ -41,7 +41,7 @@ class WorkerController extends AbstractController
 
         $worker = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
-        $messageDispatcher->dispatch(new CreateMessage(
+        $messageDispatcher->dispatch(new WorkerRequestMessage(
             MachineProviderActionInterface::ACTION_CREATE,
             new WorkerRequest((string) $worker)
         ));

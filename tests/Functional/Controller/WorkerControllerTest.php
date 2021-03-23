@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\WorkerController;
 use App\Entity\Worker;
-use App\Message\CreateMessage;
+use App\Message\WorkerRequestMessage;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
@@ -59,7 +59,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
 
         $expectedRequest = new WorkerRequest((string) $worker);
-        $expectedMessage = new CreateMessage(
+        $expectedMessage = new WorkerRequestMessage(
             MachineProviderActionInterface::ACTION_CREATE,
             $expectedRequest
         );

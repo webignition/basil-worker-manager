@@ -7,7 +7,7 @@ namespace App\Message;
 use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Model\MachineProviderActionInterface;
 
-abstract class AbstractMessage implements WorkerRequestMessageInterface
+class WorkerRequestMessage implements WorkerRequestMessageInterface
 {
     /**
      * @param MachineProviderActionInterface::ACTION_* $type
@@ -16,6 +16,16 @@ abstract class AbstractMessage implements WorkerRequestMessageInterface
         private string $type,
         private WorkerRequestInterface $request
     ) {
+    }
+
+    public static function createCreate(WorkerRequestInterface $request): self
+    {
+        return new WorkerRequestMessage(MachineProviderActionInterface::ACTION_CREATE, $request);
+    }
+
+    public static function createGet(WorkerRequestInterface $request): self
+    {
+        return new WorkerRequestMessage(MachineProviderActionInterface::ACTION_GET, $request);
     }
 
     public function getType(): string

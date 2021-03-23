@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Worker;
-use App\Message\CreateMessage;
-use App\Message\UpdateWorkerMessage;
+use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
@@ -56,7 +55,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->defaultDispatcher->dispatch(
-            new CreateMessage(
+            new WorkerRequestMessage(
                 MachineProviderActionInterface::ACTION_CREATE,
                 new WorkerRequest((string) $this->worker, 0)
             )
@@ -65,7 +64,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new CreateMessage(
+            new WorkerRequestMessage(
                 MachineProviderActionInterface::ACTION_CREATE,
                 new WorkerRequest((string) $this->worker, 0)
             )
@@ -82,7 +81,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->updateWorkerMessageDispatcher->dispatch(
-            new UpdateWorkerMessage(
+            new WorkerRequestMessage(
                 MachineProviderActionInterface::ACTION_GET,
                 new WorkerRequest((string) $this->worker, 0)
             )
@@ -91,7 +90,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateWorkerMessage(
+            new WorkerRequestMessage(
                 MachineProviderActionInterface::ACTION_GET,
                 new WorkerRequest((string) $this->worker, 0)
             )

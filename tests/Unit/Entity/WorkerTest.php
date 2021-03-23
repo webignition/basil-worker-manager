@@ -17,20 +17,20 @@ class WorkerTest extends TestCase
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $worker = Machine::create($id, $provider);
+        $machine = Machine::create($id, $provider);
 
-        self::assertSame($id, $worker->getId());
-        self::assertNull($worker->getRemoteId());
-        self::assertSame(State::VALUE_CREATE_RECEIVED, $worker->getState());
-        self::assertSame($provider, $worker->getProvider());
-        self::assertSame([], ObjectReflector::getProperty($worker, 'ip_addresses'));
-        self::assertSame('worker-' . $id, $worker->getName());
+        self::assertSame($id, $machine->getId());
+        self::assertNull($machine->getRemoteId());
+        self::assertSame(State::VALUE_CREATE_RECEIVED, $machine->getState());
+        self::assertSame($provider, $machine->getProvider());
+        self::assertSame([], ObjectReflector::getProperty($machine, 'ip_addresses'));
+        self::assertSame('worker-' . $id, $machine->getName());
     }
 
     public function testJsonSerialize(): void
     {
         $id = md5('id content');
-        $worker = Machine::create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = Machine::create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         self::assertSame(
             [
@@ -38,7 +38,7 @@ class WorkerTest extends TestCase
                 'state' => State::VALUE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ],
-            $worker->jsonSerialize()
+            $machine->jsonSerialize()
         );
     }
 
@@ -48,11 +48,11 @@ class WorkerTest extends TestCase
      * @param string[] $ipAddresses
      * @param string[] $expectedIpAddresses
      */
-    public function testSetGetIpAddresses(Machine $worker, array $ipAddresses, array $expectedIpAddresses): void
+    public function testSetGetIpAddresses(Machine $machine, array $ipAddresses, array $expectedIpAddresses): void
     {
-        $worker = $worker->setIpAddresses($ipAddresses);
+        $machine = $machine->setIpAddresses($ipAddresses);
 
-        self::assertSame($expectedIpAddresses, $worker->getIpAddresses());
+        self::assertSame($expectedIpAddresses, $machine->getIpAddresses());
     }
 
     /**

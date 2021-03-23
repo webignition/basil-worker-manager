@@ -28,7 +28,7 @@ use webignition\ObjectReflector\ObjectReflector;
 class MachineProviderTest extends AbstractBaseFunctionalTest
 {
     private MachineProvider $machineProvider;
-    private Machine $worker;
+    private Machine $machine;
     private MockHandler $mockHandler;
 
     protected function setUp(): void
@@ -42,7 +42,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
         $workerFactory = self::$container->get(MachineFactory::class);
         if ($workerFactory instanceof MachineFactory) {
-            $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+            $this->machine = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $mockHandler = self::$container->get(MockHandler::class);
@@ -53,8 +53,8 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $this->assertMutateWorker(function (Machine $worker) {
-            $this->machineProvider->create($worker);
+        $this->assertMutateWorker(function (Machine $machine) {
+            $this->machineProvider->create($machine);
         });
     }
 
@@ -72,7 +72,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->create($this->worker);
+                $this->machineProvider->create($this->machine);
             },
             MachineProviderActionInterface::ACTION_CREATE,
             $apiResponse,
@@ -97,7 +97,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         );
 
         try {
-            $this->machineProvider->create($this->worker);
+            $this->machineProvider->create($this->machine);
             self::fail(ExceptionInterface::class . ' not thrown');
         } catch (ExceptionInterface $exception) {
             self::assertEquals(
@@ -109,8 +109,8 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testUpdateSuccess(): void
     {
-        $this->assertMutateWorker(function (Machine $worker) {
-            $this->machineProvider->update($worker);
+        $this->assertMutateWorker(function (Machine $machine) {
+            $this->machineProvider->update($machine);
         });
     }
 
@@ -128,7 +128,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->update($this->worker);
+                $this->machineProvider->update($this->machine);
             },
             MachineProviderActionInterface::ACTION_GET,
             $apiResponse,
@@ -139,11 +139,11 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testDeleteSuccess(): void
     {
-        ObjectReflector::setProperty($this->worker, Machine::class, 'remote_id', 123);
+        ObjectReflector::setProperty($this->machine, Machine::class, 'remote_id', 123);
 
         $this->mockHandler->append(new Response(204));
 
-        $this->machineProvider->delete($this->worker);
+        $this->machineProvider->delete($this->machine);
         self::expectNotToPerformAssertions();
     }
 
@@ -159,7 +159,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->delete($this->worker);
+                $this->machineProvider->delete($this->machine);
             },
             MachineProviderActionInterface::ACTION_DELETE,
             $apiResponse,
@@ -192,13 +192,13 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        self::assertNull($this->worker->getRemoteId());
-        self::assertSame([], ObjectReflector::getProperty($this->worker, 'ip_addresses'));
+        self::assertNull($this->machine->getRemoteId());
+        self::assertSame([], ObjectReflector::getProperty($this->machine, 'ip_addresses'));
 
-        $callable($this->worker);
+        $callable($this->machine);
 
-        self::assertSame($remoteId, $this->worker->getRemoteId());
-        self::assertSame($ipAddresses, ObjectReflector::getProperty($this->worker, 'ip_addresses'));
+        self::assertSame($remoteId, $this->machine->getRemoteId());
+        self::assertSame($ipAddresses, ObjectReflector::getProperty($this->machine, 'ip_addresses'));
     }
 
     /**

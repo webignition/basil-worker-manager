@@ -39,7 +39,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineStore $workerStore;
-    private Machine $worker;
+    private Machine $machine;
 
     protected function setUp(): void
     {
@@ -52,7 +52,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $workerFactory = self::$container->get(MachineFactory::class);
         if ($workerFactory instanceof MachineFactory) {
-            $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+            $this->machine = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $mockHandler = self::$container->get(MockHandler::class);
@@ -91,10 +91,10 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append(...$httpFixtures);
 
-        $this->worker->setState($currentState);
-        $this->workerStore->store($this->worker);
+        $this->machine->setState($currentState);
+        $this->workerStore->store($this->machine);
 
-        $request = new MachineRequest((string) $this->worker, 0);
+        $request = new MachineRequest((string) $this->machine, 0);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals($expectedOutcome, $outcome);
@@ -187,7 +187,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $this->mockHandler->append(new Response(401));
 
         $expectedLoggedException = new AuthenticationException(
-            (string) $this->worker,
+            (string) $this->machine,
             MachineProviderActionInterface::ACTION_GET,
             new RuntimeException('Unauthorized', 401)
         );
@@ -198,7 +198,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new MachineRequest((string) $this->worker, 0);
+        $request = new MachineRequest((string) $this->machine, 0);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -218,7 +218,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $this->mockHandler->append($apiResponse);
 
         $expectedLoggedException = new HttpException(
-            (string) $this->worker,
+            (string) $this->machine,
             MachineProviderActionInterface::ACTION_GET,
             $expectedRemoteException
         );
@@ -229,7 +229,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new MachineRequest((string) $this->worker, $retryCount);
+        $request = new MachineRequest((string) $this->machine, $retryCount);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -257,8 +257,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $invalidProvider = 'invalid';
         $expectedLoggedException = new UnsupportedProviderException($invalidProvider);
 
-        ObjectReflector::setProperty($this->worker, Machine::class, 'provider', $invalidProvider);
-        $this->workerStore->store($this->worker);
+        ObjectReflector::setProperty($this->machine, Machine::class, 'provider', $invalidProvider);
+        $this->workerStore->store($this->machine);
 
         $exceptionLogger = (new MockExceptionLogger())
             ->withLogCall($expectedLoggedException)
@@ -266,7 +266,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new MachineRequest((string) $this->worker, 0);
+        $request = new MachineRequest((string) $this->machine, 0);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -279,14 +279,14 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $request = new MachineRequest((string) $this->worker, 11);
+        $request = new MachineRequest((string) $this->machine, 11);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
             ApiRequestOutcome::failed(
                 new UnknownRemoteMachineException(
-                    $this->worker->getProvider(),
-                    (string) $this->worker,
+                    $this->machine->getProvider(),
+                    (string) $this->machine,
                     MachineProviderActionInterface::ACTION_GET,
                     new RuntimeException('Not Found', 404)
                 )
@@ -294,7 +294,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
             $outcome
         );
 
-        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
+        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->machine->getState());
     }
 
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void

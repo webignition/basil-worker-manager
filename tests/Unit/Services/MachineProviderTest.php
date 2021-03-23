@@ -17,12 +17,12 @@ class MachineProviderTest extends TestCase
     {
         $machineProvider = new MachineProvider([], \Mockery::mock(ExceptionFactory::class));
 
-        $worker = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         self::expectExceptionObject(
             new UnsupportedProviderException(ProviderInterface::NAME_DIGITALOCEAN)
         );
 
-        $machineProvider->create($worker);
+        $machineProvider->create($machine);
     }
 }

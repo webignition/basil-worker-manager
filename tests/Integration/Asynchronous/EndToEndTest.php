@@ -22,8 +22,8 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     private MachineRepository $machineRepository;
     private DropletApi $dropletApi;
     private EntityRefresher $entityRefresher;
-    private string $workerId = '';
-    private Machine $worker;
+    private string $machineId = '';
+    private Machine $machine;
 
     protected function setUp(): void
     {
@@ -44,7 +44,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             $this->entityRefresher = $entityRefresher;
         }
 
-        $this->workerId = md5('id content');
+        $this->machineId = md5('id content');
 
         echo "\n" . $this->getObfuscatedDigitalOceanAccessToken(2, 2) . "\n\n";
     }
@@ -56,19 +56,19 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             'POST',
             WorkerController::PATH_CREATE,
             [
-                MachineCreateRequest::KEY_ID => $this->workerId,
+                MachineCreateRequest::KEY_ID => $this->machineId,
             ]
         );
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->machineRepository->find($this->workerId);
-        if ($worker instanceof Machine) {
-            $this->worker = $worker;
+        $machine = $this->machineRepository->find($this->machineId);
+        if ($machine instanceof Machine) {
+            $this->machine = $machine;
         }
 
-        self::assertSame(State::VALUE_CREATE_RECEIVED, $this->worker->getState());
+        self::assertSame(State::VALUE_CREATE_RECEIVED, $this->machine->getState());
 
         $waitForWorkerUpActiveResult = $this->waitUntilWorkerStateIs(State::VALUE_UP_ACTIVE);
         if (false === $waitForWorkerUpActiveResult) {
@@ -77,9 +77,9 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 
-        self::assertSame(State::VALUE_UP_ACTIVE, $this->worker->getState());
+        self::assertSame(State::VALUE_UP_ACTIVE, $this->machine->getState());
 
-        $remoteId = $this->worker->getRemoteId();
+        $remoteId = $this->machine->getRemoteId();
         if (false === is_int($remoteId)) {
             throw new \RuntimeException('Worker lacking remote_id. Verify test droplet has not been created');
         }
@@ -98,7 +98,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         $maxDuration = self::MAX_DURATION_IN_SECONDS * self::MICROSECONDS_PER_SECOND;
         $intervalInMicroseconds = 100000;
 
-        while ($stopState !== $this->worker->getState()) {
+        while ($stopState !== $this->machine->getState()) {
             usleep($intervalInMicroseconds);
             $duration += $intervalInMicroseconds;
 

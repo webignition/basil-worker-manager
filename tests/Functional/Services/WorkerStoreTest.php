@@ -39,13 +39,13 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
 
     public function testStore(): void
     {
-        $worker = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $worker = $this->workerStore->store($worker);
+        $machine = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = $this->workerStore->store($machine);
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Machine::class, $worker->getId());
+        $retrievedWorker = $this->entityManager->find(Machine::class, $machine->getId());
 
-        self::assertEquals($worker, $retrievedWorker);
+        self::assertEquals($machine, $retrievedWorker);
     }
 }

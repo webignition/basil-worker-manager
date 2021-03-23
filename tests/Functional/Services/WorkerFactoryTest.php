@@ -42,12 +42,12 @@ class WorkerFactoryTest extends AbstractBaseFunctionalTest
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $worker = $this->workerFactory->create($id, $provider);
+        $machine = $this->workerFactory->create($id, $provider);
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Machine::class, $worker->getId());
+        $retrievedWorker = $this->entityManager->find(Machine::class, $machine->getId());
 
-        self::assertEquals($worker, $retrievedWorker);
+        self::assertEquals($machine, $retrievedWorker);
     }
 }

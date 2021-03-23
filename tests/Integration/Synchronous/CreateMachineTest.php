@@ -52,14 +52,14 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->machineRepository->find($id);
-        if (false === $worker instanceof Machine) {
+        $machine = $this->machineRepository->find($id);
+        if (false === $machine instanceof Machine) {
             throw new \RuntimeException('Worker entity not created. Verify test droplet has not been created');
         }
 
-        self::assertInstanceOf(Machine::class, $worker);
+        self::assertInstanceOf(Machine::class, $machine);
 
-        $remoteId = $worker->getRemoteId();
+        $remoteId = $machine->getRemoteId();
         if (false === is_int($remoteId)) {
             throw new \RuntimeException('Worker lacking remote_id. Verify test droplet has not been created');
         }

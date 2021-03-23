@@ -22,7 +22,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
     private MachineRequestMessageDispatcher $defaultDispatcher;
     private MachineRequestMessageDispatcher $updateWorkerMessageDispatcher;
     private MessengerAsserter $messengerAsserter;
-    private Machine $worker;
+    private Machine $machine;
 
     protected function setUp(): void
     {
@@ -40,7 +40,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 
         $workerFactory = self::$container->get(MachineFactory::class);
         if ($workerFactory instanceof MachineFactory) {
-            $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+            $this->machine = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
@@ -55,7 +55,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 
         $this->defaultDispatcher->dispatch(
             MachineRequestMessage::createCreate(
-                new MachineRequest((string) $this->worker, 0)
+                new MachineRequest((string) $this->machine, 0)
             )
         );
 
@@ -63,7 +63,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             MachineRequestMessage::createCreate(
-                new MachineRequest((string) $this->worker, 0)
+                new MachineRequest((string) $this->machine, 0)
             )
         );
 
@@ -79,7 +79,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 
         $this->updateWorkerMessageDispatcher->dispatch(
             MachineRequestMessage::createGet(
-                new MachineRequest((string) $this->worker, 0)
+                new MachineRequest((string) $this->machine, 0)
             )
         );
 
@@ -87,7 +87,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             MachineRequestMessage::createGet(
-                new MachineRequest((string) $this->worker, 0)
+                new MachineRequest((string) $this->machine, 0)
             )
         );
 

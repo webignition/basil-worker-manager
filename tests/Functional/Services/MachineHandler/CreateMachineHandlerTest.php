@@ -54,11 +54,11 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
     public function testHandleSuccess(): void
     {
-        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new MachineRequest((string) $worker);
+        $machine = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $request = new MachineRequest((string) $machine);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCall($worker)
+            ->withCreateCall($machine)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -73,22 +73,22 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             MachineRequestMessage::createGet(
-                new MachineRequest((string) $worker, 0)
+                new MachineRequest((string) $machine, 0)
             )
         );
 
-        self::assertNotSame(State::VALUE_CREATE_FAILED, $worker->getState());
+        self::assertNotSame(State::VALUE_CREATE_FAILED, $machine->getState());
     }
 
     public function testHandleWithUnsupportedProviderException(): void
     {
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
-        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new MachineRequest((string) $worker);
+        $machine = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $request = new MachineRequest((string) $machine);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($worker, $exception)
+            ->withCreateCallThrowingException($machine, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -100,7 +100,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
+        self::assertSame(State::VALUE_CREATE_FAILED, $machine->getState());
         self::assertSame(0, $request->getRetryCount());
     }
 
@@ -109,9 +109,9 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testHandleExceptionWithRetry(\Throwable $previous, int $currentRetryCount): void
     {
-        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new MachineRequest((string) $worker);
+        $request = new MachineRequest((string) $machine);
         ObjectReflector::setProperty(
             $request,
             MachineRequest::class,
@@ -119,10 +119,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $exception = new Exception((string) $worker, MachineProviderActionInterface::ACTION_CREATE, $previous);
+        $exception = new Exception((string) $machine, MachineProviderActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($worker, $exception)
+            ->withCreateCallThrowingException($machine, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -134,7 +134,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->handler->handle($request);
 
         $expectedRequest = new MachineRequest(
-            (string) $worker,
+            (string) $machine,
             $request->getRetryCount() + 1
         );
 
@@ -143,7 +143,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
-        self::assertNotSame(State::VALUE_CREATE_FAILED, $worker->getState());
+        self::assertNotSame(State::VALUE_CREATE_FAILED, $machine->getState());
     }
 
     /**
@@ -172,9 +172,9 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testHandleExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
     {
-        $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new MachineRequest((string) $worker);
+        $request = new MachineRequest((string) $machine);
         ObjectReflector::setProperty(
             $request,
             MachineRequest::class,
@@ -182,10 +182,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $currentRetryCount
         );
 
-        $exception = new Exception((string) $worker, MachineProviderActionInterface::ACTION_CREATE, $previous);
+        $exception = new Exception((string) $machine, MachineProviderActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($worker, $exception)
+            ->withCreateCallThrowingException($machine, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -197,7 +197,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
+        self::assertSame(State::VALUE_CREATE_FAILED, $machine->getState());
     }
 
     /**

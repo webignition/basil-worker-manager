@@ -33,43 +33,43 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
 
     public function testUpdateRemoteId(): void
     {
-        $worker = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
-        self::assertNull($worker->getRemoteId());
+        $machine = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
+        self::assertNull($machine->getRemoteId());
 
-        $worker = $this->workerUpdater->updateRemoteId($worker, 1);
-        self::assertSame(1, $worker->getRemoteId());
+        $machine = $this->workerUpdater->updateRemoteId($machine, 1);
+        self::assertSame(1, $machine->getRemoteId());
 
-        $worker = $this->workerUpdater->updateRemoteId($worker, 2);
-        self::assertSame(2, $worker->getRemoteId());
+        $machine = $this->workerUpdater->updateRemoteId($machine, 2);
+        self::assertSame(2, $machine->getRemoteId());
 
         $this->entityRefresher->refreshForEntity(Machine::class);
-        self::assertSame(2, $worker->getRemoteId());
+        self::assertSame(2, $machine->getRemoteId());
     }
 
     public function testSetState(): void
     {
-        $worker = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
-        self::assertSame(State::VALUE_CREATE_RECEIVED, $worker->getState());
+        $machine = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
+        self::assertSame(State::VALUE_CREATE_RECEIVED, $machine->getState());
 
-        $this->workerUpdater->updateState($worker, State::VALUE_CREATE_REQUESTED);
-        self::assertSame(State::VALUE_CREATE_REQUESTED, $worker->getState());
+        $this->workerUpdater->updateState($machine, State::VALUE_CREATE_REQUESTED);
+        self::assertSame(State::VALUE_CREATE_REQUESTED, $machine->getState());
 
         $this->entityRefresher->refreshForEntity(Machine::class);
-        self::assertSame(State::VALUE_CREATE_REQUESTED, $worker->getState());
+        self::assertSame(State::VALUE_CREATE_REQUESTED, $machine->getState());
     }
 
     public function testSetIpAddresses(): void
     {
-        $worker = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
-        self::assertSame([], $worker->getIpAddresses());
+        $machine = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
+        self::assertSame([], $machine->getIpAddresses());
 
-        $this->workerUpdater->updateIpAddresses($worker, ['a']);
-        self::assertSame(['a'], $worker->getIpAddresses());
+        $this->workerUpdater->updateIpAddresses($machine, ['a']);
+        self::assertSame(['a'], $machine->getIpAddresses());
 
-        $this->workerUpdater->updateIpAddresses($worker, ['b']);
-        self::assertSame(['b'], $worker->getIpAddresses());
+        $this->workerUpdater->updateIpAddresses($machine, ['b']);
+        self::assertSame(['b'], $machine->getIpAddresses());
 
         $this->entityRefresher->refreshForEntity(Machine::class);
-        self::assertSame(['b'], $worker->getIpAddresses());
+        self::assertSame(['b'], $machine->getIpAddresses());
     }
 }

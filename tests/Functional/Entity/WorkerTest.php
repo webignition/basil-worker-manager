@@ -35,15 +35,15 @@ class WorkerTest extends AbstractBaseFunctionalTest
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $worker = Machine::create($id, $provider);
+        $machine = Machine::create($id, $provider);
 
-        $this->entityManager->persist($worker);
+        $this->entityManager->persist($machine);
         $this->entityManager->flush();
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Machine::class, $worker->getId());
+        $retrievedWorker = $this->entityManager->find(Machine::class, $machine->getId());
 
-        self::assertEquals($worker, $retrievedWorker);
+        self::assertEquals($machine, $retrievedWorker);
     }
 }

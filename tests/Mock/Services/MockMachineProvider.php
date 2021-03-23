@@ -22,24 +22,24 @@ class MockMachineProvider
         return $this->mock;
     }
 
-    public function withCreateCall(Machine $worker): self
+    public function withCreateCall(Machine $machine): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive('create')
-                ->with($worker)
-                ->andReturn($worker);
+                ->with($machine)
+                ->andReturn($machine);
         }
 
         return $this;
     }
 
-    public function withCreateCallThrowingException(Machine $worker, \Exception $exception): self
+    public function withCreateCallThrowingException(Machine $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive('create')
-                ->with($worker)
+                ->with($machine)
                 ->andThrow($exception);
         }
 

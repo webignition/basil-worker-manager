@@ -8,7 +8,6 @@ use App\Entity\Worker;
 use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
-use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
 use App\Services\WorkerFactory;
@@ -81,7 +80,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 
         $this->updateWorkerMessageDispatcher->dispatch(
             new UpdateWorkerMessage(
-                new UpdateWorkerRequest((string) $this->worker, 0)
+                new WorkerRequest((string) $this->worker, 0)
             )
         );
 
@@ -89,7 +88,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             new UpdateWorkerMessage(
-                new UpdateWorkerRequest((string) $this->worker, 0)
+                new WorkerRequest((string) $this->worker, 0)
             )
         );
 

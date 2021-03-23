@@ -18,7 +18,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     public function __construct(
         private DropletApi $dropletApi,
         private DigitalOceanExceptionFactory $exceptionFactory,
-        private MachineUpdater $workerUpdater,
+        private MachineUpdater $machineUpdater,
         private DropletConfiguration $dropletConfiguration,
         private string $prefix,
     ) {
@@ -45,7 +45,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
         $dropletEntity = $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([]);
 
-        return $this->updateWorker($machine, $dropletEntity);
+        return $this->update($machine, $dropletEntity);
     }
 
     /**
@@ -65,19 +65,19 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     {
         $dropletEntity = $this->dropletApi->getById((int)$machine->getRemoteId());
 
-        return $this->updateWorker($machine, $dropletEntity);
+        return $this->update($machine, $dropletEntity);
     }
 
-    private function updateWorker(Machine $machine, DropletEntity $droplet): Machine
+    private function update(Machine $machine, DropletEntity $droplet): Machine
     {
         $remoteMachine = new RemoteMachine($droplet);
-        $this->workerUpdater->updateRemoteId($machine, $remoteMachine->getId());
+        $this->machineUpdater->updateRemoteId($machine, $remoteMachine->getId());
 
         $state = $remoteMachine->getState();
         if (is_string($state)) {
-            $machine = $this->workerUpdater->updateState($machine, $state);
+            $machine = $this->machineUpdater->updateState($machine, $state);
         }
 
-        return $this->workerUpdater->updateIpAddresses($machine, $remoteMachine->getIpAddresses());
+        return $this->machineUpdater->updateIpAddresses($machine, $remoteMachine->getIpAddresses());
     }
 }

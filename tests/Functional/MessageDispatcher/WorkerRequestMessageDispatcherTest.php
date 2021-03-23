@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Worker;
-use App\Message\CreateMessage;
-use App\Message\UpdateWorkerMessage;
+use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
@@ -55,7 +54,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->defaultDispatcher->dispatch(
-            new CreateMessage(
+            WorkerRequestMessage::createCreate(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );
@@ -63,7 +62,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new CreateMessage(
+            WorkerRequestMessage::createCreate(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );
@@ -79,7 +78,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->updateWorkerMessageDispatcher->dispatch(
-            new UpdateWorkerMessage(
+            WorkerRequestMessage::createGet(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );
@@ -87,7 +86,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateWorkerMessage(
+            WorkerRequestMessage::createGet(
                 new WorkerRequest((string) $this->worker, 0)
             )
         );

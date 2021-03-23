@@ -95,12 +95,12 @@ services:
         arguments:
             $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'
 
-    App\Services\CreateMachineHandler:
+    App\Services\MachineHandler\CreateMachineHandler:
         arguments:
             $createDispatcher: '@app.message_dispatcher.create'
             $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
 
-    App\Services\UpdateWorkerHandler:
+    App\Services\MachineHandler\UpdateWorkerHandler:
         arguments:
             $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
 
@@ -148,3 +148,9 @@ services:
             $factories:
                 - '@App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory'
                 - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'
+
+    App\MessageHandler\WorkerRequestMessageHandler:
+        arguments:
+            $handlers:
+                - '@App\Services\MachineHandler\CreateMachineHandler'
+                - '@App\Services\MachineHandler\UpdateWorkerHandler'

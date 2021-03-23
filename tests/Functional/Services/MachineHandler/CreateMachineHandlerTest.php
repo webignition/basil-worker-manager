@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\MachineHandler;
 
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
-use App\Message\CreateMessage;
-use App\Message\UpdateWorkerMessage;
+use App\Message\WorkerRequestMessage;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
-use App\Services\CreateMachineHandler;
 use App\Services\ExceptionLogger;
+use App\Services\MachineHandler\CreateMachineHandler;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -68,12 +67,12 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateWorkerMessage(
+            WorkerRequestMessage::createGet(
                 new WorkerRequest((string) $worker, 0)
             )
         );
@@ -98,7 +97,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
@@ -132,14 +131,14 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $expectedRequest = new WorkerRequest(
             (string) $worker,
             $request->getRetryCount() + 1
         );
 
-        $expectedMessage = new CreateMessage($expectedRequest);
+        $expectedMessage = WorkerRequestMessage::createCreate($expectedRequest);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
@@ -195,7 +194,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());

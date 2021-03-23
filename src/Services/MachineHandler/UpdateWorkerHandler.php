@@ -8,10 +8,10 @@ use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
+use App\Model\Machine\State;
+use App\Model\Machine\StateTransitionSequence;
 use App\Model\MachineProviderActionInterface;
 use App\Model\MachineRequestInterface;
-use App\Model\Worker\State;
-use App\Model\Worker\StateTransitionSequence;
 use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
@@ -87,7 +87,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
     }
 
     /**
-     * @param State::VALUE_* $currentState
+     * @param \App\Model\Machine\State::VALUE_* $currentState
      */
     private function hasReachedStopStateOrEndState(string $currentState): bool
     {

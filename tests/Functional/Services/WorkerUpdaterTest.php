@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
+use App\Model\Machine\State;
 use App\Model\ProviderInterface;
-use App\Model\Worker\State;
 use App\Services\MachineUpdater;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;

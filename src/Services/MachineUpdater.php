@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Machine;
-use App\Model\Worker\State;
+use App\Model\Machine\State;
 
 class MachineUpdater
 {

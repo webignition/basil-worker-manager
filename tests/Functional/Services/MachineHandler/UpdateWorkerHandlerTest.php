@@ -11,10 +11,10 @@ use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\Machine\State;
 use App\Model\MachineProviderActionInterface;
 use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
-use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
 use App\Services\MachineHandler\UpdateWorkerHandler;
@@ -75,7 +75,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
      * @dataProvider handleDataProvider
      *
      * @param array<ResponseInterface|\Throwable> $httpFixtures
-     * @param State::VALUE_* $currentState
+     * @param \App\Model\Machine\State::VALUE_* $currentState
      */
     public function testHandle(
         array $httpFixtures,

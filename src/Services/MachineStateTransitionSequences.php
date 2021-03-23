@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\Worker\StateTransitionSequence;
+use App\Model\Machine\StateTransitionSequence;
 
 class MachineStateTransitionSequences
 {

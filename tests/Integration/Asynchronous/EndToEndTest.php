@@ -6,7 +6,7 @@ namespace App\Tests\Integration\Asynchronous;
 
 use App\Controller\WorkerController;
 use App\Entity\Machine;
-use App\Model\Worker\State;
+use App\Model\Machine\State;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;

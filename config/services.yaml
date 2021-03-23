@@ -105,36 +105,36 @@ services:
             $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
 
     app.services.worker_state_transition_sequence.create_failed:
-        class: App\Model\Worker\StateTransitionSequence
+        class: App\Model\Machine\StateTransitionSequence
         arguments:
             $states:
-                - !php/const App\Model\Worker\State::VALUE_CREATE_RECEIVED
-                - !php/const App\Model\Worker\State::VALUE_CREATE_REQUESTED
-                - !php/const App\Model\Worker\State::VALUE_CREATE_FAILED
+                - !php/const App\Model\Machine\State::VALUE_CREATE_RECEIVED
+                - !php/const App\Model\Machine\State::VALUE_CREATE_REQUESTED
+                - !php/const App\Model\Machine\State::VALUE_CREATE_FAILED
 
     app.services.worker_state_transition_sequence.delete_failed:
-        class: App\Model\Worker\StateTransitionSequence
+        class: App\Model\Machine\StateTransitionSequence
         arguments:
             $states:
-                - !php/const App\Model\Worker\State::VALUE_CREATE_RECEIVED
-                - !php/const App\Model\Worker\State::VALUE_CREATE_REQUESTED
-                - !php/const App\Model\Worker\State::VALUE_UP_STARTED
-                - !php/const App\Model\Worker\State::VALUE_UP_ACTIVE
-                - !php/const App\Model\Worker\State::VALUE_DELETE_RECEIVED
-                - !php/const App\Model\Worker\State::VALUE_DELETE_REQUESTED
-                - !php/const App\Model\Worker\State::VALUE_DELETE_FAILED
+                - !php/const App\Model\Machine\State::VALUE_CREATE_RECEIVED
+                - !php/const App\Model\Machine\State::VALUE_CREATE_REQUESTED
+                - !php/const App\Model\Machine\State::VALUE_UP_STARTED
+                - !php/const App\Model\Machine\State::VALUE_UP_ACTIVE
+                - !php/const App\Model\Machine\State::VALUE_DELETE_RECEIVED
+                - !php/const App\Model\Machine\State::VALUE_DELETE_REQUESTED
+                - !php/const App\Model\Machine\State::VALUE_DELETE_FAILED
 
     app.services.worker_state_transition_sequence.delete_deleted:
-        class: App\Model\Worker\StateTransitionSequence
+        class: App\Model\Machine\StateTransitionSequence
         arguments:
             $states:
-                - !php/const App\Model\Worker\State::VALUE_CREATE_RECEIVED
-                - !php/const App\Model\Worker\State::VALUE_CREATE_REQUESTED
-                - !php/const App\Model\Worker\State::VALUE_UP_STARTED
-                - !php/const App\Model\Worker\State::VALUE_UP_ACTIVE
-                - !php/const App\Model\Worker\State::VALUE_DELETE_RECEIVED
-                - !php/const App\Model\Worker\State::VALUE_DELETE_REQUESTED
-                - !php/const App\Model\Worker\State::VALUE_DELETE_DELETED
+                - !php/const App\Model\Machine\State::VALUE_CREATE_RECEIVED
+                - !php/const App\Model\Machine\State::VALUE_CREATE_REQUESTED
+                - !php/const App\Model\Machine\State::VALUE_UP_STARTED
+                - !php/const App\Model\Machine\State::VALUE_UP_ACTIVE
+                - !php/const App\Model\Machine\State::VALUE_DELETE_RECEIVED
+                - !php/const App\Model\Machine\State::VALUE_DELETE_REQUESTED
+                - !php/const App\Model\Machine\State::VALUE_DELETE_DELETED
 
     App\Services\MachineStateTransitionSequences:
         arguments:

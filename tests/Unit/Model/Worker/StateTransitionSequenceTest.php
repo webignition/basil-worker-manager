@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Model\Worker;
 
-use App\Model\Worker\State;
-use App\Model\Worker\StateTransitionSequence;
+use App\Model\Machine\State;
+use App\Model\Machine\StateTransitionSequence;
 use PHPUnit\Framework\TestCase;
 
 class StateTransitionSequenceTest extends TestCase
@@ -13,7 +13,7 @@ class StateTransitionSequenceTest extends TestCase
     /**
      * @dataProvider containsDataProvider
      *
-     * @param State::VALUE_* $state
+     * @param \App\Model\Machine\State::VALUE_* $state
      */
     public function testContains(StateTransitionSequence $sequence, string $state, bool $expectedContains): void
     {
@@ -73,7 +73,7 @@ class StateTransitionSequenceTest extends TestCase
     /**
      * @dataProvider endsWithDataProvider
      *
-     * @param State::VALUE_* $state
+     * @param \App\Model\Machine\State::VALUE_* $state
      */
     public function testEndsWith(StateTransitionSequence $sequence, string $state, bool $expectedEndsWith): void
     {
@@ -133,8 +133,8 @@ class StateTransitionSequenceTest extends TestCase
     /**
      * @dataProvider sliceReturnsStateTransitionsDataProvider
      *
-     * @param State::VALUE_* $start
-     * @param State::VALUE_* $end
+     * @param \App\Model\Machine\State::VALUE_* $start
+     * @param \App\Model\Machine\State::VALUE_* $end
      */
     public function testSliceReturnsStateTransitions(
         StateTransitionSequence $sequence,
@@ -212,7 +212,7 @@ class StateTransitionSequenceTest extends TestCase
     /**
      * @dataProvider sliceReturnsNullDataProvider
      *
-     * @param State::VALUE_* $start
+     * @param \App\Model\Machine\State::VALUE_* $start
      * @param State::VALUE_* $end
      */
     public function testSliceReturnsNull(
@@ -262,7 +262,7 @@ class StateTransitionSequenceTest extends TestCase
     /**
      * @dataProvider containsWithinDataProvider
      *
-     * @param State::VALUE_* $state
+     * @param \App\Model\Machine\State::VALUE_* $state
      */
     public function testContainsWithin(StateTransitionSequence $sequence, string $state, bool $expectedContains): void
     {
@@ -322,7 +322,7 @@ class StateTransitionSequenceTest extends TestCase
     /**
      * @dataProvider sliceEndingWithReturnsStateTransitionsDataProvider
      *
-     * @param State::VALUE_* $end
+     * @param \App\Model\Machine\State::VALUE_* $end
      */
     public function testSliceEndingWithReturnsStateTransitions(
         StateTransitionSequence $sequence,
@@ -383,7 +383,7 @@ class StateTransitionSequenceTest extends TestCase
     /**
      * @dataProvider sliceEndingWithReturnsNullDataProvider
      *
-     * @param State::VALUE_* $end
+     * @param \App\Model\Machine\State::VALUE_* $end
      */
     public function testSliceEndingWithReturnsNull(StateTransitionSequence $sequence, string $end): void
     {

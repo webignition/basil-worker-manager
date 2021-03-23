@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Model\Machine\State;
 use App\Model\ProviderInterface;
-use App\Model\Worker\State;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,7 +28,7 @@ class Machine implements \Stringable, \JsonSerializable
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * @var State::VALUE_*
+     * @var \App\Model\Machine\State::VALUE_*
      */
     private string $state;
 
@@ -118,7 +118,7 @@ class Machine implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return State::VALUE_*
+     * @return \App\Model\Machine\State::VALUE_*
      */
     public function getState(): string
     {
@@ -126,7 +126,7 @@ class Machine implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @param  State::VALUE_* $state
+     * @param  \App\Model\Machine\State::VALUE_* $state
      */
     public function setState(string $state): self
     {

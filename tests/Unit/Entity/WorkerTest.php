@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Machine;
+use App\Model\Machine\State;
 use App\Model\ProviderInterface;
-use App\Model\Worker\State;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Model\Worker\StateTransitionSequence;
+use App\Model\Machine\StateTransitionSequence;
 use App\Services\MachineStateTransitionSequences;
 use App\Tests\AbstractBaseFunctionalTest;
 

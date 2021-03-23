@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
+use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -74,12 +75,10 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
      *
      * @param array<ResponseInterface|\Throwable> $httpFixtures
      * @param State::VALUE_* $currentState
-     * @param State::VALUE_* $stopState
      */
     public function testHandle(
         array $httpFixtures,
         string $currentState,
-        string $stopState,
         ApiRequestOutcome $expectedOutcome,
         int $expectedMessageQueueCount
     ): void {
@@ -94,7 +93,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $this->worker->setState($currentState);
         $this->workerStore->store($this->worker);
 
-        $response = $this->handler->handle($this->worker, $stopState, 0);
+        $response = $this->handler->handle($this->worker, 0);
 
         self::assertEquals($expectedOutcome, $response);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
@@ -110,7 +109,6 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
             $endStateCases['current state is end state: ' . $endState] = [
                 'httpFixtures' => [],
                 'currentState' => $endState,
-                'stopState' => State::VALUE_CREATE_RECEIVED,
                 'expectedOutcome' => ApiRequestOutcome::success(),
                 'expectedMessageQueueCount' => 0,
             ];
@@ -120,15 +118,13 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
             [
                 'current state is stop state' => [
                     'httpFixtures' => [],
-                    'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'stopState' => State::VALUE_CREATE_RECEIVED,
+                    'currentState' => State::VALUE_UP_ACTIVE,
                     'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'current state not end state, current state not stop state, current state past stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_DELETE_RECEIVED,
-                    'stopState' => State::VALUE_UP_ACTIVE,
                     'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
@@ -137,12 +133,11 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                         HttpResponseFactory::fromDropletEntity(
                             new DropletEntity([
                                 'id' => 123,
-                                'status' => RemoteMachine::STATE_NEW,
+                                'status' => RemoteMachine::STATE_ACTIVE,
                             ])
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'stopState' => State::VALUE_UP_STARTED,
                     'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
@@ -156,7 +151,6 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'stopState' => State::VALUE_UP_STARTED,
                     'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
@@ -170,7 +164,6 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'stopState' => State::VALUE_UP_ACTIVE,
                     'expectedOutcome' => ApiRequestOutcome::retrying(),
                     'expectedMessageQueueCount' => 1,
                 ],
@@ -179,7 +172,6 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
                         new Response(503),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'stopState' => State::VALUE_UP_ACTIVE,
                     'expectedOutcome' => ApiRequestOutcome::retrying(),
                     'expectedMessageQueueCount' => 1,
                 ],
@@ -204,7 +196,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 0);
+        $outcome = $this->handler->handle($this->worker, 0);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -234,7 +226,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, $retryCount);
+        $outcome = $this->handler->handle($this->worker, $retryCount);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -270,7 +262,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 0);
+        $outcome = $this->handler->handle($this->worker, 0);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -280,13 +272,23 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
     public function testHandleThrowsUnknownRemoteMachineException(): void
     {
-        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
-
         $this->mockHandler->append(new Response(404));
 
-        $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 11);
-        self::assertEquals(ApiRequestOutcome::success(), $outcome);
-        self::assertSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
+        $outcome = $this->handler->handle($this->worker, 11);
+
+        self::assertEquals(
+            ApiRequestOutcome::failed(
+                new UnknownRemoteMachineException(
+                    $this->worker->getProvider(),
+                    (string) $this->worker,
+                    MachineProviderActionInterface::ACTION_GET,
+                    new RuntimeException('Not Found', 404)
+                )
+            ),
+            $outcome
+        );
+
+        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
     }
 
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void

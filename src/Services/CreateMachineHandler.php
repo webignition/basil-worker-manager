@@ -8,7 +8,6 @@ use App\Entity\Worker;
 use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
-use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
@@ -55,7 +54,7 @@ class CreateMachineHandler extends AbstractApiActionHandler
             return $outcome;
         }
 
-        $updateWorkerRequest = new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE);
+        $updateWorkerRequest = new WorkerRequest((string) $worker);
         $this->updateWorkerDispatcher->dispatch(
             new UpdateWorkerMessage($updateWorkerRequest)
         );

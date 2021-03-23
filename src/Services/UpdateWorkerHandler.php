@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
-use App\Model\ApiRequest\UpdateWorkerRequest;
+use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
@@ -17,12 +16,13 @@ use App\Services\MachineProvider\MachineProvider;
 
 class UpdateWorkerHandler extends AbstractApiActionHandler
 {
+    private const STOP_STATE = State::VALUE_UP_ACTIVE;
+
     public function __construct(
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
-        private WorkerUpdater $workerUpdater,
         private WorkerStateTransitionSequences $stateTransitionSequences,
     ) {
         parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger);
@@ -35,29 +35,21 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
 
     /**
      * @param Worker $worker
-     * @param State::VALUE_* $stopState
      */
-    public function handle(Worker $worker, string $stopState, int $retryCount): ApiRequestOutcome
+    public function handle(Worker $worker, int $retryCount): ApiRequestOutcome
     {
-        if ($this->hasReachedStopStateOrEndState($worker->getState(), $stopState)) {
+        if ($this->hasReachedStopStateOrEndState($worker->getState())) {
             return ApiRequestOutcome::success();
         }
 
         $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_GET, $retryCount);
 
         if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
-            $exception = $outcome->getException();
-            if ($exception instanceof UnknownRemoteMachineException) {
-                $this->workerUpdater->updateState($worker, State::VALUE_DELETE_DELETED);
-
-                return ApiRequestOutcome::success();
-            }
-
             return $outcome;
         }
 
         if (ApiRequestOutcome::STATE_SUCCESS === (string) $outcome) {
-            if ($this->hasReachedStopStateOrEndState($worker->getState(), $stopState)) {
+            if ($this->hasReachedStopStateOrEndState($worker->getState())) {
                 return ApiRequestOutcome::success();
             }
 
@@ -65,7 +57,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
         }
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $request = new UpdateWorkerRequest((string) $worker, $stopState, $retryCount + 1);
+            $request = new WorkerRequest((string) $worker, $retryCount + 1);
             $this->updateWorkerDispatcher->dispatch(
                 new UpdateWorkerMessage($request)
             );
@@ -78,11 +70,10 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
 
     /**
      * @param State::VALUE_* $currentState
-     * @param State::VALUE_* $stopState
      */
-    private function hasReachedStopStateOrEndState(string $currentState, string $stopState): bool
+    private function hasReachedStopStateOrEndState(string $currentState): bool
     {
-        if ($stopState === $currentState) {
+        if (self::STOP_STATE === $currentState) {
             return true;
         }
 
@@ -92,7 +83,10 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
 
         foreach ($this->stateTransitionSequences->getSequences() as $sequence) {
             $currentStateSubset = $sequence->sliceEndingWith($currentState);
-            if ($currentStateSubset instanceof StateTransitionSequence && $currentStateSubset->contains($stopState)) {
+            if (
+                $currentStateSubset instanceof StateTransitionSequence &&
+                $currentStateSubset->contains(self::STOP_STATE)
+            ) {
                 return true;
             }
         }

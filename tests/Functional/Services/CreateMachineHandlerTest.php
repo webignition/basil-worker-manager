@@ -8,7 +8,6 @@ use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMessage;
 use App\Message\UpdateWorkerMessage;
-use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
@@ -75,7 +74,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             new UpdateWorkerMessage(
-                new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE, 0)
+                new WorkerRequest((string) $worker, 0)
             )
         );
 

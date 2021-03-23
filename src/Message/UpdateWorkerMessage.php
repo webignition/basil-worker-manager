@@ -4,17 +4,6 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\ApiRequest\UpdateWorkerRequest;
-
-class UpdateWorkerMessage implements WorkerRequestMessageInterface
+class UpdateWorkerMessage extends AbstractMessage
 {
-    public function __construct(
-        private UpdateWorkerRequest $request
-    ) {
-    }
-
-    public function getRequest(): UpdateWorkerRequest
-    {
-        return $this->request;
-    }
 }

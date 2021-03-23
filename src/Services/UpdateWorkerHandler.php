@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entity\Worker;
-use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\UpdateWorkerRequest;
@@ -46,13 +45,6 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
         $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_GET, $retryCount);
 
         if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
-            $exception = $outcome->getException();
-            if ($exception instanceof UnknownRemoteMachineException) {
-                $this->workerUpdater->updateState($worker, State::VALUE_DELETE_DELETED);
-
-                return ApiRequestOutcome::success();
-            }
-
             return $outcome;
         }
 

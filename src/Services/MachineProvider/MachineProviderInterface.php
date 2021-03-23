@@ -16,15 +16,15 @@ interface MachineProviderInterface
     /**
      * @throws ExceptionInterface
      */
-    public function create(Machine $worker): Machine;
+    public function create(Machine $machine): Machine;
 
     /**
      * @throws ExceptionInterface
      */
-    public function remove(Machine $worker): Machine;
+    public function remove(Machine $machine): Machine;
 
     /**
      * @throws ExceptionInterface
      */
-    public function hydrate(Machine $worker): Machine;
+    public function hydrate(Machine $machine): Machine;
 }

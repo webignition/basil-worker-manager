@@ -30,25 +30,25 @@ abstract class AbstractApiActionHandler
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface
      */
-    abstract protected function doAction(Machine $worker): Machine;
+    abstract protected function doAction(Machine $machine): Machine;
 
     /**
-     * @param Machine $worker
+     * @param Machine $machine
      * @param MachineProviderActionInterface::ACTION_* $action
      * @param int $retryCount
      * @return ApiRequestOutcome
      */
-    protected function doHandle(Machine $worker, string $action, int $retryCount): ApiRequestOutcome
+    protected function doHandle(Machine $machine, string $action, int $retryCount): ApiRequestOutcome
     {
         $lastException = null;
 
         try {
-            $this->doAction($worker);
+            $this->doAction($machine);
 
             return ApiRequestOutcome::success();
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
-                $worker->getProvider(),
+                $machine->getProvider(),
                 $action,
                 $retryCount,
                 $exception->getRemoteException()

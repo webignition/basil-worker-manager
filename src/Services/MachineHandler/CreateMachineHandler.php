@@ -27,7 +27,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineRequestMessageDispatcherInterface $createDispatcher,
-        private MachineStore $workerStore,
+        private MachineStore $machineStore,
     ) {
         parent::__construct(
             $machineRepository,
@@ -38,9 +38,9 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         );
     }
 
-    protected function doAction(Machine $worker): Machine
+    protected function doAction(Machine $machine): Machine
     {
-        return $this->machineProvider->create($worker);
+        return $this->machineProvider->create($machine);
     }
 
     public function handles(string $type): bool
@@ -50,16 +50,16 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
 
     public function handle(MachineRequestInterface $request): ApiRequestOutcome
     {
-        $worker = $this->machineRepository->find($request->getWorkerId());
-        if (!$worker instanceof Machine) {
+        $machine = $this->machineRepository->find($request->getWorkerId());
+        if (!$machine instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }
 
-        $worker->setState(State::VALUE_CREATE_REQUESTED);
-        $this->workerStore->store($worker);
+        $machine->setState(State::VALUE_CREATE_REQUESTED);
+        $this->machineStore->store($machine);
 
         $retryCount = $request->getRetryCount();
-        $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
+        $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $this->createDispatcher->dispatch(
@@ -70,13 +70,13 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         }
 
         if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
-            $worker = $worker->setState(State::VALUE_CREATE_FAILED);
-            $this->workerStore->store($worker);
+            $machine = $machine->setState(State::VALUE_CREATE_FAILED);
+            $this->machineStore->store($machine);
 
             return $outcome;
         }
 
-        $updateWorkerRequest = new MachineRequest((string) $worker);
+        $updateWorkerRequest = new MachineRequest((string) $machine);
         $this->updateWorkerDispatcher->dispatch(
             MachineRequestMessage::createGet($updateWorkerRequest)
         );

@@ -39,9 +39,9 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         );
     }
 
-    protected function doAction(Machine $worker): Machine
+    protected function doAction(Machine $machine): Machine
     {
-        return $this->machineProvider->update($worker);
+        return $this->machineProvider->update($machine);
     }
 
     public function handles(string $type): bool
@@ -51,24 +51,24 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
 
     public function handle(MachineRequestInterface $request): ApiRequestOutcome
     {
-        $worker = $this->machineRepository->find($request->getWorkerId());
-        if (!$worker instanceof Machine) {
+        $machine = $this->machineRepository->find($request->getWorkerId());
+        if (!$machine instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }
 
-        if ($this->hasReachedStopStateOrEndState($worker->getState())) {
+        if ($this->hasReachedStopStateOrEndState($machine->getState())) {
             return ApiRequestOutcome::success();
         }
 
         $retryCount = $request->getRetryCount();
-        $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_GET, $retryCount);
+        $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_GET, $retryCount);
 
         if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
             return $outcome;
         }
 
         if (ApiRequestOutcome::STATE_SUCCESS === (string) $outcome) {
-            if ($this->hasReachedStopStateOrEndState($worker->getState())) {
+            if ($this->hasReachedStopStateOrEndState($machine->getState())) {
                 return ApiRequestOutcome::success();
             }
 

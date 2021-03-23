@@ -38,11 +38,11 @@ class WorkerController extends AbstractController
             return BadMachineCreateRequestResponse::createIdTakenResponse();
         }
 
-        $worker = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         $messageDispatcher->dispatch(
             MachineRequestMessage::createCreate(
-                new MachineRequest((string) $worker)
+                new MachineRequest((string) $machine)
             )
         );
 
@@ -54,11 +54,11 @@ class WorkerController extends AbstractController
         string $id,
         MachineRepository $machineRepository,
     ): Response {
-        $worker = $machineRepository->find($id);
-        if (false === $worker instanceof Machine) {
+        $machine = $machineRepository->find($id);
+        if (false === $machine instanceof Machine) {
             return new Response('', 404);
         }
 
-        return new JsonResponse($worker);
+        return new JsonResponse($machine);
     }
 }

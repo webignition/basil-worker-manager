@@ -12,11 +12,11 @@ class MachineStore
     ) {
     }
 
-    public function store(Machine $worker): Machine
+    public function store(Machine $machine): Machine
     {
-        $this->entityManager->persist($worker);
+        $this->entityManager->persist($machine);
         $this->entityManager->flush();
 
-        return $worker;
+        return $machine;
     }
 }

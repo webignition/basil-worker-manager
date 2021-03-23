@@ -51,14 +51,14 @@ class Machine implements \Stringable, \JsonSerializable
      */
     public static function create(string $id, string $provider): self
     {
-        $worker = new Machine();
-        $worker->id = $id;
-        $worker->remote_id = null;
-        $worker->state = STATE::VALUE_CREATE_RECEIVED;
-        $worker->provider = $provider;
-        $worker->ip_addresses = [];
+        $machine = new Machine();
+        $machine->id = $id;
+        $machine->remote_id = null;
+        $machine->state = STATE::VALUE_CREATE_RECEIVED;
+        $machine->provider = $provider;
+        $machine->ip_addresses = [];
 
-        return $worker;
+        return $machine;
     }
 
     public function getId(): string

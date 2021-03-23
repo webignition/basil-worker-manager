@@ -8,7 +8,7 @@ use App\Model\ProviderInterface;
 class MachineFactory
 {
     public function __construct(
-        private MachineStore $workerStore
+        private MachineStore $machineStore
     ) {
     }
 
@@ -17,7 +17,7 @@ class MachineFactory
      */
     public function create(string $id, string $provider): Machine
     {
-        return $this->workerStore->store(
+        return $this->machineStore->store(
             Machine::create($id, $provider)
         );
     }

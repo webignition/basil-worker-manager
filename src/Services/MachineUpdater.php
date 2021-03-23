@@ -8,43 +8,43 @@ use App\Model\Machine\State;
 class MachineUpdater
 {
     public function __construct(
-        private MachineStore $workerStore,
+        private MachineStore $machineStore,
     ) {
     }
 
-    public function updateRemoteId(Machine $worker, int $remoteId): Machine
+    public function updateRemoteId(Machine $machine, int $remoteId): Machine
     {
-        if ($remoteId !== $worker->getRemoteId()) {
-            $worker->setRemoteId($remoteId);
-            $this->workerStore->store($worker);
+        if ($remoteId !== $machine->getRemoteId()) {
+            $machine->setRemoteId($remoteId);
+            $this->machineStore->store($machine);
         }
 
-        return $worker;
+        return $machine;
     }
 
     /**
      * @param State::VALUE_* $state
      */
-    public function updateState(Machine $worker, string $state): Machine
+    public function updateState(Machine $machine, string $state): Machine
     {
-        if ($state !== $worker->getState()) {
-            $worker->setState($state);
-            $this->workerStore->store($worker);
+        if ($state !== $machine->getState()) {
+            $machine->setState($state);
+            $this->machineStore->store($machine);
         }
 
-        return $worker;
+        return $machine;
     }
 
     /**
      * @param string[] $ipAddresses
      */
-    public function updateIpAddresses(Machine $worker, array $ipAddresses): Machine
+    public function updateIpAddresses(Machine $machine, array $ipAddresses): Machine
     {
-        if ($ipAddresses !== $worker->getIpAddresses()) {
-            $worker->setIpAddresses($ipAddresses);
-            $this->workerStore->store($worker);
+        if ($ipAddresses !== $machine->getIpAddresses()) {
+            $machine->setIpAddresses($ipAddresses);
+            $this->machineStore->store($machine);
         }
 
-        return $worker;
+        return $machine;
     }
 }

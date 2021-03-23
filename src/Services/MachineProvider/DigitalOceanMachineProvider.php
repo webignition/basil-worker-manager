@@ -35,49 +35,49 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function create(Machine $worker): Machine
+    public function create(Machine $machine): Machine
     {
         $createArguments = new DropletApiCreateCallArguments(
-            sprintf('%s-%s', $this->prefix, $worker->getName()),
+            sprintf('%s-%s', $this->prefix, $machine->getName()),
             $this->dropletConfiguration
         );
 
         $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
         $dropletEntity = $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([]);
 
-        return $this->updateWorker($worker, $dropletEntity);
+        return $this->updateWorker($machine, $dropletEntity);
     }
 
     /**
      * @throws VendorExceptionInterface
      */
-    public function remove(Machine $worker): Machine
+    public function remove(Machine $machine): Machine
     {
-        $this->dropletApi->remove((int) $worker->getRemoteId());
+        $this->dropletApi->remove((int) $machine->getRemoteId());
 
-        return $worker;
+        return $machine;
     }
 
     /**
      * @throws VendorExceptionInterface
      */
-    public function hydrate(Machine $worker): Machine
+    public function hydrate(Machine $machine): Machine
     {
-        $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
+        $dropletEntity = $this->dropletApi->getById((int)$machine->getRemoteId());
 
-        return $this->updateWorker($worker, $dropletEntity);
+        return $this->updateWorker($machine, $dropletEntity);
     }
 
-    private function updateWorker(Machine $worker, DropletEntity $droplet): Machine
+    private function updateWorker(Machine $machine, DropletEntity $droplet): Machine
     {
         $remoteMachine = new RemoteMachine($droplet);
-        $this->workerUpdater->updateRemoteId($worker, $remoteMachine->getId());
+        $this->workerUpdater->updateRemoteId($machine, $remoteMachine->getId());
 
         $state = $remoteMachine->getState();
         if (is_string($state)) {
-            $worker = $this->workerUpdater->updateState($worker, $state);
+            $machine = $this->workerUpdater->updateState($machine, $state);
         }
 
-        return $this->workerUpdater->updateIpAddresses($worker, $remoteMachine->getIpAddresses());
+        return $this->workerUpdater->updateIpAddresses($machine, $remoteMachine->getIpAddresses());
     }
 }

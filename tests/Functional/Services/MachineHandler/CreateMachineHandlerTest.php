@@ -6,8 +6,7 @@ namespace App\Tests\Functional\Services\MachineHandler;
 
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
-use App\Message\CreateMessage;
-use App\Message\UpdateWorkerMessage;
+use App\Message\WorkerRequestMessage;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
@@ -73,7 +72,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateWorkerMessage(
+            WorkerRequestMessage::createGet(
                 new WorkerRequest((string) $worker, 0)
             )
         );
@@ -139,7 +138,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $request->getRetryCount() + 1
         );
 
-        $expectedMessage = new CreateMessage($expectedRequest);
+        $expectedMessage = WorkerRequestMessage::createCreate($expectedRequest);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);

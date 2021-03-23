@@ -11,9 +11,9 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
-class WorkerFactoryTest extends AbstractBaseFunctionalTest
+class MachineFactoryTest extends AbstractBaseFunctionalTest
 {
-    private MachineFactory $workerFactory;
+    private MachineFactory $machineFactory;
     private EntityManagerInterface $entityManager;
     private EntityRefresher $entityRefresher;
 
@@ -21,9 +21,9 @@ class WorkerFactoryTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $workerFactory = self::$container->get(MachineFactory::class);
-        if ($workerFactory instanceof MachineFactory) {
-            $this->workerFactory = $workerFactory;
+        $machineFactory = self::$container->get(MachineFactory::class);
+        if ($machineFactory instanceof MachineFactory) {
+            $this->machineFactory = $machineFactory;
         }
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
@@ -42,7 +42,7 @@ class WorkerFactoryTest extends AbstractBaseFunctionalTest
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $machine = $this->workerFactory->create($id, $provider);
+        $machine = $this->machineFactory->create($id, $provider);
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 

@@ -149,7 +149,7 @@ services:
                 - '@App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory'
                 - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'
 
-    App\MessageHandler\WorkerRequestMessageHandler:
+    App\MessageHandler\MachineRequestMessageHandler:
         arguments:
             $handlers:
                 - '@App\Services\MachineHandler\CreateMachineHandler'

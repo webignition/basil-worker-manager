@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Message\MachineRequestMessage;
-use App\MessageHandler\WorkerRequestMessageHandler;
+use App\MessageHandler\MachineRequestMessageHandler;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
 use App\Services\MachineHandler\RequestHandlerInterface;
@@ -18,14 +18,14 @@ class WorkerRequestMessageHandlerTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
-    private WorkerRequestMessageHandler $handler;
+    private MachineRequestMessageHandler $handler;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $handler = self::$container->get(WorkerRequestMessageHandler::class);
-        if ($handler instanceof WorkerRequestMessageHandler) {
+        $handler = self::$container->get(MachineRequestMessageHandler::class);
+        if ($handler instanceof MachineRequestMessageHandler) {
             $this->handler = $handler;
         }
     }
@@ -67,7 +67,7 @@ class WorkerRequestMessageHandlerTest extends AbstractBaseFunctionalTest
     {
         ObjectReflector::setProperty(
             $this->handler,
-            WorkerRequestMessageHandler::class,
+            MachineRequestMessageHandler::class,
             'handlers',
             $handlers
         );

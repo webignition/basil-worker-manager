@@ -8,7 +8,7 @@ use App\Message\MachineRequestMessage;
 use App\Services\MachineHandler\RequestHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class WorkerRequestMessageHandler implements MessageHandlerInterface
+class MachineRequestMessageHandler implements MessageHandlerInterface
 {
     /**
      * @var RequestHandlerInterface[]

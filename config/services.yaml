@@ -98,11 +98,11 @@ services:
     App\Services\MachineHandler\CreateMachineHandler:
         arguments:
             $createDispatcher: '@app.message_dispatcher.create'
-            $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
+            $updateMachineDispatcher: '@app.message_dispatcher.update_worker'
 
     App\Services\MachineHandler\UpdateWorkerHandler:
         arguments:
-            $updateWorkerDispatcher: '@app.message_dispatcher.update_worker'
+            $updateMachineDispatcher: '@app.message_dispatcher.update_worker'
 
     app.services.worker_state_transition_sequence.create_failed:
         class: App\Model\Machine\StateTransitionSequence

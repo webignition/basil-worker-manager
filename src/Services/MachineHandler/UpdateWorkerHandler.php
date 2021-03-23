@@ -26,7 +26,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
-        MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        MachineRequestMessageDispatcherInterface $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineStateTransitionSequences $stateTransitionSequences,
     ) {
@@ -34,7 +34,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
             $machineRepository,
             $machineProvider,
             $retryDecider,
-            $updateWorkerDispatcher,
+            $updateMachineDispatcher,
             $exceptionLogger
         );
     }
@@ -76,7 +76,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         }
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->updateWorkerDispatcher->dispatch(
+            $this->updateMachineDispatcher->dispatch(
                 MachineRequestMessage::createGet($request->incrementRetryCount())
             );
 

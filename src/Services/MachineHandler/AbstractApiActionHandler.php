@@ -21,7 +21,7 @@ abstract class AbstractApiActionHandler
         protected MachineRepository $machineRepository,
         protected MachineProvider $machineProvider,
         protected ApiActionRetryDecider $retryDecider,
-        protected MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        protected MachineRequestMessageDispatcherInterface $updateMachineDispatcher,
         protected ExceptionLogger $exceptionLogger,
     ) {
     }

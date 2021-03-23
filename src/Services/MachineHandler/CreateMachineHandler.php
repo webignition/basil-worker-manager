@@ -24,7 +24,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
-        MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        MachineRequestMessageDispatcherInterface $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineRequestMessageDispatcherInterface $createDispatcher,
         private MachineStore $machineStore,
@@ -33,7 +33,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
             $machineRepository,
             $machineProvider,
             $retryDecider,
-            $updateWorkerDispatcher,
+            $updateMachineDispatcher,
             $exceptionLogger
         );
     }
@@ -76,9 +76,10 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
             return $outcome;
         }
 
-        $updateWorkerRequest = new MachineRequest((string) $machine);
-        $this->updateWorkerDispatcher->dispatch(
-            MachineRequestMessage::createGet($updateWorkerRequest)
+        $this->updateMachineDispatcher->dispatch(
+            MachineRequestMessage::createGet(
+                new MachineRequest((string) $machine)
+            )
         );
 
         return ApiRequestOutcome::success();

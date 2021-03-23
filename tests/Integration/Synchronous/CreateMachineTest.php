@@ -54,14 +54,14 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
 
         $machine = $this->machineRepository->find($id);
         if (false === $machine instanceof Machine) {
-            throw new \RuntimeException('Worker entity not created. Verify test droplet has not been created');
+            throw new \RuntimeException('Machine entity not created. Verify test droplet has not been created');
         }
 
         self::assertInstanceOf(Machine::class, $machine);
 
         $remoteId = $machine->getRemoteId();
         if (false === is_int($remoteId)) {
-            throw new \RuntimeException('Worker lacking remote_id. Verify test droplet has not been created');
+            throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has not been created');
         }
 
         self::assertIsInt($remoteId);

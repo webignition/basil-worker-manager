@@ -19,4 +19,12 @@ class WorkerRequest implements WorkerRequestInterface
     {
         return $this->retryCount;
     }
+
+    public function incrementRetryCount(): self
+    {
+        $new = clone $this;
+        $new->retryCount++;
+
+        return $new;
+    }
 }

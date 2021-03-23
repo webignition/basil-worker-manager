@@ -58,8 +58,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $request = new WorkerRequest((string) $worker, $retryCount + 1);
-            $message = new CreateMessage($request);
+            $message = new CreateMessage($request->incrementRetryCount());
             $this->createDispatcher->dispatch($message);
 
             return $outcome;

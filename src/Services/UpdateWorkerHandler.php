@@ -7,7 +7,7 @@ namespace App\Services;
 use App\Entity\Worker;
 use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
-use App\Model\ApiRequest\UpdateWorkerRequest;
+use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
@@ -57,7 +57,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
         }
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $request = new UpdateWorkerRequest((string) $worker, $retryCount + 1);
+            $request = new WorkerRequest((string) $worker, $retryCount + 1);
             $this->updateWorkerDispatcher->dispatch(
                 new UpdateWorkerMessage($request)
             );

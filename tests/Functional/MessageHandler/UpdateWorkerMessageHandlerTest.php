@@ -7,6 +7,7 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Message\UpdateWorkerMessage;
 use App\MessageHandler\UpdateWorkerMessageHandler;
 use App\Model\ApiRequest\WorkerRequest;
+use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\MachineHandler\UpdateWorkerHandler;
 use App\Services\WorkerFactory;
@@ -41,7 +42,10 @@ class UpdateWorkerMessageHandlerTest extends AbstractBaseFunctionalTest
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $request = new WorkerRequest((string) $worker, 0);
-        $message = new UpdateWorkerMessage($request);
+        $message = new UpdateWorkerMessage(
+            MachineProviderActionInterface::ACTION_GET,
+            $request
+        );
 
         $updateWorkerHandler = (new MockUpdateWorkerHandler())
             ->withHandleCall($request)

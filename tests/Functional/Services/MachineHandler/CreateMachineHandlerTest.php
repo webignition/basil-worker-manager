@@ -74,6 +74,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             new UpdateWorkerMessage(
+                MachineProviderActionInterface::ACTION_GET,
                 new WorkerRequest((string) $worker, 0)
             )
         );
@@ -139,7 +140,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $request->getRetryCount() + 1
         );
 
-        $expectedMessage = new CreateMessage($expectedRequest);
+        $expectedMessage = new CreateMessage(
+            MachineProviderActionInterface::ACTION_CREATE,
+            $expectedRequest
+        );
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);

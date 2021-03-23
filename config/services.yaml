@@ -136,7 +136,7 @@ services:
                 - !php/const App\Model\Worker\State::VALUE_DELETE_REQUESTED
                 - !php/const App\Model\Worker\State::VALUE_DELETE_DELETED
 
-    App\Services\WorkerStateTransitionSequences:
+    App\Services\MachineStateTransitionSequences:
         arguments:
             $sequences:
                 create_failed: '@app.services.worker_state_transition_sequence.create_failed'

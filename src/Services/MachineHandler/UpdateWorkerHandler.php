@@ -16,7 +16,7 @@ use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\WorkerStateTransitionSequences;
+use App\Services\MachineStateTransitionSequences;
 
 class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHandlerInterface
 {
@@ -28,7 +28,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         ApiActionRetryDecider $retryDecider,
         MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
-        private WorkerStateTransitionSequences $stateTransitionSequences,
+        private MachineStateTransitionSequences $stateTransitionSequences,
     ) {
         parent::__construct(
             $machineRepository,

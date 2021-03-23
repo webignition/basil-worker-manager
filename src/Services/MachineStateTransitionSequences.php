@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Model\Worker\StateTransitionSequence;
 
-class WorkerStateTransitionSequences
+class MachineStateTransitionSequences
 {
     /**
      * @var StateTransitionSequence[]

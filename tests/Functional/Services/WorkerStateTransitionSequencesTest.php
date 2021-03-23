@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Model\Worker\StateTransitionSequence;
-use App\Services\WorkerStateTransitionSequences;
+use App\Services\MachineStateTransitionSequences;
 use App\Tests\AbstractBaseFunctionalTest;
 
 class WorkerStateTransitionSequencesTest extends AbstractBaseFunctionalTest
 {
-    private WorkerStateTransitionSequences $sequences;
+    private MachineStateTransitionSequences $sequences;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sequences = self::$container->get(WorkerStateTransitionSequences::class);
-        if ($sequences instanceof WorkerStateTransitionSequences) {
+        $sequences = self::$container->get(MachineStateTransitionSequences::class);
+        if ($sequences instanceof MachineStateTransitionSequences) {
             $this->sequences = $sequences;
         }
     }

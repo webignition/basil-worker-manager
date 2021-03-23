@@ -24,7 +24,7 @@ services:
         arguments:
             $handler: '@GuzzleHttp\Handler\MockHandler'
 
-    App\Services\WorkerStateTransitionSequences:
+    App\Services\MachineStateTransitionSequences:
         public: true
         arguments:
             $sequences:

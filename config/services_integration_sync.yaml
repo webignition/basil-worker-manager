@@ -4,7 +4,7 @@ services:
         autoconfigure: true
 
     app.message_dispatcher.update_worker:
-        class: App\MessageDispatcher\WorkerRequestMessageDispatcher
+        class: App\MessageDispatcher\MachineRequestMessageDispatcher
         arguments:
             $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'
             $enabled: false

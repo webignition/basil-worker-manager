@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Message\WorkerRequestMessageInterface;
+use App\Message\MachineRequestMessageInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -18,7 +18,7 @@ class WorkerRequestMessageDispatcher implements WorkerRequestMessageDispatcherIn
     ) {
     }
 
-    public function dispatch(WorkerRequestMessageInterface $message): void
+    public function dispatch(MachineRequestMessageInterface $message): void
     {
         if ($this->enabled) {
             $stamps = [];

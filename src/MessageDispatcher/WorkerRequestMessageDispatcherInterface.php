@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Message\WorkerRequestMessageInterface;
+use App\Message\MachineRequestMessageInterface;
 
 interface WorkerRequestMessageDispatcherInterface
 {
-    public function dispatch(WorkerRequestMessageInterface $message): void;
+    public function dispatch(MachineRequestMessageInterface $message): void;
 }

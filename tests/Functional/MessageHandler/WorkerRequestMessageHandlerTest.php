@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Message\WorkerRequestMessage;
+use App\Message\MachineRequestMessage;
 use App\MessageHandler\WorkerRequestMessageHandler;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
@@ -33,7 +33,7 @@ class WorkerRequestMessageHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeForCreateAction(): void
     {
         $request = new WorkerRequest(md5('id content'));
-        $message = WorkerRequestMessage::createCreate($request);
+        $message = MachineRequestMessage::createCreate($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
             ->withHandlesCall(MachineProviderActionInterface::ACTION_CREATE, true)
@@ -48,7 +48,7 @@ class WorkerRequestMessageHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeForGetAction(): void
     {
         $request = new WorkerRequest(md5('id content'));
-        $message = WorkerRequestMessage::createGet($request);
+        $message = MachineRequestMessage::createGet($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
             ->withHandlesCall(MachineProviderActionInterface::ACTION_GET, true)

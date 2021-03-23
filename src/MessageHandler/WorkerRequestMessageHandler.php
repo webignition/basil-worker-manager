@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Message\WorkerRequestMessage;
+use App\Message\MachineRequestMessage;
 use App\Services\MachineHandler\RequestHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -25,7 +25,7 @@ class WorkerRequestMessageHandler implements MessageHandlerInterface
         });
     }
 
-    public function __invoke(WorkerRequestMessage $message): void
+    public function __invoke(MachineRequestMessage $message): void
     {
         foreach ($this->handlers as $handler) {
             if ($handler->handles($message->getType())) {

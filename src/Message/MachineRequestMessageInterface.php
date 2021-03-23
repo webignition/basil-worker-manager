@@ -7,7 +7,7 @@ namespace App\Message;
 use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Model\MachineProviderActionInterface;
 
-interface WorkerRequestMessageInterface
+interface MachineRequestMessageInterface
 {
     /**
      * @return MachineProviderActionInterface::ACTION_*

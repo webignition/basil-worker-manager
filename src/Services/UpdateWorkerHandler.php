@@ -21,7 +21,6 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
-        private WorkerUpdater $workerUpdater,
         private WorkerStateTransitionSequences $stateTransitionSequences,
     ) {
         parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger);

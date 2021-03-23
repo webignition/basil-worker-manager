@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
@@ -22,7 +22,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
     private WorkerRequestMessageDispatcher $defaultDispatcher;
     private WorkerRequestMessageDispatcher $updateWorkerMessageDispatcher;
     private MessengerAsserter $messengerAsserter;
-    private Worker $worker;
+    private Machine $worker;
 
     protected function setUp(): void
     {

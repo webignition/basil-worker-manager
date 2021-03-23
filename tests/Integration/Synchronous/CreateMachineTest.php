@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Synchronous;
 
 use App\Controller\WorkerController;
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
@@ -53,11 +53,11 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
         self::assertSame(202, $response->getStatusCode());
 
         $worker = $this->workerRepository->find($id);
-        if (false === $worker instanceof Worker) {
+        if (false === $worker instanceof Machine) {
             throw new \RuntimeException('Worker entity not created. Verify test droplet has not been created');
         }
 
-        self::assertInstanceOf(Worker::class, $worker);
+        self::assertInstanceOf(Machine::class, $worker);
 
         $remoteId = $worker->getRemoteId();
         if (false === is_int($remoteId)) {

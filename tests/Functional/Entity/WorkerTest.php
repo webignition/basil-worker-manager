@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Entity;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
@@ -35,14 +35,14 @@ class WorkerTest extends AbstractBaseFunctionalTest
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $worker = Worker::create($id, $provider);
+        $worker = Machine::create($id, $provider);
 
         $this->entityManager->persist($worker);
         $this->entityManager->flush();
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Worker::class, $worker->getId());
+        $retrievedWorker = $this->entityManager->find(Machine::class, $worker->getId());
 
         self::assertEquals($worker, $retrievedWorker);
     }

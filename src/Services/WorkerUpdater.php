@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\Worker\State;
 
 class WorkerUpdater
@@ -12,7 +12,7 @@ class WorkerUpdater
     ) {
     }
 
-    public function updateRemoteId(Worker $worker, int $remoteId): Worker
+    public function updateRemoteId(Machine $worker, int $remoteId): Machine
     {
         if ($remoteId !== $worker->getRemoteId()) {
             $worker->setRemoteId($remoteId);
@@ -25,7 +25,7 @@ class WorkerUpdater
     /**
      * @param State::VALUE_* $state
      */
-    public function updateState(Worker $worker, string $state): Worker
+    public function updateState(Machine $worker, string $state): Machine
     {
         if ($state !== $worker->getState()) {
             $worker->setState($state);
@@ -38,7 +38,7 @@ class WorkerUpdater
     /**
      * @param string[] $ipAddresses
      */
-    public function updateIpAddresses(Worker $worker, array $ipAddresses): Worker
+    public function updateIpAddresses(Machine $worker, array $ipAddresses): Machine
     {
         if ($ipAddresses !== $worker->getIpAddresses()) {
             $worker->setIpAddresses($ipAddresses);

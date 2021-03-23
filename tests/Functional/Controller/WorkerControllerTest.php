@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\WorkerController;
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Message\WorkerRequestMessage;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
@@ -52,7 +52,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         self::assertCount(1, $workers);
 
         $worker = current($workers);
-        self::assertInstanceOf(Worker::class, $worker);
+        self::assertInstanceOf(Machine::class, $worker);
         self::assertSame($id, $worker->getId());
 
         $this->messengerAsserter->assertQueueCount(1);

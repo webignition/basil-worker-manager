@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineProvider;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
@@ -28,7 +28,7 @@ use webignition\ObjectReflector\ObjectReflector;
 class MachineProviderTest extends AbstractBaseFunctionalTest
 {
     private MachineProvider $machineProvider;
-    private Worker $worker;
+    private Machine $worker;
     private MockHandler $mockHandler;
 
     protected function setUp(): void
@@ -53,7 +53,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $this->assertMutateWorker(function (Worker $worker) {
+        $this->assertMutateWorker(function (Machine $worker) {
             $this->machineProvider->create($worker);
         });
     }
@@ -109,7 +109,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testUpdateSuccess(): void
     {
-        $this->assertMutateWorker(function (Worker $worker) {
+        $this->assertMutateWorker(function (Machine $worker) {
             $this->machineProvider->update($worker);
         });
     }
@@ -139,7 +139,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testDeleteSuccess(): void
     {
-        ObjectReflector::setProperty($this->worker, Worker::class, 'remote_id', 123);
+        ObjectReflector::setProperty($this->worker, Machine::class, 'remote_id', 123);
 
         $this->mockHandler->append(new Response(204));
 

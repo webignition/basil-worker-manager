@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
@@ -34,7 +34,7 @@ class WorkerController extends AbstractController
             return BadWorkerCreateRequestResponse::createIdMissingResponse();
         }
 
-        if ($workerRepository->find($id) instanceof Worker) {
+        if ($workerRepository->find($id) instanceof Machine) {
             return BadWorkerCreateRequestResponse::createIdTakenResponse();
         }
 
@@ -55,7 +55,7 @@ class WorkerController extends AbstractController
         WorkerRepository $workerRepository,
     ): Response {
         $worker = $workerRepository->find($id);
-        if (false === $worker instanceof Worker) {
+        if (false === $worker instanceof Machine) {
             return new Response('', 404);
         }
 

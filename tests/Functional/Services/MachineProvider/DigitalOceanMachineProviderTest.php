@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineProvider;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOceanMachineProvider;
 use App\Services\WorkerFactory;
@@ -18,7 +18,7 @@ use webignition\ObjectReflector\ObjectReflector;
 class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 {
     private DigitalOceanMachineProvider $machineProvider;
-    private Worker $worker;
+    private Machine $worker;
     private MockHandler $mockHandler;
 
     protected function setUp(): void

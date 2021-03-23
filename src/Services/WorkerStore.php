@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use Doctrine\ORM\EntityManagerInterface;
 
 class WorkerStore
@@ -12,7 +12,7 @@ class WorkerStore
     ) {
     }
 
-    public function store(Worker $worker): Worker
+    public function store(Machine $worker): Machine
     {
         $this->entityManager->persist($worker);
         $this->entityManager->flush();

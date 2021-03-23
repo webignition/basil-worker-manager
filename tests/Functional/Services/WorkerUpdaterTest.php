@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\WorkerUpdater;
@@ -33,7 +33,7 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
 
     public function testUpdateRemoteId(): void
     {
-        $worker = Worker::create('id', ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
         self::assertNull($worker->getRemoteId());
 
         $worker = $this->workerUpdater->updateRemoteId($worker, 1);
@@ -42,25 +42,25 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
         $worker = $this->workerUpdater->updateRemoteId($worker, 2);
         self::assertSame(2, $worker->getRemoteId());
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
         self::assertSame(2, $worker->getRemoteId());
     }
 
     public function testSetState(): void
     {
-        $worker = Worker::create('id', ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
         self::assertSame(State::VALUE_CREATE_RECEIVED, $worker->getState());
 
         $this->workerUpdater->updateState($worker, State::VALUE_CREATE_REQUESTED);
         self::assertSame(State::VALUE_CREATE_REQUESTED, $worker->getState());
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
         self::assertSame(State::VALUE_CREATE_REQUESTED, $worker->getState());
     }
 
     public function testSetIpAddresses(): void
     {
-        $worker = Worker::create('id', ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
         self::assertSame([], $worker->getIpAddresses());
 
         $this->workerUpdater->updateIpAddresses($worker, ['a']);
@@ -69,7 +69,7 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
         $this->workerUpdater->updateIpAddresses($worker, ['b']);
         self::assertSame(['b'], $worker->getIpAddresses());
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
         self::assertSame(['b'], $worker->getIpAddresses());
     }
 }

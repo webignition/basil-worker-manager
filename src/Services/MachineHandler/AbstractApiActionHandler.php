@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\MachineHandler;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
@@ -30,15 +30,15 @@ abstract class AbstractApiActionHandler
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface
      */
-    abstract protected function doAction(Worker $worker): Worker;
+    abstract protected function doAction(Machine $worker): Machine;
 
     /**
-     * @param Worker $worker
+     * @param Machine $worker
      * @param MachineProviderActionInterface::ACTION_* $action
      * @param int $retryCount
      * @return ApiRequestOutcome
      */
-    protected function doHandle(Worker $worker, string $action, int $retryCount): ApiRequestOutcome
+    protected function doHandle(Machine $worker, string $action, int $retryCount): ApiRequestOutcome
     {
         $lastException = null;
 

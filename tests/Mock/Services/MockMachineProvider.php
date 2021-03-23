@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Services\MachineProvider\MachineProvider;
 use Mockery\MockInterface;
 
@@ -22,7 +22,7 @@ class MockMachineProvider
         return $this->mock;
     }
 
-    public function withCreateCall(Worker $worker): self
+    public function withCreateCall(Machine $worker): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
@@ -34,7 +34,7 @@ class MockMachineProvider
         return $this;
     }
 
-    public function withCreateCallThrowingException(Worker $worker, \Exception $exception): self
+    public function withCreateCallThrowingException(Machine $worker, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock

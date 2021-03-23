@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Services\WorkerStore;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -39,12 +39,12 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
 
     public function testStore(): void
     {
-        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $worker = $this->workerStore->store($worker);
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Worker::class, $worker->getId());
+        $retrievedWorker = $this->entityManager->find(Machine::class, $worker->getId());
 
         self::assertEquals($worker, $retrievedWorker);
     }

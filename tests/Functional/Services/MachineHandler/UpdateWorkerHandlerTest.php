@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineHandler;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
@@ -39,7 +39,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private WorkerStore $workerStore;
-    private Worker $worker;
+    private Machine $worker;
 
     protected function setUp(): void
     {
@@ -257,7 +257,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $invalidProvider = 'invalid';
         $expectedLoggedException = new UnsupportedProviderException($invalidProvider);
 
-        ObjectReflector::setProperty($this->worker, Worker::class, 'provider', $invalidProvider);
+        ObjectReflector::setProperty($this->worker, Machine::class, 'provider', $invalidProvider);
         $this->workerStore->store($this->worker);
 
         $exceptionLogger = (new MockExceptionLogger())

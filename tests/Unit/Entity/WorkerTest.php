@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Entity;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,7 @@ class WorkerTest extends TestCase
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $worker = Worker::create($id, $provider);
+        $worker = Machine::create($id, $provider);
 
         self::assertSame($id, $worker->getId());
         self::assertNull($worker->getRemoteId());
@@ -30,7 +30,7 @@ class WorkerTest extends TestCase
     public function testJsonSerialize(): void
     {
         $id = md5('id content');
-        $worker = Worker::create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Machine::create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         self::assertSame(
             [
@@ -48,7 +48,7 @@ class WorkerTest extends TestCase
      * @param string[] $ipAddresses
      * @param string[] $expectedIpAddresses
      */
-    public function testSetGetIpAddresses(Worker $worker, array $ipAddresses, array $expectedIpAddresses): void
+    public function testSetGetIpAddresses(Machine $worker, array $ipAddresses, array $expectedIpAddresses): void
     {
         $worker = $worker->setIpAddresses($ipAddresses);
 
@@ -62,12 +62,12 @@ class WorkerTest extends TestCase
     {
         return [
             'worker has no ip addresses, empty set' => [
-                'worker' => new Worker(),
+                'worker' => new Machine(),
                 'ipAddresses' => [],
                 'expectedIpAddresses' => [],
             ],
             'worker has no ip address, non-repeating, alphabetical order' => [
-                'worker' => new Worker(),
+                'worker' => new Machine(),
                 'ipAddresses' => [
                     'a',
                     'b',
@@ -80,7 +80,7 @@ class WorkerTest extends TestCase
                 ],
             ],
             'worker has no ip address, non-repeating, reverse-alphabetical order' => [
-                'worker' => new Worker(),
+                'worker' => new Machine(),
                 'ipAddresses' => [
                     'c',
                     'b',
@@ -93,7 +93,7 @@ class WorkerTest extends TestCase
                 ],
             ],
             'worker has no ip address, repeating' => [
-                'worker' => new Worker(),
+                'worker' => new Machine(),
                 'ipAddresses' => [
                     'a',
                     'a',

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Asynchronous;
 
 use App\Controller\WorkerController;
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\Worker\State;
 use App\Repository\WorkerRepository;
 use App\Request\WorkerCreateRequest;
@@ -23,7 +23,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     private DropletApi $dropletApi;
     private EntityRefresher $entityRefresher;
     private string $workerId = '';
-    private Worker $worker;
+    private Machine $worker;
 
     protected function setUp(): void
     {
@@ -64,7 +64,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         self::assertSame(202, $response->getStatusCode());
 
         $worker = $this->workerRepository->find($this->workerId);
-        if ($worker instanceof Worker) {
+        if ($worker instanceof Machine) {
             $this->worker = $worker;
         }
 
@@ -75,7 +75,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             $this->fail('Timed out waiting for expected worker state: ' . State::VALUE_UP_ACTIVE);
         }
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
 
         self::assertSame(State::VALUE_UP_ACTIVE, $this->worker->getState());
 
@@ -107,7 +107,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             }
 
             $this->entityRefresher->refreshForEntities([
-                Worker::class,
+                Machine::class,
             ]);
         }
 

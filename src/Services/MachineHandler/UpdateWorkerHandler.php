@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\MachineHandler;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\WorkerRequestInterface;
@@ -39,7 +39,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         );
     }
 
-    protected function doAction(Worker $worker): Worker
+    protected function doAction(Machine $worker): Machine
     {
         return $this->machineProvider->update($worker);
     }
@@ -52,7 +52,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
     public function handle(WorkerRequestInterface $request): ApiRequestOutcome
     {
         $worker = $this->workerRepository->find($request->getWorkerId());
-        if (!$worker instanceof Worker) {
+        if (!$worker instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }
 

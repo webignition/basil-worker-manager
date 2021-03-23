@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
@@ -17,7 +17,7 @@ class MachineProviderTest extends TestCase
     {
         $machineProvider = new MachineProvider([], \Mockery::mock(ExceptionFactory::class));
 
-        $worker = Worker::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $worker = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
         self::expectExceptionObject(
             new UnsupportedProviderException(ProviderInterface::NAME_DIGITALOCEAN)

@@ -2,20 +2,20 @@
 
 namespace App\Repository;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Worker|null find($id, $lockMode = null, $lockVersion = null)
- * @method Worker|null findOneBy(array $criteria, array $orderBy = null)
- * @method Worker[]    findAll()
- * @method Worker[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Machine|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Machine|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Machine[]    findAll()
+ * @method Machine[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class WorkerRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Worker::class);
+        parent::__construct($registry, Machine::class);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -35,7 +35,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function create(Worker $worker): Worker
+    public function create(Machine $worker): Machine
     {
         $createArguments = new DropletApiCreateCallArguments(
             sprintf('%s-%s', $this->prefix, $worker->getName()),
@@ -51,7 +51,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function remove(Worker $worker): Worker
+    public function remove(Machine $worker): Machine
     {
         $this->dropletApi->remove((int) $worker->getRemoteId());
 
@@ -61,14 +61,14 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function hydrate(Worker $worker): Worker
+    public function hydrate(Machine $worker): Machine
     {
         $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
 
         return $this->updateWorker($worker, $dropletEntity);
     }
 
-    private function updateWorker(Worker $worker, DropletEntity $droplet): Worker
+    private function updateWorker(Machine $worker, DropletEntity $droplet): Machine
     {
         $remoteMachine = new RemoteMachine($droplet);
         $this->workerUpdater->updateRemoteId($worker, $remoteMachine->getId());

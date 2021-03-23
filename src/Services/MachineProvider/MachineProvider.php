@@ -2,7 +2,7 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Model\MachineProviderActionInterface;
@@ -31,12 +31,12 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function create(Worker $worker): Worker
+    public function create(Machine $worker): Machine
     {
         return $this->handle(
             $worker,
             MachineProviderActionInterface::ACTION_CREATE,
-            function (MachineProviderInterface $provider, Worker $worker) {
+            function (MachineProviderInterface $provider, Machine $worker) {
                 return $provider->create($worker);
             }
         );
@@ -46,12 +46,12 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function update(Worker $worker): Worker
+    public function update(Machine $worker): Machine
     {
         return $this->handle(
             $worker,
             MachineProviderActionInterface::ACTION_GET,
-            function (MachineProviderInterface $provider, Worker $worker) {
+            function (MachineProviderInterface $provider, Machine $worker) {
                 return $provider->hydrate($worker);
             }
         );
@@ -61,12 +61,12 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function delete(Worker $worker): Worker
+    public function delete(Machine $worker): Machine
     {
         return $this->handle(
             $worker,
             MachineProviderActionInterface::ACTION_DELETE,
-            function (MachineProviderInterface $provider, Worker $worker) {
+            function (MachineProviderInterface $provider, Machine $worker) {
                 return $provider->remove($worker);
             }
         );
@@ -79,10 +79,10 @@ class MachineProvider
      * @throws ExceptionInterface
      */
     private function handle(
-        Worker $worker,
+        Machine $worker,
         string $action,
         callable $callable
-    ): Worker {
+    ): Machine {
         $provider = $this->findProvider($worker);
 
         try {
@@ -95,7 +95,7 @@ class MachineProvider
     /**
      * @throws UnsupportedProviderException
      */
-    private function findProvider(Worker $worker): MachineProviderInterface
+    private function findProvider(Machine $worker): MachineProviderInterface
     {
         foreach ($this->machineProviders as $machineProvider) {
             if ($machineProvider->handles($worker->getProvider())) {

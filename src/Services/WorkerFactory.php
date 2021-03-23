@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\ProviderInterface;
 
 class WorkerFactory
@@ -15,10 +15,10 @@ class WorkerFactory
     /**
      * @param ProviderInterface::NAME_* $provider
      */
-    public function create(string $id, string $provider): Worker
+    public function create(string $id, string $provider): Machine
     {
         return $this->workerStore->store(
-            Worker::create($id, $provider)
+            Machine::create($id, $provider)
         );
     }
 }

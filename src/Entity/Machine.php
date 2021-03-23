@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=WorkerRepository::class)
  */
-class Worker implements \Stringable, \JsonSerializable
+class Machine implements \Stringable, \JsonSerializable
 {
     private const NAME = 'worker-%s';
 
@@ -51,7 +51,7 @@ class Worker implements \Stringable, \JsonSerializable
      */
     public static function create(string $id, string $provider): self
     {
-        $worker = new Worker();
+        $worker = new Machine();
         $worker->id = $id;
         $worker->remote_id = null;
         $worker->state = STATE::VALUE_CREATE_RECEIVED;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\MachineHandler;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\WorkerRequest;
@@ -38,7 +38,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         );
     }
 
-    protected function doAction(Worker $worker): Worker
+    protected function doAction(Machine $worker): Machine
     {
         return $this->machineProvider->create($worker);
     }
@@ -51,7 +51,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
     public function handle(WorkerRequestInterface $request): ApiRequestOutcome
     {
         $worker = $this->workerRepository->find($request->getWorkerId());
-        if (!$worker instanceof Worker) {
+        if (!$worker instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }
 

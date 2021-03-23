@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -44,9 +44,9 @@ class WorkerFactoryTest extends AbstractBaseFunctionalTest
 
         $worker = $this->workerFactory->create($id, $provider);
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Worker::class, $worker->getId());
+        $retrievedWorker = $this->entityManager->find(Machine::class, $worker->getId());
 
         self::assertEquals($worker, $retrievedWorker);
     }

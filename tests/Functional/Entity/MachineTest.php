@@ -10,7 +10,7 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
-class WorkerTest extends AbstractBaseFunctionalTest
+class MachineTest extends AbstractBaseFunctionalTest
 {
     private EntityManagerInterface $entityManager;
     private EntityRefresher $entityRefresher;
@@ -42,8 +42,8 @@ class WorkerTest extends AbstractBaseFunctionalTest
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Machine::class, $machine->getId());
+        $retrievedMachine = $this->entityManager->find(Machine::class, $machine->getId());
 
-        self::assertEquals($machine, $retrievedWorker);
+        self::assertEquals($machine, $retrievedMachine);
     }
 }

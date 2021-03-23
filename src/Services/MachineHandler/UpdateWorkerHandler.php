@@ -12,7 +12,7 @@ use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
-use App\Repository\WorkerRepository;
+use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
@@ -23,7 +23,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
     private const STOP_STATE = State::VALUE_UP_ACTIVE;
 
     public function __construct(
-        WorkerRepository $workerRepository,
+        MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
@@ -31,7 +31,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         private WorkerStateTransitionSequences $stateTransitionSequences,
     ) {
         parent::__construct(
-            $workerRepository,
+            $machineRepository,
             $machineProvider,
             $retryDecider,
             $updateWorkerDispatcher,
@@ -51,7 +51,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
 
     public function handle(WorkerRequestInterface $request): ApiRequestOutcome
     {
-        $worker = $this->workerRepository->find($request->getWorkerId());
+        $worker = $this->machineRepository->find($request->getWorkerId());
         if (!$worker instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }

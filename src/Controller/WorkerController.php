@@ -7,7 +7,7 @@ use App\Message\WorkerRequestMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
-use App\Repository\WorkerRepository;
+use App\Repository\MachineRepository;
 use App\Request\WorkerCreateRequest;
 use App\Response\BadWorkerCreateRequestResponse;
 use App\Services\WorkerFactory;
@@ -27,14 +27,14 @@ class WorkerController extends AbstractController
         WorkerCreateRequest $request,
         WorkerFactory $factory,
         WorkerRequestMessageDispatcher $messageDispatcher,
-        WorkerRepository $workerRepository
+        MachineRepository $machineRepository
     ): Response {
         $id = $request->getId();
         if ('' === $id) {
             return BadWorkerCreateRequestResponse::createIdMissingResponse();
         }
 
-        if ($workerRepository->find($id) instanceof Machine) {
+        if ($machineRepository->find($id) instanceof Machine) {
             return BadWorkerCreateRequestResponse::createIdTakenResponse();
         }
 
@@ -52,9 +52,9 @@ class WorkerController extends AbstractController
     #[Route(self::PATH_STATUS, name: 'status')]
     public function status(
         string $id,
-        WorkerRepository $workerRepository,
+        MachineRepository $machineRepository,
     ): Response {
-        $worker = $workerRepository->find($id);
+        $worker = $machineRepository->find($id);
         if (false === $worker instanceof Machine) {
             return new Response('', 404);
         }

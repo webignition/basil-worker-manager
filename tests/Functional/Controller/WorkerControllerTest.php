@@ -10,7 +10,7 @@ use App\Message\WorkerRequestMessage;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
-use App\Repository\WorkerRepository;
+use App\Repository\MachineRepository;
 use App\Request\WorkerCreateRequest;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -20,16 +20,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WorkerControllerTest extends AbstractBaseFunctionalTest
 {
-    private WorkerRepository $workerRepository;
+    private MachineRepository $machineRepository;
     private MessengerAsserter $messengerAsserter;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $workerRepository = self::$container->get(WorkerRepository::class);
-        if ($workerRepository instanceof WorkerRepository) {
-            $this->workerRepository = $workerRepository;
+        $machineRepository = self::$container->get(MachineRepository::class);
+        if ($machineRepository instanceof MachineRepository) {
+            $this->machineRepository = $machineRepository;
         }
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
@@ -48,7 +48,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
         self::assertSame(202, $response->getStatusCode());
         self::assertInstanceOf(Response::class, $response);
 
-        $workers = $this->workerRepository->findAll();
+        $workers = $this->machineRepository->findAll();
         self::assertCount(1, $workers);
 
         $worker = current($workers);

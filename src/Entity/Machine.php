@@ -4,11 +4,11 @@ namespace App\Entity;
 
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
-use App\Repository\WorkerRepository;
+use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=WorkerRepository::class)
+ * @ORM\Entity(repositoryClass=MachineRepository::class)
  */
 class Machine implements \Stringable, \JsonSerializable
 {

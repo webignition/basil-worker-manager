@@ -12,7 +12,7 @@ use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
-use App\Repository\WorkerRepository;
+use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
@@ -21,7 +21,7 @@ use App\Services\WorkerStore;
 class CreateMachineHandler extends AbstractApiActionHandler implements RequestHandlerInterface
 {
     public function __construct(
-        WorkerRepository $workerRepository,
+        MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
@@ -30,7 +30,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         private WorkerStore $workerStore,
     ) {
         parent::__construct(
-            $workerRepository,
+            $machineRepository,
             $machineProvider,
             $retryDecider,
             $updateWorkerDispatcher,
@@ -50,7 +50,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
 
     public function handle(WorkerRequestInterface $request): ApiRequestOutcome
     {
-        $worker = $this->workerRepository->find($request->getWorkerId());
+        $worker = $this->machineRepository->find($request->getWorkerId());
         if (!$worker instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }

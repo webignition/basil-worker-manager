@@ -7,7 +7,7 @@ namespace App\Tests\Integration\Asynchronous;
 use App\Controller\WorkerController;
 use App\Entity\Machine;
 use App\Model\Worker\State;
-use App\Repository\WorkerRepository;
+use App\Repository\MachineRepository;
 use App\Request\WorkerCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Services\EntityRefresher;
@@ -19,7 +19,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     private const MAX_DURATION_IN_SECONDS = 120;
     private const MICROSECONDS_PER_SECOND = 1000000;
 
-    private WorkerRepository $workerRepository;
+    private MachineRepository $machineRepository;
     private DropletApi $dropletApi;
     private EntityRefresher $entityRefresher;
     private string $workerId = '';
@@ -29,9 +29,9 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     {
         parent::setUp();
 
-        $workerRepository = self::$container->get(WorkerRepository::class);
-        if ($workerRepository instanceof WorkerRepository) {
-            $this->workerRepository = $workerRepository;
+        $machineRepository = self::$container->get(MachineRepository::class);
+        if ($machineRepository instanceof MachineRepository) {
+            $this->machineRepository = $machineRepository;
         }
 
         $digitalOceanClient = self::$container->get(Client::class);
@@ -63,7 +63,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->workerRepository->find($this->workerId);
+        $worker = $this->machineRepository->find($this->workerId);
         if ($worker instanceof Machine) {
             $this->worker = $worker;
         }

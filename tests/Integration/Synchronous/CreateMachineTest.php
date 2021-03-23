@@ -6,7 +6,7 @@ namespace App\Tests\Integration\Synchronous;
 
 use App\Controller\WorkerController;
 use App\Entity\Machine;
-use App\Repository\WorkerRepository;
+use App\Repository\MachineRepository;
 use App\Request\WorkerCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use DigitalOceanV2\Api\Droplet as DropletApi;
@@ -14,16 +14,16 @@ use DigitalOceanV2\Client;
 
 class CreateMachineTest extends AbstractBaseIntegrationTest
 {
-    private WorkerRepository $workerRepository;
+    private MachineRepository $machineRepository;
     private DropletApi $dropletApi;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $workerRepository = self::$container->get(WorkerRepository::class);
-        if ($workerRepository instanceof WorkerRepository) {
-            $this->workerRepository = $workerRepository;
+        $machineRepository = self::$container->get(MachineRepository::class);
+        if ($machineRepository instanceof MachineRepository) {
+            $this->machineRepository = $machineRepository;
         }
 
         $digitalOceanClient = self::$container->get(Client::class);
@@ -52,7 +52,7 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->workerRepository->find($id);
+        $worker = $this->machineRepository->find($id);
         if (false === $worker instanceof Machine) {
             throw new \RuntimeException('Worker entity not created. Verify test droplet has not been created');
         }

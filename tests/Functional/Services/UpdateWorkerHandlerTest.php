@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
+use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -280,13 +281,23 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
     public function testHandleThrowsUnknownRemoteMachineException(): void
     {
-        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
-
         $this->mockHandler->append(new Response(404));
 
         $outcome = $this->handler->handle($this->worker, State::VALUE_UP_ACTIVE, 11);
-        self::assertEquals(ApiRequestOutcome::success(), $outcome);
-        self::assertSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
+
+        self::assertEquals(
+            ApiRequestOutcome::failed(
+                new UnknownRemoteMachineException(
+                    $this->worker->getProvider(),
+                    (string) $this->worker,
+                    MachineProviderActionInterface::ACTION_GET,
+                    new RuntimeException('Not Found', 404)
+                )
+            ),
+            $outcome
+        );
+
+        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->worker->getState());
     }
 
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void

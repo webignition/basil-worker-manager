@@ -50,7 +50,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
 
     public function handle(MachineRequestInterface $request): ApiRequestOutcome
     {
-        $machine = $this->machineRepository->find($request->getWorkerId());
+        $machine = $this->machineRepository->find($request->getMachineId());
         if (!$machine instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }

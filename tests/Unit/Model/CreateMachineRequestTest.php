@@ -13,7 +13,7 @@ class CreateMachineRequestTest extends TestCase
         $workerId = '123';
 
         $request = new \App\Model\MachineRequest($workerId);
-        self::assertSame($workerId, $request->getWorkerId());
+        self::assertSame($workerId, $request->getMachineId());
         self::assertSame(0, $request->getRetryCount());
     }
 }

@@ -51,7 +51,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
 
     public function handle(MachineRequestInterface $request): ApiRequestOutcome
     {
-        $machine = $this->machineRepository->find($request->getWorkerId());
+        $machine = $this->machineRepository->find($request->getMachineId());
         if (!$machine instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }

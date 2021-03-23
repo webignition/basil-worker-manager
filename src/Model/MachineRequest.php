@@ -5,14 +5,14 @@ namespace App\Model;
 class MachineRequest implements MachineRequestInterface
 {
     public function __construct(
-        private string $workerId,
+        private string $machineId,
         private int $retryCount = 0,
     ) {
     }
 
-    public function getWorkerId(): string
+    public function getMachineId(): string
     {
-        return $this->workerId;
+        return $this->machineId;
     }
 
     public function getRetryCount(): int

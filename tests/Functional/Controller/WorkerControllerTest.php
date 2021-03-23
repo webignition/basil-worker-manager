@@ -59,7 +59,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $expectedRequest = new MachineRequest((string) $worker);
         $expectedMessage = MachineRequestMessage::createCreate($expectedRequest);
-        self::assertGreaterThan(0, $expectedRequest->getWorkerId());
+        self::assertGreaterThan(0, $expectedRequest->getMachineId());
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 

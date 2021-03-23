@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\ApiRequest\WorkerRequestInterface;
+use App\Model\ApiRequest\MachineRequestInterface;
 use App\Model\MachineProviderActionInterface;
 
 class MachineRequestMessage implements MachineRequestMessageInterface
@@ -14,16 +14,16 @@ class MachineRequestMessage implements MachineRequestMessageInterface
      */
     private function __construct(
         private string $type,
-        private WorkerRequestInterface $request
+        private MachineRequestInterface $request
     ) {
     }
 
-    public static function createCreate(WorkerRequestInterface $request): self
+    public static function createCreate(MachineRequestInterface $request): self
     {
         return new MachineRequestMessage(MachineProviderActionInterface::ACTION_CREATE, $request);
     }
 
-    public static function createGet(WorkerRequestInterface $request): self
+    public static function createGet(MachineRequestInterface $request): self
     {
         return new MachineRequestMessage(MachineProviderActionInterface::ACTION_GET, $request);
     }
@@ -33,7 +33,7 @@ class MachineRequestMessage implements MachineRequestMessageInterface
         return $this->type;
     }
 
-    public function getRequest(): WorkerRequestInterface
+    public function getRequest(): MachineRequestInterface
     {
         return $this->request;
     }

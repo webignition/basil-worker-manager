@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Services\MachineHandler;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\MachineRequestMessage;
-use App\Model\ApiRequest\WorkerRequest;
+use App\Model\ApiRequest\MachineRequest;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
@@ -55,7 +55,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandleSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new WorkerRequest((string) $worker);
+        $request = new MachineRequest((string) $worker);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCall($worker)
@@ -73,7 +73,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             MachineRequestMessage::createGet(
-                new WorkerRequest((string) $worker, 0)
+                new MachineRequest((string) $worker, 0)
             )
         );
 
@@ -85,7 +85,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new WorkerRequest((string) $worker);
+        $request = new MachineRequest((string) $worker);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($worker, $exception)
@@ -111,10 +111,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new WorkerRequest((string) $worker);
+        $request = new MachineRequest((string) $worker);
         ObjectReflector::setProperty(
             $request,
-            WorkerRequest::class,
+            MachineRequest::class,
             'retryCount',
             $currentRetryCount
         );
@@ -133,7 +133,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->handler->handle($request);
 
-        $expectedRequest = new WorkerRequest(
+        $expectedRequest = new MachineRequest(
             (string) $worker,
             $request->getRetryCount() + 1
         );
@@ -174,10 +174,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new WorkerRequest((string) $worker);
+        $request = new MachineRequest((string) $worker);
         ObjectReflector::setProperty(
             $request,
-            WorkerRequest::class,
+            MachineRequest::class,
             'retryCount',
             $currentRetryCount
         );

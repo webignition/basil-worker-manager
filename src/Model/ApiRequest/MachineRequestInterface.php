@@ -2,9 +2,9 @@
 
 namespace App\Model\ApiRequest;
 
-interface WorkerRequestInterface
+interface MachineRequestInterface
 {
     public function getWorkerId(): string;
     public function getRetryCount(): int;
-    public function incrementRetryCount(): WorkerRequestInterface;
+    public function incrementRetryCount(): MachineRequestInterface;
 }

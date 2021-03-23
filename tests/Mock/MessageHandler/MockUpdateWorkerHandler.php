@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\MessageHandler;
 
-use App\Model\ApiRequest\WorkerRequestInterface;
+use App\Model\ApiRequest\MachineRequestInterface;
 use App\Services\MachineHandler\UpdateWorkerHandler;
 use Mockery\MockInterface;
 
@@ -22,7 +22,7 @@ class MockUpdateWorkerHandler
         return $this->mock;
     }
 
-    public function withHandleCall(WorkerRequestInterface $request): self
+    public function withHandleCall(MachineRequestInterface $request): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock

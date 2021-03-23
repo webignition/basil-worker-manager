@@ -9,7 +9,7 @@ use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
-use App\Model\ApiRequest\WorkerRequest;
+use App\Model\ApiRequest\MachineRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineProviderActionInterface;
@@ -94,7 +94,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $this->worker->setState($currentState);
         $this->workerStore->store($this->worker);
 
-        $request = new WorkerRequest((string) $this->worker, 0);
+        $request = new MachineRequest((string) $this->worker, 0);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals($expectedOutcome, $outcome);
@@ -198,7 +198,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new WorkerRequest((string) $this->worker, 0);
+        $request = new MachineRequest((string) $this->worker, 0);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -229,7 +229,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new WorkerRequest((string) $this->worker, $retryCount);
+        $request = new MachineRequest((string) $this->worker, $retryCount);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -266,7 +266,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new WorkerRequest((string) $this->worker, 0);
+        $request = new MachineRequest((string) $this->worker, 0);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -279,7 +279,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $request = new WorkerRequest((string) $this->worker, 11);
+        $request = new MachineRequest((string) $this->worker, 11);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(

@@ -7,7 +7,7 @@ namespace App\Services\MachineHandler;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcherInterface;
-use App\Model\ApiRequest\WorkerRequestInterface;
+use App\Model\ApiRequest\MachineRequestInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
@@ -49,7 +49,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         return $type === MachineProviderActionInterface::ACTION_GET;
     }
 
-    public function handle(WorkerRequestInterface $request): ApiRequestOutcome
+    public function handle(MachineRequestInterface $request): ApiRequestOutcome
     {
         $worker = $this->machineRepository->find($request->getWorkerId());
         if (!$worker instanceof Machine) {

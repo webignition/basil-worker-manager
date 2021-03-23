@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\ApiRequest\WorkerRequest;
+use App\Model\ApiRequest\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
 use App\Request\WorkerCreateRequest;
@@ -42,7 +42,7 @@ class WorkerController extends AbstractController
 
         $messageDispatcher->dispatch(
             MachineRequestMessage::createCreate(
-                new WorkerRequest((string) $worker)
+                new MachineRequest((string) $worker)
             )
         );
 

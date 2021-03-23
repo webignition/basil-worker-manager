@@ -2,7 +2,7 @@
 
 namespace App\Model\ApiRequest;
 
-class WorkerRequest implements WorkerRequestInterface
+class MachineRequest implements MachineRequestInterface
 {
     public function __construct(
         private string $workerId,

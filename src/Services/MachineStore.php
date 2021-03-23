@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Entity\Machine;
 use Doctrine\ORM\EntityManagerInterface;
 
-class WorkerStore
+class MachineStore
 {
     public function __construct(
         private EntityManagerInterface $entityManager

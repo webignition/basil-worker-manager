@@ -8,7 +8,7 @@ use App\Model\ProviderInterface;
 class MachineFactory
 {
     public function __construct(
-        private WorkerStore $workerStore
+        private MachineStore $workerStore
     ) {
     }
 

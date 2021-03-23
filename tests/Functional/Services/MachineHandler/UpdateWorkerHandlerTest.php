@@ -18,7 +18,7 @@ use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
 use App\Services\MachineHandler\UpdateWorkerHandler;
-use App\Services\WorkerStore;
+use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -38,7 +38,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     private UpdateWorkerHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
-    private WorkerStore $workerStore;
+    private MachineStore $workerStore;
     private Machine $worker;
 
     protected function setUp(): void
@@ -65,8 +65,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
             $this->messengerAsserter = $messengerAsserter;
         }
 
-        $workerStore = self::$container->get(WorkerStore::class);
-        if ($workerStore instanceof WorkerStore) {
+        $workerStore = self::$container->get(MachineStore::class);
+        if ($workerStore instanceof MachineStore) {
             $this->workerStore = $workerStore;
         }
     }

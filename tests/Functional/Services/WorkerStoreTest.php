@@ -6,14 +6,14 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Model\ProviderInterface;
-use App\Services\WorkerStore;
+use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
 class WorkerStoreTest extends AbstractBaseFunctionalTest
 {
-    private WorkerStore $workerStore;
+    private MachineStore $workerStore;
     private EntityManagerInterface $entityManager;
     private EntityRefresher $entityRefresher;
 
@@ -21,8 +21,8 @@ class WorkerStoreTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $workerStore = self::$container->get(WorkerStore::class);
-        if ($workerStore instanceof WorkerStore) {
+        $workerStore = self::$container->get(MachineStore::class);
+        if ($workerStore instanceof MachineStore) {
             $this->workerStore = $workerStore;
         }
 

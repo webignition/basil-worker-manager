@@ -8,7 +8,7 @@ use App\Model\Worker\State;
 class WorkerUpdater
 {
     public function __construct(
-        private WorkerStore $workerStore,
+        private MachineStore $workerStore,
     ) {
     }
 

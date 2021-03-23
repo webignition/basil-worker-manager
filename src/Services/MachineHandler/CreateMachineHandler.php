@@ -16,7 +16,7 @@ use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\WorkerStore;
+use App\Services\MachineStore;
 
 class CreateMachineHandler extends AbstractApiActionHandler implements RequestHandlerInterface
 {
@@ -27,7 +27,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineRequestMessageDispatcherInterface $createDispatcher,
-        private WorkerStore $workerStore,
+        private MachineStore $workerStore,
     ) {
         parent::__construct(
             $machineRepository,

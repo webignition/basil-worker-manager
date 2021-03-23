@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\MessageHandler;
 
-use App\Entity\Worker;
+use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Services\MachineHandler\CreateMachineHandler;
 use Mockery\MockInterface;
 
@@ -22,12 +22,12 @@ class MockCreateMachineHandler
         return $this->mock;
     }
 
-    public function withHandleCall(Worker $worker, int $retryCount): self
+    public function withHandleCall(WorkerRequestInterface $request): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive('handle')
-                ->with($worker, $retryCount);
+                ->with($request);
         }
 
         return $this;

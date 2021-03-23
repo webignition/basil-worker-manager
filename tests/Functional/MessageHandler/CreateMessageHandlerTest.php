@@ -37,20 +37,6 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         }
     }
 
-    public function testInvokeUnknownWorker(): void
-    {
-        $request = new WorkerRequest('');
-        $message = new CreateMessage($request);
-
-        $createMachineHandler = (new MockCreateMachineHandler())
-            ->withoutHandleCall()
-            ->getMock();
-
-        $this->setCreateMachineHandler($createMachineHandler);
-
-        ($this->handler)($message);
-    }
-
     public function testInvokeSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
@@ -58,7 +44,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
-            ->withHandleCall($worker, $request->getRetryCount())
+            ->withHandleCall($request)
             ->getMock();
 
         $this->setCreateMachineHandler($createMachineHandler);

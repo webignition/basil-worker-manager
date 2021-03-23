@@ -68,7 +68,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
@@ -98,7 +98,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
@@ -132,7 +132,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $expectedRequest = new WorkerRequest(
             (string) $worker,
@@ -195,7 +195,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareFactory($machineProvider, $exceptionLogger);
 
-        $this->handler->handle($worker, $request->getRetryCount());
+        $this->handler->handle($request);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $worker->getState());
@@ -228,7 +228,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         ObjectReflector::setProperty(
             $this->handler,
-            \App\Services\MachineHandler\CreateMachineHandler::class,
+            CreateMachineHandler::class,
             'machineProvider',
             $machineProvider
         );
@@ -238,7 +238,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         ObjectReflector::setProperty(
             $this->handler,
-            \App\Services\MachineHandler\CreateMachineHandler::class,
+            CreateMachineHandler::class,
             'exceptionLogger',
             $exceptionLogger
         );

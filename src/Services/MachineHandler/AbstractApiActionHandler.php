@@ -10,6 +10,7 @@ use App\Exception\UnsupportedProviderException;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
+use App\Repository\WorkerRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
@@ -17,6 +18,7 @@ use App\Services\MachineProvider\MachineProvider;
 abstract class AbstractApiActionHandler
 {
     public function __construct(
+        protected WorkerRepository $workerRepository,
         protected MachineProvider $machineProvider,
         protected ApiActionRetryDecider $retryDecider,
         protected WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,

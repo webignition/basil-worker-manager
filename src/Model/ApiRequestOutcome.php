@@ -7,6 +7,7 @@ class ApiRequestOutcome implements \Stringable
     public const STATE_SUCCESS = 'success';
     public const STATE_FAILED = 'failed';
     public const STATE_RETRYING = 'retrying';
+    public const STATE_INVALID = 'invalid';
 
     /**
      * @param self::STATE_* $state
@@ -30,6 +31,11 @@ class ApiRequestOutcome implements \Stringable
     public static function retrying(): self
     {
         return new ApiRequestOutcome(self::STATE_RETRYING);
+    }
+
+    public static function invalid(): self
+    {
+        return new ApiRequestOutcome(self::STATE_INVALID);
     }
 
     /**

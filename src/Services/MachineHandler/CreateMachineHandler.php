@@ -43,6 +43,11 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         return $this->machineProvider->create($worker);
     }
 
+    public function handles(string $type): bool
+    {
+        return $type === MachineProviderActionInterface::ACTION_CREATE;
+    }
+
     public function handle(WorkerRequestInterface $request): ApiRequestOutcome
     {
         $worker = $this->workerRepository->find($request->getWorkerId());

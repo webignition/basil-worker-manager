@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Mock\MessageHandler;
 
 use App\Model\ApiRequest\WorkerRequestInterface;
+use App\Model\MachineProviderActionInterface;
 use App\Services\MachineHandler\CreateMachineHandler;
 use Mockery\MockInterface;
 
@@ -20,6 +21,22 @@ class MockCreateMachineHandler
     public function getMock(): CreateMachineHandler
     {
         return $this->mock;
+    }
+
+    /**
+     * @param MachineProviderActionInterface::ACTION_* $type
+     * @param bool $handles
+     */
+    public function withHandlesCall(string $type, bool $handles): self
+    {
+        if ($this->mock instanceof MockInterface) {
+            $this->mock
+                ->shouldReceive('handles')
+                ->with($type)
+                ->andReturn($handles);
+        }
+
+        return $this;
     }
 
     public function withHandleCall(WorkerRequestInterface $request): self

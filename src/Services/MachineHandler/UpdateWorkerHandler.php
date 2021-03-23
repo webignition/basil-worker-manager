@@ -44,6 +44,11 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         return $this->machineProvider->update($worker);
     }
 
+    public function handles(string $type): bool
+    {
+        return $type === MachineProviderActionInterface::ACTION_GET;
+    }
+
     public function handle(WorkerRequestInterface $request): ApiRequestOutcome
     {
         $worker = $this->workerRepository->find($request->getWorkerId());

@@ -38,7 +38,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     private UpdateMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
-    private MachineStore $workerStore;
+    private MachineStore $machineStore;
     private Machine $machine;
 
     protected function setUp(): void
@@ -65,9 +65,9 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
             $this->messengerAsserter = $messengerAsserter;
         }
 
-        $workerStore = self::$container->get(MachineStore::class);
-        if ($workerStore instanceof MachineStore) {
-            $this->workerStore = $workerStore;
+        $machineStore = self::$container->get(MachineStore::class);
+        if ($machineStore instanceof MachineStore) {
+            $this->machineStore = $machineStore;
         }
     }
 
@@ -92,7 +92,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->mockHandler->append(...$httpFixtures);
 
         $this->machine->setState($currentState);
-        $this->workerStore->store($this->machine);
+        $this->machineStore->store($this->machine);
 
         $request = new MachineRequest((string) $this->machine, 0);
         $outcome = $this->handler->handle($request);
@@ -258,7 +258,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $expectedLoggedException = new UnsupportedProviderException($invalidProvider);
 
         ObjectReflector::setProperty($this->machine, Machine::class, 'provider', $invalidProvider);
-        $this->workerStore->store($this->machine);
+        $this->machineStore->store($this->machine);
 
         $exceptionLogger = (new MockExceptionLogger())
             ->withLogCall($expectedLoggedException)

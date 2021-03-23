@@ -8,7 +8,7 @@ use App\Model\MachineRequestInterface;
 use App\Services\MachineHandler\UpdateMachineHandler;
 use Mockery\MockInterface;
 
-class MockUpdateWorkerHandler
+class MockUpdateMachineHandler
 {
     private UpdateMachineHandler $mock;
 

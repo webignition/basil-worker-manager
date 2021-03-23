@@ -7,21 +7,21 @@ namespace App\Tests\Functional\Services;
 use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
-use App\Services\WorkerUpdater;
+use App\Services\MachineUpdater;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
 
 class WorkerUpdaterTest extends AbstractBaseFunctionalTest
 {
-    private WorkerUpdater $workerUpdater;
+    private MachineUpdater $workerUpdater;
     private EntityRefresher $entityRefresher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $workerUpdater = self::$container->get(WorkerUpdater::class);
-        if ($workerUpdater instanceof WorkerUpdater) {
+        $workerUpdater = self::$container->get(MachineUpdater::class);
+        if ($workerUpdater instanceof MachineUpdater) {
             $this->workerUpdater = $workerUpdater;
         }
 

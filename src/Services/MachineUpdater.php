@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Entity\Machine;
 use App\Model\Worker\State;
 
-class WorkerUpdater
+class MachineUpdater
 {
     public function __construct(
         private MachineStore $workerStore,

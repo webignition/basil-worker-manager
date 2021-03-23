@@ -18,7 +18,7 @@ use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStateTransitionSequences;
 
-class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHandlerInterface
+class UpdateMachineHandler extends AbstractApiActionHandler implements RequestHandlerInterface
 {
     private const STOP_STATE = State::VALUE_UP_ACTIVE;
 

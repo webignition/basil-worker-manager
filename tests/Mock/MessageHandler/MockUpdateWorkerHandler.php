@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Tests\Mock\MessageHandler;
 
 use App\Model\MachineRequestInterface;
-use App\Services\MachineHandler\UpdateWorkerHandler;
+use App\Services\MachineHandler\UpdateMachineHandler;
 use Mockery\MockInterface;
 
 class MockUpdateWorkerHandler
 {
-    private UpdateWorkerHandler $mock;
+    private UpdateMachineHandler $mock;
 
     public function __construct()
     {
-        $this->mock = \Mockery::mock(UpdateWorkerHandler::class);
+        $this->mock = \Mockery::mock(UpdateMachineHandler::class);
     }
 
-    public function getMock(): UpdateWorkerHandler
+    public function getMock(): UpdateMachineHandler
     {
         return $this->mock;
     }

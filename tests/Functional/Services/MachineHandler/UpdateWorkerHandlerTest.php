@@ -17,7 +17,7 @@ use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
-use App\Services\MachineHandler\UpdateWorkerHandler;
+use App\Services\MachineHandler\UpdateMachineHandler;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
@@ -35,7 +35,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
-    private UpdateWorkerHandler $handler;
+    private UpdateMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineStore $workerStore;
@@ -45,8 +45,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $handler = self::$container->get(UpdateWorkerHandler::class);
-        if ($handler instanceof UpdateWorkerHandler) {
+        $handler = self::$container->get(UpdateMachineHandler::class);
+        if ($handler instanceof UpdateMachineHandler) {
             $this->handler = $handler;
         }
 
@@ -301,7 +301,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     {
         ObjectReflector::setProperty(
             $this->handler,
-            UpdateWorkerHandler::class,
+            UpdateMachineHandler::class,
             'exceptionLogger',
             $exceptionLogger
         );

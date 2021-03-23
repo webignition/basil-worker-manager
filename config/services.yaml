@@ -100,7 +100,7 @@ services:
             $createDispatcher: '@app.message_dispatcher.create'
             $updateMachineDispatcher: '@app.message_dispatcher.update_worker'
 
-    App\Services\MachineHandler\UpdateWorkerHandler:
+    App\Services\MachineHandler\UpdateMachineHandler:
         arguments:
             $updateMachineDispatcher: '@app.message_dispatcher.update_worker'
 
@@ -153,4 +153,4 @@ services:
         arguments:
             $handlers:
                 - '@App\Services\MachineHandler\CreateMachineHandler'
-                - '@App\Services\MachineHandler\UpdateWorkerHandler'
+                - '@App\Services\MachineHandler\UpdateMachineHandler'

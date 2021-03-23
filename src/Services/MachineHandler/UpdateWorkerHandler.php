@@ -2,30 +2,42 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\MachineHandler;
 
 use App\Entity\Worker;
 use App\Message\UpdateWorkerMessage;
 use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\WorkerRequest;
+use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
+use App\Repository\WorkerRepository;
+use App\Services\ApiActionRetryDecider;
+use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
+use App\Services\WorkerStateTransitionSequences;
 
-class UpdateWorkerHandler extends AbstractApiActionHandler
+class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHandlerInterface
 {
     private const STOP_STATE = State::VALUE_UP_ACTIVE;
 
     public function __construct(
+        WorkerRepository $workerRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
         WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
         private WorkerStateTransitionSequences $stateTransitionSequences,
     ) {
-        parent::__construct($machineProvider, $retryDecider, $updateWorkerDispatcher, $exceptionLogger);
+        parent::__construct(
+            $workerRepository,
+            $machineProvider,
+            $retryDecider,
+            $updateWorkerDispatcher,
+            $exceptionLogger
+        );
     }
 
     protected function doAction(Worker $worker): Worker
@@ -33,15 +45,18 @@ class UpdateWorkerHandler extends AbstractApiActionHandler
         return $this->machineProvider->update($worker);
     }
 
-    /**
-     * @param Worker $worker
-     */
-    public function handle(Worker $worker, int $retryCount): ApiRequestOutcome
+    public function handle(WorkerRequestInterface $request): ApiRequestOutcome
     {
+        $worker = $this->workerRepository->find($request->getWorkerId());
+        if (!$worker instanceof Worker) {
+            return ApiRequestOutcome::invalid();
+        }
+
         if ($this->hasReachedStopStateOrEndState($worker->getState())) {
             return ApiRequestOutcome::success();
         }
 
+        $retryCount = $request->getRetryCount();
         $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_GET, $retryCount);
 
         if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {

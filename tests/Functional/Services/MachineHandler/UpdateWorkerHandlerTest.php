@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\MachineHandler;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
+use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
-use App\Services\UpdateWorkerHandler;
+use App\Services\MachineHandler\UpdateWorkerHandler;
 use App\Services\WorkerFactory;
 use App\Services\WorkerStore;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -93,9 +94,10 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
         $this->worker->setState($currentState);
         $this->workerStore->store($this->worker);
 
-        $response = $this->handler->handle($this->worker, 0);
+        $request = new WorkerRequest((string) $this->worker, 0);
+        $outcome = $this->handler->handle($request);
 
-        self::assertEquals($expectedOutcome, $response);
+        self::assertEquals($expectedOutcome, $outcome);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
     }
 
@@ -196,7 +198,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->handle($this->worker, 0);
+        $request = new WorkerRequest((string) $this->worker, 0);
+        $outcome = $this->handler->handle($request);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -226,7 +229,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->handle($this->worker, $retryCount);
+        $request = new WorkerRequest((string) $this->worker, $retryCount);
+        $outcome = $this->handler->handle($request);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -262,7 +266,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = $this->handler->handle($this->worker, 0);
+        $request = new WorkerRequest((string) $this->worker, 0);
+        $outcome = $this->handler->handle($request);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -274,7 +279,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $outcome = $this->handler->handle($this->worker, 11);
+        $request = new WorkerRequest((string) $this->worker, 11);
+        $outcome = $this->handler->handle($request);
 
         self::assertEquals(
             ApiRequestOutcome::failed(

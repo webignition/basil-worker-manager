@@ -8,7 +8,7 @@ use App\Message\CreateMessage;
 use App\MessageHandler\CreateMessageHandler;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
-use App\Services\CreateMachineHandler;
+use App\Services\MachineHandler\CreateMachineHandler;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\MessageHandler\MockCreateMachineHandler;
@@ -37,20 +37,6 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         }
     }
 
-    public function testInvokeUnknownWorker(): void
-    {
-        $request = new WorkerRequest('');
-        $message = new CreateMessage($request);
-
-        $createMachineHandler = (new MockCreateMachineHandler())
-            ->withoutHandleCall()
-            ->getMock();
-
-        $this->setCreateMachineHandler($createMachineHandler);
-
-        ($this->handler)($message);
-    }
-
     public function testInvokeSuccess(): void
     {
         $worker = $this->workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
@@ -58,7 +44,7 @@ class CreateMessageHandlerTest extends AbstractBaseFunctionalTest
         $message = new CreateMessage($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
-            ->withHandleCall($worker, $request->getRetryCount())
+            ->withHandleCall($request)
             ->getMock();
 
         $this->setCreateMachineHandler($createMachineHandler);

@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Entity\Machine;
 use App\Model\ProviderInterface;
 
-class WorkerFactory
+class MachineFactory
 {
     public function __construct(
         private WorkerStore $workerStore

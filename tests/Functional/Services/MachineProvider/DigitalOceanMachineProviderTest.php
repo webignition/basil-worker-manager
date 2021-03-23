@@ -6,8 +6,8 @@ namespace App\Tests\Functional\Services\MachineProvider;
 
 use App\Entity\Machine;
 use App\Model\ProviderInterface;
+use App\Services\MachineFactory;
 use App\Services\MachineProvider\DigitalOceanMachineProvider;
-use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -30,8 +30,8 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             $this->machineProvider = $digitalOceanMachineProvider;
         }
 
-        $workerFactory = self::$container->get(WorkerFactory::class);
-        if ($workerFactory instanceof WorkerFactory) {
+        $workerFactory = self::$container->get(MachineFactory::class);
+        if ($workerFactory instanceof MachineFactory) {
             $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 

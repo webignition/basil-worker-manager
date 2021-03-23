@@ -9,7 +9,7 @@ use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
-use App\Services\WorkerFactory;
+use App\Services\MachineFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -38,8 +38,8 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
             $this->updateWorkerMessageDispatcher = $updateWorkerMessageDispatcher;
         }
 
-        $workerFactory = self::$container->get(WorkerFactory::class);
-        if ($workerFactory instanceof WorkerFactory) {
+        $workerFactory = self::$container->get(MachineFactory::class);
+        if ($workerFactory instanceof MachineFactory) {
             $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 

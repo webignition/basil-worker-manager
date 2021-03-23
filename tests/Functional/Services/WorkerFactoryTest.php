@@ -6,14 +6,14 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
 use App\Model\ProviderInterface;
-use App\Services\WorkerFactory;
+use App\Services\MachineFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
 class WorkerFactoryTest extends AbstractBaseFunctionalTest
 {
-    private WorkerFactory $workerFactory;
+    private MachineFactory $workerFactory;
     private EntityManagerInterface $entityManager;
     private EntityRefresher $entityRefresher;
 
@@ -21,8 +21,8 @@ class WorkerFactoryTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $workerFactory = self::$container->get(WorkerFactory::class);
-        if ($workerFactory instanceof WorkerFactory) {
+        $workerFactory = self::$container->get(MachineFactory::class);
+        if ($workerFactory instanceof MachineFactory) {
             $this->workerFactory = $workerFactory;
         }
 

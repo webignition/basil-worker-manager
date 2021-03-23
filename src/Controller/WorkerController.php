@@ -10,7 +10,7 @@ use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Response\BadMachineCreateRequestResponse;
-use App\Services\WorkerFactory;
+use App\Services\MachineFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,7 @@ class WorkerController extends AbstractController
     #[Route(self::PATH_CREATE, name: 'create')]
     public function create(
         MachineCreateRequest $request,
-        WorkerFactory $factory,
+        MachineFactory $factory,
         MachineRequestMessageDispatcher $messageDispatcher,
         MachineRepository $machineRepository
     ): Response {

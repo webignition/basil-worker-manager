@@ -12,9 +12,9 @@ use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
+use App\Services\MachineFactory;
 use App\Services\MachineHandler\CreateMachineHandler;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineProvider;
@@ -29,7 +29,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     use MockeryPHPUnitIntegration;
 
     private CreateMachineHandler $handler;
-    private WorkerFactory $workerFactory;
+    private MachineFactory $workerFactory;
     private MessengerAsserter $messengerAsserter;
 
     protected function setUp(): void
@@ -41,8 +41,8 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             $this->handler = $handler;
         }
 
-        $workerFactory = self::$container->get(WorkerFactory::class);
-        if ($workerFactory instanceof WorkerFactory) {
+        $workerFactory = self::$container->get(MachineFactory::class);
+        if ($workerFactory instanceof MachineFactory) {
             $this->workerFactory = $workerFactory;
         }
 

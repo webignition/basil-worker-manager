@@ -16,8 +16,8 @@ use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
+use App\Services\MachineFactory;
 use App\Services\MachineHandler\UpdateWorkerHandler;
-use App\Services\WorkerFactory;
 use App\Services\WorkerStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
@@ -50,8 +50,8 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
             $this->handler = $handler;
         }
 
-        $workerFactory = self::$container->get(WorkerFactory::class);
-        if ($workerFactory instanceof WorkerFactory) {
+        $workerFactory = self::$container->get(MachineFactory::class);
+        if ($workerFactory instanceof MachineFactory) {
             $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 

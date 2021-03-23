@@ -12,8 +12,8 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Services\MachineFactory;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -40,8 +40,8 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
             $this->machineProvider = $machineProvider;
         }
 
-        $workerFactory = self::$container->get(WorkerFactory::class);
-        if ($workerFactory instanceof WorkerFactory) {
+        $workerFactory = self::$container->get(MachineFactory::class);
+        if ($workerFactory instanceof MachineFactory) {
             $this->worker = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 

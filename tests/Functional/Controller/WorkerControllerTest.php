@@ -12,7 +12,7 @@ use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
-use App\Services\WorkerFactory;
+use App\Services\MachineFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -104,8 +104,8 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     public function testCreateIdTaken(): void
     {
         $id = md5('id content');
-        $workerFactory = self::$container->get(WorkerFactory::class);
-        if ($workerFactory instanceof WorkerFactory) {
+        $workerFactory = self::$container->get(MachineFactory::class);
+        if ($workerFactory instanceof MachineFactory) {
             $workerFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
         }
 

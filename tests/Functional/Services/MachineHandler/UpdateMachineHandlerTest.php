@@ -31,7 +31,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
-class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
+class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 

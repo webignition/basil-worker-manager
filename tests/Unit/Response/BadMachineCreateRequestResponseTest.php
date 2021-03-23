@@ -8,7 +8,7 @@ use App\Response\BadMachineCreateRequestResponse;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class BadWorkerCreateRequestResponseTest extends TestCase
+class BadMachineCreateRequestResponseTest extends TestCase
 {
     public function testCreateIdMissingResponse(): void
     {

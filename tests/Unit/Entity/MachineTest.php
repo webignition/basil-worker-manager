@@ -61,12 +61,12 @@ class MachineTest extends TestCase
     public function setGetIpAddressesDataProvider(): array
     {
         return [
-            'worker has no ip addresses, empty set' => [
+            'machine has no ip addresses, empty set' => [
                 'worker' => new Machine(),
                 'ipAddresses' => [],
                 'expectedIpAddresses' => [],
             ],
-            'worker has no ip address, non-repeating, alphabetical order' => [
+            'machine has no ip address, non-repeating, alphabetical order' => [
                 'worker' => new Machine(),
                 'ipAddresses' => [
                     'a',
@@ -79,7 +79,7 @@ class MachineTest extends TestCase
                     'c',
                 ],
             ],
-            'worker has no ip address, non-repeating, reverse-alphabetical order' => [
+            'machine has no ip address, non-repeating, reverse-alphabetical order' => [
                 'worker' => new Machine(),
                 'ipAddresses' => [
                     'c',
@@ -92,7 +92,7 @@ class MachineTest extends TestCase
                     'c',
                 ],
             ],
-            'worker has no ip address, repeating' => [
+            'machine has no ip address, repeating' => [
                 'worker' => new Machine(),
                 'ipAddresses' => [
                     'a',

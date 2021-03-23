@@ -11,18 +11,18 @@ use App\Services\MachineUpdater;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\EntityRefresher;
 
-class WorkerUpdaterTest extends AbstractBaseFunctionalTest
+class MachineUpdaterTest extends AbstractBaseFunctionalTest
 {
-    private MachineUpdater $workerUpdater;
+    private MachineUpdater $machineUpdater;
     private EntityRefresher $entityRefresher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $workerUpdater = self::$container->get(MachineUpdater::class);
-        if ($workerUpdater instanceof MachineUpdater) {
-            $this->workerUpdater = $workerUpdater;
+        $machineUpdater = self::$container->get(MachineUpdater::class);
+        if ($machineUpdater instanceof MachineUpdater) {
+            $this->machineUpdater = $machineUpdater;
         }
 
         $entityRefresher = self::$container->get(EntityRefresher::class);
@@ -36,10 +36,10 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
         $machine = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
         self::assertNull($machine->getRemoteId());
 
-        $machine = $this->workerUpdater->updateRemoteId($machine, 1);
+        $machine = $this->machineUpdater->updateRemoteId($machine, 1);
         self::assertSame(1, $machine->getRemoteId());
 
-        $machine = $this->workerUpdater->updateRemoteId($machine, 2);
+        $machine = $this->machineUpdater->updateRemoteId($machine, 2);
         self::assertSame(2, $machine->getRemoteId());
 
         $this->entityRefresher->refreshForEntity(Machine::class);
@@ -51,7 +51,7 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
         $machine = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
         self::assertSame(State::VALUE_CREATE_RECEIVED, $machine->getState());
 
-        $this->workerUpdater->updateState($machine, State::VALUE_CREATE_REQUESTED);
+        $this->machineUpdater->updateState($machine, State::VALUE_CREATE_REQUESTED);
         self::assertSame(State::VALUE_CREATE_REQUESTED, $machine->getState());
 
         $this->entityRefresher->refreshForEntity(Machine::class);
@@ -63,10 +63,10 @@ class WorkerUpdaterTest extends AbstractBaseFunctionalTest
         $machine = Machine::create('id', ProviderInterface::NAME_DIGITALOCEAN);
         self::assertSame([], $machine->getIpAddresses());
 
-        $this->workerUpdater->updateIpAddresses($machine, ['a']);
+        $this->machineUpdater->updateIpAddresses($machine, ['a']);
         self::assertSame(['a'], $machine->getIpAddresses());
 
-        $this->workerUpdater->updateIpAddresses($machine, ['b']);
+        $this->machineUpdater->updateIpAddresses($machine, ['b']);
         self::assertSame(['b'], $machine->getIpAddresses());
 
         $this->entityRefresher->refreshForEntity(Machine::class);

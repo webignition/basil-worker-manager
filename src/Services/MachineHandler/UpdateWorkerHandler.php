@@ -6,7 +6,7 @@ namespace App\Services\MachineHandler;
 
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
-use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
+use App\MessageDispatcher\MachineRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
@@ -26,7 +26,7 @@ class UpdateWorkerHandler extends AbstractApiActionHandler implements RequestHan
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
-        WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
         private WorkerStateTransitionSequences $stateTransitionSequences,
     ) {

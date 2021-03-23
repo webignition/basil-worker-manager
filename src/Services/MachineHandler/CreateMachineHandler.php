@@ -6,7 +6,7 @@ namespace App\Services\MachineHandler;
 
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
-use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
+use App\MessageDispatcher\MachineRequestMessageDispatcherInterface;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Model\ApiRequestOutcome;
@@ -24,9 +24,9 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
-        WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        MachineRequestMessageDispatcherInterface $updateWorkerDispatcher,
         ExceptionLogger $exceptionLogger,
-        private WorkerRequestMessageDispatcherInterface $createDispatcher,
+        private MachineRequestMessageDispatcherInterface $createDispatcher,
         private WorkerStore $workerStore,
     ) {
         parent::__construct(

@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
-use App\MessageDispatcher\WorkerRequestMessageDispatcher;
+use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
 use App\Services\WorkerFactory;
@@ -19,8 +19,8 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
-    private WorkerRequestMessageDispatcher $defaultDispatcher;
-    private WorkerRequestMessageDispatcher $updateWorkerMessageDispatcher;
+    private MachineRequestMessageDispatcher $defaultDispatcher;
+    private MachineRequestMessageDispatcher $updateWorkerMessageDispatcher;
     private MessengerAsserter $messengerAsserter;
     private Machine $worker;
 
@@ -28,13 +28,13 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $defaultDispatcher = self::$container->get(WorkerRequestMessageDispatcher::class);
-        if ($defaultDispatcher instanceof WorkerRequestMessageDispatcher) {
+        $defaultDispatcher = self::$container->get(MachineRequestMessageDispatcher::class);
+        if ($defaultDispatcher instanceof MachineRequestMessageDispatcher) {
             $this->defaultDispatcher = $defaultDispatcher;
         }
 
         $updateWorkerMessageDispatcher = self::$container->get('app.message_dispatcher.update_worker');
-        if ($updateWorkerMessageDispatcher instanceof WorkerRequestMessageDispatcher) {
+        if ($updateWorkerMessageDispatcher instanceof MachineRequestMessageDispatcher) {
             $this->updateWorkerMessageDispatcher = $updateWorkerMessageDispatcher;
         }
 

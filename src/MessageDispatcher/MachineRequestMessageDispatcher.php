@@ -9,7 +9,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-class WorkerRequestMessageDispatcher implements WorkerRequestMessageDispatcherInterface
+class MachineRequestMessageDispatcher implements MachineRequestMessageDispatcherInterface
 {
     public function __construct(
         private MessageBusInterface $messageBus,

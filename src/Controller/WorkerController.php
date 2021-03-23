@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
-use App\MessageDispatcher\WorkerRequestMessageDispatcher;
+use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
@@ -26,7 +26,7 @@ class WorkerController extends AbstractController
     public function create(
         WorkerCreateRequest $request,
         WorkerFactory $factory,
-        WorkerRequestMessageDispatcher $messageDispatcher,
+        MachineRequestMessageDispatcher $messageDispatcher,
         MachineRepository $machineRepository
     ): Response {
         $id = $request->getId();

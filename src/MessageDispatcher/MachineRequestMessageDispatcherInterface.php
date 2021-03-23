@@ -6,7 +6,7 @@ namespace App\MessageDispatcher;
 
 use App\Message\MachineRequestMessageInterface;
 
-interface WorkerRequestMessageDispatcherInterface
+interface MachineRequestMessageDispatcherInterface
 {
     public function dispatch(MachineRequestMessageInterface $message): void;
 }

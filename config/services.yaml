@@ -88,10 +88,10 @@ services:
               !php/const App\Model\MachineProviderActionInterface::ACTION_GET: '%update_retry_limit%'
 
     app.message_dispatcher.create:
-        class: App\MessageDispatcher\WorkerRequestMessageDispatcher
+        class: App\MessageDispatcher\MachineRequestMessageDispatcher
 
     app.message_dispatcher.update_worker:
-        class: App\MessageDispatcher\WorkerRequestMessageDispatcher
+        class: App\MessageDispatcher\MachineRequestMessageDispatcher
         arguments:
             $dispatchDelayInSeconds: '%update_worker_dispatch_delay%'
 

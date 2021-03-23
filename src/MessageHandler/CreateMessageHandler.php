@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\Worker;
 use App\Message\CreateMessage;
 use App\Repository\WorkerRepository;
-use App\Services\CreateMachineHandler;
+use App\Services\MachineHandler\CreateMachineHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class CreateMessageHandler extends AbstractWorkerRequestHandler implements MessageHandlerInterface

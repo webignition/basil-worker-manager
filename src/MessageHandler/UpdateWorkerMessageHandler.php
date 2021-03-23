@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\Worker;
 use App\Message\UpdateWorkerMessage;
 use App\Repository\WorkerRepository;
-use App\Services\UpdateWorkerHandler;
+use App\Services\MachineHandler\UpdateWorkerHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class UpdateWorkerMessageHandler extends AbstractWorkerRequestHandler implements MessageHandlerInterface

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Mock\MessageHandler;
 
 use App\Entity\Worker;
-use App\Services\UpdateWorkerHandler;
+use App\Services\MachineHandler\UpdateWorkerHandler;
 use Mockery\MockInterface;
 
 class MockUpdateWorkerHandler

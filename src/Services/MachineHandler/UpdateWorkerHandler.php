@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\MachineHandler;
 
 use App\Entity\Worker;
 use App\Message\UpdateWorkerMessage;
@@ -12,7 +12,10 @@ use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
 use App\Model\Worker\StateTransitionSequence;
+use App\Services\ApiActionRetryDecider;
+use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
+use App\Services\WorkerStateTransitionSequences;
 
 class UpdateWorkerHandler extends AbstractApiActionHandler
 {

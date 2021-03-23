@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\MachineHandler;
 
 use App\Entity\Worker;
 use App\Exception\MachineProvider\AuthenticationException;
@@ -15,7 +15,7 @@ use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Services\ExceptionLogger;
-use App\Services\UpdateWorkerHandler;
+use App\Services\MachineHandler\UpdateWorkerHandler;
 use App\Services\WorkerFactory;
 use App\Services\WorkerStore;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -295,7 +295,7 @@ class UpdateWorkerHandlerTest extends AbstractBaseFunctionalTest
     {
         ObjectReflector::setProperty(
             $this->handler,
-            UpdateWorkerHandler::class,
+            \App\Services\MachineHandler\UpdateWorkerHandler::class,
             'exceptionLogger',
             $exceptionLogger
         );

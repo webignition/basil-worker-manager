@@ -8,7 +8,7 @@ use App\Message\CreateMessage;
 use App\MessageHandler\CreateMessageHandler;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
-use App\Services\CreateMachineHandler;
+use App\Services\MachineHandler\CreateMachineHandler;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\MessageHandler\MockCreateMachineHandler;

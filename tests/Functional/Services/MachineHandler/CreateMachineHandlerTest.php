@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services;
+namespace App\Tests\Functional\Services\MachineHandler;
 
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
@@ -12,8 +12,8 @@ use App\Model\ApiRequest\WorkerRequest;
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
-use App\Services\CreateMachineHandler;
 use App\Services\ExceptionLogger;
+use App\Services\MachineHandler\CreateMachineHandler;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -228,7 +228,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         ObjectReflector::setProperty(
             $this->handler,
-            CreateMachineHandler::class,
+            \App\Services\MachineHandler\CreateMachineHandler::class,
             'machineProvider',
             $machineProvider
         );
@@ -238,7 +238,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         ObjectReflector::setProperty(
             $this->handler,
-            CreateMachineHandler::class,
+            \App\Services\MachineHandler\CreateMachineHandler::class,
             'exceptionLogger',
             $exceptionLogger
         );

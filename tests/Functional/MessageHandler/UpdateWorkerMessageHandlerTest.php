@@ -8,7 +8,7 @@ use App\Message\UpdateWorkerMessage;
 use App\MessageHandler\UpdateWorkerMessageHandler;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
-use App\Services\UpdateWorkerHandler;
+use App\Services\MachineHandler\UpdateWorkerHandler;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\MessageHandler\MockUpdateWorkerHandler;

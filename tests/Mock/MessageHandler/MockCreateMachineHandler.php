@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Mock\MessageHandler;
 
 use App\Entity\Worker;
-use App\Services\CreateMachineHandler;
+use App\Services\MachineHandler\CreateMachineHandler;
 use Mockery\MockInterface;
 
 class MockCreateMachineHandler

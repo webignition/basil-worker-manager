@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\MachineHandler;
 
 use App\Entity\Worker;
 use App\Message\CreateMessage;
@@ -12,7 +12,10 @@ use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
 use App\Model\Worker\State;
+use App\Services\ApiActionRetryDecider;
+use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
+use App\Services\WorkerStore;
 
 class CreateMachineHandler extends AbstractApiActionHandler
 {

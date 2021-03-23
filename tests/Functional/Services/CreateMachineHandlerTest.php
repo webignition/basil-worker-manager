@@ -75,7 +75,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             new UpdateWorkerMessage(
-                new UpdateWorkerRequest((string) $worker, State::VALUE_UP_ACTIVE, 0)
+                new UpdateWorkerRequest((string) $worker, 0)
             )
         );
 

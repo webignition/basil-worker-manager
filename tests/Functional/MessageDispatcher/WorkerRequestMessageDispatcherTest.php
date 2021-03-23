@@ -11,7 +11,6 @@ use App\MessageDispatcher\WorkerRequestMessageDispatcher;
 use App\Model\ApiRequest\UpdateWorkerRequest;
 use App\Model\ApiRequest\WorkerRequest;
 use App\Model\ProviderInterface;
-use App\Model\Worker\State;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -56,8 +55,6 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $stopState = State::VALUE_UP_ACTIVE;
-
         $this->defaultDispatcher->dispatch(
             new CreateMessage(
                 new WorkerRequest((string) $this->worker, 0)
@@ -82,11 +79,9 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $stopState = State::VALUE_UP_ACTIVE;
-
         $this->updateWorkerMessageDispatcher->dispatch(
             new UpdateWorkerMessage(
-                new UpdateWorkerRequest((string) $this->worker, $stopState, 0)
+                new UpdateWorkerRequest((string) $this->worker, 0)
             )
         );
 
@@ -94,7 +89,7 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             new UpdateWorkerMessage(
-                new UpdateWorkerRequest((string) $this->worker, $stopState, 0)
+                new UpdateWorkerRequest((string) $this->worker, 0)
             )
         );
 

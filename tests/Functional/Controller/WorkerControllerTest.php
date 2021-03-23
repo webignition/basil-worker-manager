@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Controller;
 use App\Controller\WorkerController;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
-use App\Model\ApiRequest\MachineRequest;
+use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Model\Worker\State;
 use App\Repository\MachineRepository;

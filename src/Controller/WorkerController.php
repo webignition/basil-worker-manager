@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\ApiRequest\MachineRequest;
+use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
 use App\Request\WorkerCreateRequest;

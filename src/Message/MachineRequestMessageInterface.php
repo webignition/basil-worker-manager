@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\ApiRequest\MachineRequestInterface;
 use App\Model\MachineProviderActionInterface;
+use App\Model\MachineRequestInterface;
 
 interface MachineRequestMessageInterface
 {

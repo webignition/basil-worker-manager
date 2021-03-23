@@ -7,7 +7,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\ApiRequest\MachineRequest;
+use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Services\WorkerFactory;
 use App\Tests\AbstractBaseFunctionalTest;

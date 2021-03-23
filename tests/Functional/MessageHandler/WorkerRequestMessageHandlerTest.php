@@ -6,8 +6,8 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Message\MachineRequestMessage;
 use App\MessageHandler\MachineRequestMessageHandler;
-use App\Model\ApiRequest\MachineRequest;
 use App\Model\MachineProviderActionInterface;
+use App\Model\MachineRequest;
 use App\Services\MachineHandler\RequestHandlerInterface;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\MessageHandler\MockCreateMachineHandler;

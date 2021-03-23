@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\MachineHandler;
 
-use App\Model\ApiRequest\MachineRequestInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
+use App\Model\MachineRequestInterface;
 
 interface RequestHandlerInterface
 {

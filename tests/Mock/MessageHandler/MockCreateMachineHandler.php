@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\MessageHandler;
 
-use App\Model\ApiRequest\MachineRequestInterface;
 use App\Model\MachineProviderActionInterface;
+use App\Model\MachineRequestInterface;
 use App\Services\MachineHandler\CreateMachineHandler;
 use Mockery\MockInterface;
 

@@ -10,7 +10,7 @@ use App\Model\ProviderInterface;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
-class WorkerTest extends TestCase
+class MachineTest extends TestCase
 {
     public function testCreate(): void
     {

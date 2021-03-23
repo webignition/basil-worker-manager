@@ -30,9 +30,9 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
             $this->machineProvider = $digitalOceanMachineProvider;
         }
 
-        $workerFactory = self::$container->get(MachineFactory::class);
-        if ($workerFactory instanceof MachineFactory) {
-            $this->machine = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machineFactory = self::$container->get(MachineFactory::class);
+        if ($machineFactory instanceof MachineFactory) {
+            $this->machine = $machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $mockHandler = self::$container->get(MockHandler::class);

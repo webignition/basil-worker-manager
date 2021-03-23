@@ -104,9 +104,9 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     public function testCreateIdTaken(): void
     {
         $id = md5('id content');
-        $workerFactory = self::$container->get(MachineFactory::class);
-        if ($workerFactory instanceof MachineFactory) {
-            $workerFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machineFactory = self::$container->get(MachineFactory::class);
+        if ($machineFactory instanceof MachineFactory) {
+            $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $response = $this->makeCreateRequest($id);

@@ -38,9 +38,9 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
             $this->updateWorkerMessageDispatcher = $updateWorkerMessageDispatcher;
         }
 
-        $workerFactory = self::$container->get(MachineFactory::class);
-        if ($workerFactory instanceof MachineFactory) {
-            $this->machine = $workerFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machineFactory = self::$container->get(MachineFactory::class);
+        if ($machineFactory instanceof MachineFactory) {
+            $this->machine = $machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);

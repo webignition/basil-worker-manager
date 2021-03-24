@@ -4,10 +4,19 @@ namespace App\Model;
 
 class MachineRequest implements MachineRequestInterface
 {
+    /**
+     * @param MachineProviderActionInterface::ACTION_* $type
+     */
     public function __construct(
+        private string $type,
         private string $machineId,
         private int $retryCount = 0,
     ) {
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 
     public function getMachineId(): string

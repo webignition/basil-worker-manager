@@ -78,7 +78,10 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
 
         $this->updateMachineDispatcher->dispatch(
             MachineRequestMessage::createGet(
-                new MachineRequest((string) $machine)
+                new MachineRequest(
+                    MachineProviderActionInterface::ACTION_GET,
+                    (string) $machine
+                )
             )
         );
 

@@ -8,7 +8,7 @@ use App\Model\Machine\StateTransitionSequence;
 use App\Services\MachineStateTransitionSequences;
 use App\Tests\AbstractBaseFunctionalTest;
 
-class WorkerStateTransitionSequencesTest extends AbstractBaseFunctionalTest
+class MachineStateTransitionSequencesTest extends AbstractBaseFunctionalTest
 {
     private MachineStateTransitionSequences $sequences;
 

@@ -46,8 +46,8 @@ class MachineFactoryTest extends AbstractBaseFunctionalTest
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 
-        $retrievedWorker = $this->entityManager->find(Machine::class, $machine->getId());
+        $retrievedEntity = $this->entityManager->find(Machine::class, $machine->getId());
 
-        self::assertEquals($machine, $retrievedWorker);
+        self::assertEquals($machine, $retrievedEntity);
     }
 }

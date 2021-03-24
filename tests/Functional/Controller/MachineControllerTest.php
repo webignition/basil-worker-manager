@@ -121,7 +121,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         );
     }
 
-    public function testStatusWorkerNotFound(): void
+    public function testStatusMachineNotFound(): void
     {
         $id = md5('id content');
 

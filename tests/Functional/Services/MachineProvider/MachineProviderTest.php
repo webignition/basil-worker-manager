@@ -53,7 +53,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $this->assertMutateWorker(function (Machine $machine) {
+        $this->assertMutateMachine(function (Machine $machine) {
             $this->machineProvider->create($machine);
         });
     }
@@ -109,7 +109,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testUpdateSuccess(): void
     {
-        $this->assertMutateWorker(function (Machine $machine) {
+        $this->assertMutateMachine(function (Machine $machine) {
             $this->machineProvider->update($machine);
         });
     }
@@ -168,7 +168,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         );
     }
 
-    private function assertMutateWorker(callable $callable): void
+    private function assertMutateMachine(callable $callable): void
     {
         $remoteId = 123;
         $ipAddresses = ['10.0.0.1', '127.0.0.1', ];

@@ -14,7 +14,7 @@ use App\Tests\Mock\MessageHandler\MockCreateMachineHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\ObjectReflector\ObjectReflector;
 
-class WorkerRequestMessageHandlerTest extends AbstractBaseFunctionalTest
+class MachineRequestMessageHandlerTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 

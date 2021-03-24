@@ -15,12 +15,12 @@ use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
-class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
+class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
     private MachineRequestMessageDispatcher $defaultDispatcher;
-    private MachineRequestMessageDispatcher $updateWorkerMessageDispatcher;
+    private MachineRequestMessageDispatcher $updateMachineMessageDispatcher;
     private MessengerAsserter $messengerAsserter;
     private Machine $machine;
 
@@ -33,9 +33,9 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
             $this->defaultDispatcher = $defaultDispatcher;
         }
 
-        $updateWorkerMessageDispatcher = self::$container->get('app.message_dispatcher.update_worker');
-        if ($updateWorkerMessageDispatcher instanceof MachineRequestMessageDispatcher) {
-            $this->updateWorkerMessageDispatcher = $updateWorkerMessageDispatcher;
+        $updateMachineMessageDispatcher = self::$container->get('app.message_dispatcher.update_worker');
+        if ($updateMachineMessageDispatcher instanceof MachineRequestMessageDispatcher) {
+            $this->updateMachineMessageDispatcher = $updateMachineMessageDispatcher;
         }
 
         $machineFactory = self::$container->get(MachineFactory::class);
@@ -73,11 +73,11 @@ class WorkerRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         );
     }
 
-    public function testWorkerUpdateDispatcherDispatch(): void
+    public function testMachineUpdateDispatcherDispatch(): void
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $this->updateWorkerMessageDispatcher->dispatch(
+        $this->updateMachineMessageDispatcher->dispatch(
             MachineRequestMessage::createGet(
                 new MachineRequest((string) $this->machine, 0)
             )

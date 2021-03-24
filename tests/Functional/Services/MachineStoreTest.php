@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class MachineStoreTest extends AbstractBaseFunctionalTest
 {
-    private MachineStore $workerStore;
+    private MachineStore $machineStore;
     private EntityManagerInterface $entityManager;
     private EntityRefresher $entityRefresher;
 
@@ -23,7 +23,7 @@ class MachineStoreTest extends AbstractBaseFunctionalTest
 
         $machineStore = self::$container->get(MachineStore::class);
         if ($machineStore instanceof MachineStore) {
-            $this->workerStore = $machineStore;
+            $this->machineStore = $machineStore;
         }
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
@@ -40,7 +40,7 @@ class MachineStoreTest extends AbstractBaseFunctionalTest
     public function testStore(): void
     {
         $machine = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $machine = $this->workerStore->store($machine);
+        $machine = $this->machineStore->store($machine);
 
         $this->entityRefresher->refreshForEntity(Machine::class);
 

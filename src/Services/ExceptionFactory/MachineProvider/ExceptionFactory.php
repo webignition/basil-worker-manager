@@ -4,7 +4,7 @@ namespace App\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\UnknownException;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 
 class ExceptionFactory
 {
@@ -24,7 +24,7 @@ class ExceptionFactory
     }
 
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function create(string $resourceId, string $action, \Throwable $exception): ExceptionInterface
     {

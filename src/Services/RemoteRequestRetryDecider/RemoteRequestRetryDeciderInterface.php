@@ -2,8 +2,8 @@
 
 namespace App\Services\RemoteRequestRetryDecider;
 
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 
 interface RemoteRequestRetryDeciderInterface
 {
@@ -13,7 +13,7 @@ interface RemoteRequestRetryDeciderInterface
     public function handles(string $type): bool;
 
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function decide(string $action, \Throwable $exception): bool;
 }

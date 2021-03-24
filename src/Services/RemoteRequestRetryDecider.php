@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
 
 class RemoteRequestRetryDecider
@@ -14,13 +14,13 @@ class RemoteRequestRetryDecider
     private array $deciders;
 
     /**
-     * @var array<MachineProviderActionInterface::ACTION_*, int>
+     * @var array<RemoteRequestActionInterface::ACTION_*, int>
      */
     private array $retryLimits = [];
 
     /**
      * @param RemoteRequestRetryDeciderInterface[] $deciders
-     * @param array<MachineProviderActionInterface::ACTION_*, int> $retryLimits
+     * @param array<RemoteRequestActionInterface::ACTION_*, int> $retryLimits
      */
     public function __construct(
         array $deciders,
@@ -31,7 +31,7 @@ class RemoteRequestRetryDecider
         });
 
         foreach ($retryLimits as $key => $value) {
-            if (in_array($key, MachineProviderActionInterface::ALL)) {
+            if (in_array($key, RemoteRequestActionInterface::ALL)) {
                 $this->retryLimits[$key] = $value;
             }
         }
@@ -39,7 +39,7 @@ class RemoteRequestRetryDecider
 
     /**
      * @param ProviderInterface::NAME_* $provider
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function decide(string $provider, string $action, int $retryCount, \Throwable $exception): bool
     {

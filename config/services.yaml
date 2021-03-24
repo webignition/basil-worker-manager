@@ -96,12 +96,12 @@ services:
         arguments:
             $dispatchDelayInSeconds: '%update_machine_dispatch_delay%'
 
-    App\Services\MachineHandler\CreateMachineHandler:
+    App\MessageHandler\CreateMachineHandler:
         arguments:
             $createDispatcher: '@app.message_dispatcher.create'
             $updateMachineDispatcher: '@app.message_dispatcher.update_machine'
 
-    App\Services\MachineHandler\UpdateMachineHandler:
+    App\MessageHandler\UpdateMachineHandler:
         arguments:
             $updateMachineDispatcher: '@app.message_dispatcher.update_machine'
 

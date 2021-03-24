@@ -6,7 +6,7 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\MachineController;
 use App\Entity\Machine;
-use App\Message\MachineRequest;
+use App\Message\CreateMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
@@ -56,7 +56,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueCount(1);
 
-        $expectedMessage = MachineRequest::createCreate((string) $machine);
+        $expectedMessage = new CreateMachine((string) $machine);
         self::assertGreaterThan(0, $expectedMessage->getMachineId());
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }

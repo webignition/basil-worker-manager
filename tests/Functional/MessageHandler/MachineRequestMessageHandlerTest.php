@@ -32,10 +32,7 @@ class MachineRequestMessageHandlerTest extends AbstractBaseFunctionalTest
 
     public function testInvokeForCreateAction(): void
     {
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_CREATE,
-            md5('id content')
-        );
+        $request = MachineRequest::createCreate(md5('id content'));
         $message = MachineRequestMessage::createCreate($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())
@@ -50,10 +47,7 @@ class MachineRequestMessageHandlerTest extends AbstractBaseFunctionalTest
 
     public function testInvokeForGetAction(): void
     {
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            md5('id content')
-        );
+        $request = MachineRequest::createGet(md5('id content'));
         $message = MachineRequestMessage::createGet($request);
 
         $createMachineHandler = (new MockCreateMachineHandler())

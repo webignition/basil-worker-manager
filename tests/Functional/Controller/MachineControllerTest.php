@@ -8,7 +8,6 @@ use App\Controller\MachineController;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\Model\Machine\State;
-use App\Model\MachineProviderActionInterface;
 use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
@@ -58,10 +57,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueCount(1);
 
-        $expectedRequest = new MachineRequest(
-            MachineProviderActionInterface::ACTION_CREATE,
-            (string) $machine
-        );
+        $expectedRequest = MachineRequest::createCreate((string) $machine);
         $expectedMessage = MachineRequestMessage::createCreate($expectedRequest);
         self::assertGreaterThan(0, $expectedRequest->getMachineId());
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);

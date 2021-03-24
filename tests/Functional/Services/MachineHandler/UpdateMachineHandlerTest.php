@@ -94,11 +94,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->machine->setState($currentState);
         $this->machineStore->store($this->machine);
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $this->machine,
-            0
-        );
+        $request = MachineRequest::createGet((string) $this->machine);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals($expectedOutcome, $outcome);
@@ -202,11 +198,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $this->machine,
-            0
-        );
+        $request = MachineRequest::createGet((string) $this->machine);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -237,11 +229,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $this->machine,
-            $retryCount
-        );
+        $request = MachineRequest::createGet((string) $this->machine, $retryCount);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -278,11 +266,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $this->machine,
-            0
-        );
+        $request = MachineRequest::createGet((string) $this->machine);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -295,11 +279,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $this->machine,
-            11
-        );
+        $request = MachineRequest::createGet((string) $this->machine, 11);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(

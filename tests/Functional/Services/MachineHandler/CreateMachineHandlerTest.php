@@ -55,10 +55,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandleSuccess(): void
     {
         $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_CREATE,
-            (string) $machine
-        );
+        $request = MachineRequest::createCreate((string) $machine);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCall($machine)
@@ -76,11 +73,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             MachineRequestMessage::createGet(
-                new MachineRequest(
-                    MachineProviderActionInterface::ACTION_GET,
-                    (string) $machine,
-                    0
-                )
+                MachineRequest::createGet((string) $machine)
             )
         );
 
@@ -92,10 +85,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
         $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $machine
-        );
+        $request = MachineRequest::createGet((string) $machine);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($machine, $exception)
@@ -121,10 +111,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $machine
-        );
+        $request = MachineRequest::createGet((string) $machine);
         ObjectReflector::setProperty(
             $request,
             MachineRequest::class,
@@ -146,11 +133,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->handler->handle($request);
 
-        $expectedRequest = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $machine,
-            $request->getRetryCount() + 1
-        );
+        $expectedRequest = MachineRequest::createGet((string) $machine, $request->getRetryCount() + 1);
 
         $expectedMessage = MachineRequestMessage::createCreate($expectedRequest);
 
@@ -188,10 +171,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_GET,
-            (string) $machine
-        );
+        $request = MachineRequest::createGet((string) $machine);
         ObjectReflector::setProperty(
             $request,
             MachineRequest::class,

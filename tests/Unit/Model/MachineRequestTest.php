@@ -10,14 +10,11 @@ use PHPUnit\Framework\TestCase;
 
 class MachineRequestTest extends TestCase
 {
-    public function testCreate(): void
+    public function testCreateCreate(): void
     {
         $machineId = '123';
 
-        $request = new MachineRequest(
-            MachineProviderActionInterface::ACTION_CREATE,
-            $machineId
-        );
+        $request = MachineRequest::createCreate($machineId);
 
         self::assertSame(MachineProviderActionInterface::ACTION_CREATE, $request->getType());
         self::assertSame($machineId, $request->getMachineId());

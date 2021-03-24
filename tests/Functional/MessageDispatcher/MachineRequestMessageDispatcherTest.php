@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\MachineProviderActionInterface;
 use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Services\MachineFactory;
@@ -56,11 +55,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 
         $this->defaultDispatcher->dispatch(
             MachineRequestMessage::createCreate(
-                new MachineRequest(
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    (string) $this->machine,
-                    0
-                )
+                MachineRequest::createGet((string) $this->machine)
             )
         );
 
@@ -68,11 +63,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             MachineRequestMessage::createCreate(
-                new MachineRequest(
-                    MachineProviderActionInterface::ACTION_CREATE,
-                    (string) $this->machine,
-                    0
-                )
+                MachineRequest::createGet((string) $this->machine)
             )
         );
 
@@ -88,11 +79,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 
         $this->updateMachineMessageDispatcher->dispatch(
             MachineRequestMessage::createGet(
-                new MachineRequest(
-                    MachineProviderActionInterface::ACTION_GET,
-                    (string) $this->machine,
-                    0
-                )
+                MachineRequest::createGet((string) $this->machine)
             )
         );
 
@@ -100,11 +87,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             MachineRequestMessage::createGet(
-                new MachineRequest(
-                    MachineProviderActionInterface::ACTION_GET,
-                    (string) $this->machine,
-                    0
-                )
+                MachineRequest::createGet((string) $this->machine)
             )
         );
 

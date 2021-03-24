@@ -7,11 +7,21 @@ class MachineRequest implements MachineRequestInterface
     /**
      * @param MachineProviderActionInterface::ACTION_* $type
      */
-    public function __construct(
+    private function __construct(
         private string $type,
         private string $machineId,
         private int $retryCount = 0,
     ) {
+    }
+
+    public static function createCreate(string $machineId, int $retryCount = 0): self
+    {
+        return new MachineRequest(MachineProviderActionInterface::ACTION_CREATE, $machineId, $retryCount);
+    }
+
+    public static function createGet(string $machineId, int $retryCount = 0): self
+    {
+        return new MachineRequest(MachineProviderActionInterface::ACTION_GET, $machineId, $retryCount);
     }
 
     public function getType(): string

@@ -27,7 +27,7 @@ class MachineStateTransitionSequencesTest extends AbstractBaseFunctionalTest
         $sequences = $this->sequences->getSequences();
 
         foreach ($sequences as $key => $sequence) {
-            $sequenceService = self::$container->get('app.services.worker_state_transition_sequence.' . $key);
+            $sequenceService = self::$container->get('app.services.machine_state_transition_sequence.' . $key);
             self::assertInstanceOf(StateTransitionSequence::class, $sequenceService);
             self::assertSame($sequenceService, $sequence);
         }

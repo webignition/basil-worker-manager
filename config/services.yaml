@@ -104,7 +104,7 @@ services:
         arguments:
             $updateMachineDispatcher: '@app.message_dispatcher.update_machine'
 
-    app.services.worker_state_transition_sequence.create_failed:
+    app.services.machine_state_transition_sequence.create_failed:
         class: App\Model\Machine\StateTransitionSequence
         arguments:
             $states:
@@ -112,7 +112,7 @@ services:
                 - !php/const App\Model\Machine\State::VALUE_CREATE_REQUESTED
                 - !php/const App\Model\Machine\State::VALUE_CREATE_FAILED
 
-    app.services.worker_state_transition_sequence.delete_failed:
+    app.services.machine_state_transition_sequence.delete_failed:
         class: App\Model\Machine\StateTransitionSequence
         arguments:
             $states:
@@ -124,7 +124,7 @@ services:
                 - !php/const App\Model\Machine\State::VALUE_DELETE_REQUESTED
                 - !php/const App\Model\Machine\State::VALUE_DELETE_FAILED
 
-    app.services.worker_state_transition_sequence.delete_deleted:
+    app.services.machine_state_transition_sequence.delete_deleted:
         class: App\Model\Machine\StateTransitionSequence
         arguments:
             $states:
@@ -139,9 +139,9 @@ services:
     App\Services\MachineStateTransitionSequences:
         arguments:
             $sequences:
-                create_failed: '@app.services.worker_state_transition_sequence.create_failed'
-                delete_failed: '@app.services.worker_state_transition_sequence.delete_failed'
-                delete_deleted: '@app.services.worker_state_transition_sequence.delete_deleted'
+                create_failed: '@app.services.machine_state_transition_sequence.create_failed'
+                delete_failed: '@app.services.machine_state_transition_sequence.delete_failed'
+                delete_deleted: '@app.services.machine_state_transition_sequence.delete_deleted'
 
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:

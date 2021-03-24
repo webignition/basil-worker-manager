@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Controller;
 
-use App\Controller\WorkerController;
+use App\Controller\MachineController;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\Model\Machine\State;
@@ -18,7 +18,7 @@ use App\Tests\Services\Asserter\MessengerAsserter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class WorkerControllerTest extends AbstractBaseFunctionalTest
+class MachineControllerTest extends AbstractBaseFunctionalTest
 {
     private MachineRepository $machineRepository;
     private MessengerAsserter $messengerAsserter;
@@ -71,7 +71,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
      */
     public function testCreateIdMissing(array $requestData, array $expectedResponseBody): void
     {
-        $this->client->request('POST', WorkerController::PATH_CREATE, $requestData);
+        $this->client->request('POST', MachineController::PATH_CREATE, $requestData);
 
         $this->assertBadRequestResponse($expectedResponseBody, $this->client->getResponse());
     }
@@ -127,7 +127,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $this->client->request(
             'GET',
-            str_replace(WorkerController::PATH_COMPONENT_ID, $id, WorkerController::PATH_STATUS)
+            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_STATUS)
         );
 
         self::assertSame(404, $this->client->getResponse()->getStatusCode());
@@ -142,7 +142,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $this->client->request(
             'GET',
-            str_replace(WorkerController::PATH_COMPONENT_ID, $id, WorkerController::PATH_STATUS)
+            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_STATUS)
         );
 
         $response = $this->client->getResponse();
@@ -172,7 +172,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     {
         $this->client->request(
             'POST',
-            WorkerController::PATH_CREATE,
+            MachineController::PATH_CREATE,
             [
                 MachineCreateRequest::KEY_ID => $id,
             ]

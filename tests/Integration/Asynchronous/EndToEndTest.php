@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Asynchronous;
 
-use App\Controller\WorkerController;
+use App\Controller\MachineController;
 use App\Entity\Machine;
 use App\Model\Machine\State;
 use App\Repository\MachineRepository;
@@ -54,7 +54,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     {
         $this->client->request(
             'POST',
-            WorkerController::PATH_CREATE,
+            MachineController::PATH_CREATE,
             [
                 MachineCreateRequest::KEY_ID => $this->machineId,
             ]

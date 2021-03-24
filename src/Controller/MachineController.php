@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class WorkerController extends AbstractController
+class MachineController extends AbstractController
 {
     public const PATH_CREATE = '/create';
     public const PATH_COMPONENT_ID = '{id}';

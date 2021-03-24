@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Synchronous;
 
-use App\Controller\WorkerController;
+use App\Controller\MachineController;
 use App\Entity\Machine;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
@@ -43,7 +43,7 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
 
         $this->client->request(
             'POST',
-            WorkerController::PATH_CREATE,
+            MachineController::PATH_CREATE,
             [
                 MachineCreateRequest::KEY_ID => $id,
             ]

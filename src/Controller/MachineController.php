@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\Model\MachineProviderActionInterface;
 use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
@@ -42,7 +43,10 @@ class MachineController extends AbstractController
 
         $messageDispatcher->dispatch(
             MachineRequestMessage::createCreate(
-                new MachineRequest((string) $machine)
+                new MachineRequest(
+                    MachineProviderActionInterface::ACTION_CREATE,
+                    (string) $machine
+                )
             )
         );
 

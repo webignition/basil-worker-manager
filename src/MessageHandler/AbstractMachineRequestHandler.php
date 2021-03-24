@@ -8,8 +8,8 @@ use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\ApiRequestOutcome;
 use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestOutcome;
 use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
@@ -36,16 +36,16 @@ abstract class AbstractMachineRequestHandler
      * @param Machine $machine
      * @param MachineProviderActionInterface::ACTION_* $action
      * @param int $retryCount
-     * @return ApiRequestOutcome
+     * @return RemoteRequestOutcome
      */
-    protected function doHandle(Machine $machine, string $action, int $retryCount): ApiRequestOutcome
+    protected function doHandle(Machine $machine, string $action, int $retryCount): RemoteRequestOutcome
     {
         $lastException = null;
 
         try {
             $this->doAction($machine);
 
-            return ApiRequestOutcome::success();
+            return RemoteRequestOutcome::success();
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
                 $machine->getProvider(),
@@ -61,13 +61,13 @@ abstract class AbstractMachineRequestHandler
         }
 
         if ($shouldRetry) {
-            return ApiRequestOutcome::retrying();
+            return RemoteRequestOutcome::retrying();
         }
 
         if ($lastException instanceof \Throwable) {
             $this->exceptionLogger->log($lastException);
         }
 
-        return ApiRequestOutcome::failed($lastException);
+        return RemoteRequestOutcome::failed($lastException);
     }
 }

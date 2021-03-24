@@ -12,6 +12,7 @@ use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
+use DigitalOceanV2\Exception\RuntimeException;
 
 class DigitalOceanMachineProvider implements MachineProviderInterface
 {
@@ -64,5 +65,23 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         return new RemoteMachine(
             $this->dropletApi->getById((int)$machine->getRemoteId())
         );
+    }
+
+    /**
+     * @throws VendorExceptionInterface
+     */
+    public function exists(Machine $machine): bool
+    {
+        try {
+            $this->dropletApi->getById((int)$machine->getRemoteId());
+        } catch (RuntimeException $runtimeException) {
+            if (404 === $runtimeException->getCode()) {
+                return false;
+            }
+
+            throw $runtimeException;
+        }
+
+        return true;
     }
 }

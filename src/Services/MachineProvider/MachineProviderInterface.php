@@ -24,8 +24,7 @@ interface MachineProviderInterface
      */
     public function remove(Machine $machine): void;
 
-    /**
-     * @throws ExceptionInterface
-     */
     public function get(Machine $machine): RemoteMachineInterface;
+
+    public function exists(Machine $machine): bool;
 }

@@ -2,30 +2,14 @@
 
 namespace App\Model;
 
-class RemoteRequestOutcome implements \Stringable
+class RemoteRequestOutcome implements RemoteRequestOutcomeInterface
 {
-    public const STATE_SUCCESS = 'success';
-    public const STATE_FAILED = 'failed';
-    public const STATE_RETRYING = 'retrying';
-    public const STATE_INVALID = 'invalid';
-
     /**
      * @param self::STATE_* $state
      */
     public function __construct(
         private string $state,
-        private ?\Throwable $exception = null
     ) {
-    }
-
-    public static function success(): self
-    {
-        return new RemoteRequestOutcome(self::STATE_SUCCESS);
-    }
-
-    public static function failed(?\Throwable $exception = null): self
-    {
-        return new RemoteRequestOutcome(self::STATE_FAILED, $exception);
     }
 
     public static function retrying(): self
@@ -38,16 +22,13 @@ class RemoteRequestOutcome implements \Stringable
         return new RemoteRequestOutcome(self::STATE_INVALID);
     }
 
-    /**
-     * @return self::STATE_*
-     */
-    public function __toString(): string
+    public function getState(): string
     {
         return $this->state;
     }
 
-    public function getException(): ?\Throwable
+    public function __toString(): string
     {
-        return $this->exception;
+        return $this->state;
     }
 }

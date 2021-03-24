@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
-use App\Services\ApiActionRetryDecider\ApiActionRetryDeciderInterface;
+use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
 
-class ApiActionRetryDecider
+class RemoteRequestRetryDecider
 {
     /**
-     * @var ApiActionRetryDeciderInterface[]
+     * @var RemoteRequestRetryDeciderInterface[]
      */
     private array $deciders;
 
@@ -19,7 +19,7 @@ class ApiActionRetryDecider
     private array $retryLimits = [];
 
     /**
-     * @param ApiActionRetryDeciderInterface[] $deciders
+     * @param RemoteRequestRetryDeciderInterface[] $deciders
      * @param array<MachineProviderActionInterface::ACTION_*, int> $retryLimits
      */
     public function __construct(
@@ -27,7 +27,7 @@ class ApiActionRetryDecider
         array $retryLimits,
     ) {
         $this->deciders = array_filter($deciders, function ($item) {
-            return $item instanceof ApiActionRetryDeciderInterface;
+            return $item instanceof RemoteRequestRetryDeciderInterface;
         });
 
         foreach ($retryLimits as $key => $value) {

@@ -82,7 +82,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
     public function createIdMissingDataProvider(): array
     {
         $idMissingExpectedResponseBody = [
-            'type' => 'worker-create-request',
+            'type' => 'machine-create-request',
             'message' => 'id missing',
             'code' => 100,
         ];
@@ -113,7 +113,7 @@ class WorkerControllerTest extends AbstractBaseFunctionalTest
 
         $this->assertBadRequestResponse(
             [
-                'type' => 'worker-create-request',
+                'type' => 'machine-create-request',
                 'message' => 'id taken',
                 'code' => 200,
             ],

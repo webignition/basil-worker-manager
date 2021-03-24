@@ -8,7 +8,7 @@ use App\Request\MachineCreateRequest;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class WorkerCreateRequestTest extends TestCase
+class MachineCreateRequestTest extends TestCase
 {
     public function testCreate(): void
     {

@@ -6,7 +6,7 @@ namespace App\Response;
 
 class BadMachineCreateRequestResponse extends ErrorResponse
 {
-    private const TYPE = 'worker-create-request';
+    private const TYPE = 'machine-create-request';
 
     private const CODE_ID_MISSING = 100;
     private const CODE_ID_TAKEN = 200;

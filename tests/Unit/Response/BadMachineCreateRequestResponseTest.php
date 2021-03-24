@@ -22,7 +22,7 @@ class BadMachineCreateRequestResponseTest extends TestCase
         self::assertSame('application/json', $response->headers->get('content-type'));
         self::assertSame(
             [
-                'type' => 'worker-create-request',
+                'type' => 'machine-create-request',
                 'message' => $expectedMessage,
                 'code' => $expectedCode,
             ],

@@ -33,7 +33,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
             $this->defaultDispatcher = $defaultDispatcher;
         }
 
-        $updateMachineMessageDispatcher = self::$container->get('app.message_dispatcher.update_worker');
+        $updateMachineMessageDispatcher = self::$container->get('app.message_dispatcher.update_machine');
         if ($updateMachineMessageDispatcher instanceof MachineRequestMessageDispatcher) {
             $this->updateMachineMessageDispatcher = $updateMachineMessageDispatcher;
         }

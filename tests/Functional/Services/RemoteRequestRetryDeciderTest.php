@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -29,7 +29,7 @@ class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
      * @dataProvider decideDataProvider
      *
      * @param ProviderInterface::NAME_* $provider
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function testDecide(
         string $provider,
@@ -49,14 +49,14 @@ class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
         return [
             'digitalocean ' . ApiLimitExceededException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => MachineProviderActionInterface::ACTION_GET,
+                'action' => RemoteRequestActionInterface::ACTION_GET,
                 'retryCount' => 0,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'digitalocean ' . InvalidArgumentException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => MachineProviderActionInterface::ACTION_GET,
+                'action' => RemoteRequestActionInterface::ACTION_GET,
                 'retryCount' => 0,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,

@@ -10,8 +10,8 @@ use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\MachineFactory;
 use App\Services\MachineProvider\MachineProvider;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -74,7 +74,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineProvider->create($this->machine);
             },
-            MachineProviderActionInterface::ACTION_CREATE,
+            RemoteRequestActionInterface::ACTION_CREATE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -130,7 +130,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineProvider->update($this->machine);
             },
-            MachineProviderActionInterface::ACTION_GET,
+            RemoteRequestActionInterface::ACTION_GET,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -161,7 +161,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineProvider->delete($this->machine);
             },
-            MachineProviderActionInterface::ACTION_DELETE,
+            RemoteRequestActionInterface::ACTION_DELETE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -202,7 +202,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      * @param class-string $expectedExceptionClass
      */
     private function doActionThrowsExceptionTest(

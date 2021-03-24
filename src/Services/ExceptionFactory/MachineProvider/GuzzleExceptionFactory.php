@@ -4,7 +4,7 @@ namespace App\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\CurlException;
 use App\Exception\MachineProvider\ExceptionInterface;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 use GuzzleHttp\Exception\ConnectException;
 
 class GuzzleExceptionFactory implements ExceptionFactoryInterface
@@ -18,7 +18,7 @@ class GuzzleExceptionFactory implements ExceptionFactoryInterface
     }
 
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function create(string $resourceId, string $action, \Throwable $exception): ?ExceptionInterface
     {

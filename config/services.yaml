@@ -85,8 +85,8 @@ services:
             $deciders:
                 - '@App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider'
             $retryLimits:
-              !php/const App\Model\MachineProviderActionInterface::ACTION_CREATE: '%create_retry_limit%'
-              !php/const App\Model\MachineProviderActionInterface::ACTION_GET: '%update_retry_limit%'
+              !php/const App\Model\RemoteRequestActionInterface::ACTION_CREATE: '%create_retry_limit%'
+              !php/const App\Model\RemoteRequestActionInterface::ACTION_GET: '%update_retry_limit%'
 
     app.message_dispatcher.create:
         class: App\MessageDispatcher\MachineRequestMessageDispatcher

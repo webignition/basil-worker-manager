@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider;
 use App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -18,7 +18,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
      * @dataProvider decideDataProvider
      *
      * @param ProviderInterface::NAME_* $provider
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function testDecide(
         RemoteRequestRetryDecider $decider,
@@ -40,7 +40,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
             'no deciders' => [
                 'decider' => new RemoteRequestRetryDecider([], []),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => MachineProviderActionInterface::ACTION_GET,
+                'action' => RemoteRequestActionInterface::ACTION_GET,
                 'retryCount' => 0,
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
@@ -51,11 +51,11 @@ class RemoteRequestRetryDeciderTest extends TestCase
                         new DigitalOceanRemoteRequestRetryDecider(),
                     ],
                     [
-                        MachineProviderActionInterface::ACTION_GET => 10,
+                        RemoteRequestActionInterface::ACTION_GET => 10,
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => MachineProviderActionInterface::ACTION_GET,
+                'action' => RemoteRequestActionInterface::ACTION_GET,
                 'retryCount' => 0,
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
@@ -66,11 +66,11 @@ class RemoteRequestRetryDeciderTest extends TestCase
                         new DigitalOceanRemoteRequestRetryDecider(),
                     ],
                     [
-                        MachineProviderActionInterface::ACTION_GET => 10,
+                        RemoteRequestActionInterface::ACTION_GET => 10,
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => MachineProviderActionInterface::ACTION_GET,
+                'action' => RemoteRequestActionInterface::ACTION_GET,
                 'retryCount' => 0,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
@@ -81,11 +81,11 @@ class RemoteRequestRetryDeciderTest extends TestCase
                         new DigitalOceanRemoteRequestRetryDecider(),
                     ],
                     [
-                        MachineProviderActionInterface::ACTION_GET => 1,
+                        RemoteRequestActionInterface::ACTION_GET => 1,
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => MachineProviderActionInterface::ACTION_GET,
+                'action' => RemoteRequestActionInterface::ACTION_GET,
                 'retryCount' => 1,
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => false,

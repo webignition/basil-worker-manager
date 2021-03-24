@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-interface MachineProviderActionInterface
+interface RemoteRequestActionInterface
 {
     public const ACTION_CREATE = 'create';
     public const ACTION_GET = 'get';

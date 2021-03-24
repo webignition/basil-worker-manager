@@ -3,8 +3,8 @@
 namespace App\Services\RemoteRequestRetryDecider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\RuntimeException;
@@ -31,7 +31,7 @@ class DigitalOceanRemoteRequestRetryDecider implements RemoteRequestRetryDecider
             }
 
             if (404 === $exception->getCode()) {
-                return MachineProviderActionInterface::ACTION_GET === $action;
+                return RemoteRequestActionInterface::ACTION_GET === $action;
             }
         }
 

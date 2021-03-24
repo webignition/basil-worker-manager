@@ -13,8 +13,8 @@ use App\Message\UpdateMachine;
 use App\MessageHandler\UpdateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
@@ -188,7 +188,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedLoggedException = new AuthenticationException(
             (string) $this->machine,
-            MachineProviderActionInterface::ACTION_GET,
+            RemoteRequestActionInterface::ACTION_GET,
             new RuntimeException('Unauthorized', 401)
         );
 
@@ -219,7 +219,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedLoggedException = new HttpException(
             (string) $this->machine,
-            MachineProviderActionInterface::ACTION_GET,
+            RemoteRequestActionInterface::ACTION_GET,
             $expectedRemoteException
         );
 
@@ -287,7 +287,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                 new UnknownRemoteMachineException(
                     $this->machine->getProvider(),
                     (string) $this->machine,
-                    MachineProviderActionInterface::ACTION_GET,
+                    RemoteRequestActionInterface::ACTION_GET,
                     new RuntimeException('Not Found', 404)
                 )
             ),

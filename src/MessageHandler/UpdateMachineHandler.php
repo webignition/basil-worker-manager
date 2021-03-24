@@ -9,7 +9,7 @@ use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
@@ -56,7 +56,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         }
 
         $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_GET, $retryCount);
+        $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_GET, $retryCount);
 
         if (RemoteRequestOutcome::STATE_FAILED === (string) $outcome) {
             return $outcome;

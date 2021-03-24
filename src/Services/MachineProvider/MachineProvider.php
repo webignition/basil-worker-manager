@@ -5,7 +5,7 @@ namespace App\Services\MachineProvider;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 
 class MachineProvider
@@ -35,7 +35,7 @@ class MachineProvider
     {
         return $this->handle(
             $machine,
-            MachineProviderActionInterface::ACTION_CREATE,
+            RemoteRequestActionInterface::ACTION_CREATE,
             function (MachineProviderInterface $provider, Machine $machine) {
                 return $provider->create($machine);
             }
@@ -50,7 +50,7 @@ class MachineProvider
     {
         return $this->handle(
             $machine,
-            MachineProviderActionInterface::ACTION_GET,
+            RemoteRequestActionInterface::ACTION_GET,
             function (MachineProviderInterface $provider, Machine $machine) {
                 return $provider->hydrate($machine);
             }
@@ -65,7 +65,7 @@ class MachineProvider
     {
         return $this->handle(
             $machine,
-            MachineProviderActionInterface::ACTION_DELETE,
+            RemoteRequestActionInterface::ACTION_DELETE,
             function (MachineProviderInterface $provider, Machine $machine) {
                 return $provider->remove($machine);
             }
@@ -73,7 +73,7 @@ class MachineProvider
     }
 
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      *
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface

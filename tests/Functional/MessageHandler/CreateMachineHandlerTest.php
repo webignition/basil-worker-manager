@@ -10,8 +10,8 @@ use App\Message\CreateMachine;
 use App\Message\UpdateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\Machine\State;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
@@ -112,7 +112,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $message = new CreateMachine((string) $machine, $currentRetryCount);
-        $exception = new Exception((string) $machine, MachineProviderActionInterface::ACTION_CREATE, $previous);
+        $exception = new Exception((string) $machine, RemoteRequestActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($machine, $exception)
@@ -163,7 +163,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $message = new CreateMachine((string) $machine, $currentRetryCount);
-        $exception = new Exception((string) $machine, MachineProviderActionInterface::ACTION_CREATE, $previous);
+        $exception = new Exception((string) $machine, RemoteRequestActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($machine, $exception)

@@ -10,7 +10,7 @@ use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Client;
@@ -24,7 +24,7 @@ use webignition\ObjectReflector\ObjectReflector;
 class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
     private const ID = 'resource_id';
-    private const ACTION = MachineProviderActionInterface::ACTION_CREATE;
+    private const ACTION = RemoteRequestActionInterface::ACTION_CREATE;
 
     private DigitalOceanExceptionFactory $factory;
 
@@ -53,7 +53,7 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
     {
         self::assertEquals(
             $expectedException,
-            $this->factory->create(self::ID, MachineProviderActionInterface::ACTION_CREATE, $exception)
+            $this->factory->create(self::ID, RemoteRequestActionInterface::ACTION_CREATE, $exception)
         );
     }
 
@@ -128,7 +128,7 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
             $expectedException,
             $this->factory->create(
                 self::ID,
-                MachineProviderActionInterface::ACTION_CREATE,
+                RemoteRequestActionInterface::ACTION_CREATE,
                 $vendorApiLimitExceedException
             )
         );
@@ -139,7 +139,7 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
         self::assertNull(
             $this->factory->create(
                 self::ID,
-                MachineProviderActionInterface::ACTION_GET,
+                RemoteRequestActionInterface::ACTION_GET,
                 new \Exception()
             )
         );

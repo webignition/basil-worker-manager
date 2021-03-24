@@ -33,7 +33,7 @@ abstract class AbstractMachineRequestHandler
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface
      */
-    abstract protected function doAction(Machine $machine): Machine;
+    abstract protected function doAction(Machine $machine): mixed;
 
     /**
      * @param Machine $machine

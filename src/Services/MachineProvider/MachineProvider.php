@@ -5,7 +5,7 @@ namespace App\Services\MachineProvider;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\Model\RemoteRequestActionInterface;
+use App\Model\RemoteRequestActionInterface as Action;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 
 class MachineProvider
@@ -33,13 +33,13 @@ class MachineProvider
      */
     public function create(Machine $machine): Machine
     {
-        return $this->handle(
-            $machine,
-            RemoteRequestActionInterface::ACTION_CREATE,
-            function (MachineProviderInterface $provider, Machine $machine) {
-                return $provider->create($machine);
-            }
-        );
+        try {
+            return $this->findProvider($machine)->create($machine);
+        } catch (UnsupportedProviderException $unsupportedProviderException) {
+            throw $unsupportedProviderException;
+        } catch (\Exception $exception) {
+            throw $this->exceptionFactory->create((string) $machine, Action::ACTION_CREATE, $exception);
+        }
     }
 
     /**
@@ -48,13 +48,13 @@ class MachineProvider
      */
     public function update(Machine $machine): Machine
     {
-        return $this->handle(
-            $machine,
-            RemoteRequestActionInterface::ACTION_GET,
-            function (MachineProviderInterface $provider, Machine $machine) {
-                return $provider->hydrate($machine);
-            }
-        );
+        try {
+            return $this->findProvider($machine)->hydrate($machine);
+        } catch (UnsupportedProviderException $unsupportedProviderException) {
+            throw $unsupportedProviderException;
+        } catch (\Exception $exception) {
+            throw $this->exceptionFactory->create((string) $machine, Action::ACTION_GET, $exception);
+        }
     }
 
     /**
@@ -63,32 +63,12 @@ class MachineProvider
      */
     public function delete(Machine $machine): Machine
     {
-        return $this->handle(
-            $machine,
-            RemoteRequestActionInterface::ACTION_DELETE,
-            function (MachineProviderInterface $provider, Machine $machine) {
-                return $provider->remove($machine);
-            }
-        );
-    }
-
-    /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
-     *
-     * @throws UnsupportedProviderException
-     * @throws ExceptionInterface
-     */
-    private function handle(
-        Machine $machine,
-        string $action,
-        callable $callable
-    ): Machine {
-        $provider = $this->findProvider($machine);
-
         try {
-            return $callable($provider, $machine);
+            return $this->findProvider($machine)->remove($machine);
+        } catch (UnsupportedProviderException $unsupportedProviderException) {
+            throw $unsupportedProviderException;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create((string) $machine, $action, $exception);
+            throw $this->exceptionFactory->create((string) $machine, Action::ACTION_DELETE, $exception);
         }
     }
 

@@ -2,12 +2,12 @@
 
 namespace App\Exception\MachineProvider;
 
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 
 class Exception extends \Exception implements ExceptionInterface
 {
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function __construct(
         private string $resourceId,

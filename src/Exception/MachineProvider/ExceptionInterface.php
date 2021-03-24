@@ -2,14 +2,14 @@
 
 namespace App\Exception\MachineProvider;
 
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 
 interface ExceptionInterface extends \Throwable
 {
     public function getRemoteException(): \Throwable;
 
     /**
-     * @return MachineProviderActionInterface::ACTION_*
+     * @return RemoteRequestActionInterface::ACTION_*
      */
     public function getAction(): string;
 }

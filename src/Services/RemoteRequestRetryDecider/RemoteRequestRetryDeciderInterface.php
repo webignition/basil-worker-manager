@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services\ApiActionRetryDecider;
+namespace App\Services\RemoteRequestRetryDecider;
 
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 
-interface ApiActionRetryDeciderInterface
+interface RemoteRequestRetryDeciderInterface
 {
     /**
      * @param ProviderInterface::NAME_* $type
@@ -13,7 +13,7 @@ interface ApiActionRetryDeciderInterface
     public function handles(string $type): bool;
 
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function decide(string $action, \Throwable $exception): bool;
 }

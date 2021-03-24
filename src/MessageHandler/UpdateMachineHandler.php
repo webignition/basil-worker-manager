@@ -7,15 +7,15 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\ApiRequestOutcome;
 use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
+use App\Model\RemoteRequestOutcome;
 use App\Repository\MachineRepository;
-use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStateTransitionSequences;
+use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class UpdateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
@@ -25,7 +25,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
     public function __construct(
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
-        ApiActionRetryDecider $retryDecider,
+        RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineStateTransitionSequences $stateTransitionSequences,
@@ -44,39 +44,39 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         return $this->machineProvider->update($machine);
     }
 
-    public function __invoke(UpdateMachine $message): ApiRequestOutcome
+    public function __invoke(UpdateMachine $message): RemoteRequestOutcome
     {
         $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
-            return ApiRequestOutcome::invalid();
+            return RemoteRequestOutcome::invalid();
         }
 
         if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-            return ApiRequestOutcome::success();
+            return RemoteRequestOutcome::success();
         }
 
         $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_GET, $retryCount);
+        $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_GET, $retryCount);
 
-        if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
+        if (RemoteRequestOutcome::STATE_FAILED === (string) $outcome) {
             return $outcome;
         }
 
-        if (ApiRequestOutcome::STATE_SUCCESS === (string) $outcome) {
+        if (RemoteRequestOutcome::STATE_SUCCESS === (string) $outcome) {
             if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-                return ApiRequestOutcome::success();
+                return RemoteRequestOutcome::success();
             }
 
-            $outcome = ApiRequestOutcome::retrying();
+            $outcome = RemoteRequestOutcome::retrying();
         }
 
-        if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
+        if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $this->updateMachineDispatcher->dispatch($message->incrementRetryCount());
 
-            return ApiRequestOutcome::retrying();
+            return RemoteRequestOutcome::retrying();
         }
 
-        return ApiRequestOutcome::failed();
+        return RemoteRequestOutcome::failed();
     }
 
     /**

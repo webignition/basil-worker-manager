@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-class ApiRequestOutcome implements \Stringable
+class RemoteRequestOutcome implements \Stringable
 {
     public const STATE_SUCCESS = 'success';
     public const STATE_FAILED = 'failed';
@@ -20,22 +20,22 @@ class ApiRequestOutcome implements \Stringable
 
     public static function success(): self
     {
-        return new ApiRequestOutcome(self::STATE_SUCCESS);
+        return new RemoteRequestOutcome(self::STATE_SUCCESS);
     }
 
     public static function failed(?\Throwable $exception = null): self
     {
-        return new ApiRequestOutcome(self::STATE_FAILED, $exception);
+        return new RemoteRequestOutcome(self::STATE_FAILED, $exception);
     }
 
     public static function retrying(): self
     {
-        return new ApiRequestOutcome(self::STATE_RETRYING);
+        return new RemoteRequestOutcome(self::STATE_RETRYING);
     }
 
     public static function invalid(): self
     {
-        return new ApiRequestOutcome(self::STATE_INVALID);
+        return new RemoteRequestOutcome(self::STATE_INVALID);
     }
 
     /**

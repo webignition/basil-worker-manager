@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Services\ExceptionFactory\MachineProvider;
 use App\Exception\MachineProvider\CurlException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\ExceptionInterface;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\RuntimeException;
@@ -17,7 +17,7 @@ use Psr\Http\Message\RequestInterface;
 class ExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
     private const ID = 'resource_id';
-    private const ACTION = MachineProviderActionInterface::ACTION_CREATE;
+    private const ACTION = RemoteRequestActionInterface::ACTION_CREATE;
 
     private ExceptionFactory $factory;
 

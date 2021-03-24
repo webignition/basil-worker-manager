@@ -8,14 +8,14 @@ use App\Entity\Machine;
 use App\Message\CreateMachine;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\ApiRequestOutcome;
 use App\Model\Machine\State;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
+use App\Model\RemoteRequestOutcome;
 use App\Repository\MachineRepository;
-use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
+use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class CreateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
@@ -23,7 +23,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
     public function __construct(
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
-        ApiActionRetryDecider $retryDecider,
+        RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineRequestMessageDispatcher $createDispatcher,
@@ -43,26 +43,26 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         return $this->machineProvider->create($machine);
     }
 
-    public function __invoke(CreateMachine $message): ApiRequestOutcome
+    public function __invoke(CreateMachine $message): RemoteRequestOutcome
     {
         $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
-            return ApiRequestOutcome::invalid();
+            return RemoteRequestOutcome::invalid();
         }
 
         $machine->setState(State::VALUE_CREATE_REQUESTED);
         $this->machineStore->store($machine);
 
         $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
+        $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_CREATE, $retryCount);
 
-        if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
+        if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $this->createDispatcher->dispatch($message->incrementRetryCount());
 
             return $outcome;
         }
 
-        if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
+        if (RemoteRequestOutcome::STATE_FAILED === (string) $outcome) {
             $machine = $machine->setState(State::VALUE_CREATE_FAILED);
             $this->machineStore->store($machine);
 
@@ -71,6 +71,6 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
 
         $this->updateMachineDispatcher->dispatch(new UpdateMachine((string) $machine));
 
-        return ApiRequestOutcome::success();
+        return RemoteRequestOutcome::success();
     }
 }

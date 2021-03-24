@@ -4,13 +4,13 @@ namespace App\Exception\MachineProvider\DigitalOcean;
 
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\HttpExceptionInterface;
-use App\Model\MachineProviderActionInterface;
+use App\Model\RemoteRequestActionInterface;
 use DigitalOceanV2\Exception\RuntimeException;
 
 class HttpException extends Exception implements HttpExceptionInterface
 {
     /**
-     * @param MachineProviderActionInterface::ACTION_* $action
+     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function __construct(
         string $resourceId,

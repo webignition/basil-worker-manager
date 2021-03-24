@@ -11,11 +11,11 @@ use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\UpdateMachine;
 use App\MessageHandler\UpdateMachineHandler;
-use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
-use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
+use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
 use App\Services\MachineStore;
@@ -80,7 +80,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandle(
         array $httpFixtures,
         string $currentState,
-        ApiRequestOutcome $expectedOutcome,
+        RemoteRequestOutcome $expectedOutcome,
         int $expectedMessageQueueCount
     ): void {
         $this->setExceptionLoggerOnHandler(
@@ -111,7 +111,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
             $endStateCases['current state is end state: ' . $endState] = [
                 'httpFixtures' => [],
                 'currentState' => $endState,
-                'expectedOutcome' => ApiRequestOutcome::success(),
+                'expectedOutcome' => RemoteRequestOutcome::success(),
                 'expectedMessageQueueCount' => 0,
             ];
         }
@@ -121,13 +121,13 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                 'current state is stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_UP_ACTIVE,
-                    'expectedOutcome' => ApiRequestOutcome::success(),
+                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'current state not end state, current state not stop state, current state past stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_DELETE_RECEIVED,
-                    'expectedOutcome' => ApiRequestOutcome::success(),
+                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, machine is updated to stop state' => [
@@ -140,7 +140,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => ApiRequestOutcome::success(),
+                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, machine is updated past stop state' => [
@@ -153,7 +153,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => ApiRequestOutcome::success(),
+                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, machine is updated to before stop state' => [
@@ -166,7 +166,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => ApiRequestOutcome::retrying(),
+                    'expectedOutcome' => RemoteRequestOutcome::retrying(),
                     'expectedMessageQueueCount' => 1,
                 ],
                 'HTTP 503, requires retry' => [
@@ -174,7 +174,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                         new Response(503),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => ApiRequestOutcome::retrying(),
+                    'expectedOutcome' => RemoteRequestOutcome::retrying(),
                     'expectedMessageQueueCount' => 1,
                 ],
             ],
@@ -188,7 +188,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedLoggedException = new AuthenticationException(
             (string) $this->machine,
-            MachineProviderActionInterface::ACTION_GET,
+            RemoteRequestActionInterface::ACTION_GET,
             new RuntimeException('Unauthorized', 401)
         );
 
@@ -202,7 +202,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            ApiRequestOutcome::failed($expectedLoggedException),
+            RemoteRequestOutcome::failed($expectedLoggedException),
             $outcome
         );
     }
@@ -219,7 +219,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedLoggedException = new HttpException(
             (string) $this->machine,
-            MachineProviderActionInterface::ACTION_GET,
+            RemoteRequestActionInterface::ACTION_GET,
             $expectedRemoteException
         );
 
@@ -233,7 +233,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            ApiRequestOutcome::failed($expectedLoggedException),
+            RemoteRequestOutcome::failed($expectedLoggedException),
             $outcome
         );
     }
@@ -270,7 +270,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            ApiRequestOutcome::failed($expectedLoggedException),
+            RemoteRequestOutcome::failed($expectedLoggedException),
             $outcome
         );
     }
@@ -283,11 +283,11 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            ApiRequestOutcome::failed(
+            RemoteRequestOutcome::failed(
                 new UnknownRemoteMachineException(
                     $this->machine->getProvider(),
                     (string) $this->machine,
-                    MachineProviderActionInterface::ACTION_GET,
+                    RemoteRequestActionInterface::ACTION_GET,
                     new RuntimeException('Not Found', 404)
                 )
             ),

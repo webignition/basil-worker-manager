@@ -27,6 +27,7 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
+            - '../src/Message/'
             - '../src/Kernel.php'
             - '../src/Tests/'
 
@@ -148,9 +149,3 @@ services:
             $factories:
                 - '@App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory'
                 - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'
-
-    App\MessageHandler\MachineRequestMessageHandler:
-        arguments:
-            $handlers:
-                - '@App\Services\MachineHandler\CreateMachineHandler'
-                - '@App\Services\MachineHandler\UpdateMachineHandler'

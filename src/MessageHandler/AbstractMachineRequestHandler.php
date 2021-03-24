@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\MachineHandler;
+namespace App\MessageHandler;
 
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
@@ -15,7 +15,7 @@ use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 
-abstract class AbstractApiActionHandler
+abstract class AbstractMachineRequestHandler
 {
     public function __construct(
         protected MachineRepository $machineRepository,

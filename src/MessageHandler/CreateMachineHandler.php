@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services\MachineHandler;
+namespace App\MessageHandler;
 
 use App\Entity\Machine;
-use App\Message\MachineRequest;
-use App\Message\MachineRequestInterface;
+use App\Message\CreateMachine;
+use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ApiRequestOutcome;
 use App\Model\Machine\State;
@@ -16,8 +16,9 @@ use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
+use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class CreateMachineHandler extends AbstractApiActionHandler implements RequestHandlerInterface
+class CreateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
 {
     public function __construct(
         MachineRepository $machineRepository,
@@ -42,14 +43,9 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         return $this->machineProvider->create($machine);
     }
 
-    public function handles(string $type): bool
+    public function __invoke(CreateMachine $message): ApiRequestOutcome
     {
-        return $type === MachineProviderActionInterface::ACTION_CREATE;
-    }
-
-    public function handle(MachineRequestInterface $request): ApiRequestOutcome
-    {
-        $machine = $this->machineRepository->find($request->getMachineId());
+        $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }
@@ -57,11 +53,11 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         $machine->setState(State::VALUE_CREATE_REQUESTED);
         $this->machineStore->store($machine);
 
-        $retryCount = $request->getRetryCount();
+        $retryCount = $message->getRetryCount();
         $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->createDispatcher->dispatch($request->incrementRetryCount());
+            $this->createDispatcher->dispatch($message->incrementRetryCount());
 
             return $outcome;
         }
@@ -73,7 +69,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
             return $outcome;
         }
 
-        $this->updateMachineDispatcher->dispatch(MachineRequest::createGet((string) $machine));
+        $this->updateMachineDispatcher->dispatch(new UpdateMachine((string) $machine));
 
         return ApiRequestOutcome::success();
     }

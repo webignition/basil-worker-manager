@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\MachineHandler;
+namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\Machine;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
-use App\Message\MachineRequest;
+use App\Message\UpdateMachine;
+use App\MessageHandler\UpdateMachineHandler;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
@@ -17,7 +18,6 @@ use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
-use App\Services\MachineHandler\UpdateMachineHandler;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
@@ -94,8 +94,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->machine->setState($currentState);
         $this->machineStore->store($this->machine);
 
-        $request = MachineRequest::createGet((string) $this->machine);
-        $outcome = $this->handler->handle($request);
+        $message = new UpdateMachine((string) $this->machine);
+        $outcome = ($this->handler)($message);
 
         self::assertEquals($expectedOutcome, $outcome);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
@@ -198,8 +198,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = MachineRequest::createGet((string) $this->machine);
-        $outcome = $this->handler->handle($request);
+        $message = new UpdateMachine((string) $this->machine);
+        $outcome = ($this->handler)($message);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -229,8 +229,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = MachineRequest::createGet((string) $this->machine, $retryCount);
-        $outcome = $this->handler->handle($request);
+        $message = new UpdateMachine((string) $this->machine, $retryCount);
+        $outcome = ($this->handler)($message);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -266,8 +266,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = MachineRequest::createGet((string) $this->machine);
-        $outcome = $this->handler->handle($request);
+        $message = new UpdateMachine((string) $this->machine);
+        $outcome = ($this->handler)($message);
 
         self::assertEquals(
             ApiRequestOutcome::failed($expectedLoggedException),
@@ -279,8 +279,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $request = MachineRequest::createGet((string) $this->machine, 11);
-        $outcome = $this->handler->handle($request);
+        $message = new UpdateMachine((string) $this->machine, 11);
+        $outcome = ($this->handler)($message);
 
         self::assertEquals(
             ApiRequestOutcome::failed(

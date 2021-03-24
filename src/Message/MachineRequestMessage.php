@@ -4,37 +4,50 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\MachineRequestInterface;
+use App\Model\MachineProviderActionInterface;
 
-class MachineRequestMessage implements MachineRequestMessageInterface
+class MachineRequestMessage implements MachineRequestInterface
 {
-    public function __construct(
-        private MachineRequestInterface $request
+    /**
+     * @param MachineProviderActionInterface::ACTION_* $type
+     */
+    private function __construct(
+        private string $type,
+        private string $machineId,
+        private int $retryCount,
     ) {
     }
 
-    public function getRequest(): MachineRequestInterface
+    public static function createCreate(string $machineId, int $retryCount = 0): MachineRequestInterface
     {
-        return $this->request;
+        return new MachineRequestMessage(MachineProviderActionInterface::ACTION_CREATE, $machineId, $retryCount);
+    }
+
+    public static function createGet(string $machineId, int $retryCount = 0): MachineRequestInterface
+    {
+        return new MachineRequestMessage(MachineProviderActionInterface::ACTION_GET, $machineId, $retryCount);
     }
 
     public function getType(): string
     {
-        return $this->request->getType();
+        return $this->type;
     }
 
     public function getMachineId(): string
     {
-        return $this->request->getMachineId();
+        return $this->machineId;
     }
 
     public function getRetryCount(): int
     {
-        return $this->request->getRetryCount();
+        return $this->retryCount;
     }
 
-    public function incrementRetryCount(): MachineRequestMessageInterface
+    public function incrementRetryCount(): MachineRequestInterface
     {
-        return new MachineRequestMessage($this->request->incrementRetryCount());
+        $new = clone $this;
+        $new->retryCount++;
+
+        return $new;
     }
 }

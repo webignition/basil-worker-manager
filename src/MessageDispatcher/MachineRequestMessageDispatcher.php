@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Message\MachineRequestMessage;
+use App\Message\MachineRequestInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -18,7 +18,7 @@ class MachineRequestMessageDispatcher
     ) {
     }
 
-    public function dispatch(MachineRequestMessage $message): void
+    public function dispatch(MachineRequestInterface $message): void
     {
         if ($this->enabled) {
             $stamps = [];

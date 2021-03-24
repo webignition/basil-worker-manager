@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Entity\Machine;
 use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Services\MachineFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -54,17 +53,13 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->defaultDispatcher->dispatch(
-            new MachineRequestMessage(
-                MachineRequest::createGet((string) $this->machine)
-            )
+            MachineRequestMessage::createGet((string) $this->machine)
         );
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new MachineRequestMessage(
-                MachineRequest::createGet((string) $this->machine)
-            )
+            MachineRequestMessage::createGet((string) $this->machine)
         );
 
         $this->messengerAsserter->assertEnvelopeNotContainsStampsOfType(
@@ -78,17 +73,13 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->updateMachineMessageDispatcher->dispatch(
-            new MachineRequestMessage(
-                MachineRequest::createGet((string) $this->machine)
-            )
+            MachineRequestMessage::createGet((string) $this->machine)
         );
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new MachineRequestMessage(
-                MachineRequest::createGet((string) $this->machine)
-            )
+            MachineRequestMessage::createGet((string) $this->machine)
         );
 
         $this->messengerAsserter->assertEnvelopeContainsStamp(

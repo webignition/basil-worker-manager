@@ -61,6 +61,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
+     * @dataProvider remoteMachineDoesNotExistDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -117,6 +118,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
+     * @dataProvider remoteMachineDoesNotExistDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -150,6 +152,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
+     * @dataProvider remoteMachineDoesNotExistDataProvider
      *
      * @param class-string $expectedExceptionClass
      */
@@ -196,6 +199,61 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         $remoteMachine = $callable($this->machine);
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
+    }
+
+    /**
+     * @dataProvider existsDataProvider
+     */
+    public function testExists(ResponseInterface $apiResponse, bool $expectedExists): void
+    {
+        ObjectReflector::setProperty($this->machine, Machine::class, 'remote_id', 123);
+
+        $this->mockHandler->append($apiResponse);
+
+        $exists = $this->machineProvider->exists($this->machine);
+        self::assertSame($expectedExists, $exists);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function existsDataProvider(): array
+    {
+        return [
+            'exists' => [
+                'apiResponse' => HttpResponseFactory::fromDropletEntity(
+                    new DropletEntity([
+                        'id' => 123,
+                    ])
+                ),
+                'expectedExists' => true,
+            ],
+            'not exists' => [
+                'apiResponse' => new Response(404),
+                'expectedExists' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider remoteRequestThrowsExceptionDataProvider
+     *
+     * @param class-string $expectedExceptionClass
+     */
+    public function testExistsThrowsException(
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
+    ): void {
+        $this->doActionThrowsExceptionTest(
+            function () {
+                $this->machineProvider->exists($this->machine);
+            },
+            RemoteRequestActionInterface::ACTION_EXISTS,
+            $apiResponse,
+            $expectedExceptionClass,
+            $expectedRemoveException
+        );
     }
 
     /**
@@ -247,6 +305,15 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
                 'expectedExceptionClass' => Exception::class,
                 'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
             ],
+        ];
+    }
+
+    /**
+     * @return array[]
+     */
+    public function remoteMachineDoesNotExistDataProvider(): array
+    {
+        return [
             'remote machine does not exist' => [
                 'apiResponse' => new Response(404),
                 'expectedExceptionClass' => UnknownRemoteMachineException::class,

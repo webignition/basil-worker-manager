@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Services\MachineHandler;
 
 use App\Entity\Machine;
-use App\Message\MachineRequest;
-use App\Message\MachineRequestInterface;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\Message\MachineRequestMessage;
+use App\MessageDispatcher\MachineRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\Machine\State;
 use App\Model\MachineProviderActionInterface;
+use App\Model\MachineRequest;
+use App\Model\MachineRequestInterface;
 use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
@@ -23,9 +24,9 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
-        MachineRequestMessageDispatcher $updateMachineDispatcher,
+        MachineRequestMessageDispatcherInterface $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
-        private MachineRequestMessageDispatcher $createDispatcher,
+        private MachineRequestMessageDispatcherInterface $createDispatcher,
         private MachineStore $machineStore,
     ) {
         parent::__construct(
@@ -61,7 +62,9 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->createDispatcher->dispatch($request->incrementRetryCount());
+            $this->createDispatcher->dispatch(
+                MachineRequestMessage::createCreate($request->incrementRetryCount())
+            );
 
             return $outcome;
         }
@@ -73,7 +76,11 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
             return $outcome;
         }
 
-        $this->updateMachineDispatcher->dispatch(MachineRequest::createGet((string) $machine));
+        $this->updateMachineDispatcher->dispatch(
+            MachineRequestMessage::createGet(
+                new MachineRequest((string) $machine)
+            )
+        );
 
         return ApiRequestOutcome::success();
     }

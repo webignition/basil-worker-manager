@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Services\MachineHandler;
 
 use App\Entity\Machine;
-use App\Message\MachineRequestInterface;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\Message\MachineRequestMessage;
+use App\MessageDispatcher\MachineRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
 use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;
 use App\Model\MachineProviderActionInterface;
+use App\Model\MachineRequestInterface;
 use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
@@ -25,7 +26,7 @@ class UpdateMachineHandler extends AbstractApiActionHandler implements RequestHa
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
-        MachineRequestMessageDispatcher $updateMachineDispatcher,
+        MachineRequestMessageDispatcherInterface $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineStateTransitionSequences $stateTransitionSequences,
     ) {
@@ -75,7 +76,9 @@ class UpdateMachineHandler extends AbstractApiActionHandler implements RequestHa
         }
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->updateMachineDispatcher->dispatch($request->incrementRetryCount());
+            $this->updateMachineDispatcher->dispatch(
+                MachineRequestMessage::createGet($request->incrementRetryCount())
+            );
 
             return ApiRequestOutcome::retrying();
         }
@@ -84,7 +87,7 @@ class UpdateMachineHandler extends AbstractApiActionHandler implements RequestHa
     }
 
     /**
-     * @param State::VALUE_* $currentState
+     * @param \App\Model\Machine\State::VALUE_* $currentState
      */
     private function hasReachedStopStateOrEndState(string $currentState): bool
     {

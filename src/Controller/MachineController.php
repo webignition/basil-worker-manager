@@ -3,9 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Machine;
-use App\Message\MachineRequestMessage;
+use App\Message\MachineRequest;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
@@ -41,9 +40,7 @@ class MachineController extends AbstractController
         $machine = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         $messageDispatcher->dispatch(
-            new MachineRequestMessage(
-                MachineRequest::createCreate((string) $machine)
-            )
+            MachineRequest::createCreate((string) $machine)
         );
 
         return new Response('', 202);

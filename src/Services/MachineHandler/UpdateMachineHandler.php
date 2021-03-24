@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace App\Services\MachineHandler;
 
 use App\Entity\Machine;
-use App\Message\MachineRequestMessage;
+use App\Message\MachineRequestInterface;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ApiRequestOutcome;
 use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;
 use App\Model\MachineProviderActionInterface;
-use App\Model\MachineRequestInterface;
 use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
@@ -76,9 +75,7 @@ class UpdateMachineHandler extends AbstractApiActionHandler implements RequestHa
         }
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->updateMachineDispatcher->dispatch(
-                new MachineRequestMessage($request->incrementRetryCount())
-            );
+            $this->updateMachineDispatcher->dispatch($request->incrementRetryCount());
 
             return ApiRequestOutcome::retrying();
         }

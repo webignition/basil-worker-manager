@@ -4,19 +4,28 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Message\MachineRequestMessageInterface;
-use App\Services\MachineHandler\RequestHandler;
+use App\Message\MachineRequestInterface;
+use App\Model\MachineProviderActionInterface;
+use App\Services\MachineHandler\CreateMachineHandler;
+use App\Services\MachineHandler\UpdateMachineHandler;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class MachineRequestMessageHandler implements MessageHandlerInterface
 {
     public function __construct(
-        private RequestHandler $requestHandler
+        private CreateMachineHandler $createHandler,
+        private UpdateMachineHandler $updateHandler,
     ) {
     }
 
-    public function __invoke(MachineRequestMessageInterface $message): void
+    public function __invoke(MachineRequestInterface $message): void
     {
-        $this->requestHandler->handle($message->getRequest());
+        if (MachineProviderActionInterface::ACTION_CREATE === $message->getType()) {
+            $this->createHandler->handle($message);
+
+            return;
+        }
+
+        $this->updateHandler->handle($message);
     }
 }

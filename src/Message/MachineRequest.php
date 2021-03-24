@@ -1,6 +1,10 @@
 <?php
 
-namespace App\Model;
+declare(strict_types=1);
+
+namespace App\Message;
+
+use App\Model\MachineProviderActionInterface;
 
 class MachineRequest implements MachineRequestInterface
 {
@@ -10,7 +14,7 @@ class MachineRequest implements MachineRequestInterface
     private function __construct(
         private string $type,
         private string $machineId,
-        private int $retryCount = 0,
+        private int $retryCount,
     ) {
     }
 
@@ -39,7 +43,7 @@ class MachineRequest implements MachineRequestInterface
         return $this->retryCount;
     }
 
-    public function incrementRetryCount(): self
+    public function incrementRetryCount(): MachineRequestInterface
     {
         $new = clone $this;
         $new->retryCount++;

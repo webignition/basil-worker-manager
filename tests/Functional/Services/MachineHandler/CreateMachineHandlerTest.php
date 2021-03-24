@@ -6,10 +6,9 @@ namespace App\Tests\Functional\Services\MachineHandler;
 
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
-use App\Message\MachineRequestMessage;
+use App\Message\MachineRequest;
 use App\Model\Machine\State;
 use App\Model\MachineProviderActionInterface;
-use App\Model\MachineRequest;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
@@ -72,9 +71,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new MachineRequestMessage(
-                MachineRequest::createGet((string) $machine)
-            )
+            MachineRequest::createGet((string) $machine)
         );
 
         self::assertNotSame(State::VALUE_CREATE_FAILED, $machine->getState());
@@ -133,9 +130,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->handler->handle($request);
 
-        $expectedRequest = MachineRequest::createGet((string) $machine, $request->getRetryCount() + 1);
-
-        $expectedMessage = new MachineRequestMessage($expectedRequest);
+        $expectedMessage = MachineRequest::createGet((string) $machine, $request->getRetryCount() + 1);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);

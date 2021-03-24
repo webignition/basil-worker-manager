@@ -34,3 +34,10 @@ services:
 
     App\Tests\Services\EntityRefresher:
         public: true
+
+    App\Services\MachineHandler\RequestHandler:
+        public: true
+        arguments:
+            $handlers:
+                - '@App\Services\MachineHandler\CreateMachineHandler'
+                - '@App\Services\MachineHandler\UpdateMachineHandler'

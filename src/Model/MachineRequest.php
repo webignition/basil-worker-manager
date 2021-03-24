@@ -14,12 +14,12 @@ class MachineRequest implements MachineRequestInterface
     ) {
     }
 
-    public static function createCreate(string $machineId, int $retryCount = 0): self
+    public static function createCreate(string $machineId, int $retryCount = 0): MachineRequestInterface
     {
         return new MachineRequest(MachineProviderActionInterface::ACTION_CREATE, $machineId, $retryCount);
     }
 
-    public static function createGet(string $machineId, int $retryCount = 0): self
+    public static function createGet(string $machineId, int $retryCount = 0): MachineRequestInterface
     {
         return new MachineRequest(MachineProviderActionInterface::ACTION_GET, $machineId, $retryCount);
     }

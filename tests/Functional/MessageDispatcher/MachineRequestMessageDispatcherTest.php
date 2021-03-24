@@ -54,7 +54,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->defaultDispatcher->dispatch(
-            MachineRequestMessage::createCreate(
+            new MachineRequestMessage(
                 MachineRequest::createGet((string) $this->machine)
             )
         );
@@ -62,7 +62,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            MachineRequestMessage::createCreate(
+            new MachineRequestMessage(
                 MachineRequest::createGet((string) $this->machine)
             )
         );
@@ -78,7 +78,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $this->updateMachineMessageDispatcher->dispatch(
-            MachineRequestMessage::createGet(
+            new MachineRequestMessage(
                 MachineRequest::createGet((string) $this->machine)
             )
         );
@@ -86,7 +86,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            MachineRequestMessage::createGet(
+            new MachineRequestMessage(
                 MachineRequest::createGet((string) $this->machine)
             )
         );

@@ -41,7 +41,7 @@ class MachineController extends AbstractController
         $machine = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         $messageDispatcher->dispatch(
-            MachineRequestMessage::createCreate(
+            new MachineRequestMessage(
                 MachineRequest::createCreate((string) $machine)
             )
         );

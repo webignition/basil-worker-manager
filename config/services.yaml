@@ -80,10 +80,10 @@ services:
             $machineProviders:
                 - '@App\Services\MachineProvider\DigitalOceanMachineProvider'
 
-    App\Services\ApiActionRetryDecider:
+    App\Services\RemoteRequestRetryDecider:
         arguments:
             $deciders:
-                - '@App\Services\ApiActionRetryDecider\DigitalOcean\DigitalOceanApiActionRetryDecider'
+                - '@App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider'
             $retryLimits:
               !php/const App\Model\MachineProviderActionInterface::ACTION_CREATE: '%create_retry_limit%'
               !php/const App\Model\MachineProviderActionInterface::ACTION_GET: '%update_retry_limit%'

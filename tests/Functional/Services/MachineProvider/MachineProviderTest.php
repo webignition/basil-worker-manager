@@ -59,7 +59,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider apiActionThrowsExceptionDataProvider
+     * @dataProvider remoteRequestThrowsExceptionDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -115,7 +115,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider apiActionThrowsExceptionDataProvider
+     * @dataProvider remoteRequestThrowsExceptionDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -148,7 +148,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider apiActionThrowsExceptionDataProvider
+     * @dataProvider remoteRequestThrowsExceptionDataProvider
      *
      * @param class-string $expectedExceptionClass
      */
@@ -227,7 +227,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function apiActionThrowsExceptionDataProvider(): array
+    public function remoteRequestThrowsExceptionDataProvider(): array
     {
         return [
             VendorApiLimitExceededExceptionAlias::class => [

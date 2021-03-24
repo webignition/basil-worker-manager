@@ -12,10 +12,10 @@ use App\Model\Machine\StateTransitionSequence;
 use App\Model\MachineProviderActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Repository\MachineRepository;
-use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStateTransitionSequences;
+use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class UpdateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
@@ -25,7 +25,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
     public function __construct(
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
-        ApiActionRetryDecider $retryDecider,
+        RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineStateTransitionSequences $stateTransitionSequences,

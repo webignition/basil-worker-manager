@@ -6,21 +6,21 @@ namespace App\Tests\Functional\Services;
 
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
-use App\Services\ApiActionRetryDecider;
+use App\Services\RemoteRequestRetryDecider;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 
-class ApiActionRetryDeciderTest extends AbstractBaseFunctionalTest
+class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
 {
-    private ApiActionRetryDecider $decider;
+    private RemoteRequestRetryDecider $decider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $decider = self::$container->get(ApiActionRetryDecider::class);
-        if ($decider instanceof ApiActionRetryDecider) {
+        $decider = self::$container->get(RemoteRequestRetryDecider::class);
+        if ($decider instanceof RemoteRequestRetryDecider) {
             $this->decider = $decider;
         }
     }

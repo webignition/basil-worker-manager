@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services\ApiActionRetryDecider;
+namespace App\Services\RemoteRequestRetryDecider;
 
 use App\Model\MachineProviderActionInterface;
 use App\Model\ProviderInterface;
 
-interface ApiActionRetryDeciderInterface
+interface RemoteRequestRetryDeciderInterface
 {
     /**
      * @param ProviderInterface::NAME_* $type

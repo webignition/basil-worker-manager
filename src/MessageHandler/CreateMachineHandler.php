@@ -12,10 +12,10 @@ use App\Model\Machine\State;
 use App\Model\MachineProviderActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Repository\MachineRepository;
-use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
+use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class CreateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
@@ -23,7 +23,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
     public function __construct(
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
-        ApiActionRetryDecider $retryDecider,
+        RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         private MachineRequestMessageDispatcher $createDispatcher,

@@ -11,16 +11,16 @@ use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\MachineProviderActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Repository\MachineRepository;
-use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
+use App\Services\RemoteRequestRetryDecider;
 
 abstract class AbstractMachineRequestHandler
 {
     public function __construct(
         protected MachineRepository $machineRepository,
         protected MachineProvider $machineProvider,
-        protected ApiActionRetryDecider $retryDecider,
+        protected RemoteRequestRetryDecider $retryDecider,
         protected MachineRequestMessageDispatcher $updateMachineDispatcher,
         protected ExceptionLogger $exceptionLogger,
     ) {

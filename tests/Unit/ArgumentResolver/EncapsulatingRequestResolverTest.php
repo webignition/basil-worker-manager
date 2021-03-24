@@ -55,7 +55,7 @@ class EncapsulatingRequestResolverTest extends TestCase
     }
 
     /**
-     * @dataProvider resolveWorkerCreateRequestDataProvider
+     * @dataProvider resolveMachineCreateRequestDataProvider
      */
     public function testResolve(
         Request $request,
@@ -71,7 +71,7 @@ class EncapsulatingRequestResolverTest extends TestCase
     /**
      * @return array[]
      */
-    public function resolveWorkerCreateRequestDataProvider(): array
+    public function resolveMachineCreateRequestDataProvider(): array
     {
         $id = md5('id content');
 
@@ -80,12 +80,12 @@ class EncapsulatingRequestResolverTest extends TestCase
             ->getMock();
 
         return [
-            'WorkerCreateRequest: empty' => [
+            'empty' => [
                 'request' => new Request(),
                 'argumentMetadata' => $argumentMetadata,
                 'expectedEncapsulatingRequest' => new MachineCreateRequest(new Request()),
             ],
-            'JobCreateRequest: id present' => [
+            'id present' => [
                 'request' => new Request([], [
                     MachineCreateRequest::KEY_ID => $id,
                 ]),

@@ -62,12 +62,12 @@ class MachineTest extends TestCase
     {
         return [
             'machine has no ip addresses, empty set' => [
-                'worker' => new Machine(),
+                'machine' => new Machine(),
                 'ipAddresses' => [],
                 'expectedIpAddresses' => [],
             ],
             'machine has no ip address, non-repeating, alphabetical order' => [
-                'worker' => new Machine(),
+                'machine' => new Machine(),
                 'ipAddresses' => [
                     'a',
                     'b',
@@ -80,7 +80,7 @@ class MachineTest extends TestCase
                 ],
             ],
             'machine has no ip address, non-repeating, reverse-alphabetical order' => [
-                'worker' => new Machine(),
+                'machine' => new Machine(),
                 'ipAddresses' => [
                     'c',
                     'b',
@@ -93,7 +93,7 @@ class MachineTest extends TestCase
                 ],
             ],
             'machine has no ip address, repeating' => [
-                'worker' => new Machine(),
+                'machine' => new Machine(),
                 'ipAddresses' => [
                     'a',
                     'a',

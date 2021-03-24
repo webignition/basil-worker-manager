@@ -70,9 +70,9 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
         self::assertSame(State::VALUE_CREATE_RECEIVED, $this->machine->getState());
 
-        $waitForWorkerUpActiveResult = $this->waitUntilWorkerStateIs(State::VALUE_UP_ACTIVE);
-        if (false === $waitForWorkerUpActiveResult) {
-            $this->fail('Timed out waiting for expected worker state: ' . State::VALUE_UP_ACTIVE);
+        $waitResult = $this->waitUntilMachineStateIs(State::VALUE_UP_ACTIVE);
+        if (false === $waitResult) {
+            $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_UP_ACTIVE);
         }
 
         $this->entityRefresher->refreshForEntity(Machine::class);
@@ -81,7 +81,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
         $remoteId = $this->machine->getRemoteId();
         if (false === is_int($remoteId)) {
-            throw new \RuntimeException('Worker lacking remote_id. Verify test droplet has not been created');
+            throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has not been created');
         }
 
         self::assertIsInt($remoteId);
@@ -92,7 +92,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     /**
      * @param State::VALUE_* $stopState
      */
-    private function waitUntilWorkerStateIs(string $stopState): bool
+    private function waitUntilMachineStateIs(string $stopState): bool
     {
         $duration = 0;
         $maxDuration = self::MAX_DURATION_IN_SECONDS * self::MICROSECONDS_PER_SECOND;

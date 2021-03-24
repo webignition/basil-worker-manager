@@ -130,7 +130,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                     'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
-                'no exception, worker is updated to stop state' => [
+                'no exception, machine is updated to stop state' => [
                     'httpFixtures' => [
                         HttpResponseFactory::fromDropletEntity(
                             new DropletEntity([
@@ -143,7 +143,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                     'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
-                'no exception, worker is updated past stop state' => [
+                'no exception, machine is updated past stop state' => [
                     'httpFixtures' => [
                         HttpResponseFactory::fromDropletEntity(
                             new DropletEntity([
@@ -156,7 +156,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                     'expectedOutcome' => ApiRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
-                'no exception, worker is updated to before stop state' => [
+                'no exception, machine is updated to before stop state' => [
                     'httpFixtures' => [
                         HttpResponseFactory::fromDropletEntity(
                             new DropletEntity([

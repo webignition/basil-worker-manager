@@ -11,6 +11,8 @@ use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
+use App\Model\RemoteRequestOutcomeInterface;
+use App\Model\RemoteRequestSuccess;
 use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
@@ -44,7 +46,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         return $this->machineProvider->update($machine);
     }
 
-    public function __invoke(UpdateMachine $message): RemoteRequestOutcome
+    public function __invoke(UpdateMachine $message): RemoteRequestOutcomeInterface
     {
         $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
@@ -52,19 +54,15 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         }
 
         if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-            return RemoteRequestOutcome::success();
+            return new RemoteRequestSuccess($machine);
         }
 
         $retryCount = $message->getRetryCount();
         $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_GET, $retryCount);
 
-        if (RemoteRequestOutcome::STATE_FAILED === (string) $outcome) {
-            return $outcome;
-        }
-
         if (RemoteRequestOutcome::STATE_SUCCESS === (string) $outcome) {
             if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-                return RemoteRequestOutcome::success();
+                return $outcome;
             }
 
             $outcome = RemoteRequestOutcome::retrying();
@@ -76,7 +74,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
             return RemoteRequestOutcome::retrying();
         }
 
-        return RemoteRequestOutcome::failed();
+        return $outcome;
     }
 
     /**

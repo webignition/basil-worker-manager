@@ -12,7 +12,9 @@ use App\MessageHandler\CreateMachineHandler;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
+use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
+use App\Model\RemoteRequestSuccess;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
 use App\Services\MachineProvider\MachineProvider;
@@ -69,7 +71,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->prepareHandler($machineProvider, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
-        self::assertEquals(RemoteRequestOutcome::success(), $outcome);
+        self::assertEquals(new RemoteRequestSuccess($machine), $outcome);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
@@ -98,7 +100,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->prepareHandler($machineProvider, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
-        self::assertEquals(RemoteRequestOutcome::failed($exception), $outcome);
+        self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $machine->getState());
@@ -176,7 +178,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->prepareHandler($machineProvider, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
-        self::assertEquals(RemoteRequestOutcome::failed($exception), $outcome);
+        self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(State::VALUE_CREATE_FAILED, $machine->getState());

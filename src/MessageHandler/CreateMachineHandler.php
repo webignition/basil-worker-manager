@@ -11,6 +11,7 @@ use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
+use App\Model\RemoteRequestOutcomeInterface;
 use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
@@ -43,7 +44,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         return $this->machineProvider->create($machine);
     }
 
-    public function __invoke(CreateMachine $message): RemoteRequestOutcome
+    public function __invoke(CreateMachine $message): RemoteRequestOutcomeInterface
     {
         $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
@@ -71,6 +72,6 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
 
         $this->updateMachineDispatcher->dispatch(new UpdateMachine((string) $machine));
 
-        return RemoteRequestOutcome::success();
+        return $outcome;
     }
 }

@@ -15,7 +15,9 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
+use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
+use App\Model\RemoteRequestSuccess;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
 use App\Services\MachineStore;
@@ -72,15 +74,14 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider handleDataProvider
+     * @dataProvider handleSuccessDataProvider
      *
      * @param array<ResponseInterface|\Throwable> $httpFixtures
      * @param State::VALUE_* $currentState
      */
-    public function testHandle(
+    public function testHandleSuccess(
         array $httpFixtures,
         string $currentState,
-        RemoteRequestOutcome $expectedOutcome,
         int $expectedMessageQueueCount
     ): void {
         $this->setExceptionLoggerOnHandler(
@@ -97,21 +98,20 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new UpdateMachine((string) $this->machine);
         $outcome = ($this->handler)($message);
 
-        self::assertEquals($expectedOutcome, $outcome);
+        self::assertEquals(new RemoteRequestSuccess($this->machine), $outcome);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
     }
 
     /**
      * @return array[]
      */
-    public function handleDataProvider(): array
+    public function handleSuccessDataProvider(): array
     {
         $endStateCases = [];
         foreach (State::END_STATES as $endState) {
             $endStateCases['current state is end state: ' . $endState] = [
                 'httpFixtures' => [],
                 'currentState' => $endState,
-                'expectedOutcome' => RemoteRequestOutcome::success(),
                 'expectedMessageQueueCount' => 0,
             ];
         }
@@ -121,13 +121,11 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                 'current state is stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_UP_ACTIVE,
-                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'current state not end state, current state not stop state, current state past stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_DELETE_RECEIVED,
-                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, machine is updated to stop state' => [
@@ -140,7 +138,6 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, machine is updated past stop state' => [
@@ -153,33 +150,68 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => RemoteRequestOutcome::success(),
                     'expectedMessageQueueCount' => 0,
-                ],
-                'no exception, machine is updated to before stop state' => [
-                    'httpFixtures' => [
-                        HttpResponseFactory::fromDropletEntity(
-                            new DropletEntity([
-                                'id' => 123,
-                                'status' => RemoteMachine::STATE_NEW,
-                            ])
-                        ),
-                    ],
-                    'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => RemoteRequestOutcome::retrying(),
-                    'expectedMessageQueueCount' => 1,
-                ],
-                'HTTP 503, requires retry' => [
-                    'httpFixtures' => [
-                        new Response(503),
-                    ],
-                    'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedOutcome' => RemoteRequestOutcome::retrying(),
-                    'expectedMessageQueueCount' => 1,
                 ],
             ],
             $endStateCases,
         );
+    }
+
+    /**
+     * @dataProvider handleRetryingDataProvider
+     *
+     * @param array<ResponseInterface|\Throwable> $httpFixtures
+     * @param State::VALUE_* $currentState
+     */
+    public function testHandleRetrying(
+        array $httpFixtures,
+        string $currentState,
+        int $expectedMessageQueueCount
+    ): void {
+        $this->setExceptionLoggerOnHandler(
+            (new MockExceptionLogger())
+                ->withoutLogCall()
+                ->getMock()
+        );
+
+        $this->mockHandler->append(...$httpFixtures);
+
+        $this->machine->setState($currentState);
+        $this->machineStore->store($this->machine);
+
+        $message = new UpdateMachine((string) $this->machine);
+        $outcome = ($this->handler)($message);
+
+        self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
+        $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function handleRetryingDataProvider(): array
+    {
+        return [
+            'no exception, machine is updated to before stop state' => [
+                'httpFixtures' => [
+                    HttpResponseFactory::fromDropletEntity(
+                        new DropletEntity([
+                            'id' => 123,
+                            'status' => RemoteMachine::STATE_NEW,
+                        ])
+                    ),
+                ],
+                'currentState' => State::VALUE_CREATE_RECEIVED,
+                'expectedMessageQueueCount' => 1,
+            ],
+            'HTTP 503, requires retry' => [
+                'httpFixtures' => [
+                    new Response(503),
+                ],
+                'currentState' => State::VALUE_CREATE_RECEIVED,
+                'expectedMessageQueueCount' => 1,
+            ],
+        ];
     }
 
     public function testHandleThrowsAuthenticationExceptionWithoutRetry(): void
@@ -202,7 +234,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            RemoteRequestOutcome::failed($expectedLoggedException),
+            new RemoteRequestFailure($expectedLoggedException),
             $outcome
         );
     }
@@ -233,7 +265,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            RemoteRequestOutcome::failed($expectedLoggedException),
+            new RemoteRequestFailure($expectedLoggedException),
             $outcome
         );
     }
@@ -270,7 +302,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            RemoteRequestOutcome::failed($expectedLoggedException),
+            new RemoteRequestFailure($expectedLoggedException),
             $outcome
         );
     }
@@ -283,7 +315,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
-            RemoteRequestOutcome::failed(
+            new RemoteRequestFailure(
                 new UnknownRemoteMachineException(
                     $this->machine->getProvider(),
                     (string) $this->machine,

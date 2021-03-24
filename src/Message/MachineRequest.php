@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Model\MachineProviderActionInterface;
 
-class MachineRequestMessage implements MachineRequestInterface
+class MachineRequest implements MachineRequestInterface
 {
     /**
      * @param MachineProviderActionInterface::ACTION_* $type
@@ -20,12 +20,12 @@ class MachineRequestMessage implements MachineRequestInterface
 
     public static function createCreate(string $machineId, int $retryCount = 0): MachineRequestInterface
     {
-        return new MachineRequestMessage(MachineProviderActionInterface::ACTION_CREATE, $machineId, $retryCount);
+        return new MachineRequest(MachineProviderActionInterface::ACTION_CREATE, $machineId, $retryCount);
     }
 
     public static function createGet(string $machineId, int $retryCount = 0): MachineRequestInterface
     {
-        return new MachineRequestMessage(MachineProviderActionInterface::ACTION_GET, $machineId, $retryCount);
+        return new MachineRequest(MachineProviderActionInterface::ACTION_GET, $machineId, $retryCount);
     }
 
     public function getType(): string

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\MachineHandler;
 
 use App\Entity\Machine;
+use App\Message\MachineRequest;
 use App\Message\MachineRequestInterface;
-use App\Message\MachineRequestMessage;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ApiRequestOutcome;
 use App\Model\Machine\State;
@@ -73,7 +73,7 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
             return $outcome;
         }
 
-        $this->updateMachineDispatcher->dispatch(MachineRequestMessage::createGet((string) $machine));
+        $this->updateMachineDispatcher->dispatch(MachineRequest::createGet((string) $machine));
 
         return ApiRequestOutcome::success();
     }

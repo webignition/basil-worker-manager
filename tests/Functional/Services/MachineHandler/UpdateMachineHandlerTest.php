@@ -9,7 +9,7 @@ use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
-use App\Message\MachineRequestMessage;
+use App\Message\MachineRequest;
 use App\Model\ApiRequestOutcome;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
@@ -94,7 +94,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->machine->setState($currentState);
         $this->machineStore->store($this->machine);
 
-        $request = MachineRequestMessage::createGet((string) $this->machine);
+        $request = MachineRequest::createGet((string) $this->machine);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals($expectedOutcome, $outcome);
@@ -198,7 +198,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = MachineRequestMessage::createGet((string) $this->machine);
+        $request = MachineRequest::createGet((string) $this->machine);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -229,7 +229,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = MachineRequestMessage::createGet((string) $this->machine, $retryCount);
+        $request = MachineRequest::createGet((string) $this->machine, $retryCount);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -266,7 +266,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $request = MachineRequestMessage::createGet((string) $this->machine);
+        $request = MachineRequest::createGet((string) $this->machine);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(
@@ -279,7 +279,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $request = MachineRequestMessage::createGet((string) $this->machine, 11);
+        $request = MachineRequest::createGet((string) $this->machine, 11);
         $outcome = $this->handler->handle($request);
 
         self::assertEquals(

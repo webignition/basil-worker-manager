@@ -154,3 +154,9 @@ services:
             $handlers:
                 - '@App\Services\MachineHandler\CreateMachineHandler'
                 - '@App\Services\MachineHandler\UpdateMachineHandler'
+
+    App\Services\MachineHandler\RequestHandler:
+        arguments:
+            $handlers:
+                - '@App\Services\MachineHandler\CreateMachineHandler'
+                - '@App\Services\MachineHandler\UpdateMachineHandler'

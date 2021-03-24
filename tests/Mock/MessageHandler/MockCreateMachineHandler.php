@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\MessageHandler;
 
-use App\Model\ApiRequest\WorkerRequestInterface;
 use App\Model\MachineProviderActionInterface;
+use App\Model\MachineRequestInterface;
 use App\Services\MachineHandler\CreateMachineHandler;
 use Mockery\MockInterface;
 
@@ -39,7 +39,7 @@ class MockCreateMachineHandler
         return $this;
     }
 
-    public function withHandleCall(WorkerRequestInterface $request): self
+    public function withHandleCall(MachineRequestInterface $request): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock

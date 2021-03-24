@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Synchronous;
 
-use App\Controller\WorkerController;
-use App\Entity\Worker;
-use App\Repository\WorkerRepository;
-use App\Request\WorkerCreateRequest;
+use App\Controller\MachineController;
+use App\Entity\Machine;
+use App\Repository\MachineRepository;
+use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
 
 class CreateMachineTest extends AbstractBaseIntegrationTest
 {
-    private WorkerRepository $workerRepository;
+    private MachineRepository $machineRepository;
     private DropletApi $dropletApi;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $workerRepository = self::$container->get(WorkerRepository::class);
-        if ($workerRepository instanceof WorkerRepository) {
-            $this->workerRepository = $workerRepository;
+        $machineRepository = self::$container->get(MachineRepository::class);
+        if ($machineRepository instanceof MachineRepository) {
+            $this->machineRepository = $machineRepository;
         }
 
         $digitalOceanClient = self::$container->get(Client::class);
@@ -43,25 +43,25 @@ class CreateMachineTest extends AbstractBaseIntegrationTest
 
         $this->client->request(
             'POST',
-            WorkerController::PATH_CREATE,
+            MachineController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_ID => $id,
+                MachineCreateRequest::KEY_ID => $id,
             ]
         );
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->workerRepository->find($id);
-        if (false === $worker instanceof Worker) {
-            throw new \RuntimeException('Worker entity not created. Verify test droplet has not been created');
+        $machine = $this->machineRepository->find($id);
+        if (false === $machine instanceof Machine) {
+            throw new \RuntimeException('Machine entity not created. Verify test droplet has not been created');
         }
 
-        self::assertInstanceOf(Worker::class, $worker);
+        self::assertInstanceOf(Machine::class, $machine);
 
-        $remoteId = $worker->getRemoteId();
+        $remoteId = $machine->getRemoteId();
         if (false === is_int($remoteId)) {
-            throw new \RuntimeException('Worker lacking remote_id. Verify test droplet has not been created');
+            throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has not been created');
         }
 
         self::assertIsInt($remoteId);

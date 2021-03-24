@@ -17,7 +17,7 @@ final class Version20210318103427 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql('
-            CREATE TABLE worker (
+            CREATE TABLE machine (
                 id VARCHAR(64) NOT NULL, 
                 remote_id INT DEFAULT NULL, 
                 state VARCHAR(255) NOT NULL, 
@@ -26,11 +26,11 @@ final class Version20210318103427 extends AbstractMigration
                 PRIMARY KEY(id)
             )
         ');
-        $this->addSql('COMMENT ON COLUMN worker.ip_addresses IS \'(DC2Type:simple_array)\'');
+        $this->addSql('COMMENT ON COLUMN machine.ip_addresses IS \'(DC2Type:simple_array)\'');
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP TABLE worker');
+        $this->addSql('DROP TABLE machine');
     }
 }

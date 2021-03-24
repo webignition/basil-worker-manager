@@ -2,13 +2,13 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
-use App\Services\WorkerUpdater;
+use App\Services\MachineUpdater;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
@@ -18,7 +18,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     public function __construct(
         private DropletApi $dropletApi,
         private DigitalOceanExceptionFactory $exceptionFactory,
-        private WorkerUpdater $workerUpdater,
+        private MachineUpdater $machineUpdater,
         private DropletConfiguration $dropletConfiguration,
         private string $prefix,
     ) {
@@ -35,49 +35,49 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function create(Worker $worker): Worker
+    public function create(Machine $machine): Machine
     {
         $createArguments = new DropletApiCreateCallArguments(
-            sprintf('%s-%s', $this->prefix, $worker->getName()),
+            sprintf('%s-%s', $this->prefix, $machine->getName()),
             $this->dropletConfiguration
         );
 
         $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
         $dropletEntity = $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([]);
 
-        return $this->updateWorker($worker, $dropletEntity);
+        return $this->update($machine, $dropletEntity);
     }
 
     /**
      * @throws VendorExceptionInterface
      */
-    public function remove(Worker $worker): Worker
+    public function remove(Machine $machine): Machine
     {
-        $this->dropletApi->remove((int) $worker->getRemoteId());
+        $this->dropletApi->remove((int) $machine->getRemoteId());
 
-        return $worker;
+        return $machine;
     }
 
     /**
      * @throws VendorExceptionInterface
      */
-    public function hydrate(Worker $worker): Worker
+    public function hydrate(Machine $machine): Machine
     {
-        $dropletEntity = $this->dropletApi->getById((int)$worker->getRemoteId());
+        $dropletEntity = $this->dropletApi->getById((int)$machine->getRemoteId());
 
-        return $this->updateWorker($worker, $dropletEntity);
+        return $this->update($machine, $dropletEntity);
     }
 
-    private function updateWorker(Worker $worker, DropletEntity $droplet): Worker
+    private function update(Machine $machine, DropletEntity $droplet): Machine
     {
         $remoteMachine = new RemoteMachine($droplet);
-        $this->workerUpdater->updateRemoteId($worker, $remoteMachine->getId());
+        $this->machineUpdater->updateRemoteId($machine, $remoteMachine->getId());
 
         $state = $remoteMachine->getState();
         if (is_string($state)) {
-            $worker = $this->workerUpdater->updateState($worker, $state);
+            $machine = $this->machineUpdater->updateState($machine, $state);
         }
 
-        return $this->workerUpdater->updateIpAddresses($worker, $remoteMachine->getIpAddresses());
+        return $this->machineUpdater->updateIpAddresses($machine, $remoteMachine->getIpAddresses());
     }
 }

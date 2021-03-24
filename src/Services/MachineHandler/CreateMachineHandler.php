@@ -4,43 +4,43 @@ declare(strict_types=1);
 
 namespace App\Services\MachineHandler;
 
-use App\Entity\Worker;
-use App\Message\WorkerRequestMessage;
-use App\MessageDispatcher\WorkerRequestMessageDispatcherInterface;
-use App\Model\ApiRequest\WorkerRequest;
-use App\Model\ApiRequest\WorkerRequestInterface;
+use App\Entity\Machine;
+use App\Message\MachineRequestMessage;
+use App\MessageDispatcher\MachineRequestMessageDispatcherInterface;
 use App\Model\ApiRequestOutcome;
+use App\Model\Machine\State;
 use App\Model\MachineProviderActionInterface;
-use App\Model\Worker\State;
-use App\Repository\WorkerRepository;
+use App\Model\MachineRequest;
+use App\Model\MachineRequestInterface;
+use App\Repository\MachineRepository;
 use App\Services\ApiActionRetryDecider;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\WorkerStore;
+use App\Services\MachineStore;
 
 class CreateMachineHandler extends AbstractApiActionHandler implements RequestHandlerInterface
 {
     public function __construct(
-        WorkerRepository $workerRepository,
+        MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         ApiActionRetryDecider $retryDecider,
-        WorkerRequestMessageDispatcherInterface $updateWorkerDispatcher,
+        MachineRequestMessageDispatcherInterface $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
-        private WorkerRequestMessageDispatcherInterface $createDispatcher,
-        private WorkerStore $workerStore,
+        private MachineRequestMessageDispatcherInterface $createDispatcher,
+        private MachineStore $machineStore,
     ) {
         parent::__construct(
-            $workerRepository,
+            $machineRepository,
             $machineProvider,
             $retryDecider,
-            $updateWorkerDispatcher,
+            $updateMachineDispatcher,
             $exceptionLogger
         );
     }
 
-    protected function doAction(Worker $worker): Worker
+    protected function doAction(Machine $machine): Machine
     {
-        return $this->machineProvider->create($worker);
+        return $this->machineProvider->create($machine);
     }
 
     public function handles(string $type): bool
@@ -48,37 +48,38 @@ class CreateMachineHandler extends AbstractApiActionHandler implements RequestHa
         return $type === MachineProviderActionInterface::ACTION_CREATE;
     }
 
-    public function handle(WorkerRequestInterface $request): ApiRequestOutcome
+    public function handle(MachineRequestInterface $request): ApiRequestOutcome
     {
-        $worker = $this->workerRepository->find($request->getWorkerId());
-        if (!$worker instanceof Worker) {
+        $machine = $this->machineRepository->find($request->getMachineId());
+        if (!$machine instanceof Machine) {
             return ApiRequestOutcome::invalid();
         }
 
-        $worker->setState(State::VALUE_CREATE_REQUESTED);
-        $this->workerStore->store($worker);
+        $machine->setState(State::VALUE_CREATE_REQUESTED);
+        $this->machineStore->store($machine);
 
         $retryCount = $request->getRetryCount();
-        $outcome = $this->doHandle($worker, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
+        $outcome = $this->doHandle($machine, MachineProviderActionInterface::ACTION_CREATE, $retryCount);
 
         if (ApiRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $this->createDispatcher->dispatch(
-                WorkerRequestMessage::createCreate($request->incrementRetryCount())
+                MachineRequestMessage::createCreate($request->incrementRetryCount())
             );
 
             return $outcome;
         }
 
         if (ApiRequestOutcome::STATE_FAILED === (string) $outcome) {
-            $worker = $worker->setState(State::VALUE_CREATE_FAILED);
-            $this->workerStore->store($worker);
+            $machine = $machine->setState(State::VALUE_CREATE_FAILED);
+            $this->machineStore->store($machine);
 
             return $outcome;
         }
 
-        $updateWorkerRequest = new WorkerRequest((string) $worker);
-        $this->updateWorkerDispatcher->dispatch(
-            WorkerRequestMessage::createGet($updateWorkerRequest)
+        $this->updateMachineDispatcher->dispatch(
+            MachineRequestMessage::createGet(
+                new MachineRequest((string) $machine)
+            )
         );
 
         return ApiRequestOutcome::success();

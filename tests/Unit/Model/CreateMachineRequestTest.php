@@ -10,10 +10,10 @@ class CreateMachineRequestTest extends TestCase
 {
     public function testCreate(): void
     {
-        $workerId = '123';
+        $machineId = '123';
 
-        $request = new \App\Model\ApiRequest\WorkerRequest($workerId);
-        self::assertSame($workerId, $request->getWorkerId());
+        $request = new \App\Model\MachineRequest($machineId);
+        self::assertSame($machineId, $request->getMachineId());
         self::assertSame(0, $request->getRetryCount());
     }
 }

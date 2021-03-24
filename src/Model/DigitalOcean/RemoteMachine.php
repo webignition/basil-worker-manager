@@ -2,8 +2,8 @@
 
 namespace App\Model\DigitalOcean;
 
+use App\Model\Machine\State;
 use App\Model\RemoteMachineInterface;
-use App\Model\Worker\State;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
 class RemoteMachine implements RemoteMachineInterface

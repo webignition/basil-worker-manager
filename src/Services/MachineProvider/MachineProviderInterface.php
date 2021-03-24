@@ -2,7 +2,7 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\ProviderInterface;
 
@@ -16,15 +16,15 @@ interface MachineProviderInterface
     /**
      * @throws ExceptionInterface
      */
-    public function create(Worker $worker): Worker;
+    public function create(Machine $machine): Machine;
 
     /**
      * @throws ExceptionInterface
      */
-    public function remove(Worker $worker): Worker;
+    public function remove(Machine $machine): Machine;
 
     /**
      * @throws ExceptionInterface
      */
-    public function hydrate(Worker $worker): Worker;
+    public function hydrate(Machine $machine): Machine;
 }

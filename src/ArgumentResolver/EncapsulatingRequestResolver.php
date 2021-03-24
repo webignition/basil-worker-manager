@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\ArgumentResolver;
 
 use App\Request\EncapsulatingRequestInterface;
-use App\Request\WorkerCreateRequest;
+use App\Request\MachineCreateRequest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 class EncapsulatingRequestResolver implements ArgumentValueResolverInterface
 {
     private const SUPPORTED_CLASSES = [
-        WorkerCreateRequest::class,
+        MachineCreateRequest::class,
     ];
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
@@ -29,6 +29,6 @@ class EncapsulatingRequestResolver implements ArgumentValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument): \Generator
     {
-        yield new WorkerCreateRequest($request);
+        yield new MachineCreateRequest($request);
     }
 }

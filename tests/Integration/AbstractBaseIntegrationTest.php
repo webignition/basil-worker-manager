@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\Worker;
+use App\Entity\Machine;
 use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
@@ -23,12 +23,12 @@ abstract class AbstractBaseIntegrationTest extends AbstractBaseFunctionalTest
             $this->entityManager = $entityManager;
         }
 
-        $this->removeAllEntities(Worker::class);
+        $this->removeAllEntities(Machine::class);
     }
 
     protected function tearDown(): void
     {
-        $this->removeAllEntities(Worker::class);
+        $this->removeAllEntities(Machine::class);
 
         parent::tearDown();
     }

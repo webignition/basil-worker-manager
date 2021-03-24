@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Asynchronous;
 
-use App\Controller\WorkerController;
-use App\Entity\Worker;
-use App\Model\Worker\State;
-use App\Repository\WorkerRepository;
-use App\Request\WorkerCreateRequest;
+use App\Controller\MachineController;
+use App\Entity\Machine;
+use App\Model\Machine\State;
+use App\Repository\MachineRepository;
+use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Services\EntityRefresher;
 use DigitalOceanV2\Api\Droplet as DropletApi;
@@ -19,19 +19,19 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     private const MAX_DURATION_IN_SECONDS = 120;
     private const MICROSECONDS_PER_SECOND = 1000000;
 
-    private WorkerRepository $workerRepository;
+    private MachineRepository $machineRepository;
     private DropletApi $dropletApi;
     private EntityRefresher $entityRefresher;
-    private string $workerId = '';
-    private Worker $worker;
+    private string $machineId = '';
+    private Machine $machine;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $workerRepository = self::$container->get(WorkerRepository::class);
-        if ($workerRepository instanceof WorkerRepository) {
-            $this->workerRepository = $workerRepository;
+        $machineRepository = self::$container->get(MachineRepository::class);
+        if ($machineRepository instanceof MachineRepository) {
+            $this->machineRepository = $machineRepository;
         }
 
         $digitalOceanClient = self::$container->get(Client::class);
@@ -44,7 +44,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             $this->entityRefresher = $entityRefresher;
         }
 
-        $this->workerId = md5('id content');
+        $this->machineId = md5('id content');
 
         echo "\n" . $this->getObfuscatedDigitalOceanAccessToken(2, 2) . "\n\n";
     }
@@ -54,34 +54,34 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     {
         $this->client->request(
             'POST',
-            WorkerController::PATH_CREATE,
+            MachineController::PATH_CREATE,
             [
-                WorkerCreateRequest::KEY_ID => $this->workerId,
+                MachineCreateRequest::KEY_ID => $this->machineId,
             ]
         );
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $worker = $this->workerRepository->find($this->workerId);
-        if ($worker instanceof Worker) {
-            $this->worker = $worker;
+        $machine = $this->machineRepository->find($this->machineId);
+        if ($machine instanceof Machine) {
+            $this->machine = $machine;
         }
 
-        self::assertSame(State::VALUE_CREATE_RECEIVED, $this->worker->getState());
+        self::assertSame(State::VALUE_CREATE_RECEIVED, $this->machine->getState());
 
-        $waitForWorkerUpActiveResult = $this->waitUntilWorkerStateIs(State::VALUE_UP_ACTIVE);
-        if (false === $waitForWorkerUpActiveResult) {
-            $this->fail('Timed out waiting for expected worker state: ' . State::VALUE_UP_ACTIVE);
+        $waitResult = $this->waitUntilMachineStateIs(State::VALUE_UP_ACTIVE);
+        if (false === $waitResult) {
+            $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_UP_ACTIVE);
         }
 
-        $this->entityRefresher->refreshForEntity(Worker::class);
+        $this->entityRefresher->refreshForEntity(Machine::class);
 
-        self::assertSame(State::VALUE_UP_ACTIVE, $this->worker->getState());
+        self::assertSame(State::VALUE_UP_ACTIVE, $this->machine->getState());
 
-        $remoteId = $this->worker->getRemoteId();
+        $remoteId = $this->machine->getRemoteId();
         if (false === is_int($remoteId)) {
-            throw new \RuntimeException('Worker lacking remote_id. Verify test droplet has not been created');
+            throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has not been created');
         }
 
         self::assertIsInt($remoteId);
@@ -92,13 +92,13 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     /**
      * @param State::VALUE_* $stopState
      */
-    private function waitUntilWorkerStateIs(string $stopState): bool
+    private function waitUntilMachineStateIs(string $stopState): bool
     {
         $duration = 0;
         $maxDuration = self::MAX_DURATION_IN_SECONDS * self::MICROSECONDS_PER_SECOND;
         $intervalInMicroseconds = 100000;
 
-        while ($stopState !== $this->worker->getState()) {
+        while ($stopState !== $this->machine->getState()) {
             usleep($intervalInMicroseconds);
             $duration += $intervalInMicroseconds;
 
@@ -107,7 +107,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             }
 
             $this->entityRefresher->refreshForEntities([
-                Worker::class,
+                Machine::class,
             ]);
         }
 

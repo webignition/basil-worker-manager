@@ -26,15 +26,14 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
         RemoteRequestRetryDecider $retryDecider,
-        MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
+        private MachineRequestMessageDispatcher $updateMachineDispatcher,
     ) {
         parent::__construct(
             $machineRepository,
             $machineProvider,
             $retryDecider,
-            $updateMachineDispatcher,
             $exceptionLogger,
             $machineStore
         );

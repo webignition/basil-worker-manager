@@ -50,7 +50,7 @@ class MachineProvider
     public function update(Machine $machine): RemoteMachineInterface
     {
         try {
-            return $this->findProvider($machine)->hydrate($machine);
+            return $this->findProvider($machine)->get($machine);
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {

@@ -60,7 +60,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function hydrate(Machine $machine): RemoteMachineInterface
+    public function get(Machine $machine): RemoteMachineInterface
     {
         $dropletEntity = $this->dropletApi->getById((int)$machine->getRemoteId());
 

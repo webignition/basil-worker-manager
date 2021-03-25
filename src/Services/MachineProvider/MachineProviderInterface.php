@@ -27,5 +27,5 @@ interface MachineProviderInterface
     /**
      * @throws ExceptionInterface
      */
-    public function hydrate(Machine $machine): RemoteMachineInterface;
+    public function get(Machine $machine): RemoteMachineInterface;
 }

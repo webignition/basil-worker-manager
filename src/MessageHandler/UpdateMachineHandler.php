@@ -22,6 +22,12 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class UpdateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
 {
+    /**
+     * stop if:
+     * - end state
+     * - state not in (VALUE_CREATE_RECEIVED, VALUE_CREATE_REQUESTED, VALUE_UP_STARTED)
+     */
+
     private const STOP_STATE = State::VALUE_UP_ACTIVE;
 
     public function __construct(

@@ -8,7 +8,6 @@ use App\Entity\Machine;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
-use App\Model\Machine\StateTransitionSequence;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
@@ -17,21 +16,12 @@ use App\Model\RemoteRequestSuccess;
 use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\MachineStateTransitionSequences;
 use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class UpdateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
 {
-    /**
-     * stop if:
-     * - end state
-     * - state not in (VALUE_CREATE_RECEIVED, VALUE_CREATE_REQUESTED, VALUE_UP_STARTED)
-     */
-
-    private const STOP_STATE = State::VALUE_UP_ACTIVE;
-
     public function __construct(
         MachineRepository $machineRepository,
         MachineProvider $machineProvider,
@@ -39,7 +29,6 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
-        private MachineStateTransitionSequences $stateTransitionSequences,
     ) {
         parent::__construct(
             $machineRepository,
@@ -98,24 +87,14 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
      */
     private function hasReachedStopStateOrEndState(string $currentState): bool
     {
-        if (self::STOP_STATE === $currentState) {
-            return true;
-        }
-
         if (in_array($currentState, State::END_STATES)) {
             return true;
         }
 
-        foreach ($this->stateTransitionSequences->getSequences() as $sequence) {
-            $currentStateSubset = $sequence->sliceEndingWith($currentState);
-            if (
-                $currentStateSubset instanceof StateTransitionSequence &&
-                $currentStateSubset->contains(self::STOP_STATE)
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return !in_array($currentState, [
+            State::VALUE_CREATE_RECEIVED,
+            State::VALUE_CREATE_REQUESTED,
+            State::VALUE_UP_STARTED,
+        ]);
     }
 }

@@ -7,6 +7,8 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\Machine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
+use App\Model\RemoteMachineInterface;
+use App\Tests\Mock\Model\MockRemoteMachine;
 use PHPUnit\Framework\TestCase;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -43,71 +45,65 @@ class MachineTest extends TestCase
     }
 
     /**
-     * @dataProvider setGetIpAddressesDataProvider
+     * @dataProvider updateFromRemoteMachineDataProvider
      *
-     * @param string[] $ipAddresses
      * @param string[] $expectedIpAddresses
+     * @param State::VALUE_* $expectedState
      */
-    public function testSetGetIpAddresses(Machine $machine, array $ipAddresses, array $expectedIpAddresses): void
-    {
-        $machine = $machine->setIpAddresses($ipAddresses);
+    public function testUpdateFromRemoteMachine(
+        RemoteMachineInterface $remoteMachine,
+        int $expectedRemoteId,
+        array $expectedIpAddresses,
+        string $expectedState
+    ): void {
+        $id = md5('id content');
+        $machine = Machine::create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
+        $machine = $machine->updateFromRemoteMachine($remoteMachine);
+
+        self::assertSame($expectedRemoteId, $machine->getRemoteId());
+        self::assertSame($expectedState, $machine->getState());
         self::assertSame($expectedIpAddresses, $machine->getIpAddresses());
     }
 
     /**
      * @return array[]
      */
-    public function setGetIpAddressesDataProvider(): array
+    public function updateFromRemoteMachineDataProvider(): array
     {
         return [
-            'machine has no ip addresses, empty set' => [
-                'machine' => new Machine(),
-                'ipAddresses' => [],
+            'no ip addresses, null state' => [
+                'remoteMachine' =>
+                    (new MockRemoteMachine())
+                        ->withGetIdCall(1)
+                        ->withGetIpAddressesCall([])
+                        ->withGetStateCall(null)
+                        ->getMock(),
+                'expectedRemoteId' => 1,
                 'expectedIpAddresses' => [],
+                'expectedState' => State::VALUE_CREATE_RECEIVED,
             ],
-            'machine has no ip address, non-repeating, alphabetical order' => [
-                'machine' => new Machine(),
-                'ipAddresses' => [
-                    'a',
-                    'b',
-                    'c',
-                ],
-                'expectedIpAddresses' => [
-                    'a',
-                    'b',
-                    'c',
-                ],
+            'has ip addresses, null state' => [
+                'remoteMachine' =>
+                    (new MockRemoteMachine())
+                        ->withGetIdCall(1)
+                        ->withGetIpAddressesCall(['10.0.0.1', '127.0.0.1'])
+                        ->withGetStateCall(null)
+                        ->getMock(),
+                'expectedRemoteId' => 1,
+                'expectedIpAddresses' => ['10.0.0.1', '127.0.0.1'],
+                'expectedState' => State::VALUE_CREATE_RECEIVED,
             ],
-            'machine has no ip address, non-repeating, reverse-alphabetical order' => [
-                'machine' => new Machine(),
-                'ipAddresses' => [
-                    'c',
-                    'b',
-                    'a',
-                ],
-                'expectedIpAddresses' => [
-                    'a',
-                    'b',
-                    'c',
-                ],
-            ],
-            'machine has no ip address, repeating' => [
-                'machine' => new Machine(),
-                'ipAddresses' => [
-                    'a',
-                    'a',
-                    'b',
-                    'c',
-                    'b',
-                    'a',
-                    'b',
-                ],
-                'expectedIpAddresses' => [
-                    'a',
-                    'b',
-                    'c',
-                ],
+            'has ip addresses, has state' => [
+                'remoteMachine' =>
+                    (new MockRemoteMachine())
+                        ->withGetIdCall(1)
+                        ->withGetIpAddressesCall(['10.0.0.1', '127.0.0.1'])
+                        ->withGetStateCall(State::VALUE_UP_STARTED)
+                        ->getMock(),
+                'expectedRemoteId' => 1,
+                'expectedIpAddresses' => ['10.0.0.1', '127.0.0.1'],
+                'expectedState' => State::VALUE_UP_STARTED,
             ],
         ];
     }

@@ -43,8 +43,7 @@ abstract class AbstractMachineRequestHandler
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
                 $machine->getProvider(),
-                $request->getType(),
-                $request->getRetryCount(),
+                $request,
                 $exception->getRemoteException()
             );
 

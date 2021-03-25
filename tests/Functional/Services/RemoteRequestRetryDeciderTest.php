@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Message\MachineRequestInterface;
+use App\Message\UpdateMachine;
 use App\Model\ProviderInterface;
-use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -29,16 +30,14 @@ class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
      * @dataProvider decideDataProvider
      *
      * @param ProviderInterface::NAME_* $provider
-     * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function testDecide(
         string $provider,
-        string $action,
-        int $retryCount,
+        MachineRequestInterface $request,
         \Throwable $exception,
         bool $expectedDecision
     ): void {
-        self::assertSame($expectedDecision, $this->decider->decide($provider, $action, $retryCount, $exception));
+        self::assertSame($expectedDecision, $this->decider->decide($provider, $request, $exception));
     }
 
     /**
@@ -49,15 +48,13 @@ class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
         return [
             'digitalocean ' . ApiLimitExceededException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => RemoteRequestActionInterface::ACTION_GET,
-                'retryCount' => 0,
+                'request' => new UpdateMachine('id'),
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'digitalocean ' . InvalidArgumentException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'action' => RemoteRequestActionInterface::ACTION_GET,
-                'retryCount' => 0,
+                'request' => new UpdateMachine('id'),
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
             ],

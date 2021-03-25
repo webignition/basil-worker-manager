@@ -70,14 +70,6 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
 
     private function update(Machine $machine, DropletEntity $droplet): Machine
     {
-        $remoteMachine = new RemoteMachine($droplet);
-        $this->machineUpdater->updateRemoteId($machine, $remoteMachine->getId());
-
-        $state = $remoteMachine->getState();
-        if (is_string($state)) {
-            $machine = $this->machineUpdater->updateState($machine, $state);
-        }
-
-        return $this->machineUpdater->updateIpAddresses($machine, $remoteMachine->getIpAddresses());
+        return $this->machineUpdater->updateFromRemoteMachine($machine, new RemoteMachine($droplet));
     }
 }

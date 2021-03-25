@@ -15,7 +15,6 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -229,9 +228,11 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(401));
 
+        $message = new UpdateMachine((string) $this->machine);
+
         $expectedLoggedException = new AuthenticationException(
             (string) $this->machine,
-            RemoteRequestActionInterface::ACTION_GET,
+            $message->getType(),
             new RuntimeException('Unauthorized', 401)
         );
 
@@ -241,7 +242,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $message = new UpdateMachine((string) $this->machine);
+
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
@@ -260,9 +261,11 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->mockHandler->append($apiResponse);
 
+        $message = new UpdateMachine((string) $this->machine, $retryCount);
+
         $expectedLoggedException = new HttpException(
             (string) $this->machine,
-            RemoteRequestActionInterface::ACTION_GET,
+            $message->getType(),
             $expectedRemoteException
         );
 
@@ -272,7 +275,6 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $message = new UpdateMachine((string) $this->machine, $retryCount);
         $outcome = ($this->handler)($message);
 
         self::assertEquals(
@@ -330,7 +332,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                 new UnknownRemoteMachineException(
                     $this->machine->getProvider(),
                     (string) $this->machine,
-                    RemoteRequestActionInterface::ACTION_GET,
+                    $message->getType(),
                     new RuntimeException('Not Found', 404)
                 )
             ),

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Message\MachineRequestInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
@@ -39,15 +40,16 @@ class RemoteRequestRetryDecider
 
     /**
      * @param ProviderInterface::NAME_* $provider
-     * @param RemoteRequestActionInterface::ACTION_* $action
      */
-    public function decide(string $provider, string $action, int $retryCount, \Throwable $exception): bool
+    public function decide(string $provider, MachineRequestInterface $request, \Throwable $exception): bool
     {
+        $action = $request->getType();
+
         $retryLimit = $this->retryLimits[$action] ?? 0;
 
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {
-                return $retryCount < $retryLimit && $decider->decide($action, $exception);
+                return $request->getRetryCount() < $retryLimit && $decider->decide($action, $exception);
             }
         }
 

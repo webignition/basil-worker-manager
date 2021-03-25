@@ -9,7 +9,6 @@ use App\Message\MachineExists;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\RemoteBooleanRequestSuccess;
-use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Repository\MachineRepository;
@@ -52,8 +51,7 @@ class MachineExistsHandler extends AbstractMachineRequestHandler implements Mess
             return RemoteRequestOutcome::invalid();
         }
 
-        $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_EXISTS, $retryCount);
+        $outcome = $this->doHandle($machine, $message);
 
         if ($outcome instanceof RemoteBooleanRequestSuccess) {
             if (false === $outcome->getResult()) {

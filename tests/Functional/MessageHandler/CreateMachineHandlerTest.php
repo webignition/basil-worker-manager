@@ -14,7 +14,6 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
@@ -140,7 +139,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandleExceptionWithRetry(\Throwable $previous, int $currentRetryCount): void
     {
         $message = new CreateMachine(self::MACHINE_ID, $currentRetryCount);
-        $exception = new Exception(self::MACHINE_ID, RemoteRequestActionInterface::ACTION_CREATE, $previous);
+        $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($this->machine, $exception)
@@ -190,7 +189,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandleExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
     {
         $message = new CreateMachine(self::MACHINE_ID, $currentRetryCount);
-        $exception = new Exception(self::MACHINE_ID, RemoteRequestActionInterface::ACTION_CREATE, $previous);
+        $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($this->machine, $exception)

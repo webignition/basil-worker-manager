@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\Model\RemoteRequestActionInterface;
+use App\Message\MachineRequestInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -34,10 +34,7 @@ abstract class AbstractMachineRequestHandler
      */
     abstract protected function doAction(Machine $machine): RemoteRequestOutcomeInterface;
 
-    /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
-     */
-    protected function doHandle(Machine $machine, string $action, int $retryCount): RemoteRequestOutcomeInterface
+    protected function doHandle(Machine $machine, MachineRequestInterface $request): RemoteRequestOutcomeInterface
     {
         $lastException = null;
 
@@ -46,8 +43,7 @@ abstract class AbstractMachineRequestHandler
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
                 $machine->getProvider(),
-                $action,
-                $retryCount,
+                $request,
                 $exception->getRemoteException()
             );
 

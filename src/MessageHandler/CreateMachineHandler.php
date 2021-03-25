@@ -7,38 +7,14 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Message\CreateMachine;
 use App\Message\UpdateMachine;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
-use App\Repository\MachineRepository;
-use App\Services\ExceptionLogger;
-use App\Services\MachineProvider\MachineProvider;
-use App\Services\MachineStore;
-use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class CreateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
 {
-    public function __construct(
-        MachineRepository $machineRepository,
-        MachineProvider $machineProvider,
-        RemoteRequestRetryDecider $retryDecider,
-        ExceptionLogger $exceptionLogger,
-        MachineStore $machineStore,
-        private MachineRequestMessageDispatcher $updateMachineDispatcher,
-        private MachineRequestMessageDispatcher $createDispatcher,
-    ) {
-        parent::__construct(
-            $machineRepository,
-            $machineProvider,
-            $retryDecider,
-            $exceptionLogger,
-            $machineStore,
-        );
-    }
-
     protected function doAction(Machine $machine): RemoteMachineRequestSuccess
     {
         return new RemoteMachineRequestSuccess(
@@ -59,7 +35,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         $outcome = $this->doHandle($machine, $message);
 
         if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->createDispatcher->dispatch($message->incrementRetryCount());
+            $this->dispatcher->dispatch($message->incrementRetryCount());
 
             return $outcome;
         }
@@ -77,7 +53,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
             );
         }
 
-        $this->updateMachineDispatcher->dispatch(new UpdateMachine((string) $machine));
+        $this->dispatcher->dispatch(new UpdateMachine((string) $machine));
 
         return $outcome;
     }

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
-use App\Entity\Machine;
 use App\Message\CreateMachine;
+use App\Message\MachineExists;
+use App\Message\MachineRequestInterface;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
@@ -14,33 +15,29 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 
 class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
-    private MachineRequestMessageDispatcher $defaultDispatcher;
-    private MachineRequestMessageDispatcher $updateMachineMessageDispatcher;
+    private const MACHINE_ID = 'id';
+
+    private MachineRequestMessageDispatcher $dispatcher;
     private MessengerAsserter $messengerAsserter;
-    private Machine $machine;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $defaultDispatcher = self::$container->get(MachineRequestMessageDispatcher::class);
-        if ($defaultDispatcher instanceof MachineRequestMessageDispatcher) {
-            $this->defaultDispatcher = $defaultDispatcher;
-        }
-
-        $updateMachineMessageDispatcher = self::$container->get('app.message_dispatcher.update_machine');
-        if ($updateMachineMessageDispatcher instanceof MachineRequestMessageDispatcher) {
-            $this->updateMachineMessageDispatcher = $updateMachineMessageDispatcher;
+        $dispatcher = self::$container->get(MachineRequestMessageDispatcher::class);
+        if ($dispatcher instanceof MachineRequestMessageDispatcher) {
+            $this->dispatcher = $dispatcher;
         }
 
         $machineFactory = self::$container->get(MachineFactory::class);
         if ($machineFactory instanceof MachineFactory) {
-            $this->machine = $machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+            $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
@@ -49,38 +46,54 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         }
     }
 
-    public function testDefaultDispatcherDispatch(): void
+    /**
+     * @dataProvider dispatchDataProvider
+     */
+    public function testDispatch(MachineRequestInterface $message, ?StampInterface $expectedDelayStamp): void
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $message = new CreateMachine((string) $this->machine);
-
-        $this->defaultDispatcher->dispatch($message);
+        $this->dispatcher->dispatch($message);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $message);
 
-        $this->messengerAsserter->assertEnvelopeNotContainsStampsOfType(
-            $this->messengerAsserter->getEnvelopeAtPosition(0),
-            DelayStamp::class
-        );
+        if ($expectedDelayStamp instanceof StampInterface) {
+            $this->messengerAsserter->assertEnvelopeContainsStamp(
+                $this->messengerAsserter->getEnvelopeAtPosition(0),
+                $expectedDelayStamp,
+                0
+            );
+        } else {
+            $this->messengerAsserter->assertEnvelopeNotContainsStampsOfType(
+                $this->messengerAsserter->getEnvelopeAtPosition(0),
+                DelayStamp::class
+            );
+        }
     }
 
-    public function testMachineUpdateDispatcherDispatch(): void
+    /**
+     * @return array[]
+     */
+    public function dispatchDataProvider(): array
     {
-        $this->messengerAsserter->assertQueueIsEmpty();
-
-        $message = new UpdateMachine((string) $this->machine);
-
-        $this->updateMachineMessageDispatcher->dispatch($message);
-
-        $this->messengerAsserter->assertQueueCount(1);
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, $message);
-
-        $this->messengerAsserter->assertEnvelopeContainsStamp(
-            $this->messengerAsserter->getEnvelopeAtPosition(0),
-            new DelayStamp(10000),
-            0
-        );
+        return [
+            'create' => [
+                'message' => new CreateMachine(self::MACHINE_ID),
+                'expectedDelayStamp' => null,
+            ],
+            'get' => [
+                'message' => new UpdateMachine(self::MACHINE_ID),
+                'expectedDelayStamp' => new DelayStamp(10000),
+            ],
+            'exists, first attempt' => [
+                'message' => new MachineExists(self::MACHINE_ID),
+                'expectedDelayStamp' => new DelayStamp(1000),
+            ],
+            'exists, not first attempt' => [
+                'message' => new MachineExists(self::MACHINE_ID, 2),
+                'expectedDelayStamp' => new DelayStamp(10000),
+            ],
+        ];
     }
 }

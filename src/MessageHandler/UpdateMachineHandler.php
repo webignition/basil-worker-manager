@@ -6,38 +6,15 @@ namespace App\MessageHandler;
 
 use App\Entity\Machine;
 use App\Message\UpdateMachine;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccess;
-use App\Repository\MachineRepository;
-use App\Services\ExceptionLogger;
-use App\Services\MachineProvider\MachineProvider;
-use App\Services\MachineStore;
-use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class UpdateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
 {
-    public function __construct(
-        MachineRepository $machineRepository,
-        MachineProvider $machineProvider,
-        RemoteRequestRetryDecider $retryDecider,
-        ExceptionLogger $exceptionLogger,
-        MachineStore $machineStore,
-        private MachineRequestMessageDispatcher $updateMachineDispatcher,
-    ) {
-        parent::__construct(
-            $machineRepository,
-            $machineProvider,
-            $retryDecider,
-            $exceptionLogger,
-            $machineStore
-        );
-    }
-
     protected function doAction(Machine $machine): RemoteMachineRequestSuccess
     {
         return new RemoteMachineRequestSuccess(
@@ -71,7 +48,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         }
 
         if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->updateMachineDispatcher->dispatch($message->incrementRetryCount());
+            $this->dispatcher->dispatch($message->incrementRetryCount());
 
             return RemoteRequestOutcome::retrying();
         }

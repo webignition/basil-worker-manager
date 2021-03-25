@@ -10,7 +10,6 @@ use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Repository\MachineRepository;
@@ -58,7 +57,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         $this->machineStore->store($machine);
 
         $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_CREATE, $retryCount);
+        $outcome = $this->doHandle($machine, $message->getType(), $retryCount);
 
         if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $this->createDispatcher->dispatch($message->incrementRetryCount());

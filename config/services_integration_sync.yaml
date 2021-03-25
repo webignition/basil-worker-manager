@@ -3,8 +3,8 @@ services:
         autowire: true
         autoconfigure: true
 
-    app.message_dispatcher.update_machine:
-        class: App\MessageDispatcher\MachineRequestMessageDispatcher
+    app.message_dispatcher.get.configuration:
+        class: App\Model\MachineRequestDispatcherConfiguration
         arguments:
             $dispatchDelayInSeconds: '%update_machine_dispatch_delay%'
             $enabled: false

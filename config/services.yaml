@@ -115,6 +115,10 @@ services:
         arguments:
             $updateMachineDispatcher: '@app.message_dispatcher.update_machine'
 
+    App\MessageHandler\MachineExistsHandler:
+        arguments:
+            $machineExistsDispatcher: '@app.message_dispatcher.machine_exists'
+
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:
             $factories:

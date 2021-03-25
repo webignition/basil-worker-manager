@@ -47,6 +47,18 @@ class MockMachineProvider
         return $this;
     }
 
+    public function withExistsCallThrowingException(Machine $machine, \Exception $exception): self
+    {
+        if ($this->mock instanceof MockInterface) {
+            $this->mock
+                ->shouldReceive('exists')
+                ->with($machine)
+                ->andThrow($exception);
+        }
+
+        return $this;
+    }
+
     public function withoutCreateCall(): self
     {
         if ($this->mock instanceof MockInterface) {

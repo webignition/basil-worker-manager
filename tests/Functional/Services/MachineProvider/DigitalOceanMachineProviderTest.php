@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\MachineProvider;
 
 use App\Entity\Machine;
+use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Services\MachineFactory;
 use App\Services\MachineProvider\DigitalOceanMachineProvider;
@@ -67,13 +68,12 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         self::assertNull($this->machine->getRemoteId());
 
-        $this->machineProvider->create($this->machine);
+        $remoteMachine = $this->machineProvider->create($this->machine);
 
-        self::assertSame($remoteId, $this->machine->getRemoteId());
-        self::assertSame($ipAddresses, ObjectReflector::getProperty($this->machine, 'ip_addresses'));
+        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
-    public function testHydrateSuccess(): void
+    public function testGetSuccess(): void
     {
         $remoteId = 123;
         $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
@@ -100,10 +100,9 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $this->machine = $this->machineProvider->hydrate($this->machine);
+        $remoteMachine = $this->machineProvider->get($this->machine);
 
-        self::assertSame($remoteId, $this->machine->getRemoteId());
-        self::assertSame($ipAddresses, ObjectReflector::getProperty($this->machine, 'ip_addresses'));
+        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
     public function testRemoveSuccess(): void

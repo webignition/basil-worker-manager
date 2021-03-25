@@ -5,6 +5,7 @@ namespace App\Services\MachineProvider;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
+use App\Model\RemoteMachineInterface;
 use App\Model\RemoteRequestActionInterface as Action;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 
@@ -31,7 +32,7 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function create(Machine $machine): Machine
+    public function create(Machine $machine): RemoteMachineInterface
     {
         try {
             return $this->findProvider($machine)->create($machine);
@@ -46,10 +47,10 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function update(Machine $machine): Machine
+    public function get(Machine $machine): RemoteMachineInterface
     {
         try {
-            return $this->findProvider($machine)->hydrate($machine);
+            return $this->findProvider($machine)->get($machine);
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
@@ -61,10 +62,10 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function delete(Machine $machine): Machine
+    public function delete(Machine $machine): void
     {
         try {
-            return $this->findProvider($machine)->remove($machine);
+            $this->findProvider($machine)->remove($machine);
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {

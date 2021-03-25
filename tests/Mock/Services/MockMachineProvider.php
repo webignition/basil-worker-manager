@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Mock\Services;
 
 use App\Entity\Machine;
+use App\Model\RemoteMachineInterface;
 use App\Services\MachineProvider\MachineProvider;
 use Mockery\MockInterface;
 
@@ -22,13 +23,13 @@ class MockMachineProvider
         return $this->mock;
     }
 
-    public function withCreateCall(Machine $machine): self
+    public function withCreateCall(Machine $machine, RemoteMachineInterface $remoteMachine): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive('create')
                 ->with($machine)
-                ->andReturn($machine);
+                ->andReturn($remoteMachine);
         }
 
         return $this;

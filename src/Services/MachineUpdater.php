@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Machine;
-use App\Model\Machine\State;
+use App\Model\RemoteMachineInterface;
 
 class MachineUpdater
 {
@@ -12,36 +12,29 @@ class MachineUpdater
     ) {
     }
 
-    public function updateRemoteId(Machine $machine, int $remoteId): Machine
+    public function updateFromRemoteMachine(Machine $machine, RemoteMachineInterface $remoteMachine): Machine
     {
+        $isUpdated = false;
+
+        $remoteId = $remoteMachine->getId();
         if ($remoteId !== $machine->getRemoteId()) {
             $machine->setRemoteId($remoteId);
-            $this->machineStore->store($machine);
+            $isUpdated = true;
         }
 
-        return $machine;
-    }
-
-    /**
-     * @param State::VALUE_* $state
-     */
-    public function updateState(Machine $machine, string $state): Machine
-    {
-        if ($state !== $machine->getState()) {
+        $state = $remoteMachine->getState();
+        if (is_string($state) && $state !== $machine->getState()) {
             $machine->setState($state);
-            $this->machineStore->store($machine);
+            $isUpdated = true;
         }
 
-        return $machine;
-    }
-
-    /**
-     * @param string[] $ipAddresses
-     */
-    public function updateIpAddresses(Machine $machine, array $ipAddresses): Machine
-    {
+        $ipAddresses = $remoteMachine->getIpAddresses();
         if ($ipAddresses !== $machine->getIpAddresses()) {
             $machine->setIpAddresses($ipAddresses);
+            $isUpdated = true;
+        }
+
+        if ($isUpdated) {
             $this->machineStore->store($machine);
         }
 

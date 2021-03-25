@@ -48,7 +48,7 @@ class MockRemoteMachine
     }
 
     /**
-     * @param \App\Model\Machine\State::VALUE_UP_STARTED|State::VALUE_UP_ACTIVE|null $state
+     * @param State::VALUE_UP_STARTED|State::VALUE_UP_ACTIVE|null $state
      */
     public function withGetStateCall(?string $state): self
     {

@@ -9,15 +9,15 @@ use App\Message\CreateMachine;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
-use App\Model\RemoteMachineInterface;
+use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
-use App\Model\RemoteRequestSuccess;
 use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
+use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -29,6 +29,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
+        MachineUpdater $machineUpdater,
         private MachineRequestMessageDispatcher $createDispatcher,
         private MachineStore $machineStore,
     ) {
@@ -37,13 +38,16 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
             $machineProvider,
             $retryDecider,
             $updateMachineDispatcher,
-            $exceptionLogger
+            $exceptionLogger,
+            $machineUpdater,
         );
     }
 
-    protected function doAction(Machine $machine): RemoteMachineInterface
+    protected function doAction(Machine $machine): RemoteMachineRequestSuccess
     {
-        return $this->machineProvider->create($machine);
+        return new RemoteMachineRequestSuccess(
+            $this->machineProvider->create($machine)
+        );
     }
 
     public function __invoke(CreateMachine $message): RemoteRequestOutcomeInterface
@@ -72,8 +76,12 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
             return $outcome;
         }
 
+        if ($outcome instanceof RemoteMachineRequestSuccess) {
+            $machine = $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
+        }
+
         $this->updateMachineDispatcher->dispatch(new UpdateMachine((string) $machine));
 
-        return new RemoteRequestSuccess($machine);
+        return $outcome;
     }
 }

@@ -10,6 +10,7 @@ use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
+use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\MachineFactory;
@@ -53,8 +54,8 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $this->assertMutateMachine(function (Machine $machine) {
-            $this->machineProvider->create($machine);
+        $this->assertRetrieveRemoteMachine(function (Machine $machine) {
+            return $this->machineProvider->create($machine);
         });
     }
 
@@ -107,10 +108,10 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         }
     }
 
-    public function testUpdateSuccess(): void
+    public function testGetSuccess(): void
     {
-        $this->assertMutateMachine(function (Machine $machine) {
-            $this->machineProvider->update($machine);
+        $this->assertRetrieveRemoteMachine(function (Machine $machine) {
+            return $this->machineProvider->get($machine);
         });
     }
 
@@ -121,14 +122,14 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
      * @param class-string $expectedExceptionClass
      * @param \Exception $expectedRemoveException
      */
-    public function testUpdateThrowsException(
+    public function testGetThrowsException(
         ResponseInterface $apiResponse,
         string $expectedExceptionClass,
         \Exception $expectedRemoveException
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->update($this->machine);
+                $this->machineProvider->get($this->machine);
             },
             RemoteRequestActionInterface::ACTION_GET,
             $apiResponse,
@@ -168,7 +169,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         );
     }
 
-    private function assertMutateMachine(callable $callable): void
+    private function assertRetrieveRemoteMachine(callable $callable): void
     {
         $remoteId = 123;
         $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
@@ -192,13 +193,9 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        self::assertNull($this->machine->getRemoteId());
-        self::assertSame([], ObjectReflector::getProperty($this->machine, 'ip_addresses'));
+        $remoteMachine = $callable($this->machine);
 
-        $callable($this->machine);
-
-        self::assertSame($remoteId, $this->machine->getRemoteId());
-        self::assertSame($ipAddresses, ObjectReflector::getProperty($this->machine, 'ip_addresses'));
+        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
     /**

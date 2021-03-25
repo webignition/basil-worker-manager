@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
 use App\Message\UpdateMachine;
 use App\MessageHandler\CreateMachineHandler;
+use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
-use App\Model\RemoteMachineInterface;
+use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
-use App\Model\RemoteRequestSuccess;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
 use App\Services\MachineProvider\MachineProvider;
@@ -23,8 +24,11 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineProvider;
 use App\Tests\Services\Asserter\MessengerAsserter;
+use App\Tests\Services\HttpResponseFactory;
+use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
+use GuzzleHttp\Handler\MockHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -32,9 +36,12 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
+    private const MACHINE_ID = 'id';
+
     private CreateMachineHandler $handler;
-    private MachineFactory $machineFactory;
     private MessengerAsserter $messengerAsserter;
+    private MockHandler $mockHandler;
+    private Machine $machine;
 
     protected function setUp(): void
     {
@@ -47,53 +54,70 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $machineFactory = self::$container->get(MachineFactory::class);
         if ($machineFactory instanceof MachineFactory) {
-            $this->machineFactory = $machineFactory;
+            $this->machine = $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         if ($messengerAsserter instanceof MessengerAsserter) {
             $this->messengerAsserter = $messengerAsserter;
         }
+
+        $mockHandler = self::$container->get(MockHandler::class);
+        if ($mockHandler instanceof MockHandler) {
+            $this->mockHandler = $mockHandler;
+        }
     }
 
     public function testHandleSuccess(): void
     {
-        $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMachine((string) $machine);
+        self::assertNull($this->machine->getRemoteId());
+        self::assertSame([], ObjectReflector::getProperty($this->machine, 'ip_addresses'));
 
-        $remoteMachine = \Mockery::mock(RemoteMachineInterface::class);
+        $dropletData = [
+            'id' => 123,
+            'networks' => (object) [
+                'v4' => [
+                    (object) [
+                        'ip_address' => '10.0.0.1',
+                        'type' => 'public',
+                    ],
+                    (object) [
+                        'ip_address' => '127.0.0.1',
+                        'type' => 'public',
+                    ],
+                ],
+            ],
+            'status' => RemoteMachine::STATE_NEW,
+        ];
 
-        $machineProvider = (new MockMachineProvider())
-            ->withCreateCall($machine, $remoteMachine)
-            ->getMock();
+        $expectedDropletEntity = new DropletEntity($dropletData);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $exceptionLogger = (new MockExceptionLogger())
-            ->withoutLogCall()
-            ->getMock();
-
-        $this->prepareHandler($machineProvider, $exceptionLogger);
-
+        $message = new CreateMachine(self::MACHINE_ID);
         $outcome = ($this->handler)($message);
-        self::assertEquals(new RemoteRequestSuccess($machine), $outcome);
+
+        $expectedRemoteMachine = new RemoteMachine($expectedDropletEntity);
+        self::assertEquals(new RemoteMachineRequestSuccess($expectedRemoteMachine), $outcome);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateMachine((string) $machine)
+            new UpdateMachine(self::MACHINE_ID)
         );
 
-        self::assertNotSame(State::VALUE_CREATE_FAILED, $machine->getState());
+        self::assertSame($expectedRemoteMachine->getId(), (int) $this->machine->getRemoteId());
+        self::assertSame($expectedRemoteMachine->getState(), $this->machine->getState());
+        self::assertSame($expectedRemoteMachine->getIpAddresses(), $this->machine->getIpAddresses());
     }
 
     public function testHandleWithUnsupportedProviderException(): void
     {
         $exception = \Mockery::mock(UnsupportedProviderException::class);
 
-        $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMachine((string) $machine);
+        $message = new CreateMachine(self::MACHINE_ID);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($machine, $exception)
+            ->withCreateCallThrowingException($this->machine, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -106,7 +130,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_CREATE_FAILED, $machine->getState());
+        self::assertSame(State::VALUE_CREATE_FAILED, $this->machine->getState());
         self::assertSame(0, $message->getRetryCount());
     }
 
@@ -115,12 +139,11 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testHandleExceptionWithRetry(\Throwable $previous, int $currentRetryCount): void
     {
-        $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMachine((string) $machine, $currentRetryCount);
-        $exception = new Exception((string) $machine, RemoteRequestActionInterface::ACTION_CREATE, $previous);
+        $message = new CreateMachine(self::MACHINE_ID, $currentRetryCount);
+        $exception = new Exception(self::MACHINE_ID, RemoteRequestActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($machine, $exception)
+            ->withCreateCallThrowingException($this->machine, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -132,12 +155,12 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
         self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
 
-        $expectedMessage = new CreateMachine((string) $machine, $currentRetryCount + 1);
+        $expectedMessage = new CreateMachine(self::MACHINE_ID, $currentRetryCount + 1);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
-        self::assertNotSame(State::VALUE_CREATE_FAILED, $machine->getState());
+        self::assertNotSame(State::VALUE_CREATE_FAILED, $this->machine->getState());
     }
 
     /**
@@ -166,12 +189,11 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testHandleExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
     {
-        $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $message = new CreateMachine((string) $machine, $currentRetryCount);
-        $exception = new Exception((string) $machine, RemoteRequestActionInterface::ACTION_CREATE, $previous);
+        $message = new CreateMachine(self::MACHINE_ID, $currentRetryCount);
+        $exception = new Exception(self::MACHINE_ID, RemoteRequestActionInterface::ACTION_CREATE, $previous);
 
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCallThrowingException($machine, $exception)
+            ->withCreateCallThrowingException($this->machine, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -184,7 +206,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_CREATE_FAILED, $machine->getState());
+        self::assertSame(State::VALUE_CREATE_FAILED, $this->machine->getState());
     }
 
     /**

@@ -14,9 +14,11 @@ use App\MessageHandler\UpdateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
+use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
+use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccess;
 use App\Services\ExceptionLogger;
 use App\Services\MachineFactory;
@@ -37,6 +39,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
+    private const MACHINE_ID = 'id';
+
     private UpdateMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
@@ -54,7 +58,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $machineFactory = self::$container->get(MachineFactory::class);
         if ($machineFactory instanceof MachineFactory) {
-            $this->machine = $machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+            $this->machine = $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         }
 
         $mockHandler = self::$container->get(MockHandler::class);
@@ -82,6 +86,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandleSuccess(
         array $httpFixtures,
         string $currentState,
+        RemoteRequestOutcomeInterface $expectedOutcome,
+        string $expectedState,
         int $expectedMessageQueueCount
     ): void {
         $this->setExceptionLoggerOnHandler(
@@ -98,14 +104,9 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new UpdateMachine((string) $this->machine);
         $outcome = ($this->handler)($message);
 
-//        $remoteId = 123;
-//        $dropletEntity = new DropletEntity([
-//            'id' => $remoteId,
-//        ]);
-//
-//        $expectedRemoteMachine = new RemoteMachine($dropletEntity);
+        self::assertEquals($expectedOutcome, $outcome);
+        self::assertSame($expectedState, $this->machine->getState());
 
-        self::assertEquals(new RemoteRequestSuccess($this->machine), $outcome);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
     }
 
@@ -119,6 +120,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
             $endStateCases['current state is end state: ' . $endState] = [
                 'httpFixtures' => [],
                 'currentState' => $endState,
+                'expectedOutcome' => new RemoteRequestSuccess(),
+                'expectedState' => $endState,
                 'expectedMessageQueueCount' => 0,
             ];
         }
@@ -128,11 +131,15 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                 'current state is stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_UP_ACTIVE,
+                    'expectedOutcome' => new RemoteRequestSuccess(),
+                    'expectedState' => State::VALUE_UP_ACTIVE,
                     'expectedMessageQueueCount' => 0,
                 ],
                 'current state not end state, current state not stop state, current state past stop state' => [
                     'httpFixtures' => [],
                     'currentState' => State::VALUE_DELETE_RECEIVED,
+                    'expectedOutcome' => new RemoteRequestSuccess(),
+                    'expectedState' => State::VALUE_DELETE_RECEIVED,
                     'expectedMessageQueueCount' => 0,
                 ],
                 'no exception, machine is updated to stop state' => [
@@ -145,18 +152,15 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                         ),
                     ],
                     'currentState' => State::VALUE_CREATE_RECEIVED,
-                    'expectedMessageQueueCount' => 0,
-                ],
-                'no exception, machine is updated past stop state' => [
-                    'httpFixtures' => [
-                        HttpResponseFactory::fromDropletEntity(
+                    'expectedOutcome' => new RemoteMachineRequestSuccess(
+                        new RemoteMachine(
                             new DropletEntity([
                                 'id' => 123,
                                 'status' => RemoteMachine::STATE_ACTIVE,
                             ])
-                        ),
-                    ],
-                    'currentState' => State::VALUE_CREATE_RECEIVED,
+                        )
+                    ),
+                    'expectedState' => State::VALUE_UP_ACTIVE,
                     'expectedMessageQueueCount' => 0,
                 ],
             ],

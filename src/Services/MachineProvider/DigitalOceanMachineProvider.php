@@ -9,7 +9,6 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
-use App\Services\MachineUpdater;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
@@ -19,7 +18,6 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     public function __construct(
         private DropletApi $dropletApi,
         private DigitalOceanExceptionFactory $exceptionFactory,
-        private MachineUpdater $machineUpdater,
         private DropletConfiguration $dropletConfiguration,
         private string $prefix,
     ) {
@@ -44,9 +42,10 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
         );
 
         $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
-        $dropletEntity = $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([]);
 
-        return $this->update($machine, $dropletEntity);
+        return new RemoteMachine(
+            $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([])
+        );
     }
 
     /**
@@ -62,13 +61,8 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function get(Machine $machine): RemoteMachineInterface
     {
-        $dropletEntity = $this->dropletApi->getById((int)$machine->getRemoteId());
-
-        return $this->update($machine, $dropletEntity);
-    }
-
-    private function update(Machine $machine, DropletEntity $droplet): RemoteMachineInterface
-    {
-        return $this->machineUpdater->updateFromRemoteMachine($machine, new RemoteMachine($droplet));
+        return new RemoteMachine(
+            $this->dropletApi->getById((int)$machine->getRemoteId())
+        );
     }
 }

@@ -9,7 +9,7 @@ use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;
-use App\Model\RemoteMachineInterface;
+use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -18,6 +18,7 @@ use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStateTransitionSequences;
+use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -37,6 +38,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
+        MachineUpdater $machineUpdater,
         private MachineStateTransitionSequences $stateTransitionSequences,
     ) {
         parent::__construct(
@@ -44,13 +46,16 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
             $machineProvider,
             $retryDecider,
             $updateMachineDispatcher,
-            $exceptionLogger
+            $exceptionLogger,
+            $machineUpdater
         );
     }
 
-    protected function doAction(Machine $machine): RemoteMachineInterface
+    protected function doAction(Machine $machine): RemoteMachineRequestSuccess
     {
-        return $this->machineProvider->update($machine);
+        return new RemoteMachineRequestSuccess(
+            $this->machineProvider->get($machine)
+        );
     }
 
     public function __invoke(UpdateMachine $message): RemoteRequestOutcomeInterface
@@ -61,15 +66,17 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         }
 
         if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-            return new RemoteRequestSuccess($machine);
+            return new RemoteRequestSuccess();
         }
 
         $retryCount = $message->getRetryCount();
         $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_GET, $retryCount);
 
-        if (RemoteRequestOutcome::STATE_SUCCESS === (string) $outcome) {
+        if ($outcome instanceof RemoteMachineRequestSuccess) {
+            $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
+
             if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-                return new RemoteRequestSuccess($machine);
+                return $outcome;
             }
 
             $outcome = RemoteRequestOutcome::retrying();

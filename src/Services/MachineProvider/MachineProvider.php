@@ -47,7 +47,7 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function update(Machine $machine): RemoteMachineInterface
+    public function get(Machine $machine): RemoteMachineInterface
     {
         try {
             return $this->findProvider($machine)->get($machine);

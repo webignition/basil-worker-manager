@@ -51,8 +51,7 @@ class MachineExistsHandler extends AbstractMachineRequestHandler implements Mess
             return RemoteRequestOutcome::invalid();
         }
 
-        $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, $message->getType(), $retryCount);
+        $outcome = $this->doHandle($machine, $message);
 
         if ($outcome instanceof RemoteBooleanRequestSuccess) {
             if (false === $outcome->getResult()) {

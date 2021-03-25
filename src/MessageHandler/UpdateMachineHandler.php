@@ -56,8 +56,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
             return new RemoteRequestSuccess();
         }
 
-        $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, $message->getType(), $retryCount);
+        $outcome = $this->doHandle($machine, $message);
 
         if ($outcome instanceof RemoteMachineRequestSuccess) {
             $this->machineStore->store(

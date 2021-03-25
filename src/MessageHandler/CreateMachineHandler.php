@@ -56,8 +56,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         $machine->setState(State::VALUE_CREATE_REQUESTED);
         $this->machineStore->store($machine);
 
-        $retryCount = $message->getRetryCount();
-        $outcome = $this->doHandle($machine, $message->getType(), $retryCount);
+        $outcome = $this->doHandle($machine, $message);
 
         if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
             $this->createDispatcher->dispatch($message->incrementRetryCount());

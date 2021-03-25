@@ -7,7 +7,6 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -24,7 +23,6 @@ abstract class AbstractMachineRequestHandler
         protected MachineRepository $machineRepository,
         protected MachineProvider $machineProvider,
         protected RemoteRequestRetryDecider $retryDecider,
-        protected MachineRequestMessageDispatcher $updateMachineDispatcher,
         protected ExceptionLogger $exceptionLogger,
         protected MachineStore $machineStore,
     ) {

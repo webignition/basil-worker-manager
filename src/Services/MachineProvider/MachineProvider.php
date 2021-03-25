@@ -6,6 +6,7 @@ use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Model\RemoteMachineInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestActionInterface as Action;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 
@@ -70,6 +71,25 @@ class MachineProvider
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
             throw $this->exceptionFactory->create((string) $machine, Action::ACTION_DELETE, $exception);
+        }
+    }
+
+    /**
+     * @throws ExceptionInterface
+     * @throws UnsupportedProviderException
+     */
+    public function exists(Machine $machine): bool
+    {
+        $provider = $this->findProvider($machine);
+
+        try {
+            return $provider->exists($machine);
+        } catch (\Exception $exception) {
+            throw $this->exceptionFactory->create(
+                (string) $machine,
+                RemoteRequestActionInterface::ACTION_EXISTS,
+                $exception
+            );
         }
     }
 

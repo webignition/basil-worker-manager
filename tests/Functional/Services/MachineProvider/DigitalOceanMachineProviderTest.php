@@ -14,6 +14,7 @@ use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
@@ -111,5 +112,38 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         $this->machineProvider->remove($this->machine);
 
         self::expectNotToPerformAssertions();
+    }
+
+    /**
+     * @dataProvider existsDataProvider
+     */
+    public function testExists(ResponseInterface $apiResponse, bool $expectedExists): void
+    {
+        $this->mockHandler->append($apiResponse);
+
+        $exists = $this->machineProvider->exists($this->machine);
+
+        self::assertSame($expectedExists, $exists);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function existsDataProvider(): array
+    {
+        return [
+            'exists' => [
+                'apiResponse' => HttpResponseFactory::fromDropletEntity(
+                    new DropletEntity([
+                        'id' => 123,
+                    ])
+                ),
+                'expectedExists' => true,
+            ],
+            'not exists' => [
+                'apiResponse' => new Response(404),
+                'expectedExists' => false,
+            ],
+        ];
     }
 }

@@ -7,6 +7,7 @@ use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
+use App\Model\RemoteMachineInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use App\Services\MachineUpdater;
 use DigitalOceanV2\Api\Droplet as DropletApi;
@@ -35,7 +36,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function create(Machine $machine): Machine
+    public function create(Machine $machine): RemoteMachineInterface
     {
         $createArguments = new DropletApiCreateCallArguments(
             sprintf('%s-%s', $this->prefix, $machine->getName()),
@@ -51,24 +52,22 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function remove(Machine $machine): Machine
+    public function remove(Machine $machine): void
     {
         $this->dropletApi->remove((int) $machine->getRemoteId());
-
-        return $machine;
     }
 
     /**
      * @throws VendorExceptionInterface
      */
-    public function hydrate(Machine $machine): Machine
+    public function hydrate(Machine $machine): RemoteMachineInterface
     {
         $dropletEntity = $this->dropletApi->getById((int)$machine->getRemoteId());
 
         return $this->update($machine, $dropletEntity);
     }
 
-    private function update(Machine $machine, DropletEntity $droplet): Machine
+    private function update(Machine $machine, DropletEntity $droplet): RemoteMachineInterface
     {
         return $this->machineUpdater->updateFromRemoteMachine($machine, new RemoteMachine($droplet));
     }

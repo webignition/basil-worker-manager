@@ -9,9 +9,11 @@ use App\Message\CreateMachine;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
+use App\Model\RemoteMachineInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
+use App\Model\RemoteRequestSuccess;
 use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
@@ -39,7 +41,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         );
     }
 
-    protected function doAction(Machine $machine): Machine
+    protected function doAction(Machine $machine): RemoteMachineInterface
     {
         return $this->machineProvider->create($machine);
     }
@@ -72,6 +74,6 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
 
         $this->updateMachineDispatcher->dispatch(new UpdateMachine((string) $machine));
 
-        return $outcome;
+        return new RemoteRequestSuccess($machine);
     }
 }

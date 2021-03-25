@@ -9,6 +9,7 @@ use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\Machine\State;
 use App\Model\Machine\StateTransitionSequence;
+use App\Model\RemoteMachineInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -47,7 +48,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         );
     }
 
-    protected function doAction(Machine $machine): Machine
+    protected function doAction(Machine $machine): RemoteMachineInterface
     {
         return $this->machineProvider->update($machine);
     }
@@ -68,7 +69,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
 
         if (RemoteRequestOutcome::STATE_SUCCESS === (string) $outcome) {
             if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-                return $outcome;
+                return new RemoteRequestSuccess($machine);
             }
 
             $outcome = RemoteRequestOutcome::retrying();

@@ -98,6 +98,13 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new UpdateMachine((string) $this->machine);
         $outcome = ($this->handler)($message);
 
+//        $remoteId = 123;
+//        $dropletEntity = new DropletEntity([
+//            'id' => $remoteId,
+//        ]);
+//
+//        $expectedRemoteMachine = new RemoteMachine($dropletEntity);
+
         self::assertEquals(new RemoteRequestSuccess($this->machine), $outcome);
         $this->messengerAsserter->assertQueueCount($expectedMessageQueueCount);
     }

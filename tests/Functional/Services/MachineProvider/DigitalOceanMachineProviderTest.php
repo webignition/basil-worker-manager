@@ -100,7 +100,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $this->machine = $this->machineProvider->hydrate($this->machine);
+        $this->machineProvider->hydrate($this->machine);
 
         self::assertSame($remoteId, $this->machine->getRemoteId());
         self::assertSame($ipAddresses, ObjectReflector::getProperty($this->machine, 'ip_addresses'));

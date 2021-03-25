@@ -11,6 +11,7 @@ use App\Message\UpdateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
+use App\Model\RemoteMachineInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -60,8 +61,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = $this->machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $message = new CreateMachine((string) $machine);
 
+        $remoteMachine = \Mockery::mock(RemoteMachineInterface::class);
+
         $machineProvider = (new MockMachineProvider())
-            ->withCreateCall($machine)
+            ->withCreateCall($machine, $remoteMachine)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())

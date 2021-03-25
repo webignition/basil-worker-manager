@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
+use App\Model\RemoteMachineInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,7 +29,7 @@ class Machine implements \Stringable, \JsonSerializable
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * @var \App\Model\Machine\State::VALUE_*
+     * @var State::VALUE_*
      */
     private string $state;
 
@@ -71,13 +72,6 @@ class Machine implements \Stringable, \JsonSerializable
         return $this->remote_id;
     }
 
-    public function setRemoteId(int $remoteId): self
-    {
-        $this->remote_id = $remoteId;
-
-        return $this;
-    }
-
     /**
      * @return ProviderInterface::NAME_*
      */
@@ -97,24 +91,6 @@ class Machine implements \Stringable, \JsonSerializable
     public function getIpAddresses(): array
     {
         return $this->ip_addresses;
-    }
-
-    /**
-     * @param string[] $ipAddresses
-     */
-    public function setIpAddresses(array $ipAddresses): self
-    {
-        $ipAddresses = array_filter($ipAddresses, function ($value) {
-            return is_string($value) && '' !== trim($value);
-        });
-
-        $ipAddresses = array_unique($ipAddresses);
-
-        sort($ipAddresses);
-
-        $this->ip_addresses = $ipAddresses;
-
-        return $this;
     }
 
     /**
@@ -150,5 +126,19 @@ class Machine implements \Stringable, \JsonSerializable
             'state' => $this->state,
             'ip_addresses' => $this->ip_addresses,
         ];
+    }
+
+    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): Machine
+    {
+        $this->remote_id = $remoteMachine->getId();
+
+        $state = $remoteMachine->getState();
+        if (is_string($state)) {
+            $this->setState($state);
+        }
+
+        $this->ip_addresses = $remoteMachine->getIpAddresses();
+
+        return $this;
     }
 }

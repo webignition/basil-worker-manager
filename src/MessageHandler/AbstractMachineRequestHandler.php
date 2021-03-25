@@ -15,7 +15,7 @@ use App\Model\RemoteRequestOutcomeInterface;
 use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\MachineUpdater;
+use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
 
 abstract class AbstractMachineRequestHandler
@@ -26,7 +26,7 @@ abstract class AbstractMachineRequestHandler
         protected RemoteRequestRetryDecider $retryDecider,
         protected MachineRequestMessageDispatcher $updateMachineDispatcher,
         protected ExceptionLogger $exceptionLogger,
-        protected MachineUpdater $machineUpdater,
+        protected MachineStore $machineStore,
     ) {
     }
 

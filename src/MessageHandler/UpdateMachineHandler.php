@@ -18,7 +18,7 @@ use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStateTransitionSequences;
-use App\Services\MachineUpdater;
+use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -38,7 +38,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
-        MachineUpdater $machineUpdater,
+        MachineStore $machineStore,
         private MachineStateTransitionSequences $stateTransitionSequences,
     ) {
         parent::__construct(
@@ -47,7 +47,7 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
             $retryDecider,
             $updateMachineDispatcher,
             $exceptionLogger,
-            $machineUpdater
+            $machineStore
         );
     }
 
@@ -73,7 +73,9 @@ class UpdateMachineHandler extends AbstractMachineRequestHandler implements Mess
         $outcome = $this->doHandle($machine, RemoteRequestActionInterface::ACTION_GET, $retryCount);
 
         if ($outcome instanceof RemoteMachineRequestSuccess) {
-            $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
+            $this->machineStore->store(
+                $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
+            );
 
             if ($this->hasReachedStopStateOrEndState($machine->getState())) {
                 return $outcome;

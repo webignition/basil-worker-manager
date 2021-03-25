@@ -17,7 +17,6 @@ use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
-use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -29,9 +28,8 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         RemoteRequestRetryDecider $retryDecider,
         MachineRequestMessageDispatcher $updateMachineDispatcher,
         ExceptionLogger $exceptionLogger,
-        MachineUpdater $machineUpdater,
+        MachineStore $machineStore,
         private MachineRequestMessageDispatcher $createDispatcher,
-        private MachineStore $machineStore,
     ) {
         parent::__construct(
             $machineRepository,
@@ -39,7 +37,7 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
             $retryDecider,
             $updateMachineDispatcher,
             $exceptionLogger,
-            $machineUpdater,
+            $machineStore,
         );
     }
 
@@ -77,7 +75,9 @@ class CreateMachineHandler extends AbstractMachineRequestHandler implements Mess
         }
 
         if ($outcome instanceof RemoteMachineRequestSuccess) {
-            $machine = $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
+            $this->machineStore->store(
+                $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
+            );
         }
 
         $this->updateMachineDispatcher->dispatch(new UpdateMachine((string) $machine));

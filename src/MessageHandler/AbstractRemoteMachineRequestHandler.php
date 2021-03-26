@@ -18,7 +18,7 @@ use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
 
-abstract class AbstractMachineRequestHandler
+abstract class AbstractRemoteMachineRequestHandler
 {
     public function __construct(
         protected MachineRepository $machineRepository,

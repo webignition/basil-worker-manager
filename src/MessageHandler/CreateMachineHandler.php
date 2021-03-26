@@ -13,7 +13,7 @@ use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class CreateMachineHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
+class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
     protected function doAction(Machine $machine): RemoteMachineRequestSuccess
     {

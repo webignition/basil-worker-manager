@@ -105,10 +105,11 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider invokeWithExceptionWithRetryDataProvider
      */
-    public function testInvokeExceptionWithRetry(ResponseInterface $apiResponse, int $currentRetryCount): void
+    public function testInvokeExceptionWithRetry(ResponseInterface $apiResponse, int $retryCount): void
     {
         $currentMachineState = $this->machine->getState();
-        $message = new MachineExists(self::MACHINE_ID, $currentRetryCount);
+        $message = new MachineExists(self::MACHINE_ID);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $this->mockHandler->append($apiResponse);
 
@@ -122,7 +123,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
         self::assertSame($currentMachineState, $this->machine->getState());
 
-        $expectedMessage = new MachineExists(self::MACHINE_ID, $currentRetryCount + 1);
+        $expectedMessage = $message->incrementRetryCount();
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
@@ -136,19 +137,19 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         return [
             'http error, retry limit not reached (0)' => [
                 'apiResponse' => new Response(503),
-                'currentRetryCount' => 0,
+                'retryCount' => 0,
             ],
             'http error, retry limit not reached (1)' => [
                 'apiResponse' => new Response(503),
-                'currentRetryCount' => 1,
+                'retryCount' => 1,
             ],
             'http error, retry limit not reached (9)' => [
                 'apiResponse' => new Response(503),
-                'currentRetryCount' => 9,
+                'retryCount' => 9,
             ],
             'remote machine exists' => [
                 'apiResponse' => new Response(200),
-                'currentRetryCount' => 0,
+                'retryCount' => 0,
             ],
         ];
     }
@@ -156,11 +157,13 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider handleWithExceptionWithoutRetryDataProvider
      */
-    public function testInvokeExceptionWithoutRetry(\Throwable $previous, int $currentRetryCount): void
+    public function testInvokeExceptionWithoutRetry(\Throwable $previous, int $retryCount): void
     {
         $currentMachineState = $this->machine->getState();
 
-        $message = new MachineExists(self::MACHINE_ID, $currentRetryCount);
+        $message = new MachineExists(self::MACHINE_ID);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
+
         $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
 
         $machineProvider = (new MockMachineProvider())
@@ -188,11 +191,11 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         return [
             'does not require retry' => [
                 'previous' => \Mockery::mock(ApiLimitExceededException::class),
-                'currentRetryCount' => 0,
+                'retryCount' => 0,
             ],
             'requires retry, retry limit reached (11)' => [
                 'previous' => \Mockery::mock(InvalidArgumentException::class),
-                'currentRetryCount' => 11,
+                'retryCount' => 11,
             ],
         ];
     }

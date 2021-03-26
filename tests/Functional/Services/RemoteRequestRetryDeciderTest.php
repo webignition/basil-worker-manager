@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Message\MachineRequestInterface;
+use App\Message\RemoteMachineRequestInterface;
 use App\Message\UpdateMachine;
 use App\Model\ProviderInterface;
 use App\Services\RemoteRequestRetryDecider;
@@ -33,7 +33,7 @@ class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
      */
     public function testDecide(
         string $provider,
-        MachineRequestInterface $request,
+        RemoteMachineRequestInterface $request,
         \Throwable $exception,
         bool $expectedDecision
     ): void {

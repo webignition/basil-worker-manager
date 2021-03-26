@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageDispatcher;
 
-use App\Message\MachineRequestInterface;
+use App\Message\RemoteMachineRequestInterface;
 use App\Model\MachineRequestDispatcherConfiguration;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -31,7 +31,7 @@ class MachineRequestMessageDispatcher
         }
     }
 
-    public function dispatch(MachineRequestInterface $message): void
+    public function dispatch(RemoteMachineRequestInterface $message): void
     {
         $configuration = $this->configurations[$message->getType()] ?? new MachineRequestDispatcherConfiguration();
         if (false === $configuration->isEnabled()) {

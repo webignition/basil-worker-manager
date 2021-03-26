@@ -261,7 +261,8 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->mockHandler->append($apiResponse);
 
-        $message = new UpdateMachine((string) $this->machine, $retryCount);
+        $message = new UpdateMachine((string) $this->machine);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $expectedLoggedException = new HttpException(
             (string) $this->machine,
@@ -324,7 +325,9 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $message = new UpdateMachine((string) $this->machine, 11);
+        $message = new UpdateMachine((string) $this->machine);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', 11);
+
         $outcome = ($this->handler)($message);
 
         self::assertEquals(

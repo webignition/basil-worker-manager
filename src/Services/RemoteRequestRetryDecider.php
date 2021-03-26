@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Message\MachineRequestInterface;
+use App\Message\RemoteMachineRequestInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
@@ -41,7 +41,7 @@ class RemoteRequestRetryDecider
     /**
      * @param ProviderInterface::NAME_* $provider
      */
-    public function decide(string $provider, MachineRequestInterface $request, \Throwable $exception): bool
+    public function decide(string $provider, RemoteMachineRequestInterface $request, \Throwable $exception): bool
     {
         $action = $request->getType();
 

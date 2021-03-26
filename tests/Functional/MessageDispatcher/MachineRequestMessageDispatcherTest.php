@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Message\CreateMachine;
 use App\Message\MachineExists;
-use App\Message\MachineRequestInterface;
+use App\Message\RemoteMachineRequestInterface;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
@@ -49,7 +49,7 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider dispatchDataProvider
      */
-    public function testDispatch(MachineRequestInterface $message, ?StampInterface $expectedDelayStamp): void
+    public function testDispatch(RemoteMachineRequestInterface $message, ?StampInterface $expectedDelayStamp): void
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
@@ -91,7 +91,9 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
                 'expectedDelayStamp' => new DelayStamp(1000),
             ],
             'exists, not first attempt' => [
-                'message' => new MachineExists(self::MACHINE_ID, 2),
+                'message' => (new MachineExists(self::MACHINE_ID))
+                    ->incrementRetryCount()
+                    ->incrementRetryCount(),
                 'expectedDelayStamp' => new DelayStamp(10000),
             ],
         ];

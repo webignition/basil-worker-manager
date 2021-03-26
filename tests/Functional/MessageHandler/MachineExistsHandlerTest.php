@@ -164,7 +164,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         $message = new MachineExists(self::MACHINE_ID);
         ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
-        $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
+        $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withExistsCallThrowingException($this->machine, $exception)

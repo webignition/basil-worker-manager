@@ -232,7 +232,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedLoggedException = new AuthenticationException(
             (string) $this->machine,
-            $message->getType(),
+            $message->getAction(),
             new RuntimeException('Unauthorized', 401)
         );
 
@@ -266,7 +266,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedLoggedException = new HttpException(
             (string) $this->machine,
-            $message->getType(),
+            $message->getAction(),
             $expectedRemoteException
         );
 
@@ -335,7 +335,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
                 new UnknownRemoteMachineException(
                     $this->machine->getProvider(),
                     (string) $this->machine,
-                    $message->getType(),
+                    $message->getAction(),
                     new RuntimeException('Not Found', 404)
                 )
             ),

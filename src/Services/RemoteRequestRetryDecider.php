@@ -43,7 +43,7 @@ class RemoteRequestRetryDecider
      */
     public function decide(string $provider, RemoteMachineRequestInterface $request, \Throwable $exception): bool
     {
-        $action = $request->getType();
+        $action = $request->getAction();
 
         $retryLimit = $this->retryLimits[$action] ?? 0;
 

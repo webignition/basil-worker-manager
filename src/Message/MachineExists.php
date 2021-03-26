@@ -6,11 +6,11 @@ namespace App\Message;
 
 use App\Model\RemoteRequestActionInterface;
 
-class MachineExists extends AbstractMachineRequest implements RemoteMachineRequestInterface
+class MachineExists extends AbstractRemoteMachineRequest implements RemoteMachineRequestInterface
 {
     use RetryableRequestTrait;
 
-    public function getType(): string
+    public function getAction(): string
     {
         return RemoteRequestActionInterface::ACTION_EXISTS;
     }

@@ -141,7 +141,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new CreateMachine(self::MACHINE_ID);
         ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
-        $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
+        $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($this->machine, $exception)
@@ -193,7 +193,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new CreateMachine(self::MACHINE_ID);
         ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
-        $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
+        $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
         $machineProvider = (new MockMachineProvider())
             ->withCreateCallThrowingException($this->machine, $exception)

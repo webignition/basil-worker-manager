@@ -6,10 +6,10 @@ namespace App\Message;
 
 use App\Model\RemoteRequestActionInterface;
 
-interface RemoteMachineRequestInterface extends RetryableRequestInterface
+interface RemoteMachineRequestInterface extends RetryableRequestInterface, TypedRequestInterface
 {
     /**
      * @return RemoteRequestActionInterface::ACTION_*
      */
-    public function getType(): string;
+    public function getAction(): string;
 }

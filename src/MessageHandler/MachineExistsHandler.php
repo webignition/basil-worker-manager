@@ -12,7 +12,7 @@ use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class MachineExistsHandler extends AbstractMachineRequestHandler implements MessageHandlerInterface
+class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
     protected function doAction(Machine $machine): RemoteBooleanRequestSuccess
     {

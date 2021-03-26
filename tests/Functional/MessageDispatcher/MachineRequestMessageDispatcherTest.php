@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Message\CreateMachine;
 use App\Message\MachineExists;
-use App\Message\RemoteMachineRequestInterface;
+use App\Message\MachineRequestInterface;
 use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
@@ -31,25 +31,22 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         parent::setUp();
 
         $dispatcher = self::$container->get(MachineRequestMessageDispatcher::class);
-        if ($dispatcher instanceof MachineRequestMessageDispatcher) {
-            $this->dispatcher = $dispatcher;
-        }
+        \assert($dispatcher instanceof MachineRequestMessageDispatcher);
+        $this->dispatcher = $dispatcher;
 
         $machineFactory = self::$container->get(MachineFactory::class);
-        if ($machineFactory instanceof MachineFactory) {
-            $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
-        }
+        \assert($machineFactory instanceof MachineFactory);
+        $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
-        if ($messengerAsserter instanceof MessengerAsserter) {
-            $this->messengerAsserter = $messengerAsserter;
-        }
+        \assert($messengerAsserter instanceof MessengerAsserter);
+        $this->messengerAsserter = $messengerAsserter;
     }
 
     /**
      * @dataProvider dispatchDataProvider
      */
-    public function testDispatch(RemoteMachineRequestInterface $message, ?StampInterface $expectedDelayStamp): void
+    public function testDispatch(MachineRequestInterface $message, ?StampInterface $expectedDelayStamp): void
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 

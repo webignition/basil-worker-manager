@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Model\RemoteRequestActionInterface;
 
-class MachineExists extends AbstractMachineRequest implements RemoteMachineRequestInterface
+class MachineExists extends AbstractRemoteMachineRequest implements RemoteMachineRequestInterface
 {
     use RetryableRequestTrait;
 

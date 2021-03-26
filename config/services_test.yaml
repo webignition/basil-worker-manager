@@ -3,6 +3,9 @@ services:
         autowire: true
         autoconfigure: true
 
+    App\MessageHandler\GetMachineHandler:
+        public: true
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

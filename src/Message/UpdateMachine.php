@@ -10,7 +10,7 @@ class UpdateMachine extends AbstractMachineRequest implements RemoteMachineReque
 {
     use RetryableRequestTrait;
 
-    public function getType(): string
+    public function getAction(): string
     {
         return RemoteRequestActionInterface::ACTION_GET;
     }

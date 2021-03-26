@@ -11,5 +11,5 @@ interface RemoteMachineRequestInterface extends RetryableRequestInterface
     /**
      * @return RemoteRequestActionInterface::ACTION_*
      */
-    public function getType(): string;
+    public function getAction(): string;
 }

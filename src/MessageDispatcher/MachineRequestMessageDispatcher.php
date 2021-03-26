@@ -33,7 +33,7 @@ class MachineRequestMessageDispatcher
 
     public function dispatch(RemoteMachineRequestInterface $message): void
     {
-        $configuration = $this->configurations[$message->getType()] ?? new MachineRequestDispatcherConfiguration();
+        $configuration = $this->configurations[$message->getAction()] ?? new MachineRequestDispatcherConfiguration();
         if (false === $configuration->isEnabled()) {
             return;
         }

@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
-use App\Message\AbstractMachineRequest;
 use App\Message\MachineExists;
 use App\MessageHandler\CreateMachineHandler;
 use App\MessageHandler\MachineExistsHandler;
@@ -110,7 +109,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
     {
         $currentMachineState = $this->machine->getState();
         $message = new MachineExists(self::MACHINE_ID);
-        ObjectReflector::setProperty($message, AbstractMachineRequest::class, 'retryCount', $retryCount);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $this->mockHandler->append($apiResponse);
 
@@ -163,7 +162,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         $currentMachineState = $this->machine->getState();
 
         $message = new MachineExists(self::MACHINE_ID);
-        ObjectReflector::setProperty($message, AbstractMachineRequest::class, 'retryCount', $retryCount);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
 

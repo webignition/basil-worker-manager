@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
-use App\Message\AbstractMachineRequest;
 use App\Message\CreateMachine;
 use App\Message\UpdateMachine;
 use App\MessageHandler\CreateMachineHandler;
@@ -140,7 +139,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandleExceptionWithRetry(\Throwable $previous, int $retryCount): void
     {
         $message = new CreateMachine(self::MACHINE_ID);
-        ObjectReflector::setProperty($message, AbstractMachineRequest::class, 'retryCount', $retryCount);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
 
@@ -192,7 +191,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testHandleExceptionWithoutRetry(\Throwable $previous, int $retryCount): void
     {
         $message = new CreateMachine(self::MACHINE_ID);
-        ObjectReflector::setProperty($message, AbstractMachineRequest::class, 'retryCount', $retryCount);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $exception = new Exception(self::MACHINE_ID, $message->getType(), $previous);
 
@@ -219,10 +218,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     public function handleWithExceptionWithoutRetryDataProvider(): array
     {
         return [
-//            'does not require retry' => [
-//                'previous' => \Mockery::mock(ApiLimitExceededException::class),
-//                'retryCount' => 0,
-//            ],
+            'does not require retry' => [
+                'previous' => \Mockery::mock(ApiLimitExceededException::class),
+                'retryCount' => 0,
+            ],
             'requires retry, retry limit reached (3)' => [
                 'previous' => \Mockery::mock(InvalidArgumentException::class),
                 'retryCount' => 3,

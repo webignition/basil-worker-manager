@@ -9,7 +9,6 @@ use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
-use App\Message\AbstractMachineRequest;
 use App\Message\UpdateMachine;
 use App\MessageHandler\UpdateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -263,7 +262,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->mockHandler->append($apiResponse);
 
         $message = new UpdateMachine((string) $this->machine);
-        ObjectReflector::setProperty($message, AbstractMachineRequest::class, 'retryCount', $retryCount);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $expectedLoggedException = new HttpException(
             (string) $this->machine,
@@ -327,7 +326,7 @@ class UpdateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->mockHandler->append(new Response(404));
 
         $message = new UpdateMachine((string) $this->machine);
-        ObjectReflector::setProperty($message, AbstractMachineRequest::class, 'retryCount', 11);
+        ObjectReflector::setProperty($message, $message::class, 'retryCount', 11);
 
         $outcome = ($this->handler)($message);
 

@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\Message\MachineRequestInterface;
+use App\Message\RemoteMachineRequestInterface;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -36,7 +36,7 @@ abstract class AbstractMachineRequestHandler
      */
     abstract protected function doAction(Machine $machine): RemoteRequestOutcomeInterface;
 
-    protected function doHandle(Machine $machine, MachineRequestInterface $request): RemoteRequestOutcomeInterface
+    protected function doHandle(Machine $machine, RemoteMachineRequestInterface $request): RemoteRequestOutcomeInterface
     {
         $lastException = null;
 

@@ -6,8 +6,10 @@ namespace App\Message;
 
 use App\Model\RemoteRequestActionInterface;
 
-class UpdateMachine extends AbstractMachineRequest
+class UpdateMachine extends AbstractMachineRequest implements RemoteMachineRequestInterface
 {
+    use RetryableRequestTrait;
+
     public function getType(): string
     {
         return RemoteRequestActionInterface::ACTION_GET;

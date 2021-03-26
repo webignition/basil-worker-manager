@@ -13,7 +13,7 @@ trait RetryableRequestTrait
         return $this->retryCount;
     }
 
-    public function incrementRetryCount(): self
+    public function incrementRetryCount(): static
     {
         $new = clone $this;
         $new->retryCount++;

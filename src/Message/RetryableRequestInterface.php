@@ -7,5 +7,5 @@ namespace App\Message;
 interface RetryableRequestInterface
 {
     public function getRetryCount(): int;
-    public function incrementRetryCount(): RetryableRequestInterface;
+    public function incrementRetryCount(): static;
 }

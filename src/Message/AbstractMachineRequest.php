@@ -6,9 +6,10 @@ namespace App\Message;
 
 abstract class AbstractMachineRequest implements MachineRequestInterface
 {
+    private int $retryCount = 0;
+
     public function __construct(
         private string $machineId,
-        private int $retryCount = 0,
     ) {
     }
 

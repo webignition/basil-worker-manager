@@ -91,7 +91,9 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
                 'expectedDelayStamp' => new DelayStamp(1000),
             ],
             'exists, not first attempt' => [
-                'message' => new MachineExists(self::MACHINE_ID, 2),
+                'message' => (new MachineExists(self::MACHINE_ID))
+                    ->incrementRetryCount()
+                    ->incrementRetryCount(),
                 'expectedDelayStamp' => new DelayStamp(10000),
             ],
         ];

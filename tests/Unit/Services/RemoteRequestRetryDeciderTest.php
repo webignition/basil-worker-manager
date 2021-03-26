@@ -82,7 +82,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => new UpdateMachine('id', 1),
+                'request' => (new UpdateMachine('id'))->incrementRetryCount(),
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => false,
             ],

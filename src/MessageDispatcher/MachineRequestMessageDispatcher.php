@@ -6,7 +6,6 @@ namespace App\MessageDispatcher;
 
 use App\Message\MachineRequestInterface;
 use App\Message\RetryableRequestInterface;
-use App\Message\TypedRequestInterface;
 use App\Model\MachineRequestDispatcherConfiguration as DispatcherConfiguration;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -35,7 +34,7 @@ class MachineRequestMessageDispatcher
 
     public function dispatch(MachineRequestInterface $message): void
     {
-        $configuration = $this->getConfigurationForMessageType($message);
+        $configuration = $this->configurations[$message::class] ?? new DispatcherConfiguration();
         if (false === $configuration->isEnabled()) {
             return;
         }
@@ -50,15 +49,6 @@ class MachineRequestMessageDispatcher
         }
 
         $this->messageBus->dispatch(new Envelope($message, $stamps));
-    }
-
-    private function getConfigurationForMessageType(MachineRequestInterface $request): DispatcherConfiguration
-    {
-        $type = $request instanceof TypedRequestInterface
-            ? $request->getType()
-            : null;
-
-        return $this->configurations[$type] ?? new DispatcherConfiguration();
     }
 
     private function getDispatchDelay(DispatcherConfiguration $configuration, MachineRequestInterface $request): int

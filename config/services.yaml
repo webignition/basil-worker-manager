@@ -106,8 +106,8 @@ services:
     App\MessageDispatcher\MachineRequestMessageDispatcher:
         arguments:
             $configurations:
-                !php/const App\Model\RemoteRequestActionInterface::ACTION_GET: '@app.message_dispatcher.get.configuration'
-                !php/const App\Model\RemoteRequestActionInterface::ACTION_EXISTS: '@app.message_dispatcher.exists.configuration'
+                App\Message\UpdateMachine: '@app.message_dispatcher.get.configuration'
+                App\Message\MachineExists: '@app.message_dispatcher.exists.configuration'
 
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:

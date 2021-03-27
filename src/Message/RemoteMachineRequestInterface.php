@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Model\RemoteRequestActionInterface;
 
-interface RemoteMachineRequestInterface extends RetryableRequestInterface, TypedRequestInterface
+interface RemoteMachineRequestInterface extends RetryableRequestInterface
 {
     /**
      * @return RemoteRequestActionInterface::ACTION_*

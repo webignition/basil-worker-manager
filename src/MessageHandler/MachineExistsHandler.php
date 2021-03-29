@@ -29,17 +29,19 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
         }
     }
 
+    protected function onOutcome(
+        Machine $machine,
+        RemoteRequestOutcomeInterface $outcome
+    ): RemoteRequestOutcomeInterface {
+        if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
+            return RemoteRequestOutcome::retrying();
+        }
+
+        return $outcome;
+    }
+
     public function __invoke(MachineExists $message): RemoteRequestOutcomeInterface
     {
-        return $this->doHandle(
-            $message,
-            function (RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface {
-                if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
-                    return RemoteRequestOutcome::retrying();
-                }
-
-                return $outcome;
-            }
-        );
+        return $this->doHandle($message);
     }
 }

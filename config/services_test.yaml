@@ -9,6 +9,9 @@ services:
     App\MessageHandler\CheckMachineIsActiveHandler:
         public: true
 
+    App\MessageHandler\DeleteMachineHandler:
+        public: true
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

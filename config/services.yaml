@@ -17,6 +17,7 @@ parameters:
     machine_exists_initial_dispatch_delay: '%env(MACHINE_EXISTS_INITIAL_DISPATCH_DELAY)%'
     exists_retry_limit: '%env(EXISTS_RETRY_LIMIT)%'
     machine_is_active_dispatch_delay: '%env(MACHINE_IS_ACTIVE_DISPATCH_DELAY)%'
+    delete_retry_limit: '%env(DELETE_RETRY_LIMIT)%'
 
 services:
     # default configuration for services in *this* file
@@ -92,6 +93,8 @@ services:
               !php/const App\Model\RemoteRequestActionInterface::ACTION_CREATE: '%create_retry_limit%'
               !php/const App\Model\RemoteRequestActionInterface::ACTION_GET: '%get_retry_limit%'
               !php/const App\Model\RemoteRequestActionInterface::ACTION_EXISTS: '%exists_retry_limit%'
+              !php/const App\Model\RemoteRequestActionInterface::ACTION_DELETE: '%delete_retry_limit%'
+
 
     app.message_dispatcher.exists.configuration:
         class: App\Model\MachineRequestDispatcherConfiguration

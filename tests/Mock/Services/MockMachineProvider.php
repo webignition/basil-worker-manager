@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Mock\Services;
 
 use App\Entity\Machine;
-use App\Model\RemoteMachineInterface;
 use App\Services\MachineProvider\MachineProvider;
 use Mockery\MockInterface;
 
@@ -23,25 +22,10 @@ class MockMachineProvider
         return $this->mock;
     }
 
-    public function withCreateCall(Machine $machine, RemoteMachineInterface $remoteMachine): self
-    {
-        if ($this->mock instanceof MockInterface) {
-            $this->mock
-                ->shouldReceive('create')
-                ->with($machine)
-                ->andReturn($remoteMachine);
-        }
-
-        return $this;
-    }
-
     public function withCreateCallThrowingException(Machine $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
-            $this->mock
-                ->shouldReceive('create')
-                ->with($machine)
-                ->andThrow($exception);
+            $this->withCallThrowingException('create', $machine, $exception);
         }
 
         return $this;
@@ -50,20 +34,28 @@ class MockMachineProvider
     public function withExistsCallThrowingException(Machine $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
-            $this->mock
-                ->shouldReceive('exists')
-                ->with($machine)
-                ->andThrow($exception);
+            $this->withCallThrowingException('exists', $machine, $exception);
         }
 
         return $this;
     }
 
-    public function withoutCreateCall(): self
+    public function withDeleteCallThrowingException(Machine $machine, \Exception $exception): self
+    {
+        if ($this->mock instanceof MockInterface) {
+            $this->withCallThrowingException('delete', $machine, $exception);
+        }
+
+        return $this;
+    }
+
+    private function withCallThrowingException(string $method, Machine $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
-                ->shouldNotReceive('create');
+                ->shouldReceive($method)
+                ->with($machine)
+                ->andThrow($exception);
         }
 
         return $this;

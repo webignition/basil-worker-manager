@@ -28,23 +28,21 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
             return RemoteRequestOutcome::invalid();
         }
 
-        $outcome = $this->doHandle($machine, $message);
-
-        if ($outcome instanceof RemoteBooleanRequestSuccess) {
-            if (false === $outcome->getResult()) {
-                $machine->setState(State::VALUE_DELETE_DELETED);
-                $this->machineStore->store($machine);
+        $outcome = $this->doHandle(
+            $machine,
+            $message,
+            function (RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface {
+                if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
+                    return RemoteRequestOutcome::retrying();
+                }
 
                 return $outcome;
             }
+        );
 
-            $outcome = RemoteRequestOutcome::retrying();
-        }
-
-        if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->dispatcher->dispatch($message->incrementRetryCount());
-
-            return $outcome;
+        if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
+            $machine->setState(State::VALUE_DELETE_DELETED);
+            $this->machineStore->store($machine);
         }
 
         return $outcome;

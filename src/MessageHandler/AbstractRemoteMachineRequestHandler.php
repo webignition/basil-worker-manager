@@ -36,12 +36,24 @@ abstract class AbstractRemoteMachineRequestHandler
      */
     abstract protected function doAction(Machine $machine): RemoteRequestOutcomeInterface;
 
-    protected function doHandle(Machine $machine, RemoteMachineRequestInterface $request): RemoteRequestOutcomeInterface
-    {
+    protected function doHandle(
+        Machine $machine,
+        RemoteMachineRequestInterface $request,
+        ?callable $outcomeMutator = null
+    ): RemoteRequestOutcomeInterface {
         $lastException = null;
 
         try {
-            return $this->doAction($machine);
+            $outcome = $this->doAction($machine);
+            if (is_callable($outcomeMutator)) {
+                $outcome = $outcomeMutator($outcome);
+            }
+
+            if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome) {
+                $this->dispatcher->dispatch($request->incrementRetryCount());
+            }
+
+            return $outcome;
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
                 $machine->getProvider(),
@@ -56,6 +68,8 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if ($shouldRetry) {
+            $this->dispatcher->dispatch($request->incrementRetryCount());
+
             return RemoteRequestOutcome::retrying();
         }
 

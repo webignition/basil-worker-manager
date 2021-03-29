@@ -35,12 +35,6 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
             );
         }
 
-        if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->dispatcher->dispatch($message->incrementRetryCount());
-
-            return RemoteRequestOutcome::retrying();
-        }
-
         return $outcome;
     }
 }

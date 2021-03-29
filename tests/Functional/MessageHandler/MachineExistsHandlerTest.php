@@ -82,7 +82,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         self::assertSame(State::VALUE_DELETE_DELETED, $this->machine->getState());
     }
 
-    public function testInvokeSuccessNotExist(): void
+    public function testInvokeSuccessDoesExist(): void
     {
         $dropletEntity = new DropletEntity([
             'id' => 123,

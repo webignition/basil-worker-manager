@@ -34,26 +34,18 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
 
         $outcome = $this->doHandle($machine, $message);
 
-        if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
-            $this->dispatcher->dispatch($message->incrementRetryCount());
-
-            return $outcome;
-        }
-
         if (RemoteRequestOutcome::STATE_FAILED === (string) $outcome) {
             $machine = $machine->setState(State::VALUE_CREATE_FAILED);
             $this->machineStore->store($machine);
-
-            return $outcome;
         }
 
         if ($outcome instanceof RemoteMachineRequestSuccess) {
             $this->machineStore->store(
                 $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
             );
-        }
 
-        $this->dispatcher->dispatch(new CheckMachineIsActive((string) $machine));
+            $this->dispatcher->dispatch(new CheckMachineIsActive((string) $machine));
+        }
 
         return $outcome;
     }

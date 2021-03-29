@@ -36,6 +36,10 @@ abstract class AbstractRemoteMachineRequestHandler
      */
     abstract protected function doAction(Machine $machine): RemoteRequestOutcomeInterface;
 
+    protected function preRequest(Machine $machine): void
+    {
+    }
+
     protected function onFailed(Machine $machine, \Throwable $exception): void
     {
     }
@@ -49,6 +53,8 @@ abstract class AbstractRemoteMachineRequestHandler
         RemoteMachineRequestInterface $request,
         ?callable $outcomeMutator = null
     ): RemoteRequestOutcomeInterface {
+        $this->preRequest($machine);
+
         $lastException = null;
 
         try {

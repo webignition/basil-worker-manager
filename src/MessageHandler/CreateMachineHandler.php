@@ -29,10 +29,13 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
             return RemoteRequestOutcome::invalid();
         }
 
+        return $this->doHandle($machine, $message);
+    }
+
+    protected function preRequest(Machine $machine): void
+    {
         $machine->setState(State::VALUE_CREATE_REQUESTED);
         $this->machineStore->store($machine);
-
-        return $this->doHandle($machine, $message);
     }
 
     protected function onFailed(Machine $machine, \Throwable $exception): void

@@ -21,6 +21,14 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
         );
     }
 
+    protected function onSuccess(Machine $machine, RemoteRequestOutcomeInterface $outcome): void
+    {
+        if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
+            $machine->setState(State::VALUE_DELETE_DELETED);
+            $this->machineStore->store($machine);
+        }
+    }
+
     public function __invoke(MachineExists $message): RemoteRequestOutcomeInterface
     {
         $machine = $this->machineRepository->find($message->getMachineId());
@@ -28,7 +36,7 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
             return RemoteRequestOutcome::invalid();
         }
 
-        $outcome = $this->doHandle(
+        return $this->doHandle(
             $machine,
             $message,
             function (RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface {
@@ -39,12 +47,5 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
                 return $outcome;
             }
         );
-
-        if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
-            $machine->setState(State::VALUE_DELETE_DELETED);
-            $this->machineStore->store($machine);
-        }
-
-        return $outcome;
     }
 }

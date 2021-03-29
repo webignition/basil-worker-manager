@@ -27,14 +27,15 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
             return RemoteRequestOutcome::invalid();
         }
 
-        $outcome = $this->doHandle($machine, $message);
+        return $this->doHandle($machine, $message);
+    }
 
+    protected function onSuccess(Machine $machine, RemoteRequestOutcomeInterface $outcome): void
+    {
         if ($outcome instanceof RemoteMachineRequestSuccess) {
             $this->machineStore->store(
                 $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
             );
         }
-
-        return $outcome;
     }
 }

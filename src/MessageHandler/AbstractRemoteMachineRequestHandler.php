@@ -36,6 +36,14 @@ abstract class AbstractRemoteMachineRequestHandler
      */
     abstract protected function doAction(Machine $machine): RemoteRequestOutcomeInterface;
 
+    protected function onFailed(Machine $machine, \Throwable $exception): void
+    {
+    }
+
+    protected function onSuccess(Machine $machine, RemoteRequestOutcomeInterface $outcome): void
+    {
+    }
+
     protected function doHandle(
         Machine $machine,
         RemoteMachineRequestInterface $request,
@@ -51,6 +59,10 @@ abstract class AbstractRemoteMachineRequestHandler
 
             if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome) {
                 $this->dispatcher->dispatch($request->incrementRetryCount());
+            }
+
+            if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
+                $this->onSuccess($machine, $outcome);
             }
 
             return $outcome;
@@ -76,6 +88,8 @@ abstract class AbstractRemoteMachineRequestHandler
         if ($lastException instanceof \Throwable) {
             $this->exceptionLogger->log($lastException);
         }
+
+        $this->onFailed($machine, $lastException);
 
         return new RemoteRequestFailure($lastException);
     }

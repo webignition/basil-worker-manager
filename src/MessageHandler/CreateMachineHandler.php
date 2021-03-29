@@ -21,8 +21,10 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                     $this->machineProvider->create($machine)
                 );
             }
-        ))
-        ->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+        ))->withBeforeRequestHandler(function (Machine $machine) {
+            $machine->setState(State::VALUE_CREATE_REQUESTED);
+            $this->machineStore->store($machine);
+        })->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
             if ($outcome instanceof RemoteMachineRequestSuccess) {
                 $this->machineStore->store(
                     $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
@@ -30,13 +32,8 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
 
                 $this->dispatcher->dispatch(new CheckMachineIsActive((string) $machine));
             }
-        })
-        ->withFailureHandler(function (Machine $machine) {
+        })->withFailureHandler(function (Machine $machine) {
             $machine = $machine->setState(State::VALUE_CREATE_FAILED);
-            $this->machineStore->store($machine);
-        })
-        ->withBeforeRequestHandler(function (Machine $machine) {
-            $machine->setState(State::VALUE_CREATE_REQUESTED);
             $this->machineStore->store($machine);
         });
     }

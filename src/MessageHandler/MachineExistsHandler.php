@@ -22,15 +22,13 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
                     $this->machineProvider->exists($machine)
                 );
             }
-        ))
-        ->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
+        ))->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
             if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
                 return RemoteRequestOutcome::retrying();
             }
 
             return $outcome;
-        })
-        ->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+        })->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
             if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
                 $machine->setState(State::VALUE_DELETE_DELETED);
                 $this->machineStore->store($machine);

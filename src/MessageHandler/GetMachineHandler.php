@@ -19,8 +19,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
                     $this->machineProvider->get($machine)
                 );
             }
-        ))
-        ->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+        ))->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
             if ($outcome instanceof RemoteMachineRequestSuccess) {
                 $this->machineStore->store(
                     $machine->updateFromRemoteMachine($outcome->getRemoteMachine())

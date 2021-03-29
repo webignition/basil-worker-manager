@@ -16,6 +16,7 @@ parameters:
     machine_exists_dispatch_delay: '%env(MACHINE_EXISTS_DISPATCH_DELAY)%'
     machine_exists_initial_dispatch_delay: '%env(MACHINE_EXISTS_INITIAL_DISPATCH_DELAY)%'
     exists_retry_limit: '%env(EXISTS_RETRY_LIMIT)%'
+    machine_is_active_dispatch_delay: '%env(MACHINE_IS_ACTIVE_DISPATCH_DELAY)%'
 
 services:
     # default configuration for services in *this* file
@@ -103,11 +104,17 @@ services:
             $dispatchDelayInSeconds: '%machine_exists_dispatch_delay%'
             $initialDispatchDelayInSeconds: '%machine_exists_initial_dispatch_delay%'
 
+    app.message_dispatcher.machine_is_active.configuration:
+        class: App\Model\MachineRequestDispatcherConfiguration
+        arguments:
+            $dispatchDelayInSeconds: '%machine_is_active_dispatch_delay%'
+
     App\MessageDispatcher\MachineRequestMessageDispatcher:
         arguments:
             $configurations:
                 App\Message\UpdateMachine: '@app.message_dispatcher.get.configuration'
                 App\Message\MachineExists: '@app.message_dispatcher.exists.configuration'
+                App\Message\CheckMachineIsActive: '@app.message_dispatcher.exists.configuration'
 
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:

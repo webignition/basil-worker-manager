@@ -26,6 +26,12 @@ class State implements \Stringable
         self::VALUE_DELETE_DELETED,
     ];
 
+    public const PRE_ACTIVE_STATES = [
+        self::VALUE_CREATE_RECEIVED,
+        self::VALUE_CREATE_REQUESTED,
+        self::VALUE_UP_STARTED,
+    ];
+
     public const END_STATES = [
         self::VALUE_CREATE_FAILED,
         self::VALUE_DELETE_FAILED,

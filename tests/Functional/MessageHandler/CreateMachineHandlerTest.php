@@ -7,8 +7,8 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
+use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
-use App\Message\UpdateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
@@ -101,7 +101,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new UpdateMachine(self::MACHINE_ID)
+            new CheckMachineIsActive(self::MACHINE_ID)
         );
 
         self::assertSame($expectedRemoteMachine->getId(), (int) $this->machine->getRemoteId());

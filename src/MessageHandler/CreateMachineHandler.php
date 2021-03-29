@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
+use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
-use App\Message\UpdateMachine;
 use App\Model\Machine\State;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcome;
@@ -53,7 +53,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
             );
         }
 
-        $this->dispatcher->dispatch(new UpdateMachine((string) $machine));
+        $this->dispatcher->dispatch(new CheckMachineIsActive((string) $machine));
 
         return $outcome;
     }

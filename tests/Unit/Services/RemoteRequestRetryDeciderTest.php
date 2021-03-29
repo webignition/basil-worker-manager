@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
+use App\Message\GetMachine;
 use App\Message\RemoteMachineRequestInterface;
-use App\Message\UpdateMachine;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider;
@@ -40,7 +40,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
             'no deciders' => [
                 'decider' => new RemoteRequestRetryDecider([], []),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => new UpdateMachine('id'),
+                'request' => new GetMachine('id'),
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
             ],
@@ -54,7 +54,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => new UpdateMachine('id'),
+                'request' => new GetMachine('id'),
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
@@ -68,7 +68,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => new UpdateMachine('id'),
+                'request' => new GetMachine('id'),
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
             ],
@@ -82,7 +82,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => (new UpdateMachine('id'))->incrementRetryCount(),
+                'request' => (new GetMachine('id'))->incrementRetryCount(),
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => false,
             ],

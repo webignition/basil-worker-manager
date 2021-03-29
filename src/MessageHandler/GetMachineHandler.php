@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
-use App\Message\UpdateMachine;
-use App\Model\Machine\State;
+use App\Message\GetMachine;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
-use App\Model\RemoteRequestSuccess;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
-class UpdateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
+class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
     protected function doAction(Machine $machine): RemoteMachineRequestSuccess
     {
@@ -22,15 +20,11 @@ class UpdateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         );
     }
 
-    public function __invoke(UpdateMachine $message): RemoteRequestOutcomeInterface
+    public function __invoke(GetMachine $message): RemoteRequestOutcomeInterface
     {
         $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
             return RemoteRequestOutcome::invalid();
-        }
-
-        if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-            return new RemoteRequestSuccess();
         }
 
         $outcome = $this->doHandle($machine, $message);
@@ -39,12 +33,6 @@ class UpdateMachineHandler extends AbstractRemoteMachineRequestHandler implement
             $this->machineStore->store(
                 $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
             );
-
-            if ($this->hasReachedStopStateOrEndState($machine->getState())) {
-                return $outcome;
-            }
-
-            $outcome = RemoteRequestOutcome::retrying();
         }
 
         if (RemoteRequestOutcome::STATE_RETRYING === (string) $outcome) {
@@ -54,21 +42,5 @@ class UpdateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         }
 
         return $outcome;
-    }
-
-    /**
-     * @param State::VALUE_* $currentState
-     */
-    private function hasReachedStopStateOrEndState(string $currentState): bool
-    {
-        if (in_array($currentState, State::END_STATES)) {
-            return true;
-        }
-
-        return !in_array($currentState, [
-            State::VALUE_CREATE_RECEIVED,
-            State::VALUE_CREATE_REQUESTED,
-            State::VALUE_UP_STARTED,
-        ]);
     }
 }

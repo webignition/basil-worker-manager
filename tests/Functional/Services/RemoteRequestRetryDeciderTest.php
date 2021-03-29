@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Message\GetMachine;
 use App\Message\RemoteMachineRequestInterface;
-use App\Message\UpdateMachine;
 use App\Model\ProviderInterface;
 use App\Services\RemoteRequestRetryDecider;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -48,13 +48,13 @@ class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
         return [
             'digitalocean ' . ApiLimitExceededException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => new UpdateMachine('id'),
+                'request' => new GetMachine('id'),
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
             'digitalocean ' . InvalidArgumentException::class => [
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => new UpdateMachine('id'),
+                'request' => new GetMachine('id'),
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
             ],

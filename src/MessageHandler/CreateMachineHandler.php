@@ -6,13 +6,20 @@ namespace App\MessageHandler;
 
 use App\Entity\Machine;
 use App\Message\CheckMachineIsActive;
+use App\Message\CreateMachine;
 use App\Model\Machine\State;
 use App\Model\RemoteMachineRequestSuccess;
+use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
+    public function __invoke(CreateMachine $message): RemoteRequestOutcomeInterface
+    {
+        return $this->foo($message);
+    }
+
     protected function createActionHandler(): RemoteMachineActionHandlerInterface
     {
         return (new RemoteMachineActionHandler(

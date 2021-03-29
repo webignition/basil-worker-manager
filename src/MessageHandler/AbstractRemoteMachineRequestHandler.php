@@ -32,7 +32,7 @@ abstract class AbstractRemoteMachineRequestHandler
 
     abstract protected function createActionHandler(): RemoteMachineActionHandlerInterface;
 
-    public function __invoke(RemoteMachineRequestInterface $message): RemoteRequestOutcomeInterface
+    protected function foo(RemoteMachineRequestInterface $message): RemoteRequestOutcomeInterface
     {
         $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {

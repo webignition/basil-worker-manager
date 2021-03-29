@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
+use App\Message\CreateMachine;
+use App\Message\MachineExists;
 use App\Model\Machine\State;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcome;
@@ -14,6 +16,11 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
+    public function __invoke(MachineExists $message): RemoteRequestOutcomeInterface
+    {
+        return $this->foo($message);
+    }
+
     protected function createActionHandler(): RemoteMachineActionHandlerInterface
     {
         return (new RemoteMachineActionHandler(

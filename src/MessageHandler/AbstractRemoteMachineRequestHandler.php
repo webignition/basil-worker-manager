@@ -32,61 +32,35 @@ abstract class AbstractRemoteMachineRequestHandler
 
     public function __invoke(RemoteMachineRequestInterface $message): RemoteRequestOutcomeInterface
     {
-        return $this->doHandle($message);
-    }
-
-
-    /**
-     * @throws UnsupportedProviderException
-     * @throws ExceptionInterface
-     */
-    abstract protected function doAction(Machine $machine): RemoteRequestOutcomeInterface;
-
-    protected function preRequest(Machine $machine): void
-    {
-    }
-
-    protected function onFailed(Machine $machine, \Throwable $exception): void
-    {
-    }
-
-    protected function onSuccess(Machine $machine, RemoteRequestOutcomeInterface $outcome): void
-    {
-    }
-
-    protected function onOutcome(RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface
-    {
-        return $outcome;
-    }
-
-    protected function doHandle(RemoteMachineRequestInterface $request): RemoteRequestOutcomeInterface
-    {
-        $machine = $this->machineRepository->find($request->getMachineId());
+        $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
             return RemoteRequestOutcome::invalid();
         }
 
-        $this->preRequest($machine);
+        $foo = $this->createFoo();
+
+        $foo->onBeforeRequest($machine);
 
         $lastException = null;
 
+
         try {
-            $outcome = $this->doAction($machine);
-            $outcome = $this->onOutcome($outcome);
+            $outcome = $foo->doAction($machine);
+            $outcome = $foo->onOutcome($outcome);
 
             if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome) {
-                $this->dispatcher->dispatch($request->incrementRetryCount());
+                $this->dispatcher->dispatch($message->incrementRetryCount());
             }
 
             if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
-                $this->onSuccess($machine, $outcome);
+                $foo->onSuccess($machine, $outcome);
             }
 
             return $outcome;
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
                 $machine->getProvider(),
-                $request,
+                $message,
                 $exception->getRemoteException()
             );
 
@@ -97,7 +71,7 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if ($shouldRetry) {
-            $this->dispatcher->dispatch($request->incrementRetryCount());
+            $this->dispatcher->dispatch($message->incrementRetryCount());
 
             return RemoteRequestOutcome::retrying();
         }
@@ -106,8 +80,10 @@ abstract class AbstractRemoteMachineRequestHandler
             $this->exceptionLogger->log($lastException);
         }
 
-        $this->onFailed($machine, $lastException);
+        $foo->onFailure($machine, $lastException);
 
         return new RemoteRequestFailure($lastException);
     }
+
+    abstract protected function createFoo(): FooInterface;
 }

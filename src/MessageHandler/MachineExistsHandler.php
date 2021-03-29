@@ -9,31 +9,31 @@ use App\Model\Machine\State;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
+use App\Model\RemoteRequestSuccessInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
-    protected function doAction(Machine $machine): RemoteBooleanRequestSuccess
+    protected function createFoo(): FooInterface
     {
-        return new RemoteBooleanRequestSuccess(
-            $this->machineProvider->exists($machine)
-        );
-    }
+        return (new FooImplementation())
+            ->withAction(function (Machine $machine) {
+                return new RemoteBooleanRequestSuccess(
+                    $this->machineProvider->exists($machine)
+                );
+            })
+            ->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
+                if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
+                    return RemoteRequestOutcome::retrying();
+                }
 
-    protected function onSuccess(Machine $machine, RemoteRequestOutcomeInterface $outcome): void
-    {
-        if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
-            $machine->setState(State::VALUE_DELETE_DELETED);
-            $this->machineStore->store($machine);
-        }
-    }
-
-    protected function onOutcome(RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface
-    {
-        if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
-            return RemoteRequestOutcome::retrying();
-        }
-
-        return $outcome;
+                return $outcome;
+            })
+            ->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+                if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
+                    $machine->setState(State::VALUE_DELETE_DELETED);
+                    $this->machineStore->store($machine);
+                }
+            });
     }
 }

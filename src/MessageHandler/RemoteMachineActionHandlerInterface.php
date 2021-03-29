@@ -9,13 +9,13 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Model\RemoteRequestOutcomeInterface;
 
-interface FooInterface
+interface RemoteMachineActionHandlerInterface
 {
     /**
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface
      */
-    public function doAction(Machine $machine): RemoteRequestOutcomeInterface;
+    public function performAction(Machine $machine): RemoteRequestOutcomeInterface;
 
     public function onOutcome(RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface;
 

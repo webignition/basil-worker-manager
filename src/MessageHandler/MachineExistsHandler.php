@@ -14,26 +14,27 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
-    protected function createFoo(): FooInterface
+    protected function createActionHandler(): RemoteMachineActionHandlerInterface
     {
-        return (new FooImplementation())
-            ->withAction(function (Machine $machine) {
+        return (new RemoreMachineActionHandler(
+            function (Machine $machine) {
                 return new RemoteBooleanRequestSuccess(
                     $this->machineProvider->exists($machine)
                 );
-            })
-            ->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
-                if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
-                    return RemoteRequestOutcome::retrying();
-                }
+            }
+        ))
+        ->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
+            if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
+                return RemoteRequestOutcome::retrying();
+            }
 
-                return $outcome;
-            })
-            ->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
-                if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
-                    $machine->setState(State::VALUE_DELETE_DELETED);
-                    $this->machineStore->store($machine);
-                }
-            });
+            return $outcome;
+        })
+        ->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+            if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
+                $machine->setState(State::VALUE_DELETE_DELETED);
+                $this->machineStore->store($machine);
+            }
+        });
     }
 }

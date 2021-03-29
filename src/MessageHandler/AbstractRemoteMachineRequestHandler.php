@@ -30,6 +30,8 @@ abstract class AbstractRemoteMachineRequestHandler
     ) {
     }
 
+    abstract protected function createActionHandler(): RemoteMachineActionHandlerInterface;
+
     public function __invoke(RemoteMachineRequestInterface $message): RemoteRequestOutcomeInterface
     {
         $machine = $this->machineRepository->find($message->getMachineId());
@@ -37,23 +39,22 @@ abstract class AbstractRemoteMachineRequestHandler
             return RemoteRequestOutcome::invalid();
         }
 
-        $foo = $this->createFoo();
+        $actionHandler = $this->createActionHandler();
 
-        $foo->onBeforeRequest($machine);
+        $actionHandler->onBeforeRequest($machine);
 
         $lastException = null;
 
-
         try {
-            $outcome = $foo->doAction($machine);
-            $outcome = $foo->onOutcome($outcome);
+            $outcome = $actionHandler->performAction($machine);
+            $outcome = $actionHandler->onOutcome($outcome);
 
             if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome) {
                 $this->dispatcher->dispatch($message->incrementRetryCount());
             }
 
             if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
-                $foo->onSuccess($machine, $outcome);
+                $actionHandler->onSuccess($machine, $outcome);
             }
 
             return $outcome;
@@ -80,10 +81,8 @@ abstract class AbstractRemoteMachineRequestHandler
             $this->exceptionLogger->log($lastException);
         }
 
-        $foo->onFailure($machine, $lastException);
+        $actionHandler->onFailure($machine, $lastException);
 
         return new RemoteRequestFailure($lastException);
     }
-
-    abstract protected function createFoo(): FooInterface;
 }

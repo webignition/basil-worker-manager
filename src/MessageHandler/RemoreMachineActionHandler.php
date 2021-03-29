@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Model\RemoteRequestOutcomeInterface;
 
-class FooImplementation implements FooInterface
+class RemoreMachineActionHandler implements RemoteMachineActionHandlerInterface
 {
     /**
      * @var callable
@@ -34,11 +34,9 @@ class FooImplementation implements FooInterface
      */
     private $beforeRequestHandler = null;
 
-    public function withAction(callable $action): self
+    public function __construct(callable $action)
     {
         $this->action = $action;
-
-        return $this;
     }
 
     public function withOutcomeHandler(callable $outcomeHandler): self
@@ -69,7 +67,7 @@ class FooImplementation implements FooInterface
         return $this;
     }
 
-    public function doAction(Machine $machine): RemoteRequestOutcomeInterface
+    public function performAction(Machine $machine): RemoteRequestOutcomeInterface
     {
         return ($this->action)($machine);
     }

@@ -6,5 +6,4 @@ namespace App\Message;
 
 abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest implements RemoteMachineRequestInterface
 {
-    use RetryableRequestTrait;
 }

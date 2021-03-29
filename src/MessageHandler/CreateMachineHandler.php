@@ -9,7 +9,6 @@ use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Model\Machine\State;
 use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -24,12 +23,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
 
     public function __invoke(CreateMachine $message): RemoteRequestOutcomeInterface
     {
-        $machine = $this->machineRepository->find($message->getMachineId());
-        if (!$machine instanceof Machine) {
-            return RemoteRequestOutcome::invalid();
-        }
-
-        return $this->doHandle($machine, $message);
+        return $this->doHandle($message);
     }
 
     protected function preRequest(Machine $machine): void

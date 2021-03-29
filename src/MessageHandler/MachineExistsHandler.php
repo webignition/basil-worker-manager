@@ -31,13 +31,7 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
 
     public function __invoke(MachineExists $message): RemoteRequestOutcomeInterface
     {
-        $machine = $this->machineRepository->find($message->getMachineId());
-        if (!$machine instanceof Machine) {
-            return RemoteRequestOutcome::invalid();
-        }
-
         return $this->doHandle(
-            $machine,
             $message,
             function (RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface {
                 if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {

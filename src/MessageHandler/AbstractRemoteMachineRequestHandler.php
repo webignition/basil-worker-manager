@@ -49,10 +49,14 @@ abstract class AbstractRemoteMachineRequestHandler
     }
 
     protected function doHandle(
-        Machine $machine,
         RemoteMachineRequestInterface $request,
         ?callable $outcomeMutator = null
     ): RemoteRequestOutcomeInterface {
+        $machine = $this->machineRepository->find($request->getMachineId());
+        if (!$machine instanceof Machine) {
+            return RemoteRequestOutcome::invalid();
+        }
+
         $this->preRequest($machine);
 
         $lastException = null;

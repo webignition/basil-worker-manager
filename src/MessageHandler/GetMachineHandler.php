@@ -7,7 +7,6 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Message\GetMachine;
 use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -22,12 +21,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
 
     public function __invoke(GetMachine $message): RemoteRequestOutcomeInterface
     {
-        $machine = $this->machineRepository->find($message->getMachineId());
-        if (!$machine instanceof Machine) {
-            return RemoteRequestOutcome::invalid();
-        }
-
-        return $this->doHandle($machine, $message);
+        return $this->doHandle($message);
     }
 
     protected function onSuccess(Machine $machine, RemoteRequestOutcomeInterface $outcome): void

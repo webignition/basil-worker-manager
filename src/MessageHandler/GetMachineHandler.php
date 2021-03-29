@@ -13,7 +13,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
 {
     protected function createActionHandler(): RemoteMachineActionHandlerInterface
     {
-        return (new RemoreMachineActionHandler(
+        return (new RemoteMachineActionHandler(
             function (Machine $machine) {
                 return new RemoteMachineRequestSuccess(
                     $this->machineProvider->get($machine)

@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\Machine;
 use App\Model\RemoteRequestOutcomeInterface;
 
-class RemoreMachineActionHandler implements RemoteMachineActionHandlerInterface
+class RemoteMachineActionHandler implements RemoteMachineActionHandlerInterface
 {
     /**
      * @var callable

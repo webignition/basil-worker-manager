@@ -30,22 +30,36 @@ abstract class AbstractRemoteMachineRequestHandler
     ) {
     }
 
-    /**
-     * @throws UnsupportedProviderException
-     * @throws ExceptionInterface
-     */
-    abstract protected function doAction(Machine $machine): RemoteRequestOutcomeInterface;
+    protected function handle(
+        RemoteMachineRequestInterface $message,
+        RemoteMachineActionHandlerInterface $actionHandler
+    ): RemoteRequestOutcomeInterface {
+        $machine = $this->machineRepository->find($message->getMachineId());
+        if (!$machine instanceof Machine) {
+            return RemoteRequestOutcome::invalid();
+        }
 
-    protected function doHandle(Machine $machine, RemoteMachineRequestInterface $request): RemoteRequestOutcomeInterface
-    {
+        $actionHandler->onBeforeRequest($machine);
+
         $lastException = null;
 
         try {
-            return $this->doAction($machine);
+            $outcome = $actionHandler->performAction($machine);
+            $outcome = $actionHandler->onOutcome($outcome);
+
+            if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome) {
+                $this->dispatcher->dispatch($message->incrementRetryCount());
+            }
+
+            if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
+                $actionHandler->onSuccess($machine, $outcome);
+            }
+
+            return $outcome;
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
                 $machine->getProvider(),
-                $request,
+                $message,
                 $exception->getRemoteException()
             );
 
@@ -56,12 +70,16 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if ($shouldRetry) {
+            $this->dispatcher->dispatch($message->incrementRetryCount());
+
             return RemoteRequestOutcome::retrying();
         }
 
         if ($lastException instanceof \Throwable) {
             $this->exceptionLogger->log($lastException);
         }
+
+        $actionHandler->onFailure($machine, $lastException);
 
         return new RemoteRequestFailure($lastException);
     }

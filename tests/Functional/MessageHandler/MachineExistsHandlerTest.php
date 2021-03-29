@@ -10,6 +10,7 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\MachineExists;
 use App\MessageHandler\CreateMachineHandler;
 use App\MessageHandler\MachineExistsHandler;
+use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Model\RemoteBooleanRequestSuccess;
@@ -22,6 +23,8 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineProvider;
 use App\Tests\Services\Asserter\MessengerAsserter;
+use App\Tests\Services\HttpResponseFactory;
+use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 use GuzzleHttp\Handler\MockHandler;
@@ -77,6 +80,24 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
 
         self::assertEquals(new RemoteBooleanRequestSuccess(false), $outcome);
         self::assertSame(State::VALUE_DELETE_DELETED, $this->machine->getState());
+    }
+
+    public function testInvokeSuccessDoesExist(): void
+    {
+        $dropletEntity = new DropletEntity([
+            'id' => 123,
+            'status' => RemoteMachine::STATE_NEW,
+        ]);
+
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($dropletEntity));
+
+        $message = new MachineExists(self::MACHINE_ID);
+        $outcome = ($this->handler)($message);
+
+        self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
+        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->machine->getState());
+
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $message->incrementRetryCount());
     }
 
     public function testInvokeWithUnsupportedProviderException(): void

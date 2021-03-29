@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
-use App\Message\CreateMachine;
 use App\Message\GetMachine;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -16,24 +15,21 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
 {
     public function __invoke(GetMachine $message): RemoteRequestOutcomeInterface
     {
-        return $this->foo($message);
-    }
-
-
-    protected function createActionHandler(): RemoteMachineActionHandlerInterface
-    {
-        return (new RemoteMachineActionHandler(
-            function (Machine $machine) {
-                return new RemoteMachineRequestSuccess(
-                    $this->machineProvider->get($machine)
-                );
-            }
-        ))->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
-            if ($outcome instanceof RemoteMachineRequestSuccess) {
-                $this->machineStore->store(
-                    $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
-                );
-            }
-        });
+        return $this->handle(
+            $message,
+            (new RemoteMachineActionHandler(
+                function (Machine $machine) {
+                    return new RemoteMachineRequestSuccess(
+                        $this->machineProvider->get($machine)
+                    );
+                }
+            ))->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+                if ($outcome instanceof RemoteMachineRequestSuccess) {
+                    $this->machineStore->store(
+                        $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
+                    );
+                }
+            })
+        );
     }
 }

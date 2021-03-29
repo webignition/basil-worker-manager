@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
-use App\Message\CreateMachine;
 use App\Message\MachineExists;
 use App\Model\Machine\State;
 use App\Model\RemoteBooleanRequestSuccess;
@@ -18,28 +17,26 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
 {
     public function __invoke(MachineExists $message): RemoteRequestOutcomeInterface
     {
-        return $this->foo($message);
-    }
+        return $this->handle(
+            $message,
+            (new RemoteMachineActionHandler(
+                function (Machine $machine) {
+                    return new RemoteBooleanRequestSuccess(
+                        $this->machineProvider->exists($machine)
+                    );
+                }
+            ))->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
+                if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
+                    return RemoteRequestOutcome::retrying();
+                }
 
-    protected function createActionHandler(): RemoteMachineActionHandlerInterface
-    {
-        return (new RemoteMachineActionHandler(
-            function (Machine $machine) {
-                return new RemoteBooleanRequestSuccess(
-                    $this->machineProvider->exists($machine)
-                );
-            }
-        ))->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
-            if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
-                return RemoteRequestOutcome::retrying();
-            }
-
-            return $outcome;
-        })->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
-            if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
-                $machine->setState(State::VALUE_DELETE_DELETED);
-                $this->machineStore->store($machine);
-            }
-        });
+                return $outcome;
+            })->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+                if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
+                    $machine->setState(State::VALUE_DELETE_DELETED);
+                    $this->machineStore->store($machine);
+                }
+            })
+        );
     }
 }

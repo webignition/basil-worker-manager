@@ -30,16 +30,14 @@ abstract class AbstractRemoteMachineRequestHandler
     ) {
     }
 
-    abstract protected function createActionHandler(): RemoteMachineActionHandlerInterface;
-
-    protected function foo(RemoteMachineRequestInterface $message): RemoteRequestOutcomeInterface
-    {
+    protected function handle(
+        RemoteMachineRequestInterface $message,
+        RemoteMachineActionHandlerInterface $actionHandler
+    ): RemoteRequestOutcomeInterface {
         $machine = $this->machineRepository->find($message->getMachineId());
         if (!$machine instanceof Machine) {
             return RemoteRequestOutcome::invalid();
         }
-
-        $actionHandler = $this->createActionHandler();
 
         $actionHandler->onBeforeRequest($machine);
 

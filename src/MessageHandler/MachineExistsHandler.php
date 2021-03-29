@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
-use App\Message\MachineExists;
 use App\Model\Machine\State;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcome;
@@ -29,19 +28,12 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
         }
     }
 
-    protected function onOutcome(
-        Machine $machine,
-        RemoteRequestOutcomeInterface $outcome
-    ): RemoteRequestOutcomeInterface {
+    protected function onOutcome(RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface
+    {
         if ($outcome instanceof RemoteBooleanRequestSuccess && true === $outcome->getResult()) {
             return RemoteRequestOutcome::retrying();
         }
 
         return $outcome;
-    }
-
-    public function __invoke(MachineExists $message): RemoteRequestOutcomeInterface
-    {
-        return $this->doHandle($message);
     }
 }

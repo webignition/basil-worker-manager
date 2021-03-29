@@ -6,7 +6,7 @@ namespace App\Message;
 
 use App\Model\RemoteRequestActionInterface;
 
-class GetMachine extends AbstractRemoteMachineRequest implements RemoteMachineRequestInterface
+class GetMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 

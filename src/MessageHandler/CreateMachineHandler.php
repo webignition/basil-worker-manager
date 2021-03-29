@@ -6,7 +6,6 @@ namespace App\MessageHandler;
 
 use App\Entity\Machine;
 use App\Message\CheckMachineIsActive;
-use App\Message\CreateMachine;
 use App\Model\Machine\State;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -19,11 +18,6 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         return new RemoteMachineRequestSuccess(
             $this->machineProvider->create($machine)
         );
-    }
-
-    public function __invoke(CreateMachine $message): RemoteRequestOutcomeInterface
-    {
-        return $this->doHandle($message);
     }
 
     protected function preRequest(Machine $machine): void

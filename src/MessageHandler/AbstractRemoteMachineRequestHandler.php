@@ -30,6 +30,12 @@ abstract class AbstractRemoteMachineRequestHandler
     ) {
     }
 
+    public function __invoke(RemoteMachineRequestInterface $message): RemoteRequestOutcomeInterface
+    {
+        return $this->doHandle($message);
+    }
+
+
     /**
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface
@@ -48,10 +54,8 @@ abstract class AbstractRemoteMachineRequestHandler
     {
     }
 
-    protected function onOutcome(
-        Machine $machine,
-        RemoteRequestOutcomeInterface $outcome
-    ): RemoteRequestOutcomeInterface {
+    protected function onOutcome(RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface
+    {
         return $outcome;
     }
 
@@ -68,7 +72,7 @@ abstract class AbstractRemoteMachineRequestHandler
 
         try {
             $outcome = $this->doAction($machine);
-            $outcome = $this->onOutcome($machine, $outcome);
+            $outcome = $this->onOutcome($outcome);
 
             if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome) {
                 $this->dispatcher->dispatch($request->incrementRetryCount());

@@ -44,7 +44,7 @@ class MachineController extends AbstractController
         return new Response('', 202);
     }
 
-    #[Route(self::PATH_STATUS, name: 'status')]
+    #[Route(self::PATH_STATUS, name: 'status', methods: ['GET', 'HEAD'])]
     public function status(
         string $id,
         MachineRepository $machineRepository,

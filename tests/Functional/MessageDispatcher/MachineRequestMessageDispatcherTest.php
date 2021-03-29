@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageDispatcher;
 
 use App\Message\CreateMachine;
+use App\Message\GetMachine;
 use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
-use App\Message\UpdateMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
 use App\Services\MachineFactory;
@@ -80,8 +80,8 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
                 'expectedDelayStamp' => null,
             ],
             'get' => [
-                'message' => new UpdateMachine(self::MACHINE_ID),
-                'expectedDelayStamp' => new DelayStamp(10000),
+                'message' => new GetMachine(self::MACHINE_ID),
+                'expectedDelayStamp' => null,
             ],
             'exists, first attempt' => [
                 'message' => new MachineExists(self::MACHINE_ID),

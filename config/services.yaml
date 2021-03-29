@@ -12,7 +12,7 @@ parameters:
     digitalocean_droplet_tag: '%env(DIGITALOCEAN_TAG)%'
     create_retry_limit: '%env(CREATE_RETRY_LIMIT)%'
     update_machine_dispatch_delay: '%env(UPDATE_MACHINE_DISPATCH_DELAY)%'
-    update_retry_limit: '%env(UPDATE_RETRY_LIMIT)%'
+    get_retry_limit: '%env(GET_RETRY_LIMIT)%'
     machine_exists_dispatch_delay: '%env(MACHINE_EXISTS_DISPATCH_DELAY)%'
     machine_exists_initial_dispatch_delay: '%env(MACHINE_EXISTS_INITIAL_DISPATCH_DELAY)%'
     exists_retry_limit: '%env(EXISTS_RETRY_LIMIT)%'
@@ -90,13 +90,8 @@ services:
                 - '@App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider'
             $retryLimits:
               !php/const App\Model\RemoteRequestActionInterface::ACTION_CREATE: '%create_retry_limit%'
-              !php/const App\Model\RemoteRequestActionInterface::ACTION_GET: '%update_retry_limit%'
+              !php/const App\Model\RemoteRequestActionInterface::ACTION_GET: '%get_retry_limit%'
               !php/const App\Model\RemoteRequestActionInterface::ACTION_EXISTS: '%exists_retry_limit%'
-
-    app.message_dispatcher.get.configuration:
-        class: App\Model\MachineRequestDispatcherConfiguration
-        arguments:
-            $dispatchDelayInSeconds: '%update_machine_dispatch_delay%'
 
     app.message_dispatcher.exists.configuration:
         class: App\Model\MachineRequestDispatcherConfiguration
@@ -112,7 +107,6 @@ services:
     App\MessageDispatcher\MachineRequestMessageDispatcher:
         arguments:
             $configurations:
-                App\Message\UpdateMachine: '@app.message_dispatcher.get.configuration'
                 App\Message\MachineExists: '@app.message_dispatcher.exists.configuration'
                 App\Message\CheckMachineIsActive: '@app.message_dispatcher.exists.configuration'
 

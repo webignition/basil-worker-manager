@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Asynchronous;
 
 use App\Controller\MachineController;
-use App\Entity\Machine;
+use App\Entity\Machine as MachineEntity;
 use App\Model\Machine\State;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
-use App\Tests\Model\Machine as TestMachine;
+use App\Tests\Model\Machine;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
 
@@ -71,7 +71,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
         $remoteId = $this->getMachineEntity()->getRemoteId();
         if (false === is_int($remoteId)) {
-            throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has not been created');
+            throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has been created');
         }
 
         self::assertIsInt($remoteId);
@@ -88,7 +88,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         $maxDuration = self::MAX_DURATION_IN_SECONDS * self::MICROSECONDS_PER_SECOND;
         $intervalInMicroseconds = 100000;
 
-        while ($stopState !== $this->getMachineEntity()->getState()) {
+        while ($stopState !== $this->getMachine()->getState()) {
             usleep($intervalInMicroseconds);
             $duration += $intervalInMicroseconds;
 
@@ -100,12 +100,12 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         return true;
     }
 
-    private function getMachineEntity(): Machine
+    private function getMachineEntity(): MachineEntity
     {
         $machine = $this->machineRepository->findOneBy([
             'id' => self::MACHINE_ID,
         ]);
-        \assert($machine instanceof Machine);
+        \assert($machine instanceof MachineEntity);
 
         $this->entityManager->refresh($machine);
 
@@ -129,13 +129,13 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         return str_replace('{id}', self::MACHINE_ID, MachineController::PATH_MACHINE);
     }
 
-    private function getMachine(): TestMachine
+    private function getMachine(): Machine
     {
         $this->client->request('GET', $this->getMachineUrl());
 
         $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());
 
-        return new TestMachine(json_decode((string) $response->getContent(), true));
+        return new Machine(json_decode((string) $response->getContent(), true));
     }
 }

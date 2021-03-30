@@ -125,7 +125,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $this->client->request(
             'GET',
-            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_STATUS)
+            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_MACHINE)
         );
 
         self::assertSame(404, $this->client->getResponse()->getStatusCode());
@@ -140,7 +140,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $this->client->request(
             'GET',
-            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_STATUS)
+            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_MACHINE)
         );
 
         $response = $this->client->getResponse();

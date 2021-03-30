@@ -42,7 +42,7 @@ jobs:
       - name: Setup integration environment
         run: |
           composer integration-setup
-          sleep 1
+          sleep 10
 
 #      - name: Run synchronous tests
 #        env:

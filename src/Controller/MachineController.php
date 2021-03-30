@@ -19,7 +19,7 @@ class MachineController extends AbstractController
 {
     public const PATH_CREATE = '/create';
     public const PATH_COMPONENT_ID = '{id}';
-    public const PATH_STATUS = '/' . self::PATH_COMPONENT_ID . '/status';
+    public const PATH_MACHINE = '/' . self::PATH_COMPONENT_ID . '/machine';
 
     #[Route(self::PATH_CREATE, name: 'create')]
     public function create(
@@ -44,7 +44,7 @@ class MachineController extends AbstractController
         return new Response('', 202);
     }
 
-    #[Route(self::PATH_STATUS, name: 'status', methods: ['GET', 'HEAD'])]
+    #[Route(self::PATH_MACHINE, name: 'status', methods: ['GET', 'HEAD'])]
     public function status(
         string $id,
         MachineRepository $machineRepository,

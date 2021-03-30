@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Machine;
 use App\Message\CreateMachine;
+use App\Message\DeleteMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
@@ -55,5 +56,21 @@ class MachineController extends AbstractController
         }
 
         return new JsonResponse($machine);
+    }
+
+    #[Route(self::PATH_MACHINE, name: 'delete', methods: ['DELETE'])]
+    public function delete(
+        string $id,
+        MachineRepository $machineRepository,
+        MachineRequestMessageDispatcher $messageDispatcher,
+    ): Response {
+        $machine = $machineRepository->find($id);
+        if (false === $machine instanceof Machine) {
+            return new Response('', 404);
+        }
+
+        $messageDispatcher->dispatch(new DeleteMachine((string) $machine));
+
+        return new Response('', 202);
     }
 }

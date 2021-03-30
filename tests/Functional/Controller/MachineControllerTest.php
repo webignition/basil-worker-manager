@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Controller;
 use App\Controller\MachineController;
 use App\Entity\Machine;
 use App\Message\CreateMachine;
+use App\Message\DeleteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
@@ -122,28 +123,20 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     public function testStatusMachineNotFound(): void
     {
         $id = md5('id content');
+        $response = $this->makeStatusRequest($id);
 
-        $this->client->request(
-            'GET',
-            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_MACHINE)
-        );
-
-        self::assertSame(404, $this->client->getResponse()->getStatusCode());
+        self::assertSame(404, $response->getStatusCode());
     }
 
     public function testStatus(): void
     {
         $id = md5('id content');
-        $createResponse = $this->makeCreateRequest($id);
 
-        self::assertSame(202, $createResponse->getStatusCode());
+        $machineFactory = self::$container->get(MachineFactory::class);
+        \assert($machineFactory instanceof MachineFactory);
+        $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
-        $this->client->request(
-            'GET',
-            str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_MACHINE)
-        );
-
-        $response = $this->client->getResponse();
+        $response = $this->makeStatusRequest($id);
 
         self::assertInstanceOf(JsonResponse::class, $response);
         self::assertJsonStringEqualsJsonString(
@@ -154,6 +147,28 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
             ]),
             (string) $response->getContent()
         );
+    }
+
+    public function testDeleteSuccess(): void
+    {
+        $id = md5('id content');
+
+        $machineFactory = self::$container->get(MachineFactory::class);
+        \assert($machineFactory instanceof MachineFactory);
+        $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
+
+        $response = $this->makeDeleteRequest($id);
+        self::assertSame(202, $response->getStatusCode());
+
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, new DeleteMachine($id));
+    }
+
+    public function testDeleteMachineNotFound(): void
+    {
+        $id = md5('id content');
+        $response = $this->makeDeleteRequest($id);
+
+        self::assertSame(404, $response->getStatusCode());
     }
 
     /**
@@ -177,5 +192,27 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         );
 
         return $this->client->getResponse();
+    }
+
+    private function makeStatusRequest(string $id): Response
+    {
+        return $this->makeMachineRequest('GET', $id);
+    }
+
+    private function makeDeleteRequest(string $id): Response
+    {
+        return $this->makeMachineRequest('DELETE', $id);
+    }
+
+    private function makeMachineRequest(string $method, string $id): Response
+    {
+        $this->client->request($method, $this->createMachineUrl($id));
+
+        return $this->client->getResponse();
+    }
+
+    private function createMachineUrl(string $id): string
+    {
+        return str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_MACHINE);
     }
 }

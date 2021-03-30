@@ -111,7 +111,7 @@ services:
         arguments:
             $configurations:
                 App\Message\MachineExists: '@app.message_dispatcher.exists.configuration'
-                App\Message\CheckMachineIsActive: '@app.message_dispatcher.exists.configuration'
+                App\Message\CheckMachineIsActive: '@app.message_dispatcher.machine_is_active.configuration'
 
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:

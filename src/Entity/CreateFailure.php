@@ -26,12 +26,23 @@ class CreateFailure
      */
     private string $reason;
 
-    public static function create(Machine $machine, int $code, string $reason): self
+    /**
+     * @ORM\Column(type="simple_array")
+     *
+     * @var array<string, int|string>
+     */
+    private array $context = [];
+
+    /**
+     * @param array<string, int|string> $context
+     */
+    public static function create(Machine $machine, int $code, string $reason, array $context = []): self
     {
         $entity = new CreateFailure();
         $entity->id = $machine->getId();
         $entity->code = $code;
         $entity->reason = $reason;
+        $entity->context = $context;
 
         return $entity;
     }

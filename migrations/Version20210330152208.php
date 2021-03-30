@@ -21,9 +21,11 @@ final class Version20210330152208 extends AbstractMigration
                 id VARCHAR(128) NOT NULL, 
                 code INT NOT NULL, 
                 reason TEXT NOT NULL, 
+                context TEXT,
                 PRIMARY KEY(id)
             )
         ');
+        $this->addSql('COMMENT ON COLUMN create_failure.context IS \'(DC2Type:simple_array)\'');
     }
 
     public function down(Schema $schema): void

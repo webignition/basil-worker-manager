@@ -10,18 +10,19 @@ use App\Model\Machine\State;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
+use App\Tests\Model\Machine as TestMachine;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
 
 class EndToEndTest extends AbstractBaseIntegrationTest
 {
+    private const MACHINE_ID = 'machine-id';
+
     private const MAX_DURATION_IN_SECONDS = 120;
     private const MICROSECONDS_PER_SECOND = 1000000;
 
     private MachineRepository $machineRepository;
     private DropletApi $dropletApi;
-    private string $machineId = '';
-    private Machine $machine;
 
     protected function setUp(): void
     {
@@ -35,11 +36,8 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         \assert($digitalOceanClient instanceof Client);
         $this->dropletApi = $digitalOceanClient->droplet();
 
-        $this->machineId = md5('id content');
-
         echo "\n" . $this->getObfuscatedDigitalOceanAccessToken(2, 2) . "\n\n";
     }
-
 
     public function testCreateRemoteMachine(): void
     {
@@ -47,28 +45,31 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             'POST',
             MachineController::PATH_CREATE,
             [
-                MachineCreateRequest::KEY_ID => $this->machineId,
+                MachineCreateRequest::KEY_ID => self::MACHINE_ID,
             ]
         );
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $machine = $this->machineRepository->find($this->machineId);
-        if ($machine instanceof Machine) {
-            $this->machine = $machine;
-        }
-
-        self::assertSame(State::VALUE_CREATE_RECEIVED, $this->machine->getState());
+        $testMachine = $this->getMachine();
+        self::assertTrue(in_array(
+            $testMachine->getState(),
+            [
+                State::VALUE_CREATE_RECEIVED,
+                State::VALUE_CREATE_REQUESTED,
+            ]
+        ));
 
         $waitResult = $this->waitUntilMachineStateIs(State::VALUE_UP_ACTIVE);
         if (false === $waitResult) {
             $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_UP_ACTIVE);
         }
 
-        self::assertSame(State::VALUE_UP_ACTIVE, $this->machine->getState());
+        $testMachine = $this->getMachine();
+        self::assertSame(State::VALUE_UP_ACTIVE, $testMachine->getState());
 
-        $remoteId = $this->machine->getRemoteId();
+        $remoteId = $this->getMachineEntity()->getRemoteId();
         if (false === is_int($remoteId)) {
             throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has not been created');
         }
@@ -87,31 +88,28 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         $maxDuration = self::MAX_DURATION_IN_SECONDS * self::MICROSECONDS_PER_SECOND;
         $intervalInMicroseconds = 100000;
 
-        while ($stopState !== $this->machine->getState()) {
+        while ($stopState !== $this->getMachineEntity()->getState()) {
             usleep($intervalInMicroseconds);
             $duration += $intervalInMicroseconds;
 
             if ($duration >= $maxDuration) {
                 return false;
             }
-
-            $this->refreshMachineEntity();
         }
 
         return true;
     }
 
-    private function refreshMachineEntity(): void
+    private function getMachineEntity(): Machine
     {
         $machine = $this->machineRepository->findOneBy([
-            'id' => $this->machine->getId(),
+            'id' => self::MACHINE_ID,
         ]);
+        \assert($machine instanceof Machine);
 
-        if ($machine instanceof Machine) {
-            $this->machine = $machine;
-        }
+        $this->entityManager->refresh($machine);
 
-        $this->entityManager->refresh($this->machine);
+        return $machine;
     }
 
     private function getObfuscatedDigitalOceanAccessToken(int $prefixLength, int $suffixLength): string
@@ -124,5 +122,20 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             substr($token, 0, $prefixLength) .
             str_repeat('*', $length - ($prefixLength + $suffixLength)) .
             substr($token, $length - $suffixLength);
+    }
+
+    private function getMachineUrl(): string
+    {
+        return str_replace('{id}', self::MACHINE_ID, MachineController::PATH_MACHINE);
+    }
+
+    private function getMachine(): TestMachine
+    {
+        $this->client->request('GET', $this->getMachineUrl());
+
+        $response = $this->client->getResponse();
+        self::assertSame(200, $response->getStatusCode());
+
+        return new TestMachine(json_decode((string) $response->getContent(), true));
     }
 }

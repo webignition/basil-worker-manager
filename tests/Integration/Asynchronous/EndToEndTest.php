@@ -10,7 +10,6 @@ use App\Model\Machine\State;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
-use App\Tests\Services\EntityRefresher;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Client;
 
@@ -21,7 +20,6 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
     private MachineRepository $machineRepository;
     private DropletApi $dropletApi;
-    private EntityRefresher $entityRefresher;
     private string $machineId = '';
     private Machine $machine;
 
@@ -30,19 +28,12 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         parent::setUp();
 
         $machineRepository = self::$container->get(MachineRepository::class);
-        if ($machineRepository instanceof MachineRepository) {
-            $this->machineRepository = $machineRepository;
-        }
+        \assert($machineRepository instanceof MachineRepository);
+        $this->machineRepository = $machineRepository;
 
         $digitalOceanClient = self::$container->get(Client::class);
-        if ($digitalOceanClient instanceof Client) {
-            $this->dropletApi = $digitalOceanClient->droplet();
-        }
-
-        $entityRefresher = self::$container->get(EntityRefresher::class);
-        if ($entityRefresher instanceof EntityRefresher) {
-            $this->entityRefresher = $entityRefresher;
-        }
+        \assert($digitalOceanClient instanceof Client);
+        $this->dropletApi = $digitalOceanClient->droplet();
 
         $this->machineId = md5('id content');
 
@@ -75,8 +66,6 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_UP_ACTIVE);
         }
 
-        $this->entityRefresher->refreshForEntity(Machine::class);
-
         self::assertSame(State::VALUE_UP_ACTIVE, $this->machine->getState());
 
         $remoteId = $this->machine->getRemoteId();
@@ -106,12 +95,23 @@ class EndToEndTest extends AbstractBaseIntegrationTest
                 return false;
             }
 
-            $this->entityRefresher->refreshForEntities([
-                Machine::class,
-            ]);
+            $this->refreshMachineEntity();
         }
 
         return true;
+    }
+
+    private function refreshMachineEntity(): void
+    {
+        $machine = $this->machineRepository->findOneBy([
+            'id' => $this->machine->getId(),
+        ]);
+
+        if ($machine instanceof Machine) {
+            $this->machine = $machine;
+        }
+
+        $this->entityManager->refresh($this->machine);
     }
 
     private function getObfuscatedDigitalOceanAccessToken(int $prefixLength, int $suffixLength): string

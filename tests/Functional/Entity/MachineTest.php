@@ -7,27 +7,19 @@ namespace App\Tests\Functional\Entity;
 use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Tests\AbstractBaseFunctionalTest;
-use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MachineTest extends AbstractBaseFunctionalTest
 {
     private EntityManagerInterface $entityManager;
-    private EntityRefresher $entityRefresher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
-        if ($entityManager instanceof EntityManagerInterface) {
-            $this->entityManager = $entityManager;
-        }
-
-        $entityRefresher = self::$container->get(EntityRefresher::class);
-        if ($entityRefresher instanceof EntityRefresher) {
-            $this->entityRefresher = $entityRefresher;
-        }
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
     }
 
     public function testPersist(): void
@@ -40,7 +32,7 @@ class MachineTest extends AbstractBaseFunctionalTest
         $this->entityManager->persist($machine);
         $this->entityManager->flush();
 
-        $this->entityRefresher->refreshForEntity(Machine::class);
+        $this->entityManager->refresh($machine);
 
         $retrievedMachine = $this->entityManager->find(Machine::class, $machine->getId());
 

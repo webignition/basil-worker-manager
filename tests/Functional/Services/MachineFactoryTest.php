@@ -8,33 +8,24 @@ use App\Entity\Machine;
 use App\Model\ProviderInterface;
 use App\Services\MachineFactory;
 use App\Tests\AbstractBaseFunctionalTest;
-use App\Tests\Services\EntityRefresher;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MachineFactoryTest extends AbstractBaseFunctionalTest
 {
     private MachineFactory $machineFactory;
     private EntityManagerInterface $entityManager;
-    private EntityRefresher $entityRefresher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $machineFactory = self::$container->get(MachineFactory::class);
-        if ($machineFactory instanceof MachineFactory) {
-            $this->machineFactory = $machineFactory;
-        }
+        \assert($machineFactory instanceof MachineFactory);
+        $this->machineFactory = $machineFactory;
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
-        if ($entityManager instanceof EntityManagerInterface) {
-            $this->entityManager = $entityManager;
-        }
-
-        $entityRefresher = self::$container->get(EntityRefresher::class);
-        if ($entityRefresher instanceof EntityRefresher) {
-            $this->entityRefresher = $entityRefresher;
-        }
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
     }
 
     public function testCreate(): void
@@ -44,7 +35,7 @@ class MachineFactoryTest extends AbstractBaseFunctionalTest
 
         $machine = $this->machineFactory->create($id, $provider);
 
-        $this->entityRefresher->refreshForEntity(Machine::class);
+        $this->entityManager->refresh($machine);
 
         $retrievedEntity = $this->entityManager->find(Machine::class, $machine->getId());
 

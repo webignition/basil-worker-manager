@@ -29,6 +29,3 @@ services:
         factory: ['GuzzleHttp\HandlerStack', 'create']
         arguments:
             $handler: '@GuzzleHttp\Handler\MockHandler'
-
-    App\Tests\Services\EntityRefresher:
-        public: true

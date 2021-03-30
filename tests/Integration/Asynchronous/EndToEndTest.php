@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Asynchronous;
 
 use App\Controller\MachineController;
-use App\Entity\Machine as MachineEntity;
 use App\Model\Machine\State;
-use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Model\Machine;
-use DigitalOceanV2\Api\Droplet as DropletApi;
-use DigitalOceanV2\Client;
 
 class EndToEndTest extends AbstractBaseIntegrationTest
 {
@@ -21,20 +17,9 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     private const MAX_DURATION_IN_SECONDS = 120;
     private const MICROSECONDS_PER_SECOND = 1000000;
 
-    private MachineRepository $machineRepository;
-    private DropletApi $dropletApi;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $machineRepository = self::$container->get(MachineRepository::class);
-        \assert($machineRepository instanceof MachineRepository);
-        $this->machineRepository = $machineRepository;
-
-        $digitalOceanClient = self::$container->get(Client::class);
-        \assert($digitalOceanClient instanceof Client);
-        $this->dropletApi = $digitalOceanClient->droplet();
 
         echo "\n" . $this->getObfuscatedDigitalOceanAccessToken(2, 2) . "\n\n";
     }
@@ -52,9 +37,8 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $testMachine = $this->getMachine();
         self::assertTrue(in_array(
-            $testMachine->getState(),
+            $this->getMachine()->getState(),
             [
                 State::VALUE_CREATE_RECEIVED,
                 State::VALUE_CREATE_REQUESTED,
@@ -66,17 +50,19 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_UP_ACTIVE);
         }
 
-        $testMachine = $this->getMachine();
-        self::assertSame(State::VALUE_UP_ACTIVE, $testMachine->getState());
+        self::assertSame(State::VALUE_UP_ACTIVE, $this->getMachine()->getState());
 
-        $remoteId = $this->getMachineEntity()->getRemoteId();
-        if (false === is_int($remoteId)) {
-            throw new \RuntimeException('Machine lacking remote_id. Verify test droplet has been created');
+        $this->client->request('DELETE', $this->getMachineUrl());
+
+        $response = $this->client->getResponse();
+        self::assertSame(202, $response->getStatusCode());
+
+        $waitResult = $this->waitUntilMachineStateIs(State::VALUE_DELETE_DELETED);
+        if (false === $waitResult) {
+            $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_DELETE_DELETED);
         }
 
-        self::assertIsInt($remoteId);
-
-        $this->dropletApi->remove($remoteId);
+        self::assertSame(State::VALUE_DELETE_DELETED, $this->getMachine()->getState());
     }
 
     /**
@@ -98,18 +84,6 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         }
 
         return true;
-    }
-
-    private function getMachineEntity(): MachineEntity
-    {
-        $machine = $this->machineRepository->findOneBy([
-            'id' => self::MACHINE_ID,
-        ]);
-        \assert($machine instanceof MachineEntity);
-
-        $this->entityManager->refresh($machine);
-
-        return $machine;
     }
 
     private function getObfuscatedDigitalOceanAccessToken(int $prefixLength, int $suffixLength): string

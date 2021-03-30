@@ -44,11 +44,6 @@ jobs:
           composer integration-setup
           sleep 3
 
-#      - name: Run synchronous tests
-#        env:
-#          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
-#        run: composer test-integration-sync
-
       - name: Run asynchronous tests
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}

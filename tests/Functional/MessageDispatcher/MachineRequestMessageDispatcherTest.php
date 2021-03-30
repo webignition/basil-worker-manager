@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Message\GetMachine;
 use App\Message\MachineExists;
@@ -91,6 +92,10 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
                 'message' => (new MachineExists(self::MACHINE_ID))
                     ->incrementRetryCount()
                     ->incrementRetryCount(),
+                'expectedDelayStamp' => new DelayStamp(10000),
+            ],
+            'check machine is active' => [
+                'message' => new CheckMachineIsActive(self::MACHINE_ID),
                 'expectedDelayStamp' => new DelayStamp(10000),
             ],
         ];

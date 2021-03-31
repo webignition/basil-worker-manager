@@ -6,6 +6,7 @@ use App\Entity\CreateFailure;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationExceptionInterface;
+use App\Exception\MachineProvider\CurlExceptionInterface;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +20,7 @@ class CreateFailureFactory
         CreateFailure::CODE_UNSUPPORTED_PROVIDER => CreateFailure::REASON_UNSUPPORTED_PROVIDER,
         CreateFailure::CODE_API_LIMIT_EXCEEDED => CreateFailure::REASON_API_LIMIT_EXCEEDED,
         CreateFailure::CODE_API_AUTHENTICATION_FAILURE => CreateFailure::REASON_API_AUTHENTICATION_FAILURE,
+        CreateFailure::CODE_CURL_ERROR => CreateFailure::REASON_CURL_ERROR,
     ];
 
     public function __construct(
@@ -69,6 +71,10 @@ class CreateFailureFactory
             return CreateFailure::CODE_API_AUTHENTICATION_FAILURE;
         }
 
+        if ($exception instanceof CurlExceptionInterface) {
+            return CreateFailure::CODE_CURL_ERROR;
+        }
+
         return CreateFailure::CODE_UNKNOWN;
     }
 
@@ -90,6 +96,12 @@ class CreateFailureFactory
         if ($exception instanceof ApiLimitExceptionInterface) {
             return [
                 'reset-timestamp' => $exception->getResetTimestamp(),
+            ];
+        }
+
+        if ($exception instanceof CurlExceptionInterface) {
+            return [
+                'curl-code' => $exception->getCurlCode(),
             ];
         }
 

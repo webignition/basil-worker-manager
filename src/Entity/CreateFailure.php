@@ -22,6 +22,9 @@ class CreateFailure
     public const CODE_API_AUTHENTICATION_FAILURE = 3;
     public const REASON_API_AUTHENTICATION_FAILURE = 'api authentication failure';
 
+    public const CODE_CURL_ERROR = 4;
+    public const REASON_CURL_ERROR = 'http transport error';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="string", length=128)

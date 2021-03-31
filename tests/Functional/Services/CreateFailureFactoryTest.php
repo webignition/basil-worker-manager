@@ -12,13 +12,16 @@ use App\Exception\MachineProvider\AuthenticationExceptionInterface;
 use App\Exception\MachineProvider\CurlException;
 use App\Exception\MachineProvider\CurlExceptionInterface;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\ExceptionInterface;
+use App\Exception\MachineProvider\HttpExceptionInterface;
 use App\Exception\MachineProvider\UnknownException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\CreateFailureFactory;
 use App\Tests\AbstractBaseFunctionalTest;
+use DigitalOceanV2\Exception\RuntimeException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
@@ -116,6 +119,21 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
                     CreateFailure::REASON_CURL_ERROR,
                     [
                         'curl-code' => 7,
+                    ]
+                ),
+            ],
+            HttpExceptionInterface::class => [
+                'exception' => new HttpException(
+                    $machineId,
+                    RemoteRequestActionInterface::ACTION_GET,
+                    new RuntimeException('Internal Server Error', 500)
+                ),
+                'expectedCreateFailure' => CreateFailure::create(
+                    $machine,
+                    CreateFailure::CODE_HTTP_ERROR,
+                    CreateFailure::REASON_HTTP_ERROR,
+                    [
+                        'status-code' => 500,
                     ]
                 ),
             ],

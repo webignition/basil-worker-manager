@@ -25,6 +25,9 @@ class CreateFailure
     public const CODE_CURL_ERROR = 4;
     public const REASON_CURL_ERROR = 'http transport error';
 
+    public const CODE_HTTP_ERROR = 5;
+    public const REASON_HTTP_ERROR = 'http application error';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="string", length=128)

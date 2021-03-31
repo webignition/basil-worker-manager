@@ -10,7 +10,6 @@ use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
 use App\Repository\CreateFailureRepository;
 use App\Repository\MachineRepository;
-use App\Request\MachineCreateRequest;
 use App\Response\BadMachineCreateRequestResponse;
 use App\Services\MachineFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,22 +18,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MachineController
 {
-    public const PATH_CREATE = '/create';
     public const PATH_COMPONENT_ID = '{id}';
     public const PATH_MACHINE = '/' . self::PATH_COMPONENT_ID . '/machine';
 
-    #[Route(self::PATH_CREATE, name: 'create')]
+    #[Route(self::PATH_MACHINE, name: 'create', methods: ['POST'])]
     public function create(
-        MachineCreateRequest $request,
+        string $id,
         MachineFactory $factory,
         MachineRequestMessageDispatcher $messageDispatcher,
         MachineRepository $machineRepository
     ): Response {
-        $id = $request->getId();
-        if ('' === $id) {
-            return BadMachineCreateRequestResponse::createIdMissingResponse();
-        }
-
         if ($machineRepository->find($id) instanceof Machine) {
             return BadMachineCreateRequestResponse::createIdTakenResponse();
         }

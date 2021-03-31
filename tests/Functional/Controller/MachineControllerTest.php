@@ -13,7 +13,6 @@ use App\Model\Machine\State;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Repository\MachineRepository;
-use App\Request\MachineCreateRequest;
 use App\Services\CreateFailureFactory;
 use App\Services\MachineFactory;
 use App\Services\MachineStore;
@@ -66,44 +65,6 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 
-    /**
-     * @dataProvider createIdMissingDataProvider
-     *
-     * @param array[] $requestData
-     * @param array[] $expectedResponseBody
-     */
-    public function testCreateIdMissing(array $requestData, array $expectedResponseBody): void
-    {
-        $this->client->request('POST', MachineController::PATH_CREATE, $requestData);
-
-        $this->assertBadRequestResponse($expectedResponseBody, $this->client->getResponse());
-    }
-
-    /**
-     * @return array[]
-     */
-    public function createIdMissingDataProvider(): array
-    {
-        $idMissingExpectedResponseBody = [
-            'type' => 'machine-create-request',
-            'message' => 'id missing',
-            'code' => 100,
-        ];
-
-        return [
-            'empty' => [
-                'requestData' => [],
-                'expectedResponseBody' => $idMissingExpectedResponseBody,
-            ],
-            'id empty' => [
-                'requestData' => [
-                    MachineCreateRequest::KEY_ID => '',
-                ],
-                'expectedResponseBody' => $idMissingExpectedResponseBody,
-            ],
-        ];
-    }
-
     public function testCreateIdTaken(): void
     {
         $id = md5('id content');
@@ -118,7 +79,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
             [
                 'type' => 'machine-create-request',
                 'message' => 'id taken',
-                'code' => 200,
+                'code' => 100,
             ],
             $response
         );
@@ -231,13 +192,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
     private function makeCreateRequest(string $id): Response
     {
-        $this->client->request(
-            'POST',
-            MachineController::PATH_CREATE,
-            [
-                MachineCreateRequest::KEY_ID => $id,
-            ]
-        );
+        $this->client->request('POST', $this->createMachineUrl($id));
 
         return $this->client->getResponse();
     }

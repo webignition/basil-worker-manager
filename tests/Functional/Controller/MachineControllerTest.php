@@ -6,13 +6,17 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\MachineController;
 use App\Entity\Machine;
+use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Model\Machine\State;
 use App\Model\ProviderInterface;
+use App\Model\RemoteRequestActionInterface;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
+use App\Services\CreateFailureFactory;
 use App\Services\MachineFactory;
+use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -128,7 +132,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertSame(404, $response->getStatusCode());
     }
 
-    public function testStatus(): void
+    public function testStatusWithoutCreateFailure(): void
     {
         $id = md5('id content');
 
@@ -144,6 +148,50 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
                 'id' => $id,
                 'state' => State::VALUE_CREATE_RECEIVED,
                 'ip_addresses' => [],
+            ]),
+            (string) $response->getContent()
+        );
+    }
+
+    public function testStatusWithCreateFailure(): void
+    {
+        $id = md5('id content');
+
+        $machineFactory = self::$container->get(MachineFactory::class);
+        \assert($machineFactory instanceof MachineFactory);
+        $machine = $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
+
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $machineStore->store($machine->setState(State::VALUE_CREATE_FAILED));
+
+        $createFailureFactory = self::$container->get(CreateFailureFactory::class);
+        \assert($createFailureFactory instanceof CreateFailureFactory);
+        $createFailureFactory->create(
+            $id,
+            new ApiLimitExceededException(
+                123,
+                $id,
+                RemoteRequestActionInterface::ACTION_GET,
+                new \Exception()
+            )
+        );
+
+        $response = $this->makeStatusRequest($id);
+
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode([
+                'id' => $id,
+                'state' => State::VALUE_CREATE_FAILED,
+                'ip_addresses' => [],
+                'create_failure' => [
+                    'code' => 2,
+                    'reason' => 'api limit exceeded',
+                    'context' => [
+                        'reset-timestamp' => 123,
+                    ],
+                ],
             ]),
             (string) $response->getContent()
         );

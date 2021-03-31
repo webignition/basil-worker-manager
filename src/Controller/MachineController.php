@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\CreateFailure;
 use App\Entity\Machine;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
+use App\Repository\CreateFailureRepository;
 use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Response\BadMachineCreateRequestResponse;
@@ -48,13 +50,21 @@ class MachineController
     public function status(
         string $id,
         MachineRepository $machineRepository,
+        CreateFailureRepository $createFailureRepository,
     ): Response {
         $machine = $machineRepository->find($id);
         if (false === $machine instanceof Machine) {
             return new Response('', 404);
         }
 
-        return new JsonResponse($machine);
+        $responseData = $machine->jsonSerialize();
+
+        $createFailure = $createFailureRepository->find($machine->getId());
+        if ($createFailure instanceof CreateFailure) {
+            $responseData['create_failure'] = $createFailure->jsonSerialize();
+        }
+
+        return new JsonResponse($responseData);
     }
 
     #[Route(self::PATH_MACHINE, name: 'delete', methods: ['DELETE'])]

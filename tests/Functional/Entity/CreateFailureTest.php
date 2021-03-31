@@ -33,8 +33,8 @@ class CreateFailureTest extends AbstractBaseFunctionalTest
         $this->entityManager->persist($machine);
         $this->entityManager->flush();
 
-        $code = 123;
-        $reason = 'failure-reason';
+        $code = CreateFailure::CODE_UNKNOWN;
+        $reason = CreateFailure::REASON_UNKNOWN;
 
         $createFailure = CreateFailure::create($machine, $code, $reason);
 

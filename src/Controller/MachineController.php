@@ -11,12 +11,11 @@ use App\Repository\MachineRepository;
 use App\Request\MachineCreateRequest;
 use App\Response\BadMachineCreateRequestResponse;
 use App\Services\MachineFactory;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MachineController extends AbstractController
+class MachineController
 {
     public const PATH_CREATE = '/create';
     public const PATH_COMPONENT_ID = '{id}';

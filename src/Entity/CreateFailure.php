@@ -16,6 +16,9 @@ class CreateFailure
     public const CODE_UNSUPPORTED_PROVIDER = 1;
     public const REASON_UNSUPPORTED_PROVIDER = 'unsupported provider';
 
+    public const CODE_API_LIMIT_EXCEEDED = 2;
+    public const REASON_API_LIMIT_EXCEEDED = 'api limit exceeded';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="string", length=128)

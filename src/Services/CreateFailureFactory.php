@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\CreateFailure;
 use App\Entity\Machine;
+use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,6 +16,7 @@ class CreateFailureFactory
      */
     public const REASONS = [
         CreateFailure::CODE_UNSUPPORTED_PROVIDER => CreateFailure::REASON_UNSUPPORTED_PROVIDER,
+        CreateFailure::CODE_API_LIMIT_EXCEEDED => CreateFailure::REASON_API_LIMIT_EXCEEDED,
     ];
 
     public function __construct(
@@ -33,7 +35,12 @@ class CreateFailureFactory
 
         $code = $this->findCode($exception);
 
-        $entity = CreateFailure::create($machine, $code, $this->findReason($code));
+        $entity = CreateFailure::create(
+            $machine,
+            $code,
+            $this->findReason($code),
+            $this->createContext($exception)
+        );
 
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
@@ -52,6 +59,10 @@ class CreateFailureFactory
             return CreateFailure::CODE_UNSUPPORTED_PROVIDER;
         }
 
+        if ($exception instanceof ApiLimitExceptionInterface) {
+            return CreateFailure::CODE_API_LIMIT_EXCEEDED;
+        }
+
         return CreateFailure::CODE_UNKNOWN;
     }
 
@@ -63,5 +74,19 @@ class CreateFailureFactory
     private function findReason(int $code): string
     {
         return self::REASONS[$code] ?? CreateFailure::REASON_UNKNOWN;
+    }
+
+    /**
+     * @return array<string, string|int>
+     */
+    private function createContext(ExceptionInterface | UnsupportedProviderException $exception): array
+    {
+        if ($exception instanceof ApiLimitExceptionInterface) {
+            return [
+                'reset-timestamp' => $exception->getResetTimestamp(),
+            ];
+        }
+
+        return [];
     }
 }

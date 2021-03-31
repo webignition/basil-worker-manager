@@ -6,7 +6,9 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\CreateFailure;
 use App\Entity\Machine;
+use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationException;
+use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ProviderInterface;
@@ -67,7 +69,23 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
                     $machine,
                     CreateFailure::CODE_UNSUPPORTED_PROVIDER,
                     CreateFailure::REASON_UNSUPPORTED_PROVIDER,
-                )
+                ),
+            ],
+            ApiLimitExceptionInterface::class => [
+                'exception' => new ApiLimitExceededException(
+                    123,
+                    'machine id',
+                    RemoteRequestActionInterface::ACTION_GET,
+                    new \Exception()
+                ),
+                'expectedCreateFailure' => CreateFailure::create(
+                    $machine,
+                    CreateFailure::CODE_API_LIMIT_EXCEEDED,
+                    CreateFailure::REASON_API_LIMIT_EXCEEDED,
+                    [
+                        'reset-timestamp' => 123,
+                    ]
+                ),
             ],
             'unknown' => [
                 'exception' => new AuthenticationException(
@@ -79,7 +97,7 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
                     $machine,
                     CreateFailure::CODE_UNKNOWN,
                     CreateFailure::REASON_UNKNOWN,
-                )
+                ),
             ],
         ];
     }

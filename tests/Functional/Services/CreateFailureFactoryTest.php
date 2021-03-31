@@ -9,6 +9,8 @@ use App\Entity\Machine;
 use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\AuthenticationExceptionInterface;
+use App\Exception\MachineProvider\CurlException;
+use App\Exception\MachineProvider\CurlExceptionInterface;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\UnknownException;
@@ -99,6 +101,22 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
                     $machine,
                     CreateFailure::CODE_API_AUTHENTICATION_FAILURE,
                     CreateFailure::REASON_API_AUTHENTICATION_FAILURE,
+                ),
+            ],
+            CurlExceptionInterface::class => [
+                'exception' => new CurlException(
+                    7,
+                    'machine id',
+                    RemoteRequestActionInterface::ACTION_GET,
+                    new \Exception()
+                ),
+                'expectedCreateFailure' => CreateFailure::create(
+                    $machine,
+                    CreateFailure::CODE_CURL_ERROR,
+                    CreateFailure::REASON_CURL_ERROR,
+                    [
+                        'curl-code' => 7,
+                    ]
                 ),
             ],
             'unknown' => [

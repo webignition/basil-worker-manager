@@ -2,8 +2,8 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 
@@ -17,14 +17,14 @@ interface MachineProviderInterface
     /**
      * @throws ExceptionInterface
      */
-    public function create(Machine $machine): RemoteMachineInterface;
+    public function create(MachineInterface $machine): RemoteMachineInterface;
 
     /**
      * @throws ExceptionInterface
      */
-    public function remove(Machine $machine): void;
+    public function remove(MachineInterface $machine): void;
 
-    public function get(Machine $machine): RemoteMachineInterface;
+    public function get(MachineInterface $machine): RemoteMachineInterface;
 
-    public function exists(Machine $machine): bool;
+    public function exists(MachineInterface $machine): bool;
 }

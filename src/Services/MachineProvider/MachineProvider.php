@@ -2,9 +2,9 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
+use App\Model\MachineInterface;
 use App\Model\RemoteMachineInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestActionInterface as Action;
@@ -33,7 +33,7 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function create(Machine $machine): RemoteMachineInterface
+    public function create(MachineInterface $machine): RemoteMachineInterface
     {
         try {
             return $this->findProvider($machine)->create($machine);
@@ -48,7 +48,7 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function get(Machine $machine): RemoteMachineInterface
+    public function get(MachineInterface $machine): RemoteMachineInterface
     {
         try {
             return $this->findProvider($machine)->get($machine);
@@ -63,7 +63,7 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function delete(Machine $machine): void
+    public function delete(MachineInterface $machine): void
     {
         try {
             $this->findProvider($machine)->remove($machine);
@@ -78,7 +78,7 @@ class MachineProvider
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function exists(Machine $machine): bool
+    public function exists(MachineInterface $machine): bool
     {
         $provider = $this->findProvider($machine);
 
@@ -96,7 +96,7 @@ class MachineProvider
     /**
      * @throws UnsupportedProviderException
      */
-    private function findProvider(Machine $machine): MachineProviderInterface
+    private function findProvider(MachineInterface $machine): MachineProviderInterface
     {
         foreach ($this->machineProviders as $machineProvider) {
             if ($machineProvider->handles($machine->getProvider())) {

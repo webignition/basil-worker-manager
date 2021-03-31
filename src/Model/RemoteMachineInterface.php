@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-use App\Model\Machine\State;
-
 interface RemoteMachineInterface
 {
     public function getId(): int;
@@ -14,7 +12,7 @@ interface RemoteMachineInterface
     public function getIpAddresses(): array;
 
     /**
-     * @return State::VALUE_UP_STARTED|State::VALUE_UP_ACTIVE|null
+     * @return MachineInterface::STATE_UP_STARTED|MachineInterface::STATE_UP_ACTIVE|null
      */
     public function getState(): ?string;
 }

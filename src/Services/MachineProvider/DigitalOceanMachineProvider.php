@@ -2,10 +2,10 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Entity\Machine;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
@@ -35,7 +35,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function create(Machine $machine): RemoteMachineInterface
+    public function create(MachineInterface $machine): RemoteMachineInterface
     {
         $createArguments = new DropletApiCreateCallArguments(
             sprintf('%s-%s', $this->prefix, $machine->getName()),
@@ -52,7 +52,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function remove(Machine $machine): void
+    public function remove(MachineInterface $machine): void
     {
         $this->dropletApi->remove((int) $machine->getRemoteId());
     }
@@ -60,7 +60,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function get(Machine $machine): RemoteMachineInterface
+    public function get(MachineInterface $machine): RemoteMachineInterface
     {
         return new RemoteMachine(
             $this->dropletApi->getById((int)$machine->getRemoteId())
@@ -70,7 +70,7 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function exists(Machine $machine): bool
+    public function exists(MachineInterface $machine): bool
     {
         try {
             $this->dropletApi->getById((int)$machine->getRemoteId());

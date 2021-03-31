@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Asynchronous;
 
 use App\Controller\MachineController;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Model\Machine;
 
@@ -33,33 +33,33 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         self::assertTrue(in_array(
             $this->getMachine()->getState(),
             [
-                State::VALUE_CREATE_RECEIVED,
-                State::VALUE_CREATE_REQUESTED,
+                MachineInterface::STATE_CREATE_RECEIVED,
+                MachineInterface::STATE_CREATE_REQUESTED,
             ]
         ));
 
-        $waitResult = $this->waitUntilMachineStateIs(State::VALUE_UP_ACTIVE);
+        $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_UP_ACTIVE);
         if (false === $waitResult) {
-            $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_UP_ACTIVE);
+            $this->fail('Timed out waiting for expected machine state: ' . MachineInterface::STATE_UP_ACTIVE);
         }
 
-        self::assertSame(State::VALUE_UP_ACTIVE, $this->getMachine()->getState());
+        self::assertSame(MachineInterface::STATE_UP_ACTIVE, $this->getMachine()->getState());
 
         $this->client->request('DELETE', $this->getMachineUrl());
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $waitResult = $this->waitUntilMachineStateIs(State::VALUE_DELETE_DELETED);
+        $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_DELETE_DELETED);
         if (false === $waitResult) {
-            $this->fail('Timed out waiting for expected machine state: ' . State::VALUE_DELETE_DELETED);
+            $this->fail('Timed out waiting for expected machine state: ' . MachineInterface::STATE_DELETE_DELETED);
         }
 
-        self::assertSame(State::VALUE_DELETE_DELETED, $this->getMachine()->getState());
+        self::assertSame(MachineInterface::STATE_DELETE_DELETED, $this->getMachine()->getState());
     }
 
     /**
-     * @param State::VALUE_* $stopState
+     * @param MachineInterface::STATE_* $stopState
      */
     private function waitUntilMachineStateIs(string $stopState): bool
     {

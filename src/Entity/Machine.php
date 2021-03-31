@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use App\Repository\MachineRepository;
@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=MachineRepository::class)
  */
-class Machine implements \JsonSerializable
+class Machine implements MachineInterface
 {
     private const NAME = 'worker-%s';
 
@@ -29,7 +29,7 @@ class Machine implements \JsonSerializable
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * @var State::VALUE_*
+     * @var MachineInterface::STATE_*
      */
     private string $state;
 
@@ -55,7 +55,7 @@ class Machine implements \JsonSerializable
         $machine = new Machine();
         $machine->id = $id;
         $machine->remote_id = null;
-        $machine->state = STATE::VALUE_CREATE_RECEIVED;
+        $machine->state = MachineInterface::STATE_CREATE_RECEIVED;
         $machine->provider = $provider;
         $machine->ip_addresses = [];
 
@@ -86,7 +86,7 @@ class Machine implements \JsonSerializable
     }
 
     /**
-     * @return \App\Model\Machine\State::VALUE_*
+     * @return MachineInterface::STATE_*
      */
     public function getState(): string
     {
@@ -94,7 +94,7 @@ class Machine implements \JsonSerializable
     }
 
     /**
-     * @param  \App\Model\Machine\State::VALUE_* $state
+     * @param MachineInterface::STATE_* $state
      */
     public function setState(string $state): self
     {

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Machine;
 use App\Message\MachineExists;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -20,7 +19,7 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (Machine $machine) {
+                function (MachineInterface $machine) {
                     return new RemoteBooleanRequestSuccess(
                         $this->machineProvider->exists($machine)
                     );
@@ -31,9 +30,9 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
                 }
 
                 return $outcome;
-            })->withSuccessHandler(function (Machine $machine, RemoteRequestSuccessInterface $outcome) {
+            })->withSuccessHandler(function (MachineInterface $machine, RemoteRequestSuccessInterface $outcome) {
                 if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
-                    $machine->setState(State::VALUE_DELETE_DELETED);
+                    $machine->setState(MachineInterface::STATE_DELETE_DELETED);
                     $this->machineStore->store($machine);
                 }
             })

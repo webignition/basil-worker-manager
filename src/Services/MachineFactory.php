@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Machine;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 
 class MachineFactory
@@ -15,7 +16,7 @@ class MachineFactory
     /**
      * @param ProviderInterface::NAME_* $provider
      */
-    public function create(string $id, string $provider): Machine
+    public function create(string $id, string $provider): MachineInterface
     {
         return $this->machineStore->store(
             Machine::create($id, $provider)

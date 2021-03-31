@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\MachineExists;
 use App\MessageHandler\CreateMachineHandler;
 use App\MessageHandler\MachineExistsHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestFailure;
@@ -42,7 +41,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
     private MachineExistsHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
-    private Machine $machine;
+    private MachineInterface $machine;
 
     protected function setUp(): void
     {
@@ -71,7 +70,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
 
     public function testInvokeSuccessDoesNotExist(): void
     {
-        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->machine->getState());
+        self::assertNotSame(MachineInterface::STATE_DELETE_DELETED, $this->machine->getState());
 
         $this->mockHandler->append(new Response(404));
 
@@ -79,7 +78,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(new RemoteBooleanRequestSuccess(false), $outcome);
-        self::assertSame(State::VALUE_DELETE_DELETED, $this->machine->getState());
+        self::assertSame(MachineInterface::STATE_DELETE_DELETED, $this->machine->getState());
     }
 
     public function testInvokeSuccessDoesExist(): void
@@ -95,7 +94,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         $outcome = ($this->handler)($message);
 
         self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
-        self::assertNotSame(State::VALUE_DELETE_DELETED, $this->machine->getState());
+        self::assertNotSame(MachineInterface::STATE_DELETE_DELETED, $this->machine->getState());
 
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $message->incrementRetryCount());
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Model;
 
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 
 class Machine
 {
@@ -22,10 +22,10 @@ class Machine
     }
 
     /**
-     * @return State::VALUE_*
+     * @return MachineInterface::STATE_*
      */
     public function getState(): string
     {
-        return $this->data['state'] ?? State::VALUE_CREATE_RECEIVED;
+        return $this->data['state'] ?? MachineInterface::STATE_CREATE_RECEIVED;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Entity\CreateFailure;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ApiLimitExceptionInterface;
+use App\Exception\MachineProvider\AuthenticationExceptionInterface;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +18,7 @@ class CreateFailureFactory
     public const REASONS = [
         CreateFailure::CODE_UNSUPPORTED_PROVIDER => CreateFailure::REASON_UNSUPPORTED_PROVIDER,
         CreateFailure::CODE_API_LIMIT_EXCEEDED => CreateFailure::REASON_API_LIMIT_EXCEEDED,
+        CreateFailure::CODE_API_AUTHENTICATION_FAILURE => CreateFailure::REASON_API_AUTHENTICATION_FAILURE,
     ];
 
     public function __construct(
@@ -61,6 +63,10 @@ class CreateFailureFactory
 
         if ($exception instanceof ApiLimitExceptionInterface) {
             return CreateFailure::CODE_API_LIMIT_EXCEEDED;
+        }
+
+        if ($exception instanceof AuthenticationExceptionInterface) {
+            return CreateFailure::CODE_API_AUTHENTICATION_FAILURE;
         }
 
         return CreateFailure::CODE_UNKNOWN;

@@ -86,14 +86,6 @@ class Machine implements \Stringable, \JsonSerializable
     }
 
     /**
-     * @return string[]
-     */
-    public function getIpAddresses(): array
-    {
-        return $this->ip_addresses;
-    }
-
-    /**
      * @return \App\Model\Machine\State::VALUE_*
      */
     public function getState(): string

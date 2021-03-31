@@ -63,7 +63,10 @@ class MachineTest extends TestCase
 
         self::assertSame($expectedRemoteId, $machine->getRemoteId());
         self::assertSame($expectedState, $machine->getState());
-        self::assertSame($expectedIpAddresses, $machine->getIpAddresses());
+        self::assertSame(
+            $expectedIpAddresses,
+            ObjectReflector::getProperty($machine, 'ip_addresses')
+        );
     }
 
     /**

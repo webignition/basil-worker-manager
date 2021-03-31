@@ -113,7 +113,10 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         self::assertSame($expectedRemoteMachine->getId(), (int) $this->machine->getRemoteId());
         self::assertSame($expectedRemoteMachine->getState(), $this->machine->getState());
-        self::assertSame($expectedRemoteMachine->getIpAddresses(), $this->machine->getIpAddresses());
+        self::assertSame(
+            $expectedRemoteMachine->getIpAddresses(),
+            ObjectReflector::getProperty($this->machine, 'ip_addresses')
+        );
     }
 
     public function testHandleWithUnsupportedProviderException(): void

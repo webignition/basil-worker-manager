@@ -19,6 +19,9 @@ class CreateFailure
     public const CODE_API_LIMIT_EXCEEDED = 2;
     public const REASON_API_LIMIT_EXCEEDED = 'api limit exceeded';
 
+    public const CODE_API_AUTHENTICATION_FAILURE = 3;
+    public const REASON_API_AUTHENTICATION_FAILURE = 'api authentication failure';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="string", length=128)

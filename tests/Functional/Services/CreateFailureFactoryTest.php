@@ -8,8 +8,10 @@ use App\Entity\CreateFailure;
 use App\Entity\Machine;
 use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationException;
+use App\Exception\MachineProvider\AuthenticationExceptionInterface;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\ExceptionInterface;
+use App\Exception\MachineProvider\UnknownException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
@@ -87,8 +89,20 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
                     ]
                 ),
             ],
-            'unknown' => [
+            AuthenticationExceptionInterface::class => [
                 'exception' => new AuthenticationException(
+                    $machineId,
+                    RemoteRequestActionInterface::ACTION_GET,
+                    new \Exception()
+                ),
+                'expectedCreateFailure' => CreateFailure::create(
+                    $machine,
+                    CreateFailure::CODE_API_AUTHENTICATION_FAILURE,
+                    CreateFailure::REASON_API_AUTHENTICATION_FAILURE,
+                ),
+            ],
+            'unknown' => [
+                'exception' => new UnknownException(
                     $machineId,
                     RemoteRequestActionInterface::ACTION_GET,
                     new \Exception()

@@ -34,7 +34,7 @@ class MachineController
 
         $machine = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
 
-        $messageDispatcher->dispatch(new CreateMachine((string) $machine));
+        $messageDispatcher->dispatch(new CreateMachine($machine->getId()));
 
         return new Response('', 202);
     }
@@ -71,7 +71,7 @@ class MachineController
             return new Response('', 404);
         }
 
-        $messageDispatcher->dispatch(new DeleteMachine((string) $machine));
+        $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));
 
         return new Response('', 202);
     }

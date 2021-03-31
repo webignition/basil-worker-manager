@@ -60,7 +60,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueCount(1);
 
-        $expectedMessage = new CreateMachine((string) $machine);
+        $expectedMessage = new CreateMachine($machine->getId());
         self::assertGreaterThan(0, $expectedMessage->getMachineId());
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }

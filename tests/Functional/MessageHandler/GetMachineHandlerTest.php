@@ -87,7 +87,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->machineStore->store($machine);
 
-        $message = new GetMachine((string) $machine);
+        $message = new GetMachine($machine->getId());
         $outcome = ($this->handler)($message);
 
         self::assertEquals($expectedOutcome, $outcome);
@@ -214,7 +214,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->machineStore->store($machine);
 
-        $message = new GetMachine((string) $machine);
+        $message = new GetMachine($machine->getId());
         $outcome = ($this->handler)($message);
 
         self::assertEquals($expectedOutcome, $outcome);
@@ -251,10 +251,10 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = MachineBuilder::build(MachineBuilder::DEFAULT);
         $this->machineStore->store($machine);
 
-        $message = new GetMachine((string) $machine);
+        $message = new GetMachine($machine->getId());
 
         $expectedLoggedException = new AuthenticationException(
-            (string) $machine,
+            $machine->getId(),
             $message->getAction(),
             new RuntimeException('Unauthorized', 401)
         );
@@ -284,11 +284,11 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = MachineBuilder::build(MachineBuilder::DEFAULT);
         $this->machineStore->store($machine);
 
-        $message = new GetMachine((string) $machine);
+        $message = new GetMachine($machine->getId());
         ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $expectedLoggedException = new HttpException(
-            (string) $machine,
+            $machine->getId(),
             $message->getAction(),
             $expectedRemoteException
         );
@@ -336,7 +336,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $message = new GetMachine((string) $machine);
+        $message = new GetMachine($machine->getId());
         $outcome = ($this->handler)($message);
 
         self::assertEquals(new RemoteRequestFailure($expectedLoggedException), $outcome);
@@ -351,7 +351,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = MachineBuilder::build(MachineBuilder::DEFAULT);
         $this->machineStore->store($machine);
 
-        $message = new GetMachine((string) $machine);
+        $message = new GetMachine($machine->getId());
         ObjectReflector::setProperty($message, $message::class, 'retryCount', 11);
 
         $outcome = ($this->handler)($message);
@@ -360,7 +360,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
             new RemoteRequestFailure(
                 new UnknownRemoteMachineException(
                     $machine->getProvider(),
-                    (string) $machine,
+                    $machine->getId(),
                     $message->getAction(),
                     new RuntimeException('Not Found', 404)
                 )

@@ -28,7 +28,7 @@ class DeleteMachineHandler extends AbstractRemoteMachineRequestHandler implement
                 $machine->setState(State::VALUE_DELETE_REQUESTED);
                 $this->machineStore->store($machine);
             })->withSuccessHandler(function (Machine $machine) {
-                $this->dispatcher->dispatch(new MachineExists((string) $machine));
+                $this->dispatcher->dispatch(new MachineExists($machine->getId()));
             })->withFailureHandler(function (Machine $machine) {
                 $machine = $machine->setState(State::VALUE_DELETE_FAILED);
                 $this->machineStore->store($machine);

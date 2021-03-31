@@ -6,7 +6,6 @@ namespace App\Tests\Integration\Asynchronous;
 
 use App\Controller\MachineController;
 use App\Model\Machine\State;
-use App\Request\MachineCreateRequest;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Model\Machine;
 
@@ -26,13 +25,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
     public function testCreateRemoteMachine(): void
     {
-        $this->client->request(
-            'POST',
-            MachineController::PATH_CREATE,
-            [
-                MachineCreateRequest::KEY_ID => self::MACHINE_ID,
-            ]
-        );
+        $this->client->request('POST', $this->getMachineUrl());
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());

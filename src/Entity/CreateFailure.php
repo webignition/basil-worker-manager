@@ -10,6 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class CreateFailure
 {
+    public const CODE_UNKNOWN = 0;
+    public const REASON_UNKNOWN = 'unknown';
+
+    public const CODE_UNSUPPORTED_PROVIDER = 1;
+    public const REASON_UNSUPPORTED_PROVIDER = 'unsupported provider';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="string", length=128)
@@ -18,11 +24,15 @@ class CreateFailure
 
     /**
      * @ORM\Column(type="integer")
+     *
+     * @var self::CODE_*
      */
     private int $code;
 
     /**
      * @ORM\Column(type="text")
+     *
+     * @var self::REASON_*
      */
     private string $reason;
 
@@ -34,6 +44,8 @@ class CreateFailure
     private array $context = [];
 
     /**
+     * @param self::CODE_* $code
+     * @param self::REASON_* $reason
      * @param array<string, int|string> $context
      */
     public static function create(Machine $machine, int $code, string $reason, array $context = []): self

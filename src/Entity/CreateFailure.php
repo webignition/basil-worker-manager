@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=CreateFailureRepository::class)
  */
-class CreateFailure
+class CreateFailure implements \JsonSerializable
 {
     public const CODE_UNKNOWN = 0;
     public const REASON_UNKNOWN = 'unknown';
@@ -72,5 +72,18 @@ class CreateFailure
         $entity->context = $context;
 
         return $entity;
+    }
+
+
+    /**
+     * @return array<string, string|int|array<string, string|int>>
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'code' => $this->code,
+            'reason' => $this->reason,
+            'context' => $this->context,
+        ];
     }
 }

@@ -8,6 +8,7 @@ use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationExceptionInterface;
 use App\Exception\MachineProvider\CurlExceptionInterface;
 use App\Exception\MachineProvider\ExceptionInterface;
+use App\Exception\MachineProvider\HttpExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -21,6 +22,7 @@ class CreateFailureFactory
         CreateFailure::CODE_API_LIMIT_EXCEEDED => CreateFailure::REASON_API_LIMIT_EXCEEDED,
         CreateFailure::CODE_API_AUTHENTICATION_FAILURE => CreateFailure::REASON_API_AUTHENTICATION_FAILURE,
         CreateFailure::CODE_CURL_ERROR => CreateFailure::REASON_CURL_ERROR,
+        CreateFailure::CODE_HTTP_ERROR => CreateFailure::REASON_HTTP_ERROR,
     ];
 
     public function __construct(
@@ -75,6 +77,10 @@ class CreateFailureFactory
             return CreateFailure::CODE_CURL_ERROR;
         }
 
+        if ($exception instanceof HttpExceptionInterface) {
+            return CreateFailure::CODE_HTTP_ERROR;
+        }
+
         return CreateFailure::CODE_UNKNOWN;
     }
 
@@ -102,6 +108,12 @@ class CreateFailureFactory
         if ($exception instanceof CurlExceptionInterface) {
             return [
                 'curl-code' => $exception->getCurlCode(),
+            ];
+        }
+
+        if ($exception instanceof HttpExceptionInterface) {
+            return [
+                'status-code' => $exception->getStatusCode(),
             ];
         }
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "223f88250df4e5f59c746a413a3f05a9",
+    "content-hash": "480695a422b9fba2d27fc44aa81c3bee",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -6077,6 +6077,65 @@
                 }
             ],
             "time": "2021-03-01T17:59:57+00:00"
+        },
+        {
+            "name": "webignition/symfony-messenger-json-message-serializer-bundle",
+            "version": "0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/symfony-messenger-json-message-serializer-bundle.git",
+                "reference": "4f8daf5e824f612818d815a6ed198bdb0e7b3033"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/symfony-messenger-json-message-serializer-bundle/zipball/4f8daf5e824f612818d815a6ed198bdb0e7b3033",
+                "reference": "4f8daf5e824f612818d815a6ed198bdb0e7b3033",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.4|^8",
+                "symfony/config": "^5.2",
+                "symfony/dependency-injection": "^5.2",
+                "symfony/http-kernel": "^5.2",
+                "symfony/messenger": "^5.2"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.4",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^0.12.78",
+                "phpstan/phpstan-mockery": "^0.12.12",
+                "phpstan/phpstan-phpunit": "^0.12.17",
+                "phpstan/phpstan-symfony": "^0.12.20",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.5",
+                "symplify/easy-coding-standard": "^9.2"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\JsonMessageSerializerBundle\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/webignition/symfony-messenger-json-message-serializer-bundle",
+            "support": {
+                "issues": "https://github.com/webignition/symfony-messenger-json-message-serializer-bundle/issues",
+                "source": "https://github.com/webignition/symfony-messenger-json-message-serializer-bundle/tree/0.2"
+            },
+            "time": "2021-02-23T16:30:52+00:00"
         }
     ],
     "packages-dev": [

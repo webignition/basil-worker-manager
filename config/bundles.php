@@ -7,4 +7,5 @@ return [
     Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
     DAMA\DoctrineTestBundle\DAMADoctrineTestBundle::class => ['test' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
+    webignition\JsonMessageSerializerBundle\JsonMessageSerializerBundle::class => ['all' => true],
 ];

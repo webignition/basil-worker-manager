@@ -28,6 +28,9 @@ class CreateFailure
     public const CODE_HTTP_ERROR = 5;
     public const REASON_HTTP_ERROR = 'http application error';
 
+    public const CODE_UNPROCESSABLE_REQUEST = 6;
+    public const REASON_UNPROCESSABLE_REQUEST = 'unprocessable request';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="string", length=128)

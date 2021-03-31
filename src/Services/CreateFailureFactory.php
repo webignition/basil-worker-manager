@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\AuthenticationExceptionInterface;
 use App\Exception\MachineProvider\CurlExceptionInterface;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\HttpExceptionInterface;
+use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -23,6 +24,7 @@ class CreateFailureFactory
         CreateFailure::CODE_API_AUTHENTICATION_FAILURE => CreateFailure::REASON_API_AUTHENTICATION_FAILURE,
         CreateFailure::CODE_CURL_ERROR => CreateFailure::REASON_CURL_ERROR,
         CreateFailure::CODE_HTTP_ERROR => CreateFailure::REASON_HTTP_ERROR,
+        CreateFailure::CODE_UNPROCESSABLE_REQUEST => CreateFailure::REASON_UNPROCESSABLE_REQUEST,
     ];
 
     public function __construct(
@@ -81,6 +83,10 @@ class CreateFailureFactory
             return CreateFailure::CODE_HTTP_ERROR;
         }
 
+        if ($exception instanceof UnprocessableRequestExceptionInterface) {
+            return CreateFailure::CODE_UNPROCESSABLE_REQUEST;
+        }
+
         return CreateFailure::CODE_UNKNOWN;
     }
 
@@ -114,6 +120,12 @@ class CreateFailureFactory
         if ($exception instanceof HttpExceptionInterface) {
             return [
                 'status-code' => $exception->getStatusCode(),
+            ];
+        }
+
+        if ($exception instanceof UnprocessableRequestExceptionInterface) {
+            return [
+                'provider-reason' => $exception->getReason(),
             ];
         }
 

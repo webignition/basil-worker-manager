@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Entity\CreateFailure;
-use App\Entity\Machine;
 use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationExceptionInterface;
 use App\Exception\MachineProvider\CurlExceptionInterface;
@@ -33,22 +32,17 @@ class CreateFailureFactory
     }
 
     public function create(
-        Machine $machine,
+        string $machineId,
         ExceptionInterface | UnsupportedProviderException $exception
     ): CreateFailure {
-        $existingEntity = $this->entityManager->find(CreateFailure::class, $machine->getId());
+        $existingEntity = $this->entityManager->find(CreateFailure::class, $machineId);
         if ($existingEntity instanceof CreateFailure) {
             return $existingEntity;
         }
 
         $code = $this->findCode($exception);
 
-        $entity = CreateFailure::create(
-            $machine,
-            $code,
-            $this->findReason($code),
-            $this->createContext($exception)
-        );
+        $entity = CreateFailure::create($machineId, $code, $this->findReason($code), $this->createContext($exception));
 
         $this->entityManager->persist($entity);
         $this->entityManager->flush();

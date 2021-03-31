@@ -63,10 +63,10 @@ class CreateFailure
      * @param self::REASON_* $reason
      * @param array<string, int|string> $context
      */
-    public static function create(Machine $machine, int $code, string $reason, array $context = []): self
+    public static function create(string $machineId, int $code, string $reason, array $context = []): self
     {
         $entity = new CreateFailure();
-        $entity->id = $machine->getId();
+        $entity->id = $machineId;
         $entity->code = $code;
         $entity->reason = $reason;
         $entity->context = $context;

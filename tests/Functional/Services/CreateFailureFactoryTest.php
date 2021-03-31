@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\CreateFailure;
-use App\Entity\Machine;
 use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\AuthenticationExceptionInterface;
@@ -19,7 +18,6 @@ use App\Exception\MachineProvider\HttpExceptionInterface;
 use App\Exception\MachineProvider\UnknownException;
 use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\CreateFailureFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -29,6 +27,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
 {
+    private const MACHINE_ID = 'machine id';
+
     private CreateFailureFactory $factory;
     private EntityManagerInterface $entityManager;
 
@@ -52,14 +52,11 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
         ExceptionInterface | UnsupportedProviderException $exception,
         CreateFailure $expectedCreateFailure
     ): void {
-        $machineId = 'machine id';
-        $machine = Machine::create($machineId, ProviderInterface::NAME_DIGITALOCEAN);
-
-        $createFailure = $this->factory->create($machine, $exception);
+        $createFailure = $this->factory->create(self::MACHINE_ID, $exception);
 
         self::assertEquals($expectedCreateFailure, $createFailure);
 
-        $retrievedCreateFailure = $this->entityManager->find(CreateFailure::class, $machineId);
+        $retrievedCreateFailure = $this->entityManager->find(CreateFailure::class, self::MACHINE_ID);
         self::assertInstanceOf(CreateFailure::class, $retrievedCreateFailure);
         self::assertEquals($createFailure, $retrievedCreateFailure);
     }
@@ -69,14 +66,11 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
      */
     public function createDataProvider(): array
     {
-        $machineId = 'machine id';
-        $machine = Machine::create($machineId, ProviderInterface::NAME_DIGITALOCEAN);
-
         return [
             UnsupportedProviderException::class => [
                 'exception' => new UnsupportedProviderException('unsupported provider'),
                 'expectedCreateFailure' => CreateFailure::create(
-                    $machine,
+                    self::MACHINE_ID,
                     CreateFailure::CODE_UNSUPPORTED_PROVIDER,
                     CreateFailure::REASON_UNSUPPORTED_PROVIDER,
                 ),
@@ -84,12 +78,12 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
             ApiLimitExceptionInterface::class => [
                 'exception' => new ApiLimitExceededException(
                     123,
-                    'machine id',
+                    self::MACHINE_ID,
                     RemoteRequestActionInterface::ACTION_GET,
                     new \Exception()
                 ),
                 'expectedCreateFailure' => CreateFailure::create(
-                    $machine,
+                    self::MACHINE_ID,
                     CreateFailure::CODE_API_LIMIT_EXCEEDED,
                     CreateFailure::REASON_API_LIMIT_EXCEEDED,
                     [
@@ -99,12 +93,12 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
             ],
             AuthenticationExceptionInterface::class => [
                 'exception' => new AuthenticationException(
-                    $machineId,
+                    self::MACHINE_ID,
                     RemoteRequestActionInterface::ACTION_GET,
                     new \Exception()
                 ),
                 'expectedCreateFailure' => CreateFailure::create(
-                    $machine,
+                    self::MACHINE_ID,
                     CreateFailure::CODE_API_AUTHENTICATION_FAILURE,
                     CreateFailure::REASON_API_AUTHENTICATION_FAILURE,
                 ),
@@ -112,12 +106,12 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
             CurlExceptionInterface::class => [
                 'exception' => new CurlException(
                     7,
-                    'machine id',
+                    self::MACHINE_ID,
                     RemoteRequestActionInterface::ACTION_GET,
                     new \Exception()
                 ),
                 'expectedCreateFailure' => CreateFailure::create(
-                    $machine,
+                    self::MACHINE_ID,
                     CreateFailure::CODE_CURL_ERROR,
                     CreateFailure::REASON_CURL_ERROR,
                     [
@@ -127,12 +121,12 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
             ],
             HttpExceptionInterface::class => [
                 'exception' => new HttpException(
-                    $machineId,
+                    self::MACHINE_ID,
                     RemoteRequestActionInterface::ACTION_GET,
                     new RuntimeException('Internal Server Error', 500)
                 ),
                 'expectedCreateFailure' => CreateFailure::create(
-                    $machine,
+                    self::MACHINE_ID,
                     CreateFailure::CODE_HTTP_ERROR,
                     CreateFailure::REASON_HTTP_ERROR,
                     [
@@ -142,7 +136,7 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
             ],
             UnprocessableRequestExceptionInterface::class => [
                 'exception' => new DropletLimitExceededException(
-                    'machine id',
+                    self::MACHINE_ID,
                     RemoteRequestActionInterface::ACTION_CREATE,
                     new ValidationFailedException(
                         'creating this/these droplet(s) will exceed your droplet limit',
@@ -150,7 +144,7 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
                     )
                 ),
                 'expectedCreateFailure' => CreateFailure::create(
-                    $machine,
+                    self::MACHINE_ID,
                     CreateFailure::CODE_UNPROCESSABLE_REQUEST,
                     CreateFailure::REASON_UNPROCESSABLE_REQUEST,
                     [
@@ -161,12 +155,12 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
             ],
             'unknown' => [
                 'exception' => new UnknownException(
-                    $machineId,
+                    self::MACHINE_ID,
                     RemoteRequestActionInterface::ACTION_GET,
                     new \Exception()
                 ),
                 'expectedCreateFailure' => CreateFailure::create(
-                    $machine,
+                    self::MACHINE_ID,
                     CreateFailure::CODE_UNKNOWN,
                     CreateFailure::REASON_UNKNOWN,
                 ),

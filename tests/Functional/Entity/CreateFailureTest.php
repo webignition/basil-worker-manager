@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Entity;
 
 use App\Entity\CreateFailure;
-use App\Entity\Machine;
-use App\Model\ProviderInterface;
 use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -25,25 +23,19 @@ class CreateFailureTest extends AbstractBaseFunctionalTest
 
     public function testPersist(): void
     {
-        $id = md5('id content');
-        $provider = ProviderInterface::NAME_DIGITALOCEAN;
-
-        $machine = Machine::create($id, $provider);
-
-        $this->entityManager->persist($machine);
-        $this->entityManager->flush();
+        $machineId = md5('id content');
 
         $code = CreateFailure::CODE_UNKNOWN;
         $reason = CreateFailure::REASON_UNKNOWN;
 
-        $createFailure = CreateFailure::create($machine, $code, $reason);
+        $createFailure = CreateFailure::create($machineId, $code, $reason);
 
         $this->entityManager->persist($createFailure);
         $this->entityManager->flush();
 
         $this->entityManager->refresh($createFailure);
 
-        $retrievedEntity = $this->entityManager->find(CreateFailure::class, $machine->getId());
+        $retrievedEntity = $this->entityManager->find(CreateFailure::class, $machineId);
 
         self::assertEquals($createFailure, $retrievedEntity);
     }

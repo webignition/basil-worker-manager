@@ -15,6 +15,9 @@ services:
     App\Services\CreateFailureFactory:
         public: true
 
+    App\Services\MachineFactory:
+        public: true
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

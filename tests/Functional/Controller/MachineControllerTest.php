@@ -14,7 +14,6 @@ use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Repository\MachineRepository;
 use App\Services\CreateFailureFactory;
-use App\Services\MachineFactory;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -68,10 +67,10 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     public function testCreateIdTaken(): void
     {
         $id = md5('id content');
-        $machineFactory = self::$container->get(MachineFactory::class);
-        if ($machineFactory instanceof MachineFactory) {
-            $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
-        }
+
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
 
         $response = $this->makeCreateRequest($id);
 
@@ -97,9 +96,9 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     {
         $id = md5('id content');
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
-        $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
 
         $response = $this->makeStatusRequest($id);
 
@@ -118,13 +117,16 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     {
         $id = md5('id content');
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
-        $machine = $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
-
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $machineStore->store($machine->setState(MachineInterface::STATE_CREATE_FAILED));
+        $machine = new Machine(
+            $id,
+            ProviderInterface::NAME_DIGITALOCEAN,
+            null,
+            MachineInterface::STATE_CREATE_FAILED
+        );
+
+        $machineStore->store($machine);
 
         $createFailureFactory = self::$container->get(CreateFailureFactory::class);
         \assert($createFailureFactory instanceof CreateFailureFactory);
@@ -162,9 +164,9 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     {
         $id = md5('id content');
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
-        $machineFactory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
 
         $response = $this->makeDeleteRequest($id);
         self::assertSame(202, $response->getStatusCode());

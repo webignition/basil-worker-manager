@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageDispatcher;
 
+use App\Entity\Machine;
 use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Message\GetMachine;
@@ -11,7 +12,7 @@ use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\ProviderInterface;
-use App\Services\MachineFactory;
+use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -35,9 +36,9 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
         \assert($dispatcher instanceof MachineRequestMessageDispatcher);
         $this->dispatcher = $dispatcher;
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
-        $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $machineStore->store(new Machine(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN));
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);

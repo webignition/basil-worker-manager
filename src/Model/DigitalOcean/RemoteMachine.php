@@ -3,6 +3,7 @@
 namespace App\Model\DigitalOcean;
 
 use App\Model\MachineInterface;
+use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
@@ -54,5 +55,10 @@ class RemoteMachine implements RemoteMachineInterface
         }
 
         return null;
+    }
+
+    public function getProvider(): string
+    {
+        return ProviderInterface::NAME_DIGITALOCEAN;
     }
 }

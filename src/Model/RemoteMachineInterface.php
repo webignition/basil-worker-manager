@@ -15,4 +15,9 @@ interface RemoteMachineInterface
      * @return MachineInterface::STATE_UP_STARTED|MachineInterface::STATE_UP_ACTIVE|null
      */
     public function getState(): ?string;
+
+    /**
+     * @return ProviderInterface::NAME_*
+     */
+    public function getProvider(): string;
 }

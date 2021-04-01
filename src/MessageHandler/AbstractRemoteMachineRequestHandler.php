@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Message\RemoteMachineRequestInterface;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\Model\MachineInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -35,7 +35,7 @@ abstract class AbstractRemoteMachineRequestHandler
         RemoteMachineActionHandlerInterface $actionHandler
     ): RemoteRequestOutcomeInterface {
         $machine = $this->machineRepository->find($message->getMachineId());
-        if (!$machine instanceof Machine) {
+        if (!$machine instanceof MachineInterface) {
             return RemoteRequestOutcome::invalid();
         }
 

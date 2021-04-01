@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Entity\Machine;
+use App\Model\MachineInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MachineStore
@@ -12,7 +12,7 @@ class MachineStore
     ) {
     }
 
-    public function store(Machine $machine): Machine
+    public function store(MachineInterface $machine): MachineInterface
     {
         $this->entityManager->persist($machine);
         $this->entityManager->flush();

@@ -3,10 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\CreateFailure;
-use App\Entity\Machine;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Repository\CreateFailureRepository;
 use App\Repository\MachineRepository;
@@ -28,7 +28,7 @@ class MachineController
         MachineRequestMessageDispatcher $messageDispatcher,
         MachineRepository $machineRepository
     ): Response {
-        if ($machineRepository->find($id) instanceof Machine) {
+        if ($machineRepository->find($id) instanceof MachineInterface) {
             return BadMachineCreateRequestResponse::createIdTakenResponse();
         }
 
@@ -46,7 +46,7 @@ class MachineController
         CreateFailureRepository $createFailureRepository,
     ): Response {
         $machine = $machineRepository->find($id);
-        if (false === $machine instanceof Machine) {
+        if (false === $machine instanceof MachineInterface) {
             return new Response('', 404);
         }
 
@@ -67,7 +67,7 @@ class MachineController
         MachineRequestMessageDispatcher $messageDispatcher,
     ): Response {
         $machine = $machineRepository->find($id);
-        if (false === $machine instanceof Machine) {
+        if (false === $machine instanceof MachineInterface) {
             return new Response('', 404);
         }
 

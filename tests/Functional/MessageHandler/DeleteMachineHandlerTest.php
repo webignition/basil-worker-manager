@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\DeleteMachine;
 use App\Message\MachineExists;
 use App\MessageHandler\DeleteMachineHandler;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -38,7 +37,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
     private DeleteMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
-    private Machine $machine;
+    private MachineInterface $machine;
 
     protected function setUp(): void
     {
@@ -51,7 +50,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         $machineFactory = self::$container->get(MachineFactory::class);
         if ($machineFactory instanceof MachineFactory) {
             $machine = $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
-            $machine->setState(State::VALUE_DELETE_REQUESTED);
+            $machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
 
             $machineStore = self::$container->get(MachineStore::class);
             \assert($machineStore instanceof MachineStore);
@@ -103,7 +102,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_DELETE_FAILED, $this->machine->getState());
+        self::assertSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
         self::assertSame(0, $message->getRetryCount());
     }
 
@@ -135,7 +134,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
-        self::assertNotSame(State::VALUE_DELETE_FAILED, $this->machine->getState());
+        self::assertNotSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
     }
 
     /**
@@ -183,7 +182,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_DELETE_FAILED, $this->machine->getState());
+        self::assertSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
     }
 
     /**

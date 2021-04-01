@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Machine;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use App\Tests\Mock\Model\MockRemoteMachine;
@@ -23,7 +23,7 @@ class MachineTest extends TestCase
 
         self::assertSame($id, $machine->getId());
         self::assertNull($machine->getRemoteId());
-        self::assertSame(State::VALUE_CREATE_RECEIVED, $machine->getState());
+        self::assertSame(MachineInterface::STATE_CREATE_RECEIVED, $machine->getState());
         self::assertSame($provider, $machine->getProvider());
         self::assertSame([], ObjectReflector::getProperty($machine, 'ip_addresses'));
         self::assertSame('worker-' . $id, $machine->getName());
@@ -37,7 +37,7 @@ class MachineTest extends TestCase
         self::assertSame(
             [
                 'id' => $id,
-                'state' => State::VALUE_CREATE_RECEIVED,
+                'state' => MachineInterface::STATE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ],
             $machine->jsonSerialize()
@@ -48,7 +48,7 @@ class MachineTest extends TestCase
      * @dataProvider updateFromRemoteMachineDataProvider
      *
      * @param string[] $expectedIpAddresses
-     * @param State::VALUE_* $expectedState
+     * @param MachineInterface::STATE_* $expectedState
      */
     public function testUpdateFromRemoteMachine(
         RemoteMachineInterface $remoteMachine,
@@ -84,7 +84,7 @@ class MachineTest extends TestCase
                         ->getMock(),
                 'expectedRemoteId' => 1,
                 'expectedIpAddresses' => [],
-                'expectedState' => State::VALUE_CREATE_RECEIVED,
+                'expectedState' => MachineInterface::STATE_CREATE_RECEIVED,
             ],
             'has ip addresses, null state' => [
                 'remoteMachine' =>
@@ -95,18 +95,18 @@ class MachineTest extends TestCase
                         ->getMock(),
                 'expectedRemoteId' => 1,
                 'expectedIpAddresses' => ['10.0.0.1', '127.0.0.1'],
-                'expectedState' => State::VALUE_CREATE_RECEIVED,
+                'expectedState' => MachineInterface::STATE_CREATE_RECEIVED,
             ],
             'has ip addresses, has state' => [
                 'remoteMachine' =>
                     (new MockRemoteMachine())
                         ->withGetIdCall(1)
                         ->withGetIpAddressesCall(['10.0.0.1', '127.0.0.1'])
-                        ->withGetStateCall(State::VALUE_UP_STARTED)
+                        ->withGetStateCall(MachineInterface::STATE_UP_STARTED)
                         ->getMock(),
                 'expectedRemoteId' => 1,
                 'expectedIpAddresses' => ['10.0.0.1', '127.0.0.1'],
-                'expectedState' => State::VALUE_UP_STARTED,
+                'expectedState' => MachineInterface::STATE_UP_STARTED,
             ],
         ];
     }

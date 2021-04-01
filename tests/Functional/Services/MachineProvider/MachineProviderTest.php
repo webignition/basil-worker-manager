@@ -11,6 +11,7 @@ use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\MachineFactory;
@@ -29,7 +30,7 @@ use webignition\ObjectReflector\ObjectReflector;
 class MachineProviderTest extends AbstractBaseFunctionalTest
 {
     private MachineProvider $machineProvider;
-    private Machine $machine;
+    private MachineInterface $machine;
     private MockHandler $mockHandler;
 
     protected function setUp(): void
@@ -54,7 +55,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function (Machine $machine) {
+        $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
             return $this->machineProvider->create($machine);
         });
     }
@@ -111,7 +112,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testGetSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function (Machine $machine) {
+        $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
             return $this->machineProvider->get($machine);
         });
     }

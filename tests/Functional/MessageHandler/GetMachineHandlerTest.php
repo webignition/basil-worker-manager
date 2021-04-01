@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Machine;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
@@ -12,7 +11,7 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\GetMachine;
 use App\MessageHandler\GetMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -73,9 +72,9 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeSuccess(
         ResponseInterface $apiResponse,
-        Machine $machine,
+        MachineInterface $machine,
         RemoteRequestOutcomeInterface $expectedOutcome,
-        Machine $expectedMachine,
+        MachineInterface $expectedMachine,
     ): void {
         $this->setExceptionLoggerOnHandler(
             (new MockExceptionLogger())
@@ -155,21 +154,21 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
                 'expectedMachine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
-                    MachineBuilder::PROPERTY_STATE => State::VALUE_UP_STARTED
+                    MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_STARTED
                 ]),
             ],
             'updated within initial ip addresses' => [
                 'apiResponse' => HttpResponseFactory::fromDropletEntity($upNewDropletEntity),
                 'machine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
-                    MachineBuilder::PROPERTY_STATE => State::VALUE_UP_STARTED,
+                    MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_STARTED,
                 ]),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
                     new RemoteMachine($upNewDropletEntity)
                 ),
                 'expectedMachine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
-                    MachineBuilder::PROPERTY_STATE => State::VALUE_UP_STARTED,
+                    MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_STARTED,
                     MachineBuilder::PROPERTY_IP_ADDRESSES => $ipAddresses,
                 ]),
             ],
@@ -177,7 +176,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 'apiResponse' => HttpResponseFactory::fromDropletEntity($upActiveDropletEntity),
                 'machine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
-                    MachineBuilder::PROPERTY_STATE => State::VALUE_UP_STARTED,
+                    MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_STARTED,
                     MachineBuilder::PROPERTY_IP_ADDRESSES => $ipAddresses,
                 ]),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
@@ -185,7 +184,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
                 'expectedMachine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
-                    MachineBuilder::PROPERTY_STATE => State::VALUE_UP_ACTIVE,
+                    MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_ACTIVE,
                     MachineBuilder::PROPERTY_IP_ADDRESSES => $ipAddresses,
                 ]),
             ],
@@ -199,9 +198,9 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeRetrying(
         ResponseInterface $apiResponse,
-        Machine $machine,
+        MachineInterface $machine,
         RemoteRequestOutcomeInterface $expectedOutcome,
-        Machine $expectedMachine,
+        MachineInterface $expectedMachine,
         array $expectedDispatchedMessages,
     ): void {
         $this->setExceptionLoggerOnHandler(

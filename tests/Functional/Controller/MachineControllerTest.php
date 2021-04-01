@@ -9,7 +9,7 @@ use App\Entity\Machine;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Repository\MachineRepository;
@@ -107,7 +107,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'id' => $id,
-                'state' => State::VALUE_CREATE_RECEIVED,
+                'state' => MachineInterface::STATE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ]),
             (string) $response->getContent()
@@ -124,7 +124,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $machineStore->store($machine->setState(State::VALUE_CREATE_FAILED));
+        $machineStore->store($machine->setState(MachineInterface::STATE_CREATE_FAILED));
 
         $createFailureFactory = self::$container->get(CreateFailureFactory::class);
         \assert($createFailureFactory instanceof CreateFailureFactory);
@@ -144,7 +144,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'id' => $id,
-                'state' => State::VALUE_CREATE_FAILED,
+                'state' => MachineInterface::STATE_CREATE_FAILED,
                 'ip_addresses' => [],
                 'create_failure' => [
                     'code' => 2,

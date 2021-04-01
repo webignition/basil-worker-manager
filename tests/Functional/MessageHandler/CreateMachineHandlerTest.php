@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\CreateFailure;
-use App\Entity\Machine;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
@@ -14,7 +13,7 @@ use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestActionInterface;
@@ -46,7 +45,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     private CreateMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
-    private Machine $machine;
+    private MachineInterface $machine;
     private CreateFailureRepository $createFailureRepository;
 
     protected function setUp(): void
@@ -139,7 +138,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_CREATE_FAILED, $this->machine->getState());
+        self::assertSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
         self::assertSame(0, $message->getRetryCount());
 
         $createFailure = $this->createFailureRepository->find($this->machine->getId());
@@ -181,7 +180,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
-        self::assertNotSame(State::VALUE_CREATE_FAILED, $this->machine->getState());
+        self::assertNotSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
     }
 
     /**
@@ -230,7 +229,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(State::VALUE_CREATE_FAILED, $this->machine->getState());
+        self::assertSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
 
         $createFailure = $this->createFailureRepository->find($this->machine->getId());
         self::assertEquals($expectedCreateFailure, $createFailure);

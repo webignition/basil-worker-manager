@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Services;
 
 use App\Entity\Machine;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -13,7 +13,7 @@ class MachineBuilder
 {
     public const DEFAULT_ID = 'machine_id';
     public const DEFAULT_PROVIDER = ProviderInterface::NAME_DIGITALOCEAN;
-    public const DEFAULT_STATE = State::VALUE_CREATE_RECEIVED;
+    public const DEFAULT_STATE = MachineInterface::STATE_CREATE_RECEIVED;
     public const DEFAULT_REMOTE_ID = null;
     public const DEFAULT_IP_ADDRESSES = [];
 
@@ -34,7 +34,7 @@ class MachineBuilder
     /**
      * @param array<mixed> $properties
      */
-    public static function build(array $properties): Machine
+    public static function build(array $properties): MachineInterface
     {
         $properties = array_merge(self::DEFAULT, $properties);
 

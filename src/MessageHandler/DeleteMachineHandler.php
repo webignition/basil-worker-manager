@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Machine;
 use App\Message\DeleteMachine;
 use App\Message\MachineExists;
-use App\Model\Machine\State;
+use App\Model\MachineInterface;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -19,18 +18,18 @@ class DeleteMachineHandler extends AbstractRemoteMachineRequestHandler implement
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (Machine $machine) {
+                function (MachineInterface $machine) {
                     $this->machineProvider->delete($machine);
 
                     return new RemoteBooleanRequestSuccess(true);
                 }
-            ))->withBeforeRequestHandler(function (Machine $machine) {
-                $machine->setState(State::VALUE_DELETE_REQUESTED);
+            ))->withBeforeRequestHandler(function (MachineInterface $machine) {
+                $machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
                 $this->machineStore->store($machine);
-            })->withSuccessHandler(function (Machine $machine) {
+            })->withSuccessHandler(function (MachineInterface $machine) {
                 $this->dispatcher->dispatch(new MachineExists($machine->getId()));
-            })->withFailureHandler(function (Machine $machine) {
-                $machine = $machine->setState(State::VALUE_DELETE_FAILED);
+            })->withFailureHandler(function (MachineInterface $machine) {
+                $machine = $machine->setState(MachineInterface::STATE_DELETE_FAILED);
                 $this->machineStore->store($machine);
             })
         );

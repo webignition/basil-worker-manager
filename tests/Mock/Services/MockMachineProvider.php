@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
-use App\Entity\Machine;
+use App\Model\MachineInterface;
 use App\Services\MachineProvider\MachineProvider;
 use Mockery\MockInterface;
 
@@ -22,7 +22,7 @@ class MockMachineProvider
         return $this->mock;
     }
 
-    public function withCreateCallThrowingException(Machine $machine, \Exception $exception): self
+    public function withCreateCallThrowingException(MachineInterface $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->withCallThrowingException('create', $machine, $exception);
@@ -31,7 +31,7 @@ class MockMachineProvider
         return $this;
     }
 
-    public function withExistsCallThrowingException(Machine $machine, \Exception $exception): self
+    public function withExistsCallThrowingException(MachineInterface $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->withCallThrowingException('exists', $machine, $exception);
@@ -40,7 +40,7 @@ class MockMachineProvider
         return $this;
     }
 
-    public function withDeleteCallThrowingException(Machine $machine, \Exception $exception): self
+    public function withDeleteCallThrowingException(MachineInterface $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->withCallThrowingException('delete', $machine, $exception);
@@ -49,7 +49,7 @@ class MockMachineProvider
         return $this;
     }
 
-    private function withCallThrowingException(string $method, Machine $machine, \Exception $exception): self
+    private function withCallThrowingException(string $method, MachineInterface $machine, \Exception $exception): self
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock

@@ -97,9 +97,9 @@ class Machine implements MachineInterface
     }
 
     /**
-     * @return MachineInterface::STATE_*
+     * @return MachineInterface::STATE_*|null
      */
-    public function getState(): string
+    public function getState(): ?string
     {
         return $this->state;
     }
@@ -137,8 +137,12 @@ class Machine implements MachineInterface
     public function merge(MachineInterface $machine): MachineInterface
     {
         $this->remote_id = $machine->getRemoteId();
-        $this->state = $machine->getState();
         $this->ip_addresses = $machine->getIpAddresses();
+
+        $state = $machine->getState();
+        if (null !== $state) {
+            $this->state = $state;
+        }
 
         return $this;
     }

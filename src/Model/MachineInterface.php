@@ -36,9 +36,9 @@ interface MachineInterface extends \JsonSerializable
     public function getName(): string;
 
     /**
-     * @return MachineInterface::STATE_*
+     * @return MachineInterface::STATE_*|null
      */
-    public function getState(): string;
+    public function getState(): ?string;
 
     /**
      * @param MachineInterface::STATE_* $state

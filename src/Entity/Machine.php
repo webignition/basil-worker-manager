@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
-use App\Model\RemoteMachineInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -133,20 +132,6 @@ class Machine implements MachineInterface
             'state' => $this->state,
             'ip_addresses' => $this->ip_addresses,
         ];
-    }
-
-    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): Machine
-    {
-        $this->remote_id = $remoteMachine->getId();
-
-        $state = $remoteMachine->getState();
-        if (is_string($state)) {
-            $this->setState($state);
-        }
-
-        $this->ip_addresses = $remoteMachine->getIpAddresses();
-
-        return $this;
     }
 
     public function merge(MachineInterface $machine): MachineInterface

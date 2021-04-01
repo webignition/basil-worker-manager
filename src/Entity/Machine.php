@@ -49,14 +49,21 @@ class Machine implements MachineInterface
 
     /**
      * @param ProviderInterface::NAME_* $provider
+     * @param MachineInterface::STATE_* $state
+     * @param string[] $ipAddresses
      */
-    public function __construct(string $id, string $provider)
-    {
+    public function __construct(
+        string $id,
+        string $provider,
+        ?int $remoteId = null,
+        string $state = MachineInterface::STATE_CREATE_RECEIVED,
+        array $ipAddresses = [],
+    ) {
         $this->id = $id;
         $this->provider = $provider;
-        $this->remote_id = null;
-        $this->state = MachineInterface::STATE_CREATE_RECEIVED;
-        $this->ip_addresses = [];
+        $this->remote_id = $remoteId;
+        $this->state = $state;
+        $this->ip_addresses = $ipAddresses;
     }
 
     /**

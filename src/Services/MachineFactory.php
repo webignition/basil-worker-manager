@@ -19,7 +19,7 @@ class MachineFactory
     public function create(string $id, string $provider): MachineInterface
     {
         return $this->machineStore->store(
-            Machine::create($id, $provider)
+            new Machine($id, $provider)
         );
     }
 }

@@ -27,7 +27,7 @@ class MachineTest extends AbstractBaseFunctionalTest
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $machine = Machine::create($id, $provider);
+        $machine = new Machine($id, $provider);
 
         $this->entityManager->persist($machine);
         $this->entityManager->flush();

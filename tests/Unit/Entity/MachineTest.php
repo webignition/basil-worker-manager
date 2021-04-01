@@ -19,7 +19,7 @@ class MachineTest extends TestCase
         $id = md5('id content');
         $provider = ProviderInterface::NAME_DIGITALOCEAN;
 
-        $machine = Machine::create($id, $provider);
+        $machine = new Machine($id, $provider);
 
         self::assertSame($id, $machine->getId());
         self::assertNull($machine->getRemoteId());
@@ -32,7 +32,7 @@ class MachineTest extends TestCase
     public function testJsonSerialize(): void
     {
         $id = md5('id content');
-        $machine = Machine::create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = new Machine($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         self::assertSame(
             [
@@ -57,7 +57,7 @@ class MachineTest extends TestCase
         string $expectedState
     ): void {
         $id = md5('id content');
-        $machine = Machine::create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = new Machine($id, ProviderInterface::NAME_DIGITALOCEAN);
 
         $machine = $machine->updateFromRemoteMachine($remoteMachine);
 

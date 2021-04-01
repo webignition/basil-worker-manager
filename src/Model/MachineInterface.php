@@ -46,6 +46,11 @@ interface MachineInterface extends \JsonSerializable
     public function setState(string $state): MachineInterface;
 
     /**
+     * @return string[]
+     */
+    public function getIpAddresses(): array;
+
+    /**
      * @return array<string, mixed>
      */
     public function jsonSerialize(): array;

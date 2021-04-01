@@ -3,9 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Machine;
-use App\Model\MachineInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 /**
  * @method MachineInterface|null find($id, $lockMode = null, $lockVersion = null)

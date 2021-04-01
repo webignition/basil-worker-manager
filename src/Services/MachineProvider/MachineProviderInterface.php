@@ -3,9 +3,9 @@
 namespace App\Services\MachineProvider;
 
 use App\Exception\MachineProvider\ExceptionInterface;
-use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
-use App\Model\RemoteMachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 interface MachineProviderInterface
 {

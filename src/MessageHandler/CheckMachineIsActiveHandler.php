@@ -7,9 +7,9 @@ namespace App\MessageHandler;
 use App\Message\CheckMachineIsActive;
 use App\Message\GetMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\MachineInterface;
 use App\Repository\MachineRepository;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class CheckMachineIsActiveHandler implements MessageHandlerInterface
 {

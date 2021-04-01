@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Services;
 
 use App\Entity\Machine;
-use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineBuilder

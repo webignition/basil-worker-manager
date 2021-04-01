@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Entity;
 
 use App\Entity\Machine;
-use App\Model\ProviderInterface;
 use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineTest extends AbstractBaseFunctionalTest
 {

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Entity\Machine;
-use App\Model\ProviderInterface;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineStoreTest extends AbstractBaseFunctionalTest
 {

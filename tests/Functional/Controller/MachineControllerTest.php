@@ -9,8 +9,6 @@ use App\Entity\Machine;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
-use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Repository\MachineRepository;
 use App\Services\CreateFailureFactory;
@@ -19,6 +17,8 @@ use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineControllerTest extends AbstractBaseFunctionalTest
 {

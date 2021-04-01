@@ -591,6 +591,9 @@
     "toin0u/digitalocean-v2": {
         "version": "4.2.0"
     },
+    "webignition/basil-worker-manager-interfaces": {
+        "version": "0.1"
+    },
     "webignition/object-reflector": {
         "version": "1.0"
     },

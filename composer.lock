@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "480695a422b9fba2d27fc44aa81c3bee",
+    "content-hash": "2107ba1313b82cbb0481a99927ebb543",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -6077,6 +6077,53 @@
                 }
             ],
             "time": "2021-03-01T17:59:57+00:00"
+        },
+        {
+            "name": "webignition/basil-worker-manager-interfaces",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/basil-worker-manager-interfaces.git",
+                "reference": "92d24c49af479b2544208984c5c24da498e2fee6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/basil-worker-manager-interfaces/zipball/92d24c49af479b2544208984c5c24da498e2fee6",
+                "reference": "92d24c49af479b2544208984c5c24da498e2fee6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8"
+            },
+            "require-dev": {
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan": "^0.12.82",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.5",
+                "symplify/easy-coding-standard": "^9.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\BasilWorkerManagerInterfaces\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "webignition@gmail.com"
+                }
+            ],
+            "homepage": "https://github.com/webignition/basil-worker-manager-interfaces",
+            "support": {
+                "issues": "https://github.com/webignition/basil-worker-manager-interfaces/issues",
+                "source": "https://github.com/webignition/basil-worker-manager-interfaces/tree/0.1"
+            },
+            "time": "2021-04-01T14:23:15+00:00"
         },
         {
             "name": "webignition/symfony-messenger-json-message-serializer-bundle",

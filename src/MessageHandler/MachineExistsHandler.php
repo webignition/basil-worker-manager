@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Message\MachineExists;
-use App\Model\MachineInterface;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {

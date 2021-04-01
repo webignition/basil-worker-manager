@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Entity;
 
 use App\Entity\Machine;
-use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
 use PHPUnit\Framework\TestCase;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineTest extends TestCase

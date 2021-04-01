@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Message\GetMachine;
-use App\Model\MachineInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {

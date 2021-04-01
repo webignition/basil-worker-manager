@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Asynchronous;
 
 use App\Controller\MachineController;
-use App\Model\MachineInterface;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Model\Machine;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class EndToEndTest extends AbstractBaseIntegrationTest
 {

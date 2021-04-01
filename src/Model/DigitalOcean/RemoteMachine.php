@@ -2,9 +2,9 @@
 
 namespace App\Model\DigitalOcean;
 
-use App\Model\MachineInterface;
-use App\Model\RemoteMachineInterface;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 class RemoteMachine implements RemoteMachineInterface
 {

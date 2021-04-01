@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
-use App\Model\RemoteMachineInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -49,17 +48,29 @@ class Machine implements MachineInterface
 
     /**
      * @param ProviderInterface::NAME_* $provider
+     * @param MachineInterface::STATE_* $state
+     * @param string[] $ipAddresses
+     */
+    public function __construct(
+        string $id,
+        string $provider,
+        ?int $remoteId = null,
+        string $state = MachineInterface::STATE_CREATE_RECEIVED,
+        array $ipAddresses = [],
+    ) {
+        $this->id = $id;
+        $this->provider = $provider;
+        $this->remote_id = $remoteId;
+        $this->state = $state;
+        $this->ip_addresses = $ipAddresses;
+    }
+
+    /**
+     * @param ProviderInterface::NAME_* $provider
      */
     public static function create(string $id, string $provider): self
     {
-        $machine = new Machine();
-        $machine->id = $id;
-        $machine->remote_id = null;
-        $machine->state = MachineInterface::STATE_CREATE_RECEIVED;
-        $machine->provider = $provider;
-        $machine->ip_addresses = [];
-
-        return $machine;
+        return new Machine($id, $provider);
     }
 
     public function getId(): string
@@ -104,6 +115,14 @@ class Machine implements MachineInterface
     }
 
     /**
+     * @return string[]
+     */
+    public function getIpAddresses(): array
+    {
+        return $this->ip_addresses;
+    }
+
+    /**
      * @return array<mixed>
      */
     public function jsonSerialize(): array
@@ -115,16 +134,11 @@ class Machine implements MachineInterface
         ];
     }
 
-    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): Machine
+    public function merge(MachineInterface $machine): MachineInterface
     {
-        $this->remote_id = $remoteMachine->getId();
-
-        $state = $remoteMachine->getState();
-        if (is_string($state)) {
-            $this->setState($state);
-        }
-
-        $this->ip_addresses = $remoteMachine->getIpAddresses();
+        $this->remote_id = $machine->getRemoteId();
+        $this->state = $machine->getState();
+        $this->ip_addresses = $machine->getIpAddresses();
 
         return $this;
     }

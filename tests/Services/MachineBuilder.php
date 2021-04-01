@@ -38,7 +38,7 @@ class MachineBuilder
     {
         $properties = array_merge(self::DEFAULT, $properties);
 
-        $machine = Machine::create($properties[self::PROPERTY_ID], $properties[self::PROPERTY_PROVIDER]);
+        $machine = new Machine($properties[self::PROPERTY_ID], $properties[self::PROPERTY_PROVIDER]);
 
         ObjectReflector::setProperty($machine, $machine::class, 'state', $properties[self::PROPERTY_STATE]);
         ObjectReflector::setProperty($machine, $machine::class, 'remote_id', $properties[self::PROPERTY_REMOTE_ID]);

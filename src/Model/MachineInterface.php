@@ -26,10 +26,6 @@ interface MachineInterface extends \JsonSerializable
         self::STATE_DELETE_DELETED,
     ];
 
-    /**
-     * @param ProviderInterface::NAME_* $provider
-     */
-    public static function create(string $id, string $provider): MachineInterface;
     public function getId(): string;
     public function getRemoteId(): ?int;
 
@@ -50,9 +46,14 @@ interface MachineInterface extends \JsonSerializable
     public function setState(string $state): MachineInterface;
 
     /**
+     * @return string[]
+     */
+    public function getIpAddresses(): array;
+
+    /**
      * @return array<string, mixed>
      */
     public function jsonSerialize(): array;
 
-    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): MachineInterface;
+    public function merge(MachineInterface $machine): MachineInterface;
 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\CreateFailure;
+use App\Entity\Machine;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
@@ -11,7 +12,7 @@ use App\Model\ProviderInterface;
 use App\Repository\CreateFailureRepository;
 use App\Repository\MachineRepository;
 use App\Response\BadMachineCreateRequestResponse;
-use App\Services\MachineFactory;
+use App\Services\MachineStore;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,7 +25,7 @@ class MachineController
     #[Route(self::PATH_MACHINE, name: 'create', methods: ['POST'])]
     public function create(
         string $id,
-        MachineFactory $factory,
+        MachineStore $machineStore,
         MachineRequestMessageDispatcher $messageDispatcher,
         MachineRepository $machineRepository
     ): Response {
@@ -32,9 +33,9 @@ class MachineController
             return BadMachineCreateRequestResponse::createIdTakenResponse();
         }
 
-        $machine = $factory->create($id, ProviderInterface::NAME_DIGITALOCEAN);
+        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
 
-        $messageDispatcher->dispatch(new CreateMachine($machine->getId()));
+        $messageDispatcher->dispatch(new CreateMachine($id));
 
         return new Response('', 202);
     }

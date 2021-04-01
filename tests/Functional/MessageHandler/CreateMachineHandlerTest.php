@@ -18,7 +18,6 @@ use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
-use App\Repository\CreateFailureRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
@@ -31,6 +30,7 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededExceptionAlias;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 use DigitalOceanV2\Exception\RuntimeException;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
@@ -47,7 +47,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineInterface $machine;
-    private CreateFailureRepository $createFailureRepository;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -70,9 +70,9 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($mockHandler instanceof MockHandler);
         $this->mockHandler = $mockHandler;
 
-        $createFailureRepository = self::$container->get(CreateFailureRepository::class);
-        \assert($createFailureRepository instanceof CreateFailureRepository);
-        $this->createFailureRepository = $createFailureRepository;
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
     }
 
     public function testHandleSuccess(): void
@@ -143,7 +143,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
         self::assertSame(0, $message->getRetryCount());
 
-        $createFailure = $this->createFailureRepository->find($this->machine->getId());
+        $createFailure = $this->entityManager->find(CreateFailure::class, $this->machine->getId());
         self::assertEquals(
             CreateFailure::create(
                 self::MACHINE_ID,
@@ -233,7 +233,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
 
-        $createFailure = $this->createFailureRepository->find($this->machine->getId());
+        $createFailure = $this->entityManager->find(CreateFailure::class, $this->machine->getId());
         self::assertEquals($expectedCreateFailure, $createFailure);
     }
 

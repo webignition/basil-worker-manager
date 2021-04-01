@@ -7,7 +7,6 @@ use App\Entity\Machine;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Repository\CreateFailureRepository;
 use App\Response\BadMachineCreateRequestResponse;
 use App\Services\MachineStore;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,7 +43,6 @@ class MachineController
     public function status(
         string $id,
         EntityManagerInterface $entityManager,
-        CreateFailureRepository $createFailureRepository,
     ): Response {
         $machine = $entityManager->find(Machine::class, $id);
         if (false === $machine instanceof MachineInterface) {
@@ -53,7 +51,7 @@ class MachineController
 
         $responseData = $machine->jsonSerialize();
 
-        $createFailure = $createFailureRepository->find($machine->getId());
+        $createFailure = $entityManager->find(CreateFailure::class, $id);
         if ($createFailure instanceof CreateFailure) {
             $responseData['create_failure'] = $createFailure->jsonSerialize();
         }

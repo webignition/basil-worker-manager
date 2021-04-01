@@ -2,11 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\CreateFailureRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=CreateFailureRepository::class)
+ * @ORM\Entity
  */
 class CreateFailure implements \JsonSerializable
 {

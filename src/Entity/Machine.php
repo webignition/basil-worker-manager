@@ -110,6 +110,14 @@ class Machine implements MachineInterface
     }
 
     /**
+     * @return string[]
+     */
+    public function getIpAddresses(): array
+    {
+        return $this->ip_addresses;
+    }
+
+    /**
      * @return array<mixed>
      */
     public function jsonSerialize(): array

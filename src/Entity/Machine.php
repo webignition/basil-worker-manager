@@ -83,6 +83,13 @@ class Machine implements MachineInterface
         return $this->remote_id;
     }
 
+    public function setRemoteId(int $remoteId): MachineInterface
+    {
+        $this->remote_id = $remoteId;
+
+        return $this;
+    }
+
     /**
      * @return ProviderInterface::NAME_*
      */
@@ -122,6 +129,13 @@ class Machine implements MachineInterface
         return $this->ip_addresses;
     }
 
+    public function setIpAddresses(array $ipAddresses): MachineInterface
+    {
+        $this->ip_addresses = $ipAddresses;
+
+        return $this;
+    }
+
     /**
      * @return array<mixed>
      */
@@ -132,14 +146,5 @@ class Machine implements MachineInterface
             'state' => $this->state,
             'ip_addresses' => $this->ip_addresses,
         ];
-    }
-
-    public function merge(MachineInterface $machine): MachineInterface
-    {
-        $this->remote_id = $machine->getRemoteId();
-        $this->state = $machine->getState();
-        $this->ip_addresses = $machine->getIpAddresses();
-
-        return $this;
     }
 }

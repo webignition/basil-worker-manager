@@ -103,7 +103,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new CreateMachine(self::MACHINE_ID);
         $outcome = ($this->handler)($message);
 
-        $expectedRemoteMachine = new RemoteMachine($expectedDropletEntity);
+        $expectedRemoteMachine = new RemoteMachine(self::MACHINE_ID, $expectedDropletEntity);
         self::assertEquals(new RemoteMachineRequestSuccess($expectedRemoteMachine), $outcome);
 
         $this->messengerAsserter->assertQueueCount(1);
@@ -112,7 +112,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             new CheckMachineIsActive(self::MACHINE_ID)
         );
 
-        self::assertSame($expectedRemoteMachine->getId(), (int) $this->machine->getRemoteId());
+        self::assertSame($expectedRemoteMachine->getRemoteId(), (int) $this->machine->getRemoteId());
         self::assertSame($expectedRemoteMachine->getState(), $this->machine->getState());
         self::assertSame(
             $expectedRemoteMachine->getIpAddresses(),

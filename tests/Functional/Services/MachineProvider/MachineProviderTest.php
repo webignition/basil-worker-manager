@@ -29,6 +29,8 @@ use webignition\ObjectReflector\ObjectReflector;
 
 class MachineProviderTest extends AbstractBaseFunctionalTest
 {
+    private const MACHINE_ID = 'machine id';
+
     private MachineProvider $machineProvider;
     private MachineInterface $machine;
     private MockHandler $mockHandler;
@@ -44,7 +46,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $this->machine = new Machine(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $this->machine = new Machine(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $machineStore->store($this->machine);
 
         $mockHandler = self::$container->get(MockHandler::class);
@@ -199,7 +201,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
         $remoteMachine = $callable($this->machine);
 
-        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
+        self::assertEquals(new RemoteMachine(self::MACHINE_ID, $expectedDropletEntity), $remoteMachine);
     }
 
     /**

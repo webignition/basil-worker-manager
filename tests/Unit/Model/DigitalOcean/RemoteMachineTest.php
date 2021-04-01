@@ -10,16 +10,19 @@ use PHPUnit\Framework\TestCase;
 
 class RemoteMachineTest extends TestCase
 {
-    public function testGetId(): void
+    private const MACHINE_ID = 'machine id';
+
+    public function testGetIdGetRemoteId(): void
     {
         $remoteId = 123;
         $dropletEntity = new DropletEntity([
             'id' => $remoteId,
         ]);
 
-        $remoteMachine = new RemoteMachine($dropletEntity);
+        $remoteMachine = new RemoteMachine(self::MACHINE_ID, $dropletEntity);
 
-        self::assertSame($remoteId, $remoteMachine->getId());
+        self::assertSame(self::MACHINE_ID, $remoteMachine->getId());
+        self::assertSame($remoteId, $remoteMachine->getRemoteId());
     }
 
     /**
@@ -31,7 +34,7 @@ class RemoteMachineTest extends TestCase
     public function testGetIpAddresses(array $dropletData, array $expectedIpAddresses): void
     {
         $dropletEntity = new DropletEntity($dropletData);
-        $remoteMachine = new RemoteMachine($dropletEntity);
+        $remoteMachine = new RemoteMachine(self::MACHINE_ID, $dropletEntity);
 
         self::assertSame($expectedIpAddresses, $remoteMachine->getIpAddresses());
     }

@@ -3,6 +3,7 @@
 namespace App\Model\DigitalOcean;
 
 use App\Model\MachineInterface;
+use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 
@@ -12,11 +13,17 @@ class RemoteMachine implements RemoteMachineInterface
     public const STATE_ACTIVE = 'active';
 
     public function __construct(
+        private string $id,
         private DropletEntity $droplet
     ) {
     }
 
-    public function getId(): int
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getRemoteId(): int
     {
         return $this->droplet->id;
     }
@@ -54,5 +61,10 @@ class RemoteMachine implements RemoteMachineInterface
         }
 
         return null;
+    }
+
+    public function getProvider(): string
+    {
+        return ProviderInterface::NAME_DIGITALOCEAN;
     }
 }

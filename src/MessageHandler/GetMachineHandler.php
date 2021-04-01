@@ -34,7 +34,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
                     $remoteMachineMachine = new Machine(
                         '',
                         ProviderInterface::NAME_DIGITALOCEAN,
-                        $remoteMachine->getId(),
+                        $remoteMachine->getRemoteId(),
                         $remoteMachineState,
                         $remoteMachine->getIpAddresses(),
                     );

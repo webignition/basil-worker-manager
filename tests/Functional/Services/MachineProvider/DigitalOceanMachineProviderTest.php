@@ -20,6 +20,8 @@ use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 {
+    private const MACHINE_ID = 'machine id';
+
     private DigitalOceanMachineProvider $machineProvider;
     private MachineInterface $machine;
     private MockHandler $mockHandler;
@@ -35,7 +37,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $this->machine = new Machine(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $this->machine = new Machine(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $machineStore->store($this->machine);
 
         $mockHandler = self::$container->get(MockHandler::class);
@@ -72,7 +74,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         $remoteMachine = $this->machineProvider->create($this->machine);
 
-        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
+        self::assertEquals(new RemoteMachine(self::MACHINE_ID, $expectedDropletEntity), $remoteMachine);
     }
 
     public function testGetSuccess(): void
@@ -104,7 +106,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         $remoteMachine = $this->machineProvider->get($this->machine);
 
-        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
+        self::assertEquals(new RemoteMachine(self::MACHINE_ID, $expectedDropletEntity), $remoteMachine);
     }
 
     public function testRemoveSuccess(): void

@@ -35,7 +35,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
-    private const MACHINE_ID = 'id';
+    private const MACHINE_ID = 'machine id';
 
     private GetMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
@@ -146,7 +146,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 'apiResponse' => HttpResponseFactory::fromDropletEntity($createdDropletEntity),
                 'machine' => MachineBuilder::build(MachineBuilder::DEFAULT),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
-                    new RemoteMachine($createdDropletEntity)
+                    new RemoteMachine(self::MACHINE_ID, $createdDropletEntity)
                 ),
                 'expectedMachine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
@@ -160,7 +160,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                     MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_STARTED,
                 ]),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
-                    new RemoteMachine($upNewDropletEntity)
+                    new RemoteMachine(self::MACHINE_ID, $upNewDropletEntity)
                 ),
                 'expectedMachine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
@@ -176,7 +176,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                     MachineBuilder::PROPERTY_IP_ADDRESSES => $ipAddresses,
                 ]),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
-                    new RemoteMachine($upActiveDropletEntity)
+                    new RemoteMachine(self::MACHINE_ID, $upActiveDropletEntity)
                 ),
                 'expectedMachine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,

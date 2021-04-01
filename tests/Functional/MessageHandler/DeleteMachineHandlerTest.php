@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\DeleteMachine;
@@ -14,7 +15,6 @@ use App\Model\ProviderInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
-use App\Services\MachineFactory;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -47,17 +47,15 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($handler instanceof DeleteMachineHandler);
         $this->handler = $handler;
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        if ($machineFactory instanceof MachineFactory) {
-            $machine = $machineFactory->create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
-            $machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
-
-            $machineStore = self::$container->get(MachineStore::class);
-            \assert($machineStore instanceof MachineStore);
-            $machineStore->store($machine);
-
-            $this->machine = $machine;
-        }
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $this->machine = new Machine(
+            self::MACHINE_ID,
+            ProviderInterface::NAME_DIGITALOCEAN,
+            null,
+            MachineInterface::STATE_DELETE_REQUESTED
+        );
+        $machineStore->store($this->machine);
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);

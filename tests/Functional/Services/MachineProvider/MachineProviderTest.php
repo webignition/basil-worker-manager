@@ -14,8 +14,8 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
-use App\Services\MachineFactory;
 use App\Services\MachineProvider\MachineProvider;
+use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -42,10 +42,10 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
             $this->machineProvider = $machineProvider;
         }
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        if ($machineFactory instanceof MachineFactory) {
-            $this->machine = $machineFactory->create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        }
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $this->machine = new Machine(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machineStore->store($this->machine);
 
         $mockHandler = self::$container->get(MockHandler::class);
         if ($mockHandler instanceof MockHandler) {

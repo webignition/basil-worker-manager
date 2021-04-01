@@ -17,7 +17,6 @@ use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\ExceptionLogger;
-use App\Services\MachineFactory;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
@@ -50,9 +49,6 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $handler = self::$container->get(GetMachineHandler::class);
         \assert($handler instanceof GetMachineHandler);
         $this->handler = $handler;
-
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
 
         $mockHandler = self::$container->get(MockHandler::class);
         \assert($mockHandler instanceof MockHandler);

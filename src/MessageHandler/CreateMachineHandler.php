@@ -12,19 +12,19 @@ use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
-use App\Repository\MachineRepository;
 use App\Services\CreateFailureFactory;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
     public function __construct(
-        MachineRepository $machineRepository,
+        EntityManagerInterface $entityManager,
         MachineProvider $machineProvider,
         RemoteRequestRetryDecider $retryDecider,
         ExceptionLogger $exceptionLogger,
@@ -33,7 +33,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         private CreateFailureFactory $createFailureFactory,
     ) {
         parent::__construct(
-            $machineRepository,
+            $entityManager,
             $machineProvider,
             $retryDecider,
             $exceptionLogger,

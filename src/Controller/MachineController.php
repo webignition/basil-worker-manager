@@ -7,10 +7,9 @@ use App\Entity\Machine;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Repository\CreateFailureRepository;
-use App\Repository\MachineRepository;
 use App\Response\BadMachineCreateRequestResponse;
 use App\Services\MachineStore;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,9 +26,9 @@ class MachineController
         string $id,
         MachineStore $machineStore,
         MachineRequestMessageDispatcher $messageDispatcher,
-        MachineRepository $machineRepository
+        EntityManagerInterface $entityManager,
     ): Response {
-        if ($machineRepository->find($id) instanceof MachineInterface) {
+        if ($entityManager->find(Machine::class, $id) instanceof MachineInterface) {
             return BadMachineCreateRequestResponse::createIdTakenResponse();
         }
 
@@ -43,17 +42,16 @@ class MachineController
     #[Route(self::PATH_MACHINE, name: 'status', methods: ['GET', 'HEAD'])]
     public function status(
         string $id,
-        MachineRepository $machineRepository,
-        CreateFailureRepository $createFailureRepository,
+        EntityManagerInterface $entityManager,
     ): Response {
-        $machine = $machineRepository->find($id);
+        $machine = $entityManager->find(Machine::class, $id);
         if (false === $machine instanceof MachineInterface) {
             return new Response('', 404);
         }
 
         $responseData = $machine->jsonSerialize();
 
-        $createFailure = $createFailureRepository->find($machine->getId());
+        $createFailure = $entityManager->find(CreateFailure::class, $id);
         if ($createFailure instanceof CreateFailure) {
             $responseData['create_failure'] = $createFailure->jsonSerialize();
         }
@@ -64,10 +62,10 @@ class MachineController
     #[Route(self::PATH_MACHINE, name: 'delete', methods: ['DELETE'])]
     public function delete(
         string $id,
-        MachineRepository $machineRepository,
+        EntityManagerInterface $entityManager,
         MachineRequestMessageDispatcher $messageDispatcher,
     ): Response {
-        $machine = $machineRepository->find($id);
+        $machine = $entityManager->find(Machine::class, $id);
         if (false === $machine instanceof MachineInterface) {
             return new Response('', 404);
         }

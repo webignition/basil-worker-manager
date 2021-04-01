@@ -10,11 +10,11 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Model\RemoteRequestActionInterface;
-use App\Repository\MachineRepository;
 use App\Services\CreateFailureFactory;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
@@ -22,22 +22,20 @@ use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineControllerTest extends AbstractBaseFunctionalTest
 {
-    private MachineRepository $machineRepository;
+    private EntityManagerInterface $entityManager;
     private MessengerAsserter $messengerAsserter;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $machineRepository = self::$container->get(MachineRepository::class);
-        if ($machineRepository instanceof MachineRepository) {
-            $this->machineRepository = $machineRepository;
-        }
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+        \assert($entityManager instanceof EntityManagerInterface);
+        $this->entityManager = $entityManager;
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
-        if ($messengerAsserter instanceof MessengerAsserter) {
-            $this->messengerAsserter = $messengerAsserter;
-        }
+        \assert($messengerAsserter instanceof MessengerAsserter);
+        $this->messengerAsserter = $messengerAsserter;
     }
 
     public function testCreateSuccess(): void
@@ -50,10 +48,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertSame(202, $response->getStatusCode());
         self::assertInstanceOf(Response::class, $response);
 
-        $machines = $this->machineRepository->findAll();
-        self::assertCount(1, $machines);
-
-        $machine = current($machines);
+        $machine = $this->entityManager->find(Machine::class, $id);
         self::assertInstanceOf(Machine::class, $machine);
         self::assertSame($id, $machine->getId());
 

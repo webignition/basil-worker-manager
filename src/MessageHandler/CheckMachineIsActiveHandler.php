@@ -4,24 +4,25 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
 use App\Message\CheckMachineIsActive;
 use App\Message\GetMachine;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Repository\MachineRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class CheckMachineIsActiveHandler implements MessageHandlerInterface
 {
     public function __construct(
-        private MachineRepository $machineRepository,
+        private EntityManagerInterface $entityManager,
         private MachineRequestMessageDispatcher $dispatcher,
     ) {
     }
 
     public function __invoke(CheckMachineIsActive $message): void
     {
-        $machine = $this->machineRepository->find($message->getMachineId());
+        $machine = $this->entityManager->find(Machine::class, $message->getMachineId());
         if (!$machine instanceof MachineInterface) {
             return;
         }

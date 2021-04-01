@@ -11,7 +11,7 @@ use webignition\ObjectReflector\ObjectReflector;
 
 class MachineBuilder
 {
-    public const DEFAULT_ID = 'machine_id';
+    public const DEFAULT_ID = 'machine id';
     public const DEFAULT_PROVIDER = ProviderInterface::NAME_DIGITALOCEAN;
     public const DEFAULT_STATE = MachineInterface::STATE_CREATE_RECEIVED;
     public const DEFAULT_REMOTE_ID = null;

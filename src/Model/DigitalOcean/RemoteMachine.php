@@ -13,8 +13,14 @@ class RemoteMachine implements RemoteMachineInterface
     public const STATE_ACTIVE = 'active';
 
     public function __construct(
+        private string $id,
         private DropletEntity $droplet
     ) {
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     public function getRemoteId(): int

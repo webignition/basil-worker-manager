@@ -56,7 +56,6 @@ class Machine implements MachineInterface
         $this->provider = $provider;
         $this->remote_id = null;
         $this->state = MachineInterface::STATE_CREATE_RECEIVED;
-        $this->provider = $provider;
         $this->ip_addresses = [];
     }
 
@@ -139,6 +138,15 @@ class Machine implements MachineInterface
         }
 
         $this->ip_addresses = $remoteMachine->getIpAddresses();
+
+        return $this;
+    }
+
+    public function merge(MachineInterface $machine): MachineInterface
+    {
+        $this->remote_id = $machine->getRemoteId();
+        $this->state = $machine->getState();
+        $this->ip_addresses = $machine->getIpAddresses();
 
         return $this;
     }

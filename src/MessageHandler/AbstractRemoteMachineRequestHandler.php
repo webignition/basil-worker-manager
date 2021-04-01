@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Message\RemoteMachineRequestInterface;
@@ -11,17 +12,17 @@ use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
-use App\Repository\MachineRepository;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
+use Doctrine\ORM\EntityManagerInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 abstract class AbstractRemoteMachineRequestHandler
 {
     public function __construct(
-        protected MachineRepository $machineRepository,
+        private EntityManagerInterface $entityManager,
         protected MachineProvider $machineProvider,
         protected RemoteRequestRetryDecider $retryDecider,
         protected ExceptionLogger $exceptionLogger,
@@ -34,7 +35,7 @@ abstract class AbstractRemoteMachineRequestHandler
         RemoteMachineRequestInterface $message,
         RemoteMachineActionHandlerInterface $actionHandler
     ): RemoteRequestOutcomeInterface {
-        $machine = $this->machineRepository->find($message->getMachineId());
+        $machine = $this->entityManager->find(Machine::class, $message->getMachineId());
         if (!$machine instanceof MachineInterface) {
             return RemoteRequestOutcome::invalid();
         }

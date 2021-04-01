@@ -19,7 +19,7 @@ class RemoteMachineTest extends TestCase
 
         $remoteMachine = new RemoteMachine($dropletEntity);
 
-        self::assertSame($remoteId, $remoteMachine->getId());
+        self::assertSame($remoteId, $remoteMachine->getRemoteId());
     }
 
     /**

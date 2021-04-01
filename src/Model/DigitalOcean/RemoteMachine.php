@@ -17,7 +17,7 @@ class RemoteMachine implements RemoteMachineInterface
     ) {
     }
 
-    public function getId(): int
+    public function getRemoteId(): int
     {
         return $this->droplet->id;
     }

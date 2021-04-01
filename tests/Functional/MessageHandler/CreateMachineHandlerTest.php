@@ -112,7 +112,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             new CheckMachineIsActive(self::MACHINE_ID)
         );
 
-        self::assertSame($expectedRemoteMachine->getId(), (int) $this->machine->getRemoteId());
+        self::assertSame($expectedRemoteMachine->getRemoteId(), (int) $this->machine->getRemoteId());
         self::assertSame($expectedRemoteMachine->getState(), $this->machine->getState());
         self::assertSame(
             $expectedRemoteMachine->getIpAddresses(),

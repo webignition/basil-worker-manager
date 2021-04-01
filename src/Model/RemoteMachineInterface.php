@@ -4,7 +4,7 @@ namespace App\Model;
 
 interface RemoteMachineInterface
 {
-    public function getId(): int;
+    public function getRemoteId(): int;
 
     /**
      * @return string[]

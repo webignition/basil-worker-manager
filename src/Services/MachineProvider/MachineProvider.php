@@ -40,7 +40,7 @@ class MachineProvider
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create((string) $machine, Action::ACTION_CREATE, $exception);
+            throw $this->exceptionFactory->create($machine->getId(), Action::ACTION_CREATE, $exception);
         }
     }
 
@@ -55,7 +55,7 @@ class MachineProvider
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create((string) $machine, Action::ACTION_GET, $exception);
+            throw $this->exceptionFactory->create($machine->getId(), Action::ACTION_GET, $exception);
         }
     }
 
@@ -70,7 +70,7 @@ class MachineProvider
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create((string) $machine, Action::ACTION_DELETE, $exception);
+            throw $this->exceptionFactory->create($machine->getId(), Action::ACTION_DELETE, $exception);
         }
     }
 
@@ -86,7 +86,7 @@ class MachineProvider
             return $provider->exists($machine);
         } catch (\Exception $exception) {
             throw $this->exceptionFactory->create(
-                (string) $machine,
+                $machine->getId(),
                 RemoteRequestActionInterface::ACTION_EXISTS,
                 $exception
             );

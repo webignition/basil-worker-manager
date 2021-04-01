@@ -62,7 +62,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                         $machine->updateFromRemoteMachine($outcome->getRemoteMachine())
                     );
 
-                    $this->dispatcher->dispatch(new CheckMachineIsActive((string) $machine));
+                    $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
                 }
             })->withFailureHandler(
                 function (Machine $machine, ExceptionInterface | UnsupportedProviderException $exception) {

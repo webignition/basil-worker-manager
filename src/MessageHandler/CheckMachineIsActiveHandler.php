@@ -36,7 +36,7 @@ class CheckMachineIsActiveHandler implements MessageHandlerInterface
             return;
         }
 
-        $this->dispatcher->dispatch(new GetMachine((string) $machine));
-        $this->dispatcher->dispatch(new CheckMachineIsActive((string) $machine));
+        $this->dispatcher->dispatch(new GetMachine($machine->getId()));
+        $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
     }
 }

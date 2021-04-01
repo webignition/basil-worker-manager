@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=MachineRepository::class)
  */
-class Machine implements \Stringable, \JsonSerializable
+class Machine implements \JsonSerializable
 {
     private const NAME = 'worker-%s';
 
@@ -82,7 +82,7 @@ class Machine implements \Stringable, \JsonSerializable
 
     public function getName(): string
     {
-        return sprintf(self::NAME, (string) $this);
+        return sprintf(self::NAME, $this->id);
     }
 
     /**
@@ -101,11 +101,6 @@ class Machine implements \Stringable, \JsonSerializable
         $this->state = $state;
 
         return $this;
-    }
-
-    public function __toString(): string
-    {
-        return (string) $this->id;
     }
 
     /**

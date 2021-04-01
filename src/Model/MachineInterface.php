@@ -26,10 +26,6 @@ interface MachineInterface extends \JsonSerializable
         self::STATE_DELETE_DELETED,
     ];
 
-    /**
-     * @param ProviderInterface::NAME_* $provider
-     */
-    public static function create(string $id, string $provider): MachineInterface;
     public function getId(): string;
     public function getRemoteId(): ?int;
 

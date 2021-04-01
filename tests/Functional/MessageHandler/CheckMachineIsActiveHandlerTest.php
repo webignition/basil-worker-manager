@@ -49,7 +49,7 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testHandleMachineIsActiveOrEnded(string $state): void
     {
-        $machine = Machine::create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = new Machine(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $machine->setState($state);
         $this->machineStore->store($machine);
 
@@ -92,7 +92,7 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testHandleMachineIsPreActive(string $state): void
     {
-        $machine = Machine::create(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = new Machine(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $machine->setState($state);
         $this->machineStore->store($machine);
 

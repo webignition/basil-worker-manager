@@ -50,16 +50,22 @@ class Machine implements MachineInterface
     /**
      * @param ProviderInterface::NAME_* $provider
      */
+    public function __construct(string $id, string $provider)
+    {
+        $this->id = $id;
+        $this->provider = $provider;
+        $this->remote_id = null;
+        $this->state = MachineInterface::STATE_CREATE_RECEIVED;
+        $this->provider = $provider;
+        $this->ip_addresses = [];
+    }
+
+    /**
+     * @param ProviderInterface::NAME_* $provider
+     */
     public static function create(string $id, string $provider): self
     {
-        $machine = new Machine();
-        $machine->id = $id;
-        $machine->remote_id = null;
-        $machine->state = MachineInterface::STATE_CREATE_RECEIVED;
-        $machine->provider = $provider;
-        $machine->ip_addresses = [];
-
-        return $machine;
+        return new Machine($id, $provider);
     }
 
     public function getId(): string

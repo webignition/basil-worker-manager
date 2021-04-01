@@ -30,7 +30,7 @@ class MachineStoreTest extends AbstractBaseFunctionalTest
 
     public function testStore(): void
     {
-        $machine = Machine::create(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
+        $machine = new Machine(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
         $machine = $this->machineStore->store($machine);
 
         $this->entityManager->refresh($machine);

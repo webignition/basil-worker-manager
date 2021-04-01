@@ -55,7 +55,5 @@ interface MachineInterface extends \JsonSerializable
      */
     public function jsonSerialize(): array;
 
-    public function updateFromRemoteMachine(RemoteMachineInterface $remoteMachine): MachineInterface;
-
     public function merge(MachineInterface $machine): MachineInterface;
 }

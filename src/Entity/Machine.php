@@ -2,13 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 /**
- * @ORM\Entity(repositoryClass=MachineRepository::class)
+ * @ORM\Entity
  */
 class Machine implements MachineInterface
 {

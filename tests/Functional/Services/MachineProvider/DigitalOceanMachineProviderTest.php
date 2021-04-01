@@ -6,8 +6,6 @@ namespace App\Tests\Functional\Services\MachineProvider;
 
 use App\Entity\Machine;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
 use App\Services\MachineProvider\DigitalOceanMachineProvider;
 use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -16,6 +14,8 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest

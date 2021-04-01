@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
 use App\Repository\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 /**
  * @ORM\Entity(repositoryClass=MachineRepository::class)

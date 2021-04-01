@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Model\MachineInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineStore
 {

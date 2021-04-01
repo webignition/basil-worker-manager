@@ -11,8 +11,6 @@ use App\Message\MachineExists;
 use App\MessageHandler\CreateMachineHandler;
 use App\MessageHandler\MachineExistsHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -31,6 +29,8 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineExistsHandlerTest extends AbstractBaseFunctionalTest

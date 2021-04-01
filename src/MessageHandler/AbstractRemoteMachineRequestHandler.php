@@ -8,7 +8,6 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Message\RemoteMachineRequestInterface;
 use App\MessageDispatcher\MachineRequestMessageDispatcher;
-use App\Model\MachineInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -17,6 +16,7 @@ use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
 use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 abstract class AbstractRemoteMachineRequestHandler
 {

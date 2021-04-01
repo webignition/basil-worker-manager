@@ -6,11 +6,11 @@ namespace App\Tests\Functional\Services;
 
 use App\Message\GetMachine;
 use App\Message\RemoteMachineRequestInterface;
-use App\Model\ProviderInterface;
 use App\Services\RemoteRequestRetryDecider;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class RemoteRequestRetryDeciderTest extends AbstractBaseFunctionalTest
 {

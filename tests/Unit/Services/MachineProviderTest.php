@@ -6,10 +6,10 @@ namespace App\Tests\Unit\Services;
 
 use App\Entity\Machine;
 use App\Exception\UnsupportedProviderException;
-use App\Model\ProviderInterface;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use App\Services\MachineProvider\MachineProvider;
 use PHPUnit\Framework\TestCase;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineProviderTest extends TestCase
 {

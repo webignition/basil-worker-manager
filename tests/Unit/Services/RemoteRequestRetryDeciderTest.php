@@ -6,13 +6,13 @@ namespace App\Tests\Unit\Services;
 
 use App\Message\GetMachine;
 use App\Message\RemoteMachineRequestInterface;
-use App\Model\ProviderInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider;
 use App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class RemoteRequestRetryDeciderTest extends TestCase
 {

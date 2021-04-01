@@ -6,10 +6,10 @@ namespace App\MessageHandler;
 
 use App\Message\DeleteMachine;
 use App\Message\MachineExists;
-use App\Model\MachineInterface;
 use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class DeleteMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {

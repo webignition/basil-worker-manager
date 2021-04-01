@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Model;
 
-use App\Model\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class Machine
 {

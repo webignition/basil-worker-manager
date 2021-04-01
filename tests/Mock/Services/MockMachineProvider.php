@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
-use App\Model\MachineInterface;
 use App\Services\MachineProvider\MachineProvider;
 use Mockery\MockInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MockMachineProvider
 {

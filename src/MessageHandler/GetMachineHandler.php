@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Entity\Machine;
 use App\Message\GetMachine;
 use App\Model\MachineInterface;
-use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
@@ -31,15 +29,9 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
                     $remoteMachineState = $remoteMachine->getState();
                     $remoteMachineState = $remoteMachineState ?? MachineInterface::STATE_CREATE_REQUESTED;
 
-                    $remoteMachineMachine = new Machine(
-                        '',
-                        ProviderInterface::NAME_DIGITALOCEAN,
-                        $remoteMachine->getId(),
-                        $remoteMachineState,
-                        $remoteMachine->getIpAddresses(),
-                    );
-
-                    $machine = $machine->merge($remoteMachineMachine);
+                    $machine->setRemoteId($remoteMachine->getId());
+                    $machine->setState($remoteMachineState);
+                    $machine->setIpAddresses($remoteMachine->getIpAddresses());
                     $this->machineStore->store($machine);
                 }
             })

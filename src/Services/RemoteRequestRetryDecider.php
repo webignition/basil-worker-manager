@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Message\RemoteMachineRequestInterface;
-use App\Model\RemoteRequestActionInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class RemoteRequestRetryDecider
 {

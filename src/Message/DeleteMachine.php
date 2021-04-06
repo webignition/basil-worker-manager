@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
 
 class DeleteMachine extends AbstractRemoteMachineRequest

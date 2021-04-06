@@ -2,8 +2,8 @@
 
 namespace App\Services\ExceptionFactory\MachineProvider;
 
-use App\Model\RemoteRequestActionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 interface ExceptionFactoryInterface
 {

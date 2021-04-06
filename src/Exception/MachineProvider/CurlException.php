@@ -2,8 +2,8 @@
 
 namespace App\Exception\MachineProvider;
 
-use App\Model\RemoteRequestActionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\CurlExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class CurlException extends Exception implements CurlExceptionInterface
 {

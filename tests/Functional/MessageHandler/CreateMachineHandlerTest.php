@@ -13,7 +13,6 @@ use App\Message\CreateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
@@ -35,6 +34,7 @@ use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class CreateMachineHandlerTest extends AbstractBaseFunctionalTest

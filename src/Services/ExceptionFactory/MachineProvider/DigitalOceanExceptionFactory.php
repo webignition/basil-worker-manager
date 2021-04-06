@@ -8,7 +8,6 @@ use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
-use App\Model\RemoteRequestActionInterface;
 use DigitalOceanV2\Client;
 use DigitalOceanV2\Exception\ApiLimitExceededException as VendorApiLimitExceededException;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
@@ -16,6 +15,7 @@ use DigitalOceanV2\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class DigitalOceanExceptionFactory implements ExceptionFactoryInterface
 {

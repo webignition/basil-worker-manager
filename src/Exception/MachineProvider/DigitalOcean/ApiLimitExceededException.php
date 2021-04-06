@@ -3,8 +3,8 @@
 namespace App\Exception\MachineProvider\DigitalOcean;
 
 use App\Exception\MachineProvider\Exception;
-use App\Model\RemoteRequestActionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ApiLimitExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class ApiLimitExceededException extends Exception implements ApiLimitExceptionInterface
 {

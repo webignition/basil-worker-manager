@@ -9,7 +9,6 @@ use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\RemoteRequestActionInterface;
 use App\Services\MachineProvider\MachineProvider;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
@@ -25,6 +24,7 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineProviderTest extends AbstractBaseFunctionalTest

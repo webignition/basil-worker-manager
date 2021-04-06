@@ -8,7 +8,6 @@ use App\Controller\MachineController;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
-use App\Model\RemoteRequestActionInterface;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +18,7 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFail
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class MachineControllerTest extends AbstractBaseFunctionalTest
 {

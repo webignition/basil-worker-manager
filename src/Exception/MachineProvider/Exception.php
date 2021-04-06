@@ -2,7 +2,8 @@
 
 namespace App\Exception\MachineProvider;
 
-use App\Model\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class Exception extends \Exception implements ExceptionInterface
 {

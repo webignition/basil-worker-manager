@@ -6,13 +6,13 @@ namespace App\Tests\Functional\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\CurlException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
-use App\Exception\MachineProvider\ExceptionInterface;
-use App\Model\RemoteRequestActionInterface;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\RequestInterface;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class ExceptionFactoryTest extends AbstractBaseFunctionalTest
 {

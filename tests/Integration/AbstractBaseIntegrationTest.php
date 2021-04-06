@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration;
 
-use App\Entity\Machine;
 use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 
 abstract class AbstractBaseIntegrationTest extends AbstractBaseFunctionalTest
 {

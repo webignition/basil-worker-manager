@@ -2,8 +2,8 @@
 
 namespace App\Services\RemoteRequestRetryDecider;
 
-use App\Model\RemoteRequestActionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 interface RemoteRequestRetryDeciderInterface
 {

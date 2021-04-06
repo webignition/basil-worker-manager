@@ -90,10 +90,10 @@ services:
             $deciders:
                 - '@App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider'
             $retryLimits:
-              !php/const App\Model\RemoteRequestActionInterface::ACTION_CREATE: '%create_retry_limit%'
-              !php/const App\Model\RemoteRequestActionInterface::ACTION_GET: '%get_retry_limit%'
-              !php/const App\Model\RemoteRequestActionInterface::ACTION_EXISTS: '%exists_retry_limit%'
-              !php/const App\Model\RemoteRequestActionInterface::ACTION_DELETE: '%delete_retry_limit%'
+              !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_CREATE: '%create_retry_limit%'
+              !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_GET: '%get_retry_limit%'
+              !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_EXISTS: '%exists_retry_limit%'
+              !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_DELETE: '%delete_retry_limit%'
 
 
     app.message_dispatcher.exists.configuration:

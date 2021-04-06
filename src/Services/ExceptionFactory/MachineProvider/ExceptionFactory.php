@@ -2,9 +2,9 @@
 
 namespace App\Services\ExceptionFactory\MachineProvider;
 
-use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\UnknownException;
-use App\Model\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class ExceptionFactory
 {

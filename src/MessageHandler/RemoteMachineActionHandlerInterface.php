@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Model\RemoteRequestOutcomeInterface;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 interface RemoteMachineActionHandlerInterface

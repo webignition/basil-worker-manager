@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\Machine;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
 use App\Message\MachineExists;
@@ -16,7 +15,6 @@ use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineProvider;
@@ -29,6 +27,8 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;

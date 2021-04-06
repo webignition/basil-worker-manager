@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
@@ -12,19 +11,18 @@ use App\MessageDispatcher\MachineRequestMessageDispatcher;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
-use App\Services\CreateFailureFactory;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\MachineStore;
 use App\Services\RemoteRequestRetryDecider;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
     public function __construct(
-        EntityManagerInterface $entityManager,
         MachineProvider $machineProvider,
         RemoteRequestRetryDecider $retryDecider,
         ExceptionLogger $exceptionLogger,
@@ -33,7 +31,6 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         private CreateFailureFactory $createFailureFactory,
     ) {
         parent::__construct(
-            $entityManager,
             $machineProvider,
             $retryDecider,
             $exceptionLogger,

@@ -9,7 +9,6 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
-use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\RemoteRequestActionInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -19,6 +18,7 @@ use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use Psr\Http\Message\ResponseInterface;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest

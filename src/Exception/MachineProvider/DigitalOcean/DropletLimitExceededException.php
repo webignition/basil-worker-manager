@@ -3,9 +3,9 @@
 namespace App\Exception\MachineProvider\DigitalOcean;
 
 use App\Exception\MachineProvider\Exception;
-use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use DigitalOceanV2\Exception\ValidationFailedException;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
 
 class DropletLimitExceededException extends Exception implements UnprocessableRequestExceptionInterface
 {

@@ -2,11 +2,11 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Model\RemoteRequestActionInterface;
 use App\Model\RemoteRequestActionInterface as Action;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 

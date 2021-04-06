@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Services;
 
-use App\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;

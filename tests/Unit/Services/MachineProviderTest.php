@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Services;
 
-use App\Entity\Machine;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use App\Services\MachineProvider\MachineProvider;
 use PHPUnit\Framework\TestCase;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineProviderTest extends TestCase

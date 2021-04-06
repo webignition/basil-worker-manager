@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\MachineController;
-use App\Entity\Machine;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Model\RemoteRequestActionInterface;
-use App\Services\CreateFailureFactory;
-use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 

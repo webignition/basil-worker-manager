@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Entity\CreateFailure;
-use App\Entity\Machine;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
@@ -20,7 +18,6 @@ use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineProvider;
@@ -33,6 +30,9 @@ use DigitalOceanV2\Exception\RuntimeException;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
@@ -145,7 +145,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $createFailure = $this->entityManager->find(CreateFailure::class, $this->machine->getId());
         self::assertEquals(
-            CreateFailure::create(
+            new CreateFailure(
                 self::MACHINE_ID,
                 CreateFailure::CODE_UNSUPPORTED_PROVIDER,
                 CreateFailure::REASON_UNSUPPORTED_PROVIDER
@@ -251,7 +251,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
                     new VendorApiLimitExceededExceptionAlias()
                 ),
                 'retryCount' => 0,
-                'expectedCreateFailure' => CreateFailure::create(
+                'expectedCreateFailure' => new CreateFailure(
                     self::MACHINE_ID,
                     CreateFailure::CODE_API_LIMIT_EXCEEDED,
                     CreateFailure::REASON_API_LIMIT_EXCEEDED,
@@ -267,7 +267,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
                     new RuntimeException('Internal Server Error', 500)
                 ),
                 'retryCount' => 3,
-                'expectedCreateFailure' => CreateFailure::create(
+                'expectedCreateFailure' => new CreateFailure(
                     self::MACHINE_ID,
                     CreateFailure::CODE_HTTP_ERROR,
                     CreateFailure::REASON_HTTP_ERROR,

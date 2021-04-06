@@ -71,7 +71,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                 }
             })->withFailureHandler(
                 function (MachineInterface $machine, ExceptionInterface | UnsupportedProviderException $exception) {
-                    $machine = $machine->setState(MachineInterface::STATE_CREATE_FAILED);
+                    $machine->setState(MachineInterface::STATE_CREATE_FAILED);
                     $this->machineStore->store($machine);
 
                     $this->createFailureFactory->create($machine->getId(), $exception);

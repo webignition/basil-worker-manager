@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "84c6b3151c8ad80394b2a3b6cd5d1013",
+    "content-hash": "07d1c759c919740ca3123f836bd963bd",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -6080,16 +6080,16 @@
         },
         {
             "name": "webignition/basil-worker-manager-interfaces",
-            "version": "0.6",
+            "version": "0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/basil-worker-manager-interfaces.git",
-                "reference": "4945bafe28253878e78ca404c0d9cb7f58c59961"
+                "reference": "18262d3e13f4e34a32a3b00204742fdb13551f7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/basil-worker-manager-interfaces/zipball/4945bafe28253878e78ca404c0d9cb7f58c59961",
-                "reference": "4945bafe28253878e78ca404c0d9cb7f58c59961",
+                "url": "https://api.github.com/repos/webignition/basil-worker-manager-interfaces/zipball/18262d3e13f4e34a32a3b00204742fdb13551f7b",
+                "reference": "18262d3e13f4e34a32a3b00204742fdb13551f7b",
                 "shasum": ""
             },
             "require": {
@@ -6121,9 +6121,9 @@
             "homepage": "https://github.com/webignition/basil-worker-manager-interfaces",
             "support": {
                 "issues": "https://github.com/webignition/basil-worker-manager-interfaces/issues",
-                "source": "https://github.com/webignition/basil-worker-manager-interfaces/tree/0.6"
+                "source": "https://github.com/webignition/basil-worker-manager-interfaces/tree/0.7"
             },
-            "time": "2021-04-06T13:54:53+00:00"
+            "time": "2021-04-06T15:06:43+00:00"
         },
         {
             "name": "webignition/symfony-messenger-json-message-serializer-bundle",

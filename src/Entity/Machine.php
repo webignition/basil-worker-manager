@@ -82,11 +82,9 @@ class Machine implements MachineInterface
         return $this->remote_id;
     }
 
-    public function setRemoteId(int $remoteId): MachineInterface
+    public function setRemoteId(int $remoteId): void
     {
         $this->remote_id = $remoteId;
-
-        return $this;
     }
 
     /**
@@ -113,11 +111,9 @@ class Machine implements MachineInterface
     /**
      * @param MachineInterface::STATE_* $state
      */
-    public function setState(string $state): self
+    public function setState(string $state): void
     {
         $this->state = $state;
-
-        return $this;
     }
 
     /**
@@ -128,11 +124,9 @@ class Machine implements MachineInterface
         return $this->ip_addresses;
     }
 
-    public function setIpAddresses(array $ipAddresses): MachineInterface
+    public function setIpAddresses(array $ipAddresses): void
     {
         $this->ip_addresses = $ipAddresses;
-
-        return $this;
     }
 
     /**

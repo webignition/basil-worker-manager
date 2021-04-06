@@ -24,7 +24,7 @@
         "symfony/proxy-manager-bridge": "5.2.*",
         "symfony/yaml": "5.2.*",
         "toin0u/digitalocean-v2": "^4.2.1",
-        "webignition/basil-worker-manager-interfaces": "^0.6.0",
+        "webignition/basil-worker-manager-interfaces": ">=0.7,<1",
         "webignition/symfony-messenger-json-message-serializer-bundle": "^0.2.0"
     },
     "require-dev": {

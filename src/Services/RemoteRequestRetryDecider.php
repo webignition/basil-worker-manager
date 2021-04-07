@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Message\RemoteMachineRequestInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class RemoteRequestRetryDecider
 {
@@ -15,27 +14,16 @@ class RemoteRequestRetryDecider
     private array $deciders;
 
     /**
-     * @var array<RemoteRequestActionInterface::ACTION_*, int>
-     */
-    private array $retryLimits = [];
-
-    /**
      * @param RemoteRequestRetryDeciderInterface[] $deciders
-     * @param array<RemoteRequestActionInterface::ACTION_*, int> $retryLimits
+     * @param array<class-string, int> $retryLimits
      */
     public function __construct(
         array $deciders,
-        array $retryLimits,
+        private array $retryLimits,
     ) {
         $this->deciders = array_filter($deciders, function ($item) {
             return $item instanceof RemoteRequestRetryDeciderInterface;
         });
-
-        foreach ($retryLimits as $key => $value) {
-            if (in_array($key, RemoteRequestActionInterface::ALL)) {
-                $this->retryLimits[$key] = $value;
-            }
-        }
     }
 
     /**
@@ -43,13 +31,11 @@ class RemoteRequestRetryDecider
      */
     public function decide(string $provider, RemoteMachineRequestInterface $request, \Throwable $exception): bool
     {
-        $action = $request->getAction();
-
-        $retryLimit = $this->retryLimits[$action] ?? 0;
+        $retryLimit = $this->retryLimits[$request::class] ?? 0;
 
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {
-                return $request->getRetryCount() < $retryLimit && $decider->decide($action, $exception);
+                return $request->getRetryCount() < $retryLimit && $decider->decide($request->getAction(), $exception);
             }
         }
 

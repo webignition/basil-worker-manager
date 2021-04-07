@@ -6,6 +6,7 @@ namespace App\MessageDispatcher;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 
 class MessageDispatcher implements MessageBusInterface
 {
@@ -26,6 +27,12 @@ class MessageDispatcher implements MessageBusInterface
         });
     }
 
+    /**
+     * @param object|Envelope $message
+     * @param StampInterface[] $stamps
+     *
+     * @throws NonDispatchableMessageExceptionInterface
+     */
     public function dispatch($message, array $stamps = []): Envelope
     {
         $envelope = Envelope::wrap($message, $stamps);

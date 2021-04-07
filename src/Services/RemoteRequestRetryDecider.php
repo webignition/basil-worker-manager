@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Message\RemoteMachineRequestInterface;
+use App\Message\RemoteMachineMessageInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
@@ -27,7 +27,7 @@ class RemoteRequestRetryDecider
     /**
      * @param ProviderInterface::NAME_* $provider
      */
-    public function decide(string $provider, RemoteMachineRequestInterface $request, \Throwable $exception): bool
+    public function decide(string $provider, RemoteMachineMessageInterface $request, \Throwable $exception): bool
     {
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {

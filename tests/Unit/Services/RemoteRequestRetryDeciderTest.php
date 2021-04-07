@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services;
 
 use App\Message\GetMachine;
-use App\Message\RemoteMachineRequestInterface;
+use App\Message\RemoteMachineMessageInterface;
 use App\Services\RemoteRequestRetryDecider;
 use App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -23,7 +23,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
     public function testDecide(
         RemoteRequestRetryDecider $decider,
         string $provider,
-        RemoteMachineRequestInterface $request,
+        RemoteMachineMessageInterface $request,
         \Throwable $exception,
         bool $expectedDecision
     ): void {

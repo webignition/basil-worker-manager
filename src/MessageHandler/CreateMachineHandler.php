@@ -13,7 +13,6 @@ use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
-use App\Services\RemoteRequestRetryCounter;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
@@ -26,7 +25,6 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
     public function __construct(
         MachineProvider $machineProvider,
         RemoteRequestRetryDecider $retryDecider,
-        RemoteRequestRetryCounter $retryCounter,
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
         MessageDispatcher $dispatcher,
@@ -35,7 +33,6 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         parent::__construct(
             $machineProvider,
             $retryDecider,
-            $retryCounter,
             $exceptionLogger,
             $machineStore,
             $dispatcher

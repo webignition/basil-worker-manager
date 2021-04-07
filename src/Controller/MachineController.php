@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\MessageDispatcher\MessageDispatcher;
+use App\MessageDispatcher\NonDispatchableMessageExceptionInterface;
 use App\Response\BadMachineCreateRequestResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,10 @@ class MachineController
 
         $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
 
-        $messageDispatcher->dispatch(new CreateMachine($id));
+        try {
+            $messageDispatcher->dispatch(new CreateMachine($id));
+        } catch (NonDispatchableMessageExceptionInterface) {
+        }
 
         return new Response('', 202);
     }
@@ -70,7 +74,10 @@ class MachineController
             return new Response('', 404);
         }
 
-        $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));
+        try {
+            $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));
+        } catch (NonDispatchableMessageExceptionInterface) {
+        }
 
         return new Response('', 202);
     }

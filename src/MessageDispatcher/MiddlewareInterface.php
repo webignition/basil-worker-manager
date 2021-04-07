@@ -8,5 +8,8 @@ use Symfony\Component\Messenger\Envelope;
 
 interface MiddlewareInterface
 {
+    /**
+     * @throws NonDispatchableMessageExceptionInterface
+     */
     public function __invoke(Envelope $envelope): Envelope;
 }

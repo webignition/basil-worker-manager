@@ -90,7 +90,13 @@ services:
             $deciders:
                 - '@App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider'
 
-    App\Services\RemoteRequestRetryCounter:
+    App\MessageDispatcher\DelayedMessageMiddleware:
+        arguments:
+            $delays:
+                App\Message\CheckMachineIsActive: '%machine_is_active_dispatch_delay%'
+                App\Message\MachineExists: '%machine_exists_dispatch_delay%'
+
+    App\MessageDispatcher\RetryByLimitMiddleware:
         arguments:
             $retryLimits:
                 App\Message\CreateMachine: '%create_retry_limit%'
@@ -98,16 +104,11 @@ services:
                 App\Message\DeleteMachine: '%delete_retry_limit%'
                 App\Message\MachineExists: '%exists_retry_limit%'
 
-    App\MessageDispatcher\DelayedMessageMiddleware:
-        arguments:
-            $delays:
-                App\Message\CheckMachineIsActive: '%machine_is_active_dispatch_delay%'
-                App\Message\MachineExists: '%machine_exists_dispatch_delay%'
-
     App\MessageDispatcher\MessageDispatcher:
         arguments:
             $middleware:
                 - '@App\MessageDispatcher\DelayedMessageMiddleware'
+                - '@App\MessageDispatcher\RetryByLimitMiddleware'
 
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:

@@ -6,7 +6,7 @@ namespace App\Message;
 
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
-interface RemoteMachineRequestInterface extends MachineRequestInterface, RetryableRequestInterface
+interface RemoteMachineMessageInterface extends MachineRequestInterface, RetryableMessageInterface
 {
     /**
      * @return RemoteRequestActionInterface::ACTION_*

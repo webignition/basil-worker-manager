@@ -41,21 +41,13 @@ abstract class AbstractRemoteMachineRequestHandler
 
         $actionHandler->onBeforeRequest($machine);
 
+        $outcome = RemoteRequestOutcome::invalid();
+        $shouldRetry = false;
         $lastException = null;
 
         try {
             $outcome = $actionHandler->performAction($machine);
             $outcome = $actionHandler->onOutcome($outcome);
-
-            if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome) {
-                $this->dispatcher->dispatch($message->incrementRetryCount());
-            }
-
-            if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
-                $actionHandler->onSuccess($machine, $outcome);
-            }
-
-            return $outcome;
         } catch (ExceptionInterface $exception) {
             $isRetryLimitReached = $this->retryCounter->isLimitReached($message);
 
@@ -71,18 +63,22 @@ abstract class AbstractRemoteMachineRequestHandler
             $shouldRetry = false;
         }
 
-        if ($shouldRetry) {
+        if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome || $shouldRetry) {
             $this->dispatcher->dispatch($message->incrementRetryCount());
 
             return RemoteRequestOutcome::retrying();
         }
 
-        if ($lastException instanceof \Throwable) {
-            $this->exceptionLogger->log($lastException);
+        if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
+            $actionHandler->onSuccess($machine, $outcome);
         }
 
-        $actionHandler->onFailure($machine, $lastException);
+        if ($lastException instanceof \Throwable) {
+            $this->exceptionLogger->log($lastException);
+            $actionHandler->onFailure($machine, $lastException);
+            $outcome = new RemoteRequestFailure($lastException);
+        }
 
-        return new RemoteRequestFailure($lastException);
+        return $outcome;
     }
 }

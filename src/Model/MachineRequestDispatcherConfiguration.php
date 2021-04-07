@@ -7,7 +7,6 @@ class MachineRequestDispatcherConfiguration
     public function __construct(
         private int $dispatchDelayInSeconds = 0,
         private ?int $initialDispatchDelayInSeconds = null,
-        private bool $enabled = true,
     ) {
     }
 
@@ -19,10 +18,5 @@ class MachineRequestDispatcherConfiguration
     public function getInitialDispatchDelayInSeconds(): ?int
     {
         return $this->initialDispatchDelayInSeconds;
-    }
-
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
     }
 }

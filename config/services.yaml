@@ -95,23 +95,11 @@ services:
               !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_EXISTS: '%exists_retry_limit%'
               !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_DELETE: '%delete_retry_limit%'
 
-
-    app.message_dispatcher.exists.configuration:
-        class: App\Model\MachineRequestDispatcherConfiguration
-        arguments:
-            $dispatchDelayInSeconds: '%machine_exists_dispatch_delay%'
-            $initialDispatchDelayInSeconds: '%machine_exists_initial_dispatch_delay%'
-
-    app.message_dispatcher.machine_is_active.configuration:
-        class: App\Model\MachineRequestDispatcherConfiguration
-        arguments:
-            $dispatchDelayInSeconds: '%machine_is_active_dispatch_delay%'
-
     App\MessageDispatcher\MachineRequestMessageDispatcher:
         arguments:
-            $configurations:
-                App\Message\MachineExists: '@app.message_dispatcher.exists.configuration'
-                App\Message\CheckMachineIsActive: '@app.message_dispatcher.machine_is_active.configuration'
+            $delays:
+                App\Message\CheckMachineIsActive: '%machine_is_active_dispatch_delay%'
+                App\Message\MachineExists: '%machine_exists_dispatch_delay%'
 
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:

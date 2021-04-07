@@ -85,15 +85,9 @@ class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
                 'message' => new GetMachine(self::MACHINE_ID),
                 'expectedDelayStamp' => null,
             ],
-            'exists, first attempt' => [
+            'exists' => [
                 'message' => new MachineExists(self::MACHINE_ID),
-                'expectedDelayStamp' => new DelayStamp(1000),
-            ],
-            'exists, not first attempt' => [
-                'message' => (new MachineExists(self::MACHINE_ID))
-                    ->incrementRetryCount()
-                    ->incrementRetryCount(),
-                'expectedDelayStamp' => new DelayStamp(10000),
+                'expectedDelayStamp' => new DelayStamp(5000),
             ],
             'check machine is active' => [
                 'message' => new CheckMachineIsActive(self::MACHINE_ID),

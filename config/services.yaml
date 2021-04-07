@@ -89,6 +89,9 @@ services:
         arguments:
             $deciders:
                 - '@App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider'
+
+    App\Services\RemoteRequestRetryCounter:
+        arguments:
             $retryLimits:
                 App\Message\CreateMachine: '%create_retry_limit%'
                 App\Message\GetMachine: '%get_retry_limit%'

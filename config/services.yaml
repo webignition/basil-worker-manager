@@ -95,11 +95,16 @@ services:
               !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_EXISTS: '%exists_retry_limit%'
               !php/const webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface::ACTION_DELETE: '%delete_retry_limit%'
 
-    App\MessageDispatcher\MachineRequestMessageDispatcher:
+    App\MessageDispatcher\DelayedMessageMiddleware:
         arguments:
             $delays:
                 App\Message\CheckMachineIsActive: '%machine_is_active_dispatch_delay%'
                 App\Message\MachineExists: '%machine_exists_dispatch_delay%'
+
+    App\MessageDispatcher\MessageDispatcher:
+        arguments:
+            $middleware:
+                - '@App\MessageDispatcher\DelayedMessageMiddleware'
 
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:

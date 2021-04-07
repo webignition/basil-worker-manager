@@ -9,7 +9,7 @@ use App\Message\CreateMachine;
 use App\Message\GetMachine;
 use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\MessageDispatcher\MessageDispatcher;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -19,21 +19,21 @@ use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
-class MachineRequestMessageDispatcherTest extends AbstractBaseFunctionalTest
+class MessageDispatcherTest extends AbstractBaseFunctionalTest
 {
     use MockeryPHPUnitIntegration;
 
     private const MACHINE_ID = 'id';
 
-    private MachineRequestMessageDispatcher $dispatcher;
+    private MessageDispatcher $dispatcher;
     private MessengerAsserter $messengerAsserter;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dispatcher = self::$container->get(MachineRequestMessageDispatcher::class);
-        \assert($dispatcher instanceof MachineRequestMessageDispatcher);
+        $dispatcher = self::$container->get(MessageDispatcher::class);
+        \assert($dispatcher instanceof MessageDispatcher);
         $this->dispatcher = $dispatcher;
 
         $machineStore = self::$container->get(MachineStore::class);

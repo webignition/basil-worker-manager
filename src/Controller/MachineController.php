@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\MessageDispatcher\MessageDispatcher;
 use App\Response\BadMachineCreateRequestResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,7 @@ class MachineController
     public function create(
         string $id,
         MachineStore $machineStore,
-        MachineRequestMessageDispatcher $messageDispatcher,
+        MessageDispatcher $messageDispatcher,
     ): Response {
         if ($machineStore->find($id) instanceof MachineInterface) {
             return BadMachineCreateRequestResponse::createIdTakenResponse();
@@ -63,7 +63,7 @@ class MachineController
     public function delete(
         string $id,
         MachineStore $machineStore,
-        MachineRequestMessageDispatcher $messageDispatcher,
+        MessageDispatcher $messageDispatcher,
     ): Response {
         $machine = $machineStore->find($id);
         if (false === $machine instanceof MachineInterface) {

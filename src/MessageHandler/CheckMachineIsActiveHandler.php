@@ -6,7 +6,7 @@ namespace App\MessageHandler;
 
 use App\Message\CheckMachineIsActive;
 use App\Message\GetMachine;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\MessageDispatcher\MessageDispatcher;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
@@ -15,7 +15,7 @@ class CheckMachineIsActiveHandler implements MessageHandlerInterface
 {
     public function __construct(
         private MachineStore $machineStore,
-        private MachineRequestMessageDispatcher $dispatcher,
+        private MessageDispatcher $dispatcher,
     ) {
     }
 

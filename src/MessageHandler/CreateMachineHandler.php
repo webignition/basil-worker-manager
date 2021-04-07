@@ -7,7 +7,7 @@ namespace App\MessageHandler;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
-use App\MessageDispatcher\MachineRequestMessageDispatcher;
+use App\MessageDispatcher\MessageDispatcher;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
@@ -27,7 +27,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         RemoteRequestRetryDecider $retryDecider,
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
-        MachineRequestMessageDispatcher $dispatcher,
+        MessageDispatcher $dispatcher,
         private CreateFailureFactory $createFailureFactory,
     ) {
         parent::__construct(

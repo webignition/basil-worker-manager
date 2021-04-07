@@ -35,10 +35,6 @@ class MachineRequestMessageDispatcher
     public function dispatch(MachineRequestInterface $message): void
     {
         $configuration = $this->configurations[$message::class] ?? new DispatcherConfiguration();
-        if (false === $configuration->isEnabled()) {
-            return;
-        }
-
         $stamps = [];
         $dispatchDelay = $this->getDispatchDelay($configuration, $message);
 

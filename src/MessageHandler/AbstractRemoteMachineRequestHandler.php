@@ -12,6 +12,7 @@ use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineProvider\MachineProvider;
+use App\Services\RemoteRequestRetryCounter;
 use App\Services\RemoteRequestRetryDecider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
@@ -22,6 +23,7 @@ abstract class AbstractRemoteMachineRequestHandler
     public function __construct(
         protected MachineProvider $machineProvider,
         protected RemoteRequestRetryDecider $retryDecider,
+        protected RemoteRequestRetryCounter $retryCounter,
         protected ExceptionLogger $exceptionLogger,
         protected MachineStore $machineStore,
         protected MessageDispatcher $dispatcher,
@@ -55,7 +57,9 @@ abstract class AbstractRemoteMachineRequestHandler
 
             return $outcome;
         } catch (ExceptionInterface $exception) {
-            $shouldRetry = $this->retryDecider->decide(
+            $isRetryLimitReached = $this->retryCounter->isLimitReached($message);
+
+            $shouldRetry = false === $isRetryLimitReached && $this->retryDecider->decide(
                 $machine->getProvider(),
                 $message,
                 $exception->getRemoteException()

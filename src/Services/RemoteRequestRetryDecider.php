@@ -15,11 +15,9 @@ class RemoteRequestRetryDecider
 
     /**
      * @param RemoteRequestRetryDeciderInterface[] $deciders
-     * @param array<class-string, int> $retryLimits
      */
     public function __construct(
         array $deciders,
-        private array $retryLimits,
     ) {
         $this->deciders = array_filter($deciders, function ($item) {
             return $item instanceof RemoteRequestRetryDeciderInterface;
@@ -31,11 +29,9 @@ class RemoteRequestRetryDecider
      */
     public function decide(string $provider, RemoteMachineRequestInterface $request, \Throwable $exception): bool
     {
-        $retryLimit = $this->retryLimits[$request::class] ?? 0;
-
         foreach ($this->deciders as $decider) {
             if ($decider->handles($provider)) {
-                return $request->getRetryCount() < $retryLimit && $decider->decide($request->getAction(), $exception);
+                return $decider->decide($request->getAction(), $exception);
             }
         }
 

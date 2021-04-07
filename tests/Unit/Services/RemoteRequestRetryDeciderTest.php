@@ -37,53 +37,25 @@ class RemoteRequestRetryDeciderTest extends TestCase
     {
         return [
             'no deciders' => [
-                'decider' => new RemoteRequestRetryDecider([], []),
+                'decider' => new RemoteRequestRetryDecider([]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'request' => new GetMachine('id'),
                 'exception' => new \Exception(),
                 'expectedDecision' => false,
             ],
-            'has decider, decider: false, retry limit not reached' => [
-                'decider' => new RemoteRequestRetryDecider(
-                    [
-                        new DigitalOceanRemoteRequestRetryDecider(),
-                    ],
-                    [
-                        GetMachine::class => 10,
-                    ]
-                ),
+            'has decider, decider: false' => [
+                'decider' => new RemoteRequestRetryDecider([new DigitalOceanRemoteRequestRetryDecider()]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'request' => new GetMachine('id'),
                 'exception' => new ApiLimitExceededException(),
                 'expectedDecision' => false,
             ],
-            'has decider, decider: true, retry limit not reached' => [
-                'decider' => new RemoteRequestRetryDecider(
-                    [
-                        new DigitalOceanRemoteRequestRetryDecider(),
-                    ],
-                    [
-                        GetMachine::class => 10,
-                    ]
-                ),
+            'has decider, decider: true' => [
+                'decider' => new RemoteRequestRetryDecider([new DigitalOceanRemoteRequestRetryDecider()]),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
                 'request' => new GetMachine('id'),
                 'exception' => new InvalidArgumentException(),
                 'expectedDecision' => true,
-            ],
-            'has decider, decider: true, retry limit reached' => [
-                'decider' => new RemoteRequestRetryDecider(
-                    [
-                        new DigitalOceanRemoteRequestRetryDecider(),
-                    ],
-                    [
-                        GetMachine::class => 1,
-                    ]
-                ),
-                'provider' => ProviderInterface::NAME_DIGITALOCEAN,
-                'request' => (new GetMachine('id'))->incrementRetryCount(),
-                'exception' => new InvalidArgumentException(),
-                'expectedDecision' => false,
             ],
         ];
     }

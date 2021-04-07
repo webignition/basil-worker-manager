@@ -12,7 +12,6 @@ use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class RemoteRequestRetryDeciderTest extends TestCase
 {
@@ -50,7 +49,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
                         new DigitalOceanRemoteRequestRetryDecider(),
                     ],
                     [
-                        RemoteRequestActionInterface::ACTION_GET => 10,
+                        GetMachine::class => 10,
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
@@ -64,7 +63,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
                         new DigitalOceanRemoteRequestRetryDecider(),
                     ],
                     [
-                        RemoteRequestActionInterface::ACTION_GET => 10,
+                        GetMachine::class => 10,
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,
@@ -78,7 +77,7 @@ class RemoteRequestRetryDeciderTest extends TestCase
                         new DigitalOceanRemoteRequestRetryDecider(),
                     ],
                     [
-                        RemoteRequestActionInterface::ACTION_GET => 1,
+                        GetMachine::class => 1,
                     ]
                 ),
                 'provider' => ProviderInterface::NAME_DIGITALOCEAN,

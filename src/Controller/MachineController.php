@@ -4,8 +4,6 @@ namespace App\Controller;
 
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
-use App\MessageDispatcher\MessageDispatcher;
-use App\MessageDispatcher\NonDispatchableMessageExceptionInterface;
 use App\Response\BadMachineCreateRequestResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +14,7 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\CreateFailur
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class MachineController
 {
@@ -34,10 +33,7 @@ class MachineController
 
         $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
 
-        try {
-            $messageDispatcher->dispatch(new CreateMachine($id));
-        } catch (NonDispatchableMessageExceptionInterface) {
-        }
+        $messageDispatcher->dispatch(new CreateMachine($id));
 
         return new Response('', 202);
     }
@@ -74,10 +70,7 @@ class MachineController
             return new Response('', 404);
         }
 
-        try {
-            $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));
-        } catch (NonDispatchableMessageExceptionInterface) {
-        }
+        $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));
 
         return new Response('', 202);
     }

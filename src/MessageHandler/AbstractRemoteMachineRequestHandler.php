@@ -6,8 +6,6 @@ namespace App\MessageHandler;
 
 use App\Exception\UnsupportedProviderException;
 use App\Message\RemoteMachineMessageInterface;
-use App\MessageDispatcher\MessageDispatcher;
-use App\MessageDispatcher\NonDispatchableMessageExceptionInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -17,6 +15,7 @@ use App\Services\RemoteRequestRetryDecider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 abstract class AbstractRemoteMachineRequestHandler
 {
@@ -61,11 +60,11 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome || $shouldRetry) {
-            try {
-                $this->dispatcher->dispatch($message->incrementRetryCount());
+            $envelope = $this->dispatcher->dispatch($message->incrementRetryCount());
+
+            if (MessageDispatcher::isDispatchable($envelope)) {
                 $outcome = RemoteRequestOutcome::retrying();
                 $lastException = null;
-            } catch (NonDispatchableMessageExceptionInterface) {
             }
         }
 

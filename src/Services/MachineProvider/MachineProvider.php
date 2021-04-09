@@ -2,6 +2,8 @@
 
 namespace App\Services\MachineProvider;
 
+use App\Exception\MachineProvider\RemoteMachineNotFoundException;
+use App\Exception\MachineProvider\RemoteMachineNotFoundExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
@@ -47,6 +49,7 @@ class MachineProvider
     /**
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
+     * @throws RemoteMachineNotFoundExceptionInterface
      */
     public function get(MachineInterface $machine): RemoteMachineInterface
     {

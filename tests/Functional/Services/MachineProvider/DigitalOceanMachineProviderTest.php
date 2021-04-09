@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\MachineProvider;
 
+use App\Exception\MachineProvider\RemoteMachineNotFoundException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\MachineProvider\DigitalOceanMachineProvider;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -105,6 +106,15 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         $remoteMachine = $this->machineProvider->get($this->machine);
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
+    }
+
+    public function testGetRemoteMachineDoesNotExist(): void
+    {
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
+
+        self::expectExceptionObject(new RemoteMachineNotFoundException($this->machine));
+
+        $this->machineProvider->get($this->machine);
     }
 
     public function testRemoveSuccess(): void

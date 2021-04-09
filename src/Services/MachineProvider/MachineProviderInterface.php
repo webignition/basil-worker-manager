@@ -2,6 +2,7 @@
 
 namespace App\Services\MachineProvider;
 
+use App\Exception\MachineProvider\RemoteMachineNotFoundExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
@@ -24,6 +25,9 @@ interface MachineProviderInterface
      */
     public function remove(MachineInterface $machine): void;
 
+    /**
+     * @throws RemoteMachineNotFoundExceptionInterface
+     */
     public function get(MachineInterface $machine): RemoteMachineInterface;
 
     public function exists(MachineInterface $machine): bool;

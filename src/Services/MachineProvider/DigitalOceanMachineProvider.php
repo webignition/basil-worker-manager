@@ -2,6 +2,8 @@
 
 namespace App\Services\MachineProvider;
 
+use App\Exception\MachineProvider\RemoteMachineNotFoundException;
+use App\Exception\MachineProvider\RemoteMachineNotFoundExceptionInterface;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -60,15 +62,16 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
 
     /**
      * @throws VendorExceptionInterface
+     * @throws RemoteMachineNotFoundExceptionInterface
      */
     public function get(MachineInterface $machine): RemoteMachineInterface
     {
         $droplets = $this->dropletApi->getAll($machine->getId());
-        $dropletEntity = 0 === count($droplets)
-            ? new DropletEntity([])
-            : $droplets[0];
+        if (1 !== count($droplets)) {
+            throw new RemoteMachineNotFoundException($machine);
+        }
 
-        return new RemoteMachine($dropletEntity);
+        return new RemoteMachine($droplets[0]);
     }
 
     /**

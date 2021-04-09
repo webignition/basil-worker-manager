@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services\MachineProvider;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\RemoteMachineNotFoundException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\MachineProvider\MachineProvider;
@@ -85,7 +86,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
+     * @dataProvider remoteMachineRequestReturnsNotFoundDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -143,16 +144,16 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
+     * @dataProvider remoteMachineRequestReturnsNotFoundDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
-     * @param \Exception $expectedRemoveException
+     * @param \Exception $expectedRemoteException
      */
     public function testGetThrowsException(
         ResponseInterface $apiResponse,
         string $expectedExceptionClass,
-        \Exception $expectedRemoveException
+        \Exception $expectedRemoteException
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
@@ -161,8 +162,17 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
             RemoteRequestActionInterface::ACTION_GET,
             $apiResponse,
             $expectedExceptionClass,
-            $expectedRemoveException
+            $expectedRemoteException
         );
+    }
+
+    public function testGetRemoteMachineNotFound(): void
+    {
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
+
+        self::expectExceptionObject(new RemoteMachineNotFoundException($this->machine));
+
+        $this->machineProvider->get($this->machine);
     }
 
     public function testDeleteSuccess(): void
@@ -177,7 +187,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
+     * @dataProvider remoteMachineRequestReturnsNotFoundDataProvider
      *
      * @param class-string $expectedExceptionClass
      */
@@ -307,7 +317,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function remoteMachineDoesNotExistDataProvider(): array
+    public function remoteMachineRequestReturnsNotFoundDataProvider(): array
     {
         return [
             'remote machine does not exist' => [

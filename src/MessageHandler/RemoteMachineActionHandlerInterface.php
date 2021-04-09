@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Exception\MachineProvider\RemoteMachineNotFoundExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Model\RemoteRequestOutcomeInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
@@ -14,6 +15,7 @@ interface RemoteMachineActionHandlerInterface
     /**
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface
+     * @throws RemoteMachineNotFoundExceptionInterface
      */
     public function performAction(MachineInterface $machine): RemoteRequestOutcomeInterface;
 

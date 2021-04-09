@@ -39,7 +39,8 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     {
         $createArguments = new DropletApiCreateCallArguments(
             sprintf('%s-%s', $this->prefix, $machine->getName()),
-            $this->dropletConfiguration
+            $this->dropletConfiguration,
+            $machine->getId()
         );
 
         $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());

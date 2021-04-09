@@ -50,4 +50,39 @@ class HttpResponseFactory
             'droplet' => $dropletData,
         ]);
     }
+
+    /**
+     * @param DropletEntity[] $collection
+     */
+    public static function fromDropletEntityCollection(array $collection): ResponseInterface
+    {
+        $collectionData = [];
+
+        foreach ($collection as $dropletEntity) {
+            $dropletData = $dropletEntity->toArray();
+            if (array_key_exists('networks', $dropletData)) {
+                $dropletNetworksData = $dropletData['networks'];
+                $networksData = [];
+
+                foreach ($dropletNetworksData as $networkEntity) {
+                    if ($networkEntity instanceof NetworkEntity) {
+                        $networkVersionKey = 'v' . (string) $networkEntity->version;
+                        if (!array_key_exists($networkVersionKey, $networksData)) {
+                            $networksData[$networkVersionKey] = [];
+                        }
+
+                        $networksData[$networkVersionKey][] = $networkEntity->toArray();
+                    }
+                }
+
+                $dropletData['networks'] = $networksData;
+            }
+
+            $collectionData[] = $dropletData;
+        }
+
+        return self::createJsonResponse([
+            'droplets' => $collectionData,
+        ]);
+    }
 }

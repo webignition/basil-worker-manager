@@ -63,9 +63,12 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function get(MachineInterface $machine): RemoteMachineInterface
     {
-        return new RemoteMachine(
-            $this->dropletApi->getById((int)$machine->getRemoteId())
-        );
+        $droplets = $this->dropletApi->getAll($machine->getId());
+        $dropletEntity = 0 === count($droplets)
+            ? new DropletEntity([])
+            : $droplets[0];
+
+        return new RemoteMachine($dropletEntity);
     }
 
     /**

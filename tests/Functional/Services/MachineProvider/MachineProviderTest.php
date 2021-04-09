@@ -32,6 +32,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     private MachineProvider $machineProvider;
     private MachineInterface $machine;
     private MockHandler $mockHandler;
+    private DropletEntity $dropletEntity;
 
     protected function setUp(): void
     {
@@ -51,13 +52,35 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         if ($mockHandler instanceof MockHandler) {
             $this->mockHandler = $mockHandler;
         }
+
+        $remoteId = 123;
+        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
+
+        $dropletData = [
+            'id' => $remoteId,
+            'networks' => (object) [
+                'v4' => [
+                    (object) [
+                        'ip_address' => $ipAddresses[0],
+                        'type' => 'public',
+                    ],
+                    (object) [
+                        'ip_address' => $ipAddresses[1],
+                        'type' => 'public',
+                    ],
+                ],
+            ],
+        ];
+
+        $this->dropletEntity = new DropletEntity($dropletData);
     }
 
     public function testCreateSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
-            return $this->machineProvider->create($machine);
-        });
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($this->dropletEntity));
+        $remoteMachine = $this->machineProvider->create($this->machine);
+
+        self::assertEquals(new RemoteMachine($this->dropletEntity), $remoteMachine);
     }
 
     /**
@@ -112,9 +135,10 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
     public function testGetSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
-            return $this->machineProvider->get($machine);
-        });
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$this->dropletEntity]));
+        $remoteMachine = $this->machineProvider->get($this->machine);
+
+        self::assertEquals(new RemoteMachine($this->dropletEntity), $remoteMachine);
     }
 
     /**
@@ -171,35 +195,6 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
             $expectedExceptionClass,
             $expectedRemoveException
         );
-    }
-
-    private function assertRetrieveRemoteMachine(callable $callable): void
-    {
-        $remoteId = 123;
-        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
-
-        $dropletData = [
-            'id' => $remoteId,
-            'networks' => (object) [
-                'v4' => [
-                    (object) [
-                        'ip_address' => $ipAddresses[0],
-                        'type' => 'public',
-                    ],
-                    (object) [
-                        'ip_address' => $ipAddresses[1],
-                        'type' => 'public',
-                    ],
-                ],
-            ],
-        ];
-
-        $expectedDropletEntity = new DropletEntity($dropletData);
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
-
-        $remoteMachine = $callable($this->machine);
-
-        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
     /**

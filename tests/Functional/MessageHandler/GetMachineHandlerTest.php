@@ -143,7 +143,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         return [
             'updated within initial remote id and initial remote state' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity($createdDropletEntity),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$createdDropletEntity]),
                 'machine' => MachineBuilder::build(MachineBuilder::DEFAULT),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
                     new RemoteMachine($createdDropletEntity)
@@ -154,7 +154,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ]),
             ],
             'updated within initial ip addresses' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity($upNewDropletEntity),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity]),
                 'machine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
                     MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_STARTED,
@@ -169,7 +169,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ]),
             ],
             'updated within active remote state' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity($upActiveDropletEntity),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$upActiveDropletEntity]),
                 'machine' => MachineBuilder::build([
                     MachineBuilder::PROPERTY_REMOTE_ID => $remoteId,
                     MachineBuilder::PROPERTY_STATE => MachineInterface::STATE_UP_STARTED,

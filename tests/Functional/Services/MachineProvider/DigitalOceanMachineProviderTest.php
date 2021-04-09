@@ -100,7 +100,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         ];
 
         $expectedDropletEntity = new DropletEntity($dropletData);
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$expectedDropletEntity]));
 
         $remoteMachine = $this->machineProvider->get($this->machine);
 

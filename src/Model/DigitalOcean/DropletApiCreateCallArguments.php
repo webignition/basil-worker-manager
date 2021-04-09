@@ -6,7 +6,8 @@ class DropletApiCreateCallArguments
 {
     public function __construct(
         private string $name,
-        private DropletConfiguration $dropletConfiguration
+        private DropletConfiguration $dropletConfiguration,
+        private string $identifier,
     ) {
     }
 
@@ -27,7 +28,12 @@ class DropletApiCreateCallArguments
             '',
             true,
             [],
-            $this->dropletConfiguration->getTags(),
+            array_merge(
+                $this->dropletConfiguration->getTags(),
+                [
+                    $this->identifier,
+                ]
+            ),
         ];
     }
 }

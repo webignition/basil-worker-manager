@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: ../..
+    container_name: test-basil-worker-manager
+    volumes:
+      - ../../var:/app/var:rw
+    depends_on:
+      - postgres
+      - rabbitmq

@@ -2,7 +2,6 @@
 
 namespace App\Services\MachineProvider;
 
-use App\Exception\MachineProvider\RemoteMachineNotFoundException;
 use App\Exception\MachineProvider\RemoteMachineNotFoundExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
@@ -57,6 +56,8 @@ class MachineProvider
             return $this->findProvider($machine)->get($machine);
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
+        } catch (RemoteMachineNotFoundExceptionInterface $remoteMachineNotFoundException) {
+            throw $remoteMachineNotFoundException;
         } catch (\Exception $exception) {
             throw $this->exceptionFactory->create($machine->getId(), Action::ACTION_GET, $exception);
         }

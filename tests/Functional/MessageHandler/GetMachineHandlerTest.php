@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
-use App\Exception\MachineProvider\UnknownRemoteMachineException;
+use App\Exception\MachineProvider\RemoteMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\GetMachine;
 use App\MessageHandler\GetMachineHandler;
@@ -339,9 +339,9 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueIsEmpty();
     }
 
-    public function testHandleThrowsUnknownRemoteMachineException(): void
+    public function testHandleThrowsRemoteMachineNotFoundException(): void
     {
-        $this->mockHandler->append(new Response(404));
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
 
         $machine = MachineBuilder::build(MachineBuilder::DEFAULT);
         $this->machineStore->store($machine);
@@ -353,12 +353,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         self::assertEquals(
             new RemoteRequestFailure(
-                new UnknownRemoteMachineException(
-                    $machine->getProvider(),
-                    $machine->getId(),
-                    $message->getAction(),
-                    new RuntimeException('Not Found', 404)
-                )
+                new RemoteMachineNotFoundException($machine)
             ),
             $outcome
         );

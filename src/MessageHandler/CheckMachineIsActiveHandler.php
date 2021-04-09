@@ -6,11 +6,10 @@ namespace App\MessageHandler;
 
 use App\Message\CheckMachineIsActive;
 use App\Message\GetMachine;
-use App\MessageDispatcher\MessageDispatcher;
-use App\MessageDispatcher\NonDispatchableMessageExceptionInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class CheckMachineIsActiveHandler implements MessageHandlerInterface
 {
@@ -36,10 +35,7 @@ class CheckMachineIsActiveHandler implements MessageHandlerInterface
             return;
         }
 
-        try {
-            $this->dispatcher->dispatch(new GetMachine($machine->getId()));
-            $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
-        } catch (NonDispatchableMessageExceptionInterface) {
-        }
+        $this->dispatcher->dispatch(new GetMachine($machine->getId()));
+        $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
     }
 }

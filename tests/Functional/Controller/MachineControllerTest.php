@@ -14,16 +14,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class MachineControllerTest extends AbstractBaseFunctionalTest
 {
+    private const MACHINE_ID = 'machine id';
+
     private EntityManagerInterface $entityManager;
     private MessengerAsserter $messengerAsserter;
+    private string $machineUrl;
 
     protected function setUp(): void
     {
@@ -36,21 +39,30 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
         $this->messengerAsserter = $messengerAsserter;
+
+        $this->machineUrl = str_replace(
+            MachineController::PATH_COMPONENT_ID,
+            self::MACHINE_ID,
+            MachineController::PATH_MACHINE
+        );
     }
 
     public function testCreateSuccess(): void
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $id = md5('id content');
-        $response = $this->makeCreateRequest($id);
+        $response = $this->makeCreateRequest();
 
         self::assertSame(202, $response->getStatusCode());
         self::assertInstanceOf(Response::class, $response);
 
-        $machine = $this->entityManager->find(Machine::class, $id);
+        $machine = $this->entityManager->find(Machine::class, self::MACHINE_ID);
         self::assertInstanceOf(Machine::class, $machine);
-        self::assertSame($id, $machine->getId());
+        self::assertSame(self::MACHINE_ID, $machine->getId());
+
+        $machineProvider = $this->entityManager->find(MachineProvider::class, self::MACHINE_ID);
+        self::assertInstanceOf(MachineProvider::class, $machineProvider);
+        self::assertSame(self::MACHINE_ID, $machineProvider->getId());
 
         $this->messengerAsserter->assertQueueCount(1);
 
@@ -61,13 +73,11 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
     public function testCreateIdTaken(): void
     {
-        $id = md5('id content');
-
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
+        $machineStore->store(new Machine(self::MACHINE_ID));
 
-        $response = $this->makeCreateRequest($id);
+        $response = $this->makeCreateRequest();
 
         $this->assertBadRequestResponse(
             [
@@ -81,26 +91,23 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
     public function testStatusMachineNotFound(): void
     {
-        $id = md5('id content');
-        $response = $this->makeStatusRequest($id);
+        $response = $this->makeStatusRequest();
 
         self::assertSame(404, $response->getStatusCode());
     }
 
     public function testStatusWithoutCreateFailure(): void
     {
-        $id = md5('id content');
-
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
+        $machineStore->store(new Machine(self::MACHINE_ID));
 
-        $response = $this->makeStatusRequest($id);
+        $response = $this->makeStatusRequest();
 
         self::assertInstanceOf(JsonResponse::class, $response);
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
-                'id' => $id,
+                'id' => self::MACHINE_ID,
                 'state' => MachineInterface::STATE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ]),
@@ -110,37 +117,30 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
     public function testStatusWithCreateFailure(): void
     {
-        $id = md5('id content');
-
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $machine = new Machine(
-            $id,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            null,
-            MachineInterface::STATE_CREATE_FAILED
-        );
+        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_FAILED);
 
         $machineStore->store($machine);
 
         $createFailureFactory = self::$container->get(CreateFailureFactory::class);
         \assert($createFailureFactory instanceof CreateFailureFactory);
         $createFailureFactory->create(
-            $id,
+            self::MACHINE_ID,
             new ApiLimitExceededException(
                 123,
-                $id,
+                self::MACHINE_ID,
                 RemoteRequestActionInterface::ACTION_GET,
                 new \Exception()
             )
         );
 
-        $response = $this->makeStatusRequest($id);
+        $response = $this->makeStatusRequest();
 
         self::assertInstanceOf(JsonResponse::class, $response);
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
-                'id' => $id,
+                'id' => self::MACHINE_ID,
                 'state' => MachineInterface::STATE_CREATE_FAILED,
                 'ip_addresses' => [],
                 'create_failure' => [
@@ -157,22 +157,19 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
     public function testDeleteSuccess(): void
     {
-        $id = md5('id content');
-
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
+        $machineStore->store(new Machine(self::MACHINE_ID));
 
-        $response = $this->makeDeleteRequest($id);
+        $response = $this->makeDeleteRequest();
         self::assertSame(202, $response->getStatusCode());
 
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, new DeleteMachine($id));
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, new DeleteMachine(self::MACHINE_ID));
     }
 
     public function testDeleteMachineNotFound(): void
     {
-        $id = md5('id content');
-        $response = $this->makeDeleteRequest($id);
+        $response = $this->makeDeleteRequest();
 
         self::assertSame(404, $response->getStatusCode());
     }
@@ -187,32 +184,27 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertSame($expectedResponseBody, json_decode((string) $response->getContent(), true));
     }
 
-    private function makeCreateRequest(string $id): Response
+    private function makeCreateRequest(): Response
     {
-        $this->client->request('POST', $this->createMachineUrl($id));
+        $this->client->request('POST', $this->machineUrl);
 
         return $this->client->getResponse();
     }
 
-    private function makeStatusRequest(string $id): Response
+    private function makeStatusRequest(): Response
     {
-        return $this->makeMachineRequest('GET', $id);
+        return $this->makeMachineRequest('GET');
     }
 
-    private function makeDeleteRequest(string $id): Response
+    private function makeDeleteRequest(): Response
     {
-        return $this->makeMachineRequest('DELETE', $id);
+        return $this->makeMachineRequest('DELETE');
     }
 
-    private function makeMachineRequest(string $method, string $id): Response
+    private function makeMachineRequest(string $method): Response
     {
-        $this->client->request($method, $this->createMachineUrl($id));
+        $this->client->request($method, $this->machineUrl);
 
         return $this->client->getResponse();
-    }
-
-    private function createMachineUrl(string $id): string
-    {
-        return str_replace(MachineController::PATH_COMPONENT_ID, $id, MachineController::PATH_MACHINE);
     }
 }

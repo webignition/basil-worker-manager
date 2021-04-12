@@ -27,9 +27,11 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -38,25 +40,34 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
     use MockeryPHPUnitIntegration;
 
     private const MACHINE_ID = 'id';
+    private const REMOTE_ID = 123;
 
     private MachineExistsHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineInterface $machine;
+    private MachineProviderInterface $machineProvider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $handler = self::$container->get(MachineExistsHandler::class);
-        if ($handler instanceof MachineExistsHandler) {
-            $this->handler = $handler;
-        }
+        \assert($handler instanceof MachineExistsHandler);
+        $this->handler = $handler;
 
-        $machineStore = self::$container->get(MachineStore::class);
-        \assert($machineStore instanceof MachineStore);
-        $this->machine = new Machine(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
-        $machineStore->store($this->machine);
+        $machineFactory = self::$container->get(MachineFactory::class);
+        \assert($machineFactory instanceof MachineFactory);
+        $this->machine = $machineFactory->create(self::MACHINE_ID);
+
+        $machineProviderStore = self::$container->get(MachineProviderStore::class);
+        \assert($machineProviderStore instanceof MachineProviderStore);
+        $this->machineProvider = new MachineProvider(
+            self::MACHINE_ID,
+            ProviderInterface::NAME_DIGITALOCEAN,
+            self::REMOTE_ID
+        );
+        $machineProviderStore->store($this->machineProvider);
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         if ($messengerAsserter instanceof MessengerAsserter) {
@@ -107,7 +118,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         $message = new MachineExists(self::MACHINE_ID);
 
         $machineManager = (new MockMachineManager())
-            ->withExistsCallThrowingException($this->machine, $exception)
+            ->withExistsCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -187,7 +198,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
         $machineManager = (new MockMachineManager())
-            ->withExistsCallThrowingException($this->machine, $exception)
+            ->withExistsCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())

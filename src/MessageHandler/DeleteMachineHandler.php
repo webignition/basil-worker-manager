@@ -10,6 +10,7 @@ use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class DeleteMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
@@ -18,8 +19,8 @@ class DeleteMachineHandler extends AbstractRemoteMachineRequestHandler implement
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (MachineInterface $machine) {
-                    $this->machineManager->delete($machine);
+                function (MachineProviderInterface $machineProvider) {
+                    $this->machineManager->delete($machineProvider);
 
                     return new RemoteBooleanRequestSuccess(true);
                 }

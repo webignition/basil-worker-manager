@@ -6,7 +6,7 @@ namespace App\Tests\Mock\Services;
 
 use App\Services\MachineManager\MachineManager;
 use Mockery\MockInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class MockMachineManager
 {
@@ -22,39 +22,48 @@ class MockMachineManager
         return $this->mock;
     }
 
-    public function withCreateCallThrowingException(MachineInterface $machine, \Exception $exception): self
-    {
+    public function withCreateCallThrowingException(
+        MachineProviderInterface $machineProvider,
+        \Exception $exception
+    ): self {
         if ($this->mock instanceof MockInterface) {
-            $this->withCallThrowingException('create', $machine, $exception);
+            $this->withCallThrowingException('create', $machineProvider, $exception);
         }
 
         return $this;
     }
 
-    public function withExistsCallThrowingException(MachineInterface $machine, \Exception $exception): self
-    {
+    public function withExistsCallThrowingException(
+        MachineProviderInterface $machineProvider,
+        \Exception $exception
+    ): self {
         if ($this->mock instanceof MockInterface) {
-            $this->withCallThrowingException('exists', $machine, $exception);
+            $this->withCallThrowingException('exists', $machineProvider, $exception);
         }
 
         return $this;
     }
 
-    public function withDeleteCallThrowingException(MachineInterface $machine, \Exception $exception): self
-    {
+    public function withDeleteCallThrowingException(
+        MachineProviderInterface $machineProvider,
+        \Exception $exception
+    ): self {
         if ($this->mock instanceof MockInterface) {
-            $this->withCallThrowingException('delete', $machine, $exception);
+            $this->withCallThrowingException('delete', $machineProvider, $exception);
         }
 
         return $this;
     }
 
-    private function withCallThrowingException(string $method, MachineInterface $machine, \Exception $exception): self
-    {
+    private function withCallThrowingException(
+        string $method,
+        MachineProviderInterface $machineProvider,
+        \Exception $exception
+    ): self {
         if ($this->mock instanceof MockInterface) {
             $this->mock
                 ->shouldReceive($method)
-                ->with($machine)
+                ->with($machineProvider)
                 ->andThrow($exception);
         }
 

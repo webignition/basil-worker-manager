@@ -19,7 +19,7 @@ class DeleteMachineHandler extends AbstractRemoteMachineRequestHandler implement
             $message,
             (new RemoteMachineActionHandler(
                 function (MachineInterface $machine) {
-                    $this->machineProvider->delete($machine);
+                    $this->machineManager->delete($machine);
 
                     return new RemoteBooleanRequestSuccess(true);
                 }

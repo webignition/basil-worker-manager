@@ -21,7 +21,7 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
             (new RemoteMachineActionHandler(
                 function (MachineInterface $machine) {
                     return new RemoteBooleanRequestSuccess(
-                        $this->machineProvider->exists($machine)
+                        $this->machineManager->exists($machine)
                     );
                 }
             ))->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {

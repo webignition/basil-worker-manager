@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
-use App\Services\MachineProvider\MachineProvider;
+use App\Services\MachineManager\MachineManager;
 use Mockery\MockInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
-class MockMachineProvider
+class MockMachineManager
 {
-    private MachineProvider $mock;
+    private MachineManager $mock;
 
     public function __construct()
     {
-        $this->mock = \Mockery::mock(MachineProvider::class);
+        $this->mock = \Mockery::mock(MachineManager::class);
     }
 
-    public function getMock(): MachineProvider
+    public function getMock(): MachineManager
     {
         return $this->mock;
     }

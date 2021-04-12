@@ -11,21 +11,24 @@ use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class EndToEndTest extends AbstractBaseIntegrationTest
 {
-    private const MACHINE_ID = 'machine-id';
-
     private const MAX_DURATION_IN_SECONDS = 120;
     private const MICROSECONDS_PER_SECOND = 1000000;
+
+    private string $machineUrl;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $machineId = md5((string) rand());
+        $this->machineUrl = str_replace('{id}', $machineId, MachineController::PATH_MACHINE);
 
         echo "\n" . $this->getObfuscatedDigitalOceanAccessToken(2, 2) . "\n\n";
     }
 
     public function testCreateRemoteMachine(): void
     {
-        $this->client->request('POST', $this->getMachineUrl());
+        $this->client->request('POST', $this->machineUrl);
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
@@ -45,7 +48,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
         self::assertSame(MachineInterface::STATE_UP_ACTIVE, $this->getMachine()->getState());
 
-        $this->client->request('DELETE', $this->getMachineUrl());
+        $this->client->request('DELETE', $this->machineUrl);
 
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
@@ -91,14 +94,9 @@ class EndToEndTest extends AbstractBaseIntegrationTest
             substr($token, $length - $suffixLength);
     }
 
-    private function getMachineUrl(): string
-    {
-        return str_replace('{id}', self::MACHINE_ID, MachineController::PATH_MACHINE);
-    }
-
     private function getMachine(): Machine
     {
-        $this->client->request('GET', $this->getMachineUrl());
+        $this->client->request('GET', $this->machineUrl);
 
         $response = $this->client->getResponse();
         self::assertSame(200, $response->getStatusCode());

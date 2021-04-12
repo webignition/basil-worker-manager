@@ -10,9 +10,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\CreateFailureStore;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
@@ -25,13 +28,19 @@ class MachineController
     public function create(
         string $id,
         MachineStore $machineStore,
+        MachineProviderStore $machineProviderStore,
         MessageDispatcher $messageDispatcher,
     ): Response {
         if ($machineStore->find($id) instanceof MachineInterface) {
             return BadMachineCreateRequestResponse::createIdTakenResponse();
         }
 
-        $machineStore->store(new Machine($id, ProviderInterface::NAME_DIGITALOCEAN));
+        if ($machineProviderStore->find($id) instanceof MachineProviderInterface) {
+            return BadMachineCreateRequestResponse::createIdTakenResponse();
+        }
+
+        $machineStore->store(new Machine($id));
+        $machineProviderStore->store(new MachineProvider($id, ProviderInterface::NAME_DIGITALOCEAN));
 
         $messageDispatcher->dispatch(new CreateMachine($id));
 

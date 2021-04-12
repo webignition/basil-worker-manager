@@ -82,7 +82,7 @@ services:
 
     App\Services\MachineManager\MachineManager:
         arguments:
-            $machineProviders:
+            $machineManagers:
                 - '@App\Services\MachineManager\DigitalOceanMachineManager'
 
     App\Services\RemoteRequestRetryDecider:

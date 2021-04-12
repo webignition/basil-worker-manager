@@ -30,9 +30,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
@@ -47,6 +48,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineInterface $machine;
+    private MachineProviderInterface $machineProvider;
     private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
@@ -57,10 +59,16 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($handler instanceof CreateMachineHandler);
         $this->handler = $handler;
 
-        $machineStore = self::$container->get(MachineStore::class);
-        \assert($machineStore instanceof MachineStore);
-        $this->machine = new Machine(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
-        $machineStore->store($this->machine);
+        $machineFactory = self::$container->get(MachineFactory::class);
+        \assert($machineFactory instanceof MachineFactory);
+        $this->machine = $machineFactory->create(self::MACHINE_ID);
+
+        $machineProviderFactory = self::$container->get(MachineProviderFactory::class);
+        \assert($machineProviderFactory instanceof MachineProviderFactory);
+        $this->machineProvider = $machineProviderFactory->create(
+            self::MACHINE_ID,
+            ProviderInterface::NAME_DIGITALOCEAN
+        );
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
@@ -77,7 +85,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
     public function testHandleSuccess(): void
     {
-        self::assertNull($this->machine->getRemoteId());
+        self::assertNull($this->machineProvider->getRemoteId());
         self::assertSame([], ObjectReflector::getProperty($this->machine, 'ip_addresses'));
 
         $dropletData = [
@@ -112,7 +120,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             new CheckMachineIsActive(self::MACHINE_ID)
         );
 
-        self::assertSame($expectedRemoteMachine->getId(), (int) $this->machine->getRemoteId());
+        self::assertSame($expectedRemoteMachine->getId(), (int) $this->machineProvider->getRemoteId());
         self::assertSame($expectedRemoteMachine->getState(), $this->machine->getState());
         self::assertSame(
             $expectedRemoteMachine->getIpAddresses(),
@@ -127,7 +135,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new CreateMachine(self::MACHINE_ID);
 
         $machineManager = (new MockMachineManager())
-            ->withCreateCallThrowingException($this->machine, $exception)
+            ->withCreateCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -165,7 +173,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
         $machineManager = (new MockMachineManager())
-            ->withCreateCallThrowingException($this->machine, $exception)
+            ->withCreateCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -218,7 +226,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $machineManager = (new MockMachineManager())
-            ->withCreateCallThrowingException($this->machine, $exception)
+            ->withCreateCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())

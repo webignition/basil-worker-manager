@@ -11,6 +11,7 @@ use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
@@ -19,9 +20,9 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (MachineInterface $machine) {
+                function (MachineProviderInterface $machineProvider) {
                     return new RemoteBooleanRequestSuccess(
-                        $this->machineManager->exists($machine)
+                        $this->machineManager->exists($machineProvider)
                     );
                 }
             ))->withOutcomeHandler(function (RemoteRequestOutcomeInterface $outcome) {
@@ -30,12 +31,18 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
                 }
 
                 return $outcome;
-            })->withSuccessHandler(function (MachineInterface $machine, RemoteRequestSuccessInterface $outcome) {
-                if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
-                    $machine->setState(MachineInterface::STATE_DELETE_DELETED);
-                    $this->machineStore->store($machine);
+            })->withSuccessHandler(
+                function (
+                    MachineInterface $machine,
+                    MachineProviderInterface $machineProvider,
+                    RemoteRequestSuccessInterface $outcome
+                ) {
+                    if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {
+                        $machine->setState(MachineInterface::STATE_DELETE_DELETED);
+                        $this->machineStore->store($machine);
+                    }
                 }
-            })
+            )
         );
     }
 }

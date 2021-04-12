@@ -22,9 +22,11 @@ use DigitalOceanV2\Exception\InvalidArgumentException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
@@ -38,6 +40,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineInterface $machine;
+    private MachineProviderInterface $machineProvider;
 
     protected function setUp(): void
     {
@@ -47,15 +50,21 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($handler instanceof DeleteMachineHandler);
         $this->handler = $handler;
 
+        $machineFactory = self::$container->get(MachineFactory::class);
+        \assert($machineFactory instanceof MachineFactory);
+        $this->machine = $machineFactory->create(self::MACHINE_ID);
+
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $this->machine = new Machine(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            null,
-            MachineInterface::STATE_DELETE_REQUESTED
-        );
+        $this->machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
         $machineStore->store($this->machine);
+
+        $machineProviderFactory = self::$container->get(MachineProviderFactory::class);
+        \assert($machineProviderFactory instanceof MachineProviderFactory);
+        $this->machineProvider = $machineProviderFactory->create(
+            self::MACHINE_ID,
+            ProviderInterface::NAME_DIGITALOCEAN
+        );
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
@@ -87,7 +96,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new DeleteMachine(self::MACHINE_ID);
 
         $machineManager = (new MockMachineManager())
-            ->withDeleteCallThrowingException($this->machine, $exception)
+            ->withDeleteCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -115,7 +124,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
         $machineManager = (new MockMachineManager())
-            ->withDeleteCallThrowingException($this->machine, $exception)
+            ->withDeleteCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())
@@ -167,7 +176,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
         $machineManager = (new MockMachineManager())
-            ->withDeleteCallThrowingException($this->machine, $exception)
+            ->withDeleteCallThrowingException($this->machineProvider, $exception)
             ->getMock();
 
         $exceptionLogger = (new MockExceptionLogger())

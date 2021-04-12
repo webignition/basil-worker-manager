@@ -12,9 +12,11 @@ use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineManager\MachineManager;
 use App\Services\RemoteRequestRetryDecider;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 abstract class AbstractRemoteMachineRequestHandler
@@ -24,6 +26,7 @@ abstract class AbstractRemoteMachineRequestHandler
         protected RemoteRequestRetryDecider $retryDecider,
         protected ExceptionLogger $exceptionLogger,
         protected MachineStore $machineStore,
+        protected MachineProviderStore $machineProviderStore,
         protected MessageDispatcher $dispatcher,
     ) {
     }
@@ -37,6 +40,11 @@ abstract class AbstractRemoteMachineRequestHandler
             return RemoteRequestOutcome::invalid();
         }
 
+        $machineProvider = $this->machineProviderStore->find($message->getMachineId());
+        if (!$machineProvider instanceof MachineProviderInterface) {
+            return RemoteRequestOutcome::invalid();
+        }
+
         $actionHandler->onBeforeRequest($machine);
 
         $outcome = RemoteRequestOutcome::invalid();
@@ -44,11 +52,11 @@ abstract class AbstractRemoteMachineRequestHandler
         $lastException = null;
 
         try {
-            $outcome = $actionHandler->performAction($machine);
+            $outcome = $actionHandler->performAction($machineProvider);
             $outcome = $actionHandler->onOutcome($outcome);
         } catch (ExceptionInterface $exception) {
             $shouldRetry = $this->retryDecider->decide(
-                $machine->getProvider(),
+                $machineProvider->getName(),
                 $message,
                 $exception->getRemoteException()
             );
@@ -69,7 +77,7 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
-            $actionHandler->onSuccess($machine, $outcome);
+            $actionHandler->onSuccess($machine, $machineProvider, $outcome);
         }
 
         if ($lastException instanceof \Throwable) {

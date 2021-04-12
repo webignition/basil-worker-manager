@@ -8,6 +8,7 @@ use App\Exception\UnsupportedProviderException;
 use App\Model\RemoteRequestOutcomeInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 interface RemoteMachineActionHandlerInterface
 {
@@ -15,11 +16,15 @@ interface RemoteMachineActionHandlerInterface
      * @throws UnsupportedProviderException
      * @throws ExceptionInterface
      */
-    public function performAction(MachineInterface $machine): RemoteRequestOutcomeInterface;
+    public function performAction(MachineProviderInterface $machineProvider): RemoteRequestOutcomeInterface;
 
     public function onOutcome(RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface;
 
-    public function onSuccess(MachineInterface $machine, RemoteRequestOutcomeInterface $outcome): void;
+    public function onSuccess(
+        MachineInterface $machine,
+        MachineProviderInterface $machineProvider,
+        RemoteRequestOutcomeInterface $outcome
+    ): void;
 
     public function onFailure(MachineInterface $machine, \Throwable $exception): void;
 

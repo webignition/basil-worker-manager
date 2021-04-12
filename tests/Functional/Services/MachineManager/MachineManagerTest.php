@@ -20,7 +20,9 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
@@ -29,8 +31,11 @@ use webignition\ObjectReflector\ObjectReflector;
 
 class MachineManagerTest extends AbstractBaseFunctionalTest
 {
+    private const MACHINE_ID = 'machine id';
+
     private MachineManager $machineManager;
     private MachineInterface $machine;
+    private MachineProvider $machineProvider;
     private MockHandler $mockHandler;
 
     protected function setUp(): void
@@ -38,14 +43,19 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         parent::setUp();
 
         $machineManager = self::$container->get(MachineManager::class);
-        if ($machineManager instanceof MachineManager) {
-            $this->machineManager = $machineManager;
-        }
+        \assert($machineManager instanceof MachineManager);
+        $this->machineManager = $machineManager;
 
-        $machineStore = self::$container->get(MachineStore::class);
-        \assert($machineStore instanceof MachineStore);
-        $this->machine = new Machine(md5('id content'), ProviderInterface::NAME_DIGITALOCEAN);
-        $machineStore->store($this->machine);
+        $machineFactory = self::$container->get(MachineFactory::class);
+        \assert($machineFactory instanceof MachineFactory);
+        $this->machine = $machineFactory->create(self::MACHINE_ID);
+
+        $machineProviderFactory = self::$container->get(MachineProviderFactory::class);
+        \assert($machineProviderFactory instanceof MachineProviderFactory);
+        $this->machineProvider = $machineProviderFactory->create(
+            self::MACHINE_ID,
+            ProviderInterface::NAME_DIGITALOCEAN
+        );
 
         $mockHandler = self::$container->get(MockHandler::class);
         if ($mockHandler instanceof MockHandler) {
@@ -55,8 +65,8 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
-            return $this->machineManager->create($machine);
+        $this->assertRetrieveRemoteMachine(function () {
+            return $this->machineManager->create($this->machineProvider);
         });
     }
 
@@ -75,7 +85,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineManager->create($this->machine);
+                $this->machineManager->create($this->machineProvider);
             },
             RemoteRequestActionInterface::ACTION_CREATE,
             $apiResponse,
@@ -100,7 +110,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         );
 
         try {
-            $this->machineManager->create($this->machine);
+            $this->machineManager->create($this->machineProvider);
             self::fail(ExceptionInterface::class . ' not thrown');
         } catch (ExceptionInterface $exception) {
             self::assertEquals(
@@ -112,8 +122,8 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testGetSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
-            return $this->machineManager->get($machine);
+        $this->assertRetrieveRemoteMachine(function () {
+            return $this->machineManager->get($this->machineProvider);
         });
     }
 
@@ -132,7 +142,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineManager->get($this->machine);
+                $this->machineManager->get($this->machineProvider);
             },
             RemoteRequestActionInterface::ACTION_GET,
             $apiResponse,
@@ -143,11 +153,11 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testDeleteSuccess(): void
     {
-        ObjectReflector::setProperty($this->machine, Machine::class, 'remote_id', 123);
+        ObjectReflector::setProperty($this->machineProvider, Machine::class, 'remote_id', 123);
 
         $this->mockHandler->append(new Response(204));
 
-        $this->machineManager->delete($this->machine);
+        $this->machineManager->delete($this->machineProvider);
         self::expectNotToPerformAssertions();
     }
 
@@ -164,7 +174,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineManager->delete($this->machine);
+                $this->machineManager->delete($this->machineProvider);
             },
             RemoteRequestActionInterface::ACTION_DELETE,
             $apiResponse,
@@ -197,7 +207,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $remoteMachine = $callable($this->machine);
+        $remoteMachine = $callable();
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
@@ -211,7 +221,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append($apiResponse);
 
-        $exists = $this->machineManager->exists($this->machine);
+        $exists = $this->machineManager->exists($this->machineProvider);
         self::assertSame($expectedExists, $exists);
     }
 
@@ -248,7 +258,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineManager->exists($this->machine);
+                $this->machineManager->exists($this->machineProvider);
             },
             RemoteRequestActionInterface::ACTION_EXISTS,
             $apiResponse,

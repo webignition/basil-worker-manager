@@ -15,9 +15,11 @@ use App\Services\MachineManager\MachineManager;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
@@ -27,10 +29,18 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         RemoteRequestRetryDecider $retryDecider,
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
+        MachineProviderStore $machineProviderStore,
         MessageDispatcher $dispatcher,
         private CreateFailureFactory $createFailureFactory,
     ) {
-        parent::__construct($machineManager, $retryDecider, $exceptionLogger, $machineStore, $dispatcher);
+        parent::__construct(
+            $machineManager,
+            $retryDecider,
+            $exceptionLogger,
+            $machineStore,
+            $machineProviderStore,
+            $dispatcher,
+        );
     }
 
     public function __invoke(CreateMachine $message): RemoteRequestOutcomeInterface
@@ -38,29 +48,36 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (MachineInterface $machine) {
+                function (MachineProviderInterface $machineProvider) {
                     return new RemoteMachineRequestSuccess(
-                        $this->machineManager->create($machine)
+                        $this->machineManager->create($machineProvider)
                     );
                 }
             ))->withBeforeRequestHandler(function (MachineInterface $machine) {
                 $machine->setState(MachineInterface::STATE_CREATE_REQUESTED);
                 $this->machineStore->store($machine);
-            })->withSuccessHandler(function (MachineInterface $machine, RemoteRequestSuccessInterface $outcome) {
-                if ($outcome instanceof RemoteMachineRequestSuccess) {
-                    $remoteMachine = $outcome->getRemoteMachine();
-                    $remoteMachineState = $remoteMachine->getState();
-                    $remoteMachineState = $remoteMachineState ?? MachineInterface::STATE_CREATE_REQUESTED;
+            })->withSuccessHandler(
+                function (
+                    MachineInterface $machine,
+                    MachineProviderInterface $machineProvider,
+                    RemoteRequestSuccessInterface $outcome
+                ) {
+                    if ($outcome instanceof RemoteMachineRequestSuccess) {
+                        $remoteMachine = $outcome->getRemoteMachine();
+                        $remoteMachineState = $remoteMachine->getState();
+                        $remoteMachineState = $remoteMachineState ?? MachineInterface::STATE_CREATE_REQUESTED;
 
-                    $machine->setRemoteId($remoteMachine->getId());
-                    $machine->setState($remoteMachineState);
-                    $machine->setIpAddresses($remoteMachine->getIpAddresses());
+                        $machineProvider->setRemoteId($remoteMachine->getId());
+                        $this->machineProviderStore->store($machineProvider);
 
-                    $this->machineStore->store($machine);
+                        $machine->setState($remoteMachineState);
+                        $machine->setIpAddresses($remoteMachine->getIpAddresses());
+                        $this->machineStore->store($machine);
 
-                    $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
+                        $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
+                    }
                 }
-            })->withFailureHandler(
+            )->withFailureHandler(
                 function (MachineInterface $machine, ExceptionInterface | UnsupportedProviderException $exception) {
                     $machine->setState(MachineInterface::STATE_CREATE_FAILED);
                     $this->machineStore->store($machine);

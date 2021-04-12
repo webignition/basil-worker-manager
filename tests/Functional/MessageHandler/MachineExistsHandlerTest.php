@@ -73,7 +73,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
     {
         self::assertNotSame(MachineInterface::STATE_DELETE_DELETED, $this->machine->getState());
 
-        $this->mockHandler->append(new Response(404));
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
 
         $message = new MachineExists(self::MACHINE_ID);
         $outcome = ($this->handler)($message);
@@ -89,7 +89,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
             'status' => RemoteMachine::STATE_NEW,
         ]);
 
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($dropletEntity));
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$dropletEntity]));
 
         $message = new MachineExists(self::MACHINE_ID);
         $outcome = ($this->handler)($message);

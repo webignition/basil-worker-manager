@@ -144,15 +144,15 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     {
         return [
             'exists' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity(
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([
                     new DropletEntity([
                         'id' => 123,
-                    ])
-                ),
+                    ]),
+                ]),
                 'expectedExists' => true,
             ],
             'not exists' => [
-                'apiResponse' => new Response(404),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([]),
                 'expectedExists' => false,
             ],
         ];

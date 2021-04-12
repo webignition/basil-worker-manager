@@ -11,7 +11,6 @@ use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
-use DigitalOceanV2\Exception\RuntimeException;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
@@ -66,12 +65,13 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function get(MachineInterface $machine): RemoteMachineInterface
     {
-        $droplets = $this->dropletApi->getAll($machine->getId());
-        if (1 !== count($droplets)) {
+        $remoteMachine = $this->find($machine);
+
+        if (null === $remoteMachine) {
             throw new RemoteMachineNotFoundException($machine);
         }
 
-        return new RemoteMachine($droplets[0]);
+        return $remoteMachine;
     }
 
     /**
@@ -79,16 +79,19 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
      */
     public function exists(MachineInterface $machine): bool
     {
-        try {
-            $this->dropletApi->getById((int)$machine->getRemoteId());
-        } catch (RuntimeException $runtimeException) {
-            if (404 === $runtimeException->getCode()) {
-                return false;
-            }
+        return $this->find($machine) instanceof RemoteMachineInterface;
+    }
 
-            throw $runtimeException;
+    /**
+     * @throws VendorExceptionInterface
+     */
+    private function find(MachineInterface $machine): ?RemoteMachineInterface
+    {
+        $droplets = $this->dropletApi->getAll($machine->getId());
+        if (1 !== count($droplets)) {
+            return null;
         }
 
-        return true;
+        return new RemoteMachine($droplets[0]);
     }
 }

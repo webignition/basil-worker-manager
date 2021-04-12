@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services\MachineProvider;
+namespace App\Services\MachineManager;
 
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
-interface MachineProviderInterface
+interface MachineManagerInterface
 {
     /**
      * @param ProviderInterface::NAME_* $type

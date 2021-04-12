@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\MachineProvider;
+namespace App\Tests\Functional\Services\MachineManager;
 
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Services\MachineProvider\DigitalOceanMachineProvider;
+use App\Services\MachineManager\DigitalOceanMachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -18,9 +18,9 @@ use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
-class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
+class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 {
-    private DigitalOceanMachineProvider $machineProvider;
+    private DigitalOceanMachineManager $machineManager;
     private MachineInterface $machine;
     private MockHandler $mockHandler;
 
@@ -28,9 +28,9 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $digitalOceanMachineProvider = self::$container->get(DigitalOceanMachineProvider::class);
-        if ($digitalOceanMachineProvider instanceof DigitalOceanMachineProvider) {
-            $this->machineProvider = $digitalOceanMachineProvider;
+        $machineManager = self::$container->get(DigitalOceanMachineManager::class);
+        if ($machineManager instanceof DigitalOceanMachineManager) {
+            $this->machineManager = $machineManager;
         }
 
         $machineStore = self::$container->get(MachineStore::class);
@@ -70,7 +70,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         self::assertNull($this->machine->getRemoteId());
 
-        $remoteMachine = $this->machineProvider->create('worker-' . $this->machine->getId());
+        $remoteMachine = $this->machineManager->create('worker-' . $this->machine->getId());
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
@@ -102,7 +102,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $remoteMachine = $this->machineProvider->get((int) $this->machine->getRemoteId());
+        $remoteMachine = $this->machineManager->get((int) $this->machine->getRemoteId());
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
@@ -110,7 +110,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     public function testRemoveSuccess(): void
     {
         $this->mockHandler->append(new Response(204));
-        $this->machineProvider->remove((int) $this->machine->getRemoteId());
+        $this->machineManager->remove((int) $this->machine->getRemoteId());
 
         self::expectNotToPerformAssertions();
     }
@@ -122,7 +122,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append($apiResponse);
 
-        $exists = $this->machineProvider->exists((int) $this->machine->getRemoteId());
+        $exists = $this->machineManager->exists((int) $this->machine->getRemoteId());
 
         self::assertSame($expectedExists, $exists);
     }

@@ -75,15 +75,15 @@ services:
             $tags:
                 - '%digitalocean_droplet_tag%'
 
-    App\Services\MachineProvider\DigitalOceanMachineProvider:
+    App\Services\MachineManager\DigitalOceanMachineManager:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
             $prefix: '%digitalocean_droplet_name_prefix%'
 
-    App\Services\MachineProvider\MachineProvider:
+    App\Services\MachineManager\MachineManager:
         arguments:
             $machineProviders:
-                - '@App\Services\MachineProvider\DigitalOceanMachineProvider'
+                - '@App\Services\MachineManager\DigitalOceanMachineManager'
 
     App\Services\RemoteRequestRetryDecider:
         arguments:

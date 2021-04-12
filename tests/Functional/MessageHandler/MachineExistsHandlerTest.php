@@ -14,10 +14,10 @@ use App\Model\RemoteBooleanRequestSuccess;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
-use App\Services\MachineProvider\MachineProvider;
+use App\Services\MachineManager\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
-use App\Tests\Mock\Services\MockMachineProvider;
+use App\Tests\Mock\Services\MockMachineManager;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -106,7 +106,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         $exception = new UnsupportedProviderException('unsupported-provider');
         $message = new MachineExists(self::MACHINE_ID);
 
-        $machineProvider = (new MockMachineProvider())
+        $machineManager = (new MockMachineManager())
             ->withExistsCallThrowingException($this->machine, $exception)
             ->getMock();
 
@@ -114,7 +114,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
             ->withLogCall($exception)
             ->getMock();
 
-        $this->prepareHandler($machineProvider, $exceptionLogger);
+        $this->prepareHandler($machineManager, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
@@ -186,7 +186,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
-        $machineProvider = (new MockMachineProvider())
+        $machineManager = (new MockMachineManager())
             ->withExistsCallThrowingException($this->machine, $exception)
             ->getMock();
 
@@ -194,7 +194,7 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
             ->withLogCall($exception)
             ->getMock();
 
-        $this->prepareHandler($machineProvider, $exceptionLogger);
+        $this->prepareHandler($machineManager, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
@@ -220,19 +220,19 @@ class MachineExistsHandlerTest extends AbstractBaseFunctionalTest
         ];
     }
 
-    private function prepareHandler(MachineProvider $machineProvider, ExceptionLogger $exceptionLogger): void
+    private function prepareHandler(MachineManager $machineManager, ExceptionLogger $exceptionLogger): void
     {
-        $this->setMachineProviderOnHandler($machineProvider);
+        $this->setMachineManagerOnHandler($machineManager);
         $this->setExceptionLoggerOnHandler($exceptionLogger);
     }
 
-    private function setMachineProviderOnHandler(MachineProvider $machineProvider): void
+    private function setMachineManagerOnHandler(MachineManager $machineManager): void
     {
         ObjectReflector::setProperty(
             $this->handler,
             CreateMachineHandler::class,
-            'machineProvider',
-            $machineProvider
+            'machineManager',
+            $machineManager
         );
     }
 

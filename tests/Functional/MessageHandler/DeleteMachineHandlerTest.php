@@ -12,10 +12,10 @@ use App\MessageHandler\DeleteMachineHandler;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
-use App\Services\MachineProvider\MachineProvider;
+use App\Services\MachineManager\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
-use App\Tests\Mock\Services\MockMachineProvider;
+use App\Tests\Mock\Services\MockMachineManager;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\InvalidArgumentException;
@@ -86,7 +86,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $message = new DeleteMachine(self::MACHINE_ID);
 
-        $machineProvider = (new MockMachineProvider())
+        $machineManager = (new MockMachineManager())
             ->withDeleteCallThrowingException($this->machine, $exception)
             ->getMock();
 
@@ -94,7 +94,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
             ->withLogCall($exception)
             ->getMock();
 
-        $this->prepareHandler($machineProvider, $exceptionLogger);
+        $this->prepareHandler($machineManager, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
@@ -114,7 +114,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
-        $machineProvider = (new MockMachineProvider())
+        $machineManager = (new MockMachineManager())
             ->withDeleteCallThrowingException($this->machine, $exception)
             ->getMock();
 
@@ -122,7 +122,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
             ->withoutLogCall()
             ->getMock();
 
-        $this->prepareHandler($machineProvider, $exceptionLogger);
+        $this->prepareHandler($machineManager, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
         self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
@@ -166,7 +166,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
 
-        $machineProvider = (new MockMachineProvider())
+        $machineManager = (new MockMachineManager())
             ->withDeleteCallThrowingException($this->machine, $exception)
             ->getMock();
 
@@ -174,7 +174,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
             ->withLogCall($exception)
             ->getMock();
 
-        $this->prepareHandler($machineProvider, $exceptionLogger);
+        $this->prepareHandler($machineManager, $exceptionLogger);
 
         $outcome = ($this->handler)($message);
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
@@ -200,19 +200,19 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         ];
     }
 
-    private function prepareHandler(MachineProvider $machineProvider, ExceptionLogger $exceptionLogger): void
+    private function prepareHandler(MachineManager $machineManager, ExceptionLogger $exceptionLogger): void
     {
-        $this->setMachineProviderOnHandler($machineProvider);
+        $this->setMachineManagerOnHandler($machineManager);
         $this->setExceptionLoggerOnHandler($exceptionLogger);
     }
 
-    private function setMachineProviderOnHandler(MachineProvider $machineProvider): void
+    private function setMachineManagerOnHandler(MachineManager $machineManager): void
     {
         ObjectReflector::setProperty(
             $this->handler,
             DeleteMachineHandler::class,
-            'machineProvider',
-            $machineProvider
+            'machineManager',
+            $machineManager
         );
     }
 

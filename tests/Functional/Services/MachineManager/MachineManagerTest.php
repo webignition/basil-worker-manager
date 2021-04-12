@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\MachineProvider;
+namespace App\Tests\Functional\Services\MachineManager;
 
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Services\MachineProvider\MachineProvider;
+use App\Services\MachineManager\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -27,9 +27,9 @@ use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
-class MachineProviderTest extends AbstractBaseFunctionalTest
+class MachineManagerTest extends AbstractBaseFunctionalTest
 {
-    private MachineProvider $machineProvider;
+    private MachineManager $machineManager;
     private MachineInterface $machine;
     private MockHandler $mockHandler;
 
@@ -37,9 +37,9 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     {
         parent::setUp();
 
-        $machineProvider = self::$container->get(MachineProvider::class);
-        if ($machineProvider instanceof MachineProvider) {
-            $this->machineProvider = $machineProvider;
+        $machineManager = self::$container->get(MachineManager::class);
+        if ($machineManager instanceof MachineManager) {
+            $this->machineManager = $machineManager;
         }
 
         $machineStore = self::$container->get(MachineStore::class);
@@ -56,7 +56,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     public function testCreateSuccess(): void
     {
         $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
-            return $this->machineProvider->create($machine);
+            return $this->machineManager->create($machine);
         });
     }
 
@@ -75,7 +75,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->create($this->machine);
+                $this->machineManager->create($this->machine);
             },
             RemoteRequestActionInterface::ACTION_CREATE,
             $apiResponse,
@@ -100,7 +100,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
         );
 
         try {
-            $this->machineProvider->create($this->machine);
+            $this->machineManager->create($this->machine);
             self::fail(ExceptionInterface::class . ' not thrown');
         } catch (ExceptionInterface $exception) {
             self::assertEquals(
@@ -113,7 +113,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     public function testGetSuccess(): void
     {
         $this->assertRetrieveRemoteMachine(function (MachineInterface $machine) {
-            return $this->machineProvider->get($machine);
+            return $this->machineManager->get($machine);
         });
     }
 
@@ -132,7 +132,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->get($this->machine);
+                $this->machineManager->get($this->machine);
             },
             RemoteRequestActionInterface::ACTION_GET,
             $apiResponse,
@@ -147,7 +147,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append(new Response(204));
 
-        $this->machineProvider->delete($this->machine);
+        $this->machineManager->delete($this->machine);
         self::expectNotToPerformAssertions();
     }
 
@@ -164,7 +164,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->delete($this->machine);
+                $this->machineManager->delete($this->machine);
             },
             RemoteRequestActionInterface::ACTION_DELETE,
             $apiResponse,
@@ -211,7 +211,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append($apiResponse);
 
-        $exists = $this->machineProvider->exists($this->machine);
+        $exists = $this->machineManager->exists($this->machine);
         self::assertSame($expectedExists, $exists);
     }
 
@@ -248,7 +248,7 @@ class MachineProviderTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineProvider->exists($this->machine);
+                $this->machineManager->exists($this->machine);
             },
             RemoteRequestActionInterface::ACTION_EXISTS,
             $apiResponse,

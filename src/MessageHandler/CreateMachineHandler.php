@@ -11,7 +11,7 @@ use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use App\Services\ExceptionLogger;
-use App\Services\MachineProvider\MachineProvider;
+use App\Services\MachineManager\MachineManager;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
@@ -23,20 +23,14 @@ use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
     public function __construct(
-        MachineProvider $machineProvider,
+        MachineManager $machineManager,
         RemoteRequestRetryDecider $retryDecider,
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
         MessageDispatcher $dispatcher,
         private CreateFailureFactory $createFailureFactory,
     ) {
-        parent::__construct(
-            $machineProvider,
-            $retryDecider,
-            $exceptionLogger,
-            $machineStore,
-            $dispatcher
-        );
+        parent::__construct($machineManager, $retryDecider, $exceptionLogger, $machineStore, $dispatcher);
     }
 
     public function __invoke(CreateMachine $message): RemoteRequestOutcomeInterface
@@ -46,7 +40,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
             (new RemoteMachineActionHandler(
                 function (MachineInterface $machine) {
                     return new RemoteMachineRequestSuccess(
-                        $this->machineProvider->create($machine)
+                        $this->machineManager->create($machine)
                     );
                 }
             ))->withBeforeRequestHandler(function (MachineInterface $machine) {

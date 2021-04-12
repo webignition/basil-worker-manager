@@ -1,33 +1,32 @@
 <?php
 
-namespace App\Services\MachineProvider;
+namespace App\Services\MachineManager;
 
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface as Action;
 
-class MachineProvider
+class MachineManager
 {
     private const MACHINE_NAME = 'worker-%s';
 
     /**
-     * @var MachineProviderInterface[]
+     * @var MachineManagerInterface[]
      */
     private array $machineProviders;
 
     /**
-     * @param MachineProviderInterface[] $machineProviders
+     * @param MachineManagerInterface[] $machineProviders
      */
     public function __construct(
         array $machineProviders,
         private ExceptionFactory $exceptionFactory,
     ) {
         $this->machineProviders = array_filter($machineProviders, function ($item) {
-            return $item instanceof MachineProviderInterface;
+            return $item instanceof MachineManagerInterface;
         });
     }
 
@@ -89,7 +88,7 @@ class MachineProvider
         } catch (\Exception $exception) {
             throw $this->exceptionFactory->create(
                 $machine->getId(),
-                RemoteRequestActionInterface::ACTION_EXISTS,
+                Action::ACTION_EXISTS,
                 $exception
             );
         }
@@ -98,7 +97,7 @@ class MachineProvider
     /**
      * @throws UnsupportedProviderException
      */
-    private function findProvider(MachineInterface $machine): MachineProviderInterface
+    private function findProvider(MachineInterface $machine): MachineManagerInterface
     {
         foreach ($this->machineProviders as $machineProvider) {
             if ($machineProvider->handles($machine->getProvider())) {

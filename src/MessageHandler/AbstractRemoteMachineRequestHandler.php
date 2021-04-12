@@ -10,7 +10,7 @@ use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\ExceptionLogger;
-use App\Services\MachineProvider\MachineProvider;
+use App\Services\MachineManager\MachineManager;
 use App\Services\RemoteRequestRetryDecider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
@@ -20,7 +20,7 @@ use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 abstract class AbstractRemoteMachineRequestHandler
 {
     public function __construct(
-        protected MachineProvider $machineProvider,
+        protected MachineManager $machineManager,
         protected RemoteRequestRetryDecider $retryDecider,
         protected ExceptionLogger $exceptionLogger,
         protected MachineStore $machineStore,

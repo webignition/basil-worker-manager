@@ -27,7 +27,12 @@ class DropletApiCreateCallArguments
             '',
             true,
             [],
-            $this->dropletConfiguration->getTags(),
+            array_merge(
+                $this->dropletConfiguration->getTags(),
+                [
+                    $this->name,
+                ]
+            ),
         ];
     }
 }

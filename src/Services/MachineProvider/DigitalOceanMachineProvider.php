@@ -35,10 +35,10 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function create(MachineInterface $machine): RemoteMachineInterface
+    public function create(string $name): RemoteMachineInterface
     {
         $createArguments = new DropletApiCreateCallArguments(
-            sprintf('%s-%s', $this->prefix, $machine->getName()),
+            sprintf('%s-%s', $this->prefix, $name),
             $this->dropletConfiguration
         );
 

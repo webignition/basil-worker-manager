@@ -17,7 +17,7 @@ interface MachineProviderInterface
     /**
      * @throws ExceptionInterface
      */
-    public function create(MachineInterface $machine): RemoteMachineInterface;
+    public function create(string $name): RemoteMachineInterface;
 
     /**
      * @throws ExceptionInterface

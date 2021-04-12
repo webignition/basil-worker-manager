@@ -70,7 +70,7 @@ class DigitalOceanMachineProviderTest extends AbstractBaseFunctionalTest
 
         self::assertNull($this->machine->getRemoteId());
 
-        $remoteMachine = $this->machineProvider->create($this->machine);
+        $remoteMachine = $this->machineProvider->create('worker-' . $this->machine->getId());
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }

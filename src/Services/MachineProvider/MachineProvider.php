@@ -12,6 +12,8 @@ use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface as Act
 
 class MachineProvider
 {
+    private const MACHINE_NAME = 'worker-%s';
+
     /**
      * @var MachineProviderInterface[]
      */
@@ -36,7 +38,7 @@ class MachineProvider
     public function create(MachineInterface $machine): RemoteMachineInterface
     {
         try {
-            return $this->findProvider($machine)->create($machine);
+            return $this->findProvider($machine)->create(sprintf(self::MACHINE_NAME, $machine->getId()));
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {

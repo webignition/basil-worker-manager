@@ -53,7 +53,7 @@ class MachineProvider
     public function get(MachineInterface $machine): RemoteMachineInterface
     {
         try {
-            return $this->findProvider($machine)->get($machine);
+            return $this->findProvider($machine)->get((int) $machine->getRemoteId());
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
@@ -68,7 +68,7 @@ class MachineProvider
     public function delete(MachineInterface $machine): void
     {
         try {
-            $this->findProvider($machine)->remove($machine);
+            $this->findProvider($machine)->remove((int) $machine->getRemoteId());
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
@@ -85,7 +85,7 @@ class MachineProvider
         $provider = $this->findProvider($machine);
 
         try {
-            return $provider->exists($machine);
+            return $provider->exists((int) $machine->getRemoteId());
         } catch (\Exception $exception) {
             throw $this->exceptionFactory->create(
                 $machine->getId(),

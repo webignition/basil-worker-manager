@@ -10,7 +10,6 @@ use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use DigitalOceanV2\Exception\RuntimeException;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
@@ -52,28 +51,28 @@ class DigitalOceanMachineProvider implements MachineProviderInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function remove(MachineInterface $machine): void
+    public function remove(int $remoteId): void
     {
-        $this->dropletApi->remove((int) $machine->getRemoteId());
+        $this->dropletApi->remove($remoteId);
     }
 
     /**
      * @throws VendorExceptionInterface
      */
-    public function get(MachineInterface $machine): RemoteMachineInterface
+    public function get(int $remoteId): RemoteMachineInterface
     {
         return new RemoteMachine(
-            $this->dropletApi->getById((int)$machine->getRemoteId())
+            $this->dropletApi->getById($remoteId)
         );
     }
 
     /**
      * @throws VendorExceptionInterface
      */
-    public function exists(MachineInterface $machine): bool
+    public function exists(int $remoteId): bool
     {
         try {
-            $this->dropletApi->getById((int)$machine->getRemoteId());
+            $this->dropletApi->getById($remoteId);
         } catch (RuntimeException $runtimeException) {
             if (404 === $runtimeException->getCode()) {
                 return false;

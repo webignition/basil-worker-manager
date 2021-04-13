@@ -1,4 +1,10 @@
 {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webignition/Client"
+        }
+    ],
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "dev",
@@ -23,7 +29,7 @@
         "symfony/monolog-bundle": "^3.6",
         "symfony/proxy-manager-bridge": "5.2.*",
         "symfony/yaml": "5.2.*",
-        "toin0u/digitalocean-v2": "^4.3",
+        "toin0u/digitalocean-v2": "dev-delete-droplet-by-tag",
         "webignition/basil-worker-manager-interfaces": ">=0.14,<1",
         "webignition/basil-worker-manager-persistence-bundle": "^0.7.0",
         "webignition/symfony-messenger-json-message-serializer-bundle": "^0.2.0",

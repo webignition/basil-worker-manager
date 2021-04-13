@@ -204,8 +204,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testDeleteSuccess(): void
     {
-        ObjectReflector::setProperty($this->machineProvider, Machine::class, 'remote_id', 123);
-
         $this->mockHandler->append(new Response(204));
 
         $this->machineManager->delete($this->machineProvider);

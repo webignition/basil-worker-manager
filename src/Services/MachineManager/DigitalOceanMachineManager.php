@@ -55,11 +55,13 @@ class DigitalOceanMachineManager implements MachineManagerInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function get(int $remoteId): RemoteMachineInterface
+    public function get(string $name): ?RemoteMachineInterface
     {
-        return new RemoteMachine(
-            $this->dropletApi->getById($remoteId)
-        );
+        $droplets = $this->dropletApi->getAll($name);
+
+        return 1 === count($droplets)
+            ? new RemoteMachine($droplets[0])
+            : null;
     }
 
     /**

@@ -59,11 +59,9 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $remoteId = 123;
         $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
 
         $dropletData = [
-            'id' => $remoteId,
             'networks' => (object) [
                 'v4' => [
                     (object) [
@@ -81,8 +79,6 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        self::assertNull($this->machineProvider->getRemoteId());
-
         $remoteMachine = $this->machineManager->create($this->machineName);
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
@@ -90,14 +86,11 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testGetSuccess(): void
     {
-        $remoteId = 123;
         $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
 
-        self::assertNull($this->machineProvider->getRemoteId());
         self::assertSame([], $this->machine->getIpAddresses());
 
         $dropletData = [
-            'id' => $remoteId,
             'networks' => (object) [
                 'v4' => [
                     (object) [

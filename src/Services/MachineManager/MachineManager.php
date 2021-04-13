@@ -2,6 +2,7 @@
 
 namespace App\Services\MachineManager;
 
+use App\Exception\MachineProvider\MachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use App\Services\MachineNameFactory;
@@ -12,8 +13,6 @@ use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface as Act
 
 class MachineManager
 {
-    private const MACHINE_NAME = 'worker-%s';
-
     /**
      * @var MachineManagerInterface[]
      */
@@ -52,16 +51,24 @@ class MachineManager
     /**
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
+     * @throws MachineNotFoundException
      */
     public function get(MachineProviderInterface $machineProvider): RemoteMachineInterface
     {
+        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+
         try {
-            return $this->findProvider($machineProvider)->get((int) $machineProvider->getRemoteId());
+            $machine = $this->findProvider($machineProvider)->get($machineName);
+            if ($machine instanceof RemoteMachineInterface) {
+                return $machine;
+            }
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {
             throw $this->exceptionFactory->create($machineProvider->getId(), Action::ACTION_GET, $exception);
         }
+
+        throw new MachineNotFoundException($machineProvider);
     }
 
     /**

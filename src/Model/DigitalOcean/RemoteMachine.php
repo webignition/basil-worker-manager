@@ -4,6 +4,7 @@ namespace App\Model\DigitalOcean;
 
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 class RemoteMachine implements RemoteMachineInterface
@@ -14,6 +15,14 @@ class RemoteMachine implements RemoteMachineInterface
     public function __construct(
         private DropletEntity $droplet
     ) {
+    }
+
+    /**
+     * @return ProviderInterface::NAME_*
+     */
+    public function getProvider(): string
+    {
+        return ProviderInterface::NAME_DIGITALOCEAN;
     }
 
     public function getId(): int

@@ -78,7 +78,10 @@ services:
     App\Services\MachineManager\DigitalOceanMachineManager:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
-            $prefix: '%machine_name_prefix%'
+
+    App\Services\MachineNameFactory:
+        arguments:
+            $environmentPrefix: '%machine_name_prefix%'
 
     App\Services\MachineManager\MachineManager:
         arguments:

@@ -19,7 +19,6 @@ class DigitalOceanMachineManager implements MachineManagerInterface
         private DropletApi $dropletApi,
         private DigitalOceanExceptionFactory $exceptionFactory,
         private DropletConfiguration $dropletConfiguration,
-        private string $prefix,
     ) {
     }
 
@@ -36,10 +35,7 @@ class DigitalOceanMachineManager implements MachineManagerInterface
      */
     public function create(string $name): RemoteMachineInterface
     {
-        $createArguments = new DropletApiCreateCallArguments(
-            sprintf('%s-%s', $this->prefix, $name),
-            $this->dropletConfiguration
-        );
+        $createArguments = new DropletApiCreateCallArguments($name, $this->dropletConfiguration);
 
         $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
 

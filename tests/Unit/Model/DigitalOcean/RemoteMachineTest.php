@@ -10,18 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class RemoteMachineTest extends TestCase
 {
-    public function testGetId(): void
-    {
-        $remoteId = 123;
-        $dropletEntity = new DropletEntity([
-            'id' => $remoteId,
-        ]);
-
-        $remoteMachine = new RemoteMachine($dropletEntity);
-
-        self::assertSame($remoteId, $remoteMachine->getId());
-    }
-
     /**
      * @dataProvider getIpAddressesDataProvider
      *

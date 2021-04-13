@@ -21,7 +21,7 @@ interface MachineManagerInterface
     /**
      * @throws ExceptionInterface
      */
-    public function remove(int $remoteId): void;
+    public function remove(string $name): void;
 
     public function get(string $name): ?RemoteMachineInterface;
 

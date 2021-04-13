@@ -24,7 +24,6 @@ interface RemoteMachineActionHandlerInterface
 
     public function onSuccess(
         MachineInterface $machine,
-        MachineProviderInterface $machineProvider,
         RemoteRequestOutcomeInterface $outcome
     ): void;
 

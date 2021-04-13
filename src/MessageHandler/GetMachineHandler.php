@@ -53,7 +53,6 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
             ))->withSuccessHandler(
                 function (
                     MachineInterface $machine,
-                    MachineProviderInterface $machineProvider,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {

@@ -61,7 +61,6 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
             })->withSuccessHandler(
                 function (
                     MachineInterface $machine,
-                    MachineProviderInterface $machineProvider,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {

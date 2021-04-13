@@ -132,7 +132,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
     public function testRemoveSuccess(): void
     {
         $this->mockHandler->append(new Response(204));
-        $this->machineManager->remove((int) $this->machineProvider->getRemoteId());
+        $this->machineManager->remove($this->machineName);
 
         self::expectNotToPerformAssertions();
     }

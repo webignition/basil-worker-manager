@@ -85,7 +85,6 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
     public function testHandleSuccess(): void
     {
-        self::assertNull($this->machineProvider->getRemoteId());
         self::assertSame([], ObjectReflector::getProperty($this->machine, 'ip_addresses'));
 
         $dropletData = [
@@ -120,7 +119,6 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             new CheckMachineIsActive(self::MACHINE_ID)
         );
 
-        self::assertSame($expectedRemoteMachine->getId(), (int) $this->machineProvider->getRemoteId());
         self::assertSame($expectedRemoteMachine->getState(), $this->machine->getState());
         self::assertSame(
             $expectedRemoteMachine->getIpAddresses(),

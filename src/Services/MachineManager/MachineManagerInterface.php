@@ -25,5 +25,5 @@ interface MachineManagerInterface
 
     public function get(string $name): ?RemoteMachineInterface;
 
-    public function exists(int $remoteId): bool;
+    public function exists(string $name): bool;
 }

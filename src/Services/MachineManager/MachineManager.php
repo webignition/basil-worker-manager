@@ -92,8 +92,10 @@ class MachineManager
      */
     public function exists(MachineProviderInterface $machineProvider): bool
     {
+        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+
         try {
-            return $this->findProvider($machineProvider)->exists($machineProvider->getName());
+            return $this->findProvider($machineProvider)->exists($machineName);
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {

@@ -6,6 +6,11 @@ use App\Exception\MachineProvider\MachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use App\Services\MachineNameFactory;
+use App\Services\MachineUpdater;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
@@ -25,10 +30,39 @@ class MachineManager
         array $machineManagers,
         private ExceptionFactory $exceptionFactory,
         private MachineNameFactory $machineNameFactory,
+        private MachineStore $machineStore,
+        private MachineUpdater $machineUpdater,
+        private MachineProviderFactory $machineProviderFactory,
+        private MachineProviderStore $machineProviderStore,
     ) {
         $this->machineManagers = array_filter($machineManagers, function ($item) {
             return $item instanceof MachineManagerInterface;
         });
+    }
+
+    public function find(string $machineId): void
+    {
+        $machineName = $this->machineNameFactory->create($machineId);
+
+        $remoteMachine = null;
+        foreach ($this->machineManagers as $machineManager) {
+            if (null === $remoteMachine) {
+                $remoteMachine = $machineManager->get($machineName);
+
+                if ($remoteMachine instanceof RemoteMachineInterface) {
+                    $machine = $this->machineStore->find($machineId);
+                    if (null === $machine) {
+                        $machine = new Machine($machineId);
+                    }
+
+                    $this->machineUpdater->updateFromRemoteMachine($machine, $remoteMachine);
+
+                    if (null === $this->machineProviderStore->find($machineId)) {
+                        $this->machineProviderFactory->create($machineId, $machineManager->getType());
+                    }
+                }
+            }
+        }
     }
 
     /**

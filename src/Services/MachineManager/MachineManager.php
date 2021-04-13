@@ -4,6 +4,7 @@ namespace App\Services\MachineManager;
 
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
+use App\Services\MachineNameFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
@@ -24,6 +25,7 @@ class MachineManager
     public function __construct(
         array $machineManagers,
         private ExceptionFactory $exceptionFactory,
+        private MachineNameFactory $machineNameFactory,
     ) {
         $this->machineManagers = array_filter($machineManagers, function ($item) {
             return $item instanceof MachineManagerInterface;
@@ -36,10 +38,10 @@ class MachineManager
      */
     public function create(MachineProviderInterface $machineProvider): RemoteMachineInterface
     {
+        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+
         try {
-            return $this->findProvider($machineProvider)->create(
-                sprintf(self::MACHINE_NAME, $machineProvider->getId())
-            );
+            return $this->findProvider($machineProvider)->create($machineName);
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {

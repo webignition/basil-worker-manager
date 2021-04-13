@@ -9,9 +9,9 @@ use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 interface MachineManagerInterface
 {
     /**
-     * @param ProviderInterface::NAME_* $type
+     * @return ProviderInterface::NAME_* $type
      */
-    public function handles(string $type): bool;
+    public function getType(): string;
 
     /**
      * @throws ExceptionInterface

@@ -12,8 +12,6 @@ use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface as Act
 
 class MachineManager
 {
-    private const MACHINE_NAME = 'worker-%s';
-
     /**
      * @var MachineManagerInterface[]
      */
@@ -103,8 +101,10 @@ class MachineManager
      */
     private function findProvider(MachineProviderInterface $machineProvider): MachineManagerInterface
     {
+        $providerName = $machineProvider->getName();
+
         foreach ($this->machineManagers as $machineManager) {
-            if ($machineManager->handles($machineProvider->getName())) {
+            if ($machineManager->getType() === $providerName) {
                 return $machineManager;
             }
         }

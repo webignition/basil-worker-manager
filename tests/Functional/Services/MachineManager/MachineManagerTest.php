@@ -164,7 +164,10 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
         $machineProvider = $this->createMachineProvider();
 
-        self::expectExceptionObject(new MachineNotFoundException($machineProvider));
+        self::expectExceptionObject(new MachineNotFoundException(
+            $machineProvider->getId(),
+            $machineProvider->getName()
+        ));
 
         $this->machineManager->get($machineProvider);
     }

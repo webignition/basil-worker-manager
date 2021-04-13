@@ -46,9 +46,9 @@ class DigitalOceanMachineManager implements MachineManagerInterface
     /**
      * @throws VendorExceptionInterface
      */
-    public function remove(int $remoteId): void
+    public function remove(string $name): void
     {
-        $this->dropletApi->remove($remoteId);
+        $this->dropletApi->removeAll($name);
     }
 
     /**

@@ -6,6 +6,7 @@ namespace App\Tests\Functional\Services\MachineManager;
 
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\MachineManager\DigitalOceanMachineManager;
+use App\Services\MachineNameFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -26,6 +27,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
     private MachineInterface $machine;
     private MachineProviderInterface $machineProvider;
     private MockHandler $mockHandler;
+    private string $machineName;
 
     protected function setUp(): void
     {
@@ -46,10 +48,13 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
             ProviderInterface::NAME_DIGITALOCEAN
         );
 
+        $machineNameFactory = self::$container->get(MachineNameFactory::class);
+        \assert($machineNameFactory instanceof MachineNameFactory);
+        $this->machineName = $machineNameFactory->create(self::MACHINE_ID);
+
         $mockHandler = self::$container->get(MockHandler::class);
-        if ($mockHandler instanceof MockHandler) {
-            $this->mockHandler = $mockHandler;
-        }
+        \assert($mockHandler instanceof MockHandler);
+        $this->mockHandler = $mockHandler;
     }
 
     public function testCreateSuccess(): void
@@ -78,7 +83,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 
         self::assertNull($this->machineProvider->getRemoteId());
 
-        $remoteMachine = $this->machineManager->create('worker-' . $this->machine->getId());
+        $remoteMachine = $this->machineManager->create($this->machineName);
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
@@ -108,11 +113,20 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
         ];
 
         $expectedDropletEntity = new DropletEntity($dropletData);
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$expectedDropletEntity]));
 
-        $remoteMachine = $this->machineManager->get((int) $this->machineProvider->getRemoteId());
+        $remoteMachine = $this->machineManager->get($this->machineName);
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
+    }
+
+    public function testGetMachineNotFound(): void
+    {
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
+
+        $remoteMachine = $this->machineManager->get($this->machineName);
+
+        self::assertNull($remoteMachine);
     }
 
     public function testRemoveSuccess(): void

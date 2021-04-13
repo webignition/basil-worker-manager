@@ -8,7 +8,6 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\MachineNotFoundException;
-use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\MachineManager\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -95,7 +94,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -183,7 +181,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -217,7 +214,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
      *
      * @param class-string $expectedExceptionClass
      */
@@ -235,35 +231,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
             $expectedExceptionClass,
             $expectedRemoveException
         );
-    }
-
-    private function assertRetrieveRemoteMachine(callable $callable): void
-    {
-        $remoteId = 123;
-        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
-
-        $dropletData = [
-            'id' => $remoteId,
-            'networks' => (object) [
-                'v4' => [
-                    (object) [
-                        'ip_address' => $ipAddresses[0],
-                        'type' => 'public',
-                    ],
-                    (object) [
-                        'ip_address' => $ipAddresses[1],
-                        'type' => 'public',
-                    ],
-                ],
-            ],
-        ];
-
-        $expectedDropletEntity = new DropletEntity($dropletData);
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
-
-        $remoteMachine = $callable();
-
-        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
     /**
@@ -286,15 +253,15 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     {
         return [
             'exists' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity(
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([
                     new DropletEntity([
                         'id' => 123,
-                    ])
-                ),
+                    ]),
+                ]),
                 'expectedExists' => true,
             ],
             'not exists' => [
-                'apiResponse' => new Response(404),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([]),
                 'expectedExists' => false,
             ],
         ];
@@ -369,20 +336,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
                 'apiResponse' => new Response(400),
                 'expectedExceptionClass' => Exception::class,
                 'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
-            ],
-        ];
-    }
-
-    /**
-     * @return array[]
-     */
-    public function remoteMachineDoesNotExistDataProvider(): array
-    {
-        return [
-            'remote machine does not exist' => [
-                'apiResponse' => new Response(404),
-                'expectedExceptionClass' => UnknownRemoteMachineException::class,
-                'expectedRemoteException' => new RuntimeException('Not Found', 404),
             ],
         ];
     }

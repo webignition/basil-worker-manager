@@ -92,16 +92,12 @@ class MachineManager
      */
     public function exists(MachineProviderInterface $machineProvider): bool
     {
-        $provider = $this->findProvider($machineProvider);
-
         try {
-            return $provider->exists((int) $machineProvider->getRemoteId());
+            return $this->findProvider($machineProvider)->exists($machineProvider->getName());
+        } catch (UnsupportedProviderException $unsupportedProviderException) {
+            throw $unsupportedProviderException;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create(
-                $machineProvider->getId(),
-                Action::ACTION_EXISTS,
-                $exception
-            );
+            throw $this->exceptionFactory->create($machineProvider->getId(), Action::ACTION_EXISTS, $exception);
         }
     }
 

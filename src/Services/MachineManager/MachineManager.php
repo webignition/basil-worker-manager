@@ -77,8 +77,10 @@ class MachineManager
      */
     public function delete(MachineProviderInterface $machineProvider): void
     {
+        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+
         try {
-            $this->findProvider($machineProvider)->remove((int) $machineProvider->getRemoteId());
+            $this->findProvider($machineProvider)->remove($machineName);
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             throw $unsupportedProviderException;
         } catch (\Exception $exception) {

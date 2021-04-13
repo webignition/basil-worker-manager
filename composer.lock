@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05ee643bd8f34d3ff2310a3bdb265fcf",
+    "content-hash": "dcb1c37be167c06cd0db39fff3ba0aa0",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -5998,16 +5998,16 @@
         },
         {
             "name": "toin0u/digitalocean-v2",
-            "version": "4.3.0",
+            "version": "dev-delete-droplet-by-tag",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DigitalOceanPHP/Client.git",
-                "reference": "1ffb85f66e6d1530b3a3ed1b74de293fc0b0bb85"
+                "url": "https://github.com/webignition/Client.git",
+                "reference": "94a9893442bf308fee2a1079b522a72641c3e782"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DigitalOceanPHP/Client/zipball/1ffb85f66e6d1530b3a3ed1b74de293fc0b0bb85",
-                "reference": "1ffb85f66e6d1530b3a3ed1b74de293fc0b0bb85",
+                "url": "https://api.github.com/repos/webignition/Client/zipball/94a9893442bf308fee2a1079b522a72641c3e782",
+                "reference": "94a9893442bf308fee2a1079b522a72641c3e782",
                 "shasum": ""
             },
             "require": {
@@ -6032,7 +6032,11 @@
                     "DigitalOceanV2\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "DigitalOceanV2\\Tests\\": "tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -6060,23 +6064,22 @@
             ],
             "description": "DigitalOcean API v2 client for PHP",
             "keywords": [
+                "API",
                 "Cloud Hosting",
+                "DigitalOcean",
                 "SSD",
-                "api",
-                "digitalocean",
-                "vps"
+                "VPS"
             ],
             "support": {
-                "issues": "https://github.com/DigitalOceanPHP/Client/issues",
-                "source": "https://github.com/DigitalOceanPHP/Client/tree/4.3.0"
+                "source": "https://github.com/webignition/Client/tree/delete-droplet-by-tag"
             },
             "funding": [
                 {
-                    "url": "https://github.com/GrahamCampbell",
-                    "type": "github"
+                    "type": "github",
+                    "url": "https://github.com/GrahamCampbell"
                 }
             ],
-            "time": "2021-03-14T20:10:34+00:00"
+            "time": "2021-04-13T11:02:22+00:00"
         },
         {
             "name": "webignition/basil-worker-manager-interfaces",
@@ -10750,6 +10753,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "toin0u/digitalocean-v2": 20,
         "squizlabs/php_codesniffer": 20
     },
     "prefer-stable": true,

@@ -67,7 +67,6 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                         $remoteMachineState = $remoteMachine->getState();
                         $remoteMachineState = $remoteMachineState ?? MachineInterface::STATE_CREATE_REQUESTED;
 
-                        $machineProvider->setRemoteId($remoteMachine->getId());
                         $this->machineProviderStore->store($machineProvider);
 
                         $machine->setState($remoteMachineState);

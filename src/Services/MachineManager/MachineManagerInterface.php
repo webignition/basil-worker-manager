@@ -16,14 +16,14 @@ interface MachineManagerInterface
     /**
      * @throws ExceptionInterface
      */
-    public function create(string $name): RemoteMachineInterface;
+    public function create(string $machineId, string $name): RemoteMachineInterface;
 
     /**
      * @throws ExceptionInterface
      */
-    public function remove(string $name): void;
+    public function remove(string $machineId, string $name): void;
 
-    public function get(string $name): ?RemoteMachineInterface;
+    public function get(string $machineId, string $name): ?RemoteMachineInterface;
 
-    public function exists(string $name): bool;
+    public function exists(string $machineId, string $name): bool;
 }

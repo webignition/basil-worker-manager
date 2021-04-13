@@ -23,11 +23,11 @@ class DigitalOceanMachineManager implements MachineManagerInterface
     }
 
     /**
-     * @param ProviderInterface::NAME_* $type
+     * @return ProviderInterface::NAME_* $type
      */
-    public function handles(string $type): bool
+    public function getType(): string
     {
-        return ProviderInterface::NAME_DIGITALOCEAN === $type;
+        return ProviderInterface::NAME_DIGITALOCEAN;
     }
 
     /**

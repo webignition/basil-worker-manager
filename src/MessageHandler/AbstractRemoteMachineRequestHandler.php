@@ -81,7 +81,7 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
-            $actionHandler->onSuccess($machine, $machineProvider, $outcome);
+            $actionHandler->onSuccess($machine, $outcome);
         }
 
         if ($lastException instanceof \Throwable) {

@@ -12,6 +12,7 @@ use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineManager\MachineManager;
+use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
@@ -32,6 +33,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         MachineProviderStore $machineProviderStore,
         MessageDispatcher $dispatcher,
         private CreateFailureFactory $createFailureFactory,
+        private MachineUpdater $machineUpdater,
     ) {
         parent::__construct(
             $machineManager,
@@ -59,19 +61,10 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
             })->withSuccessHandler(
                 function (
                     MachineInterface $machine,
-                    MachineProviderInterface $machineProvider,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
-                        $remoteMachine = $outcome->getRemoteMachine();
-                        $remoteMachineState = $remoteMachine->getState();
-                        $remoteMachineState = $remoteMachineState ?? MachineInterface::STATE_CREATE_REQUESTED;
-
-                        $this->machineProviderStore->store($machineProvider);
-
-                        $machine->setState($remoteMachineState);
-                        $machine->setIpAddresses($remoteMachine->getIpAddresses());
-                        $this->machineStore->store($machine);
+                        $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
 
                         $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
                     }

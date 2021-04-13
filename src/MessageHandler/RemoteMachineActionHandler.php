@@ -84,11 +84,10 @@ class RemoteMachineActionHandler implements RemoteMachineActionHandlerInterface
 
     public function onSuccess(
         MachineInterface $machine,
-        MachineProviderInterface $machineProvider,
         RemoteRequestOutcomeInterface $outcome
     ): void {
         if (is_callable($this->successHandler)) {
-            ($this->successHandler)($machine, $machineProvider, $outcome);
+            ($this->successHandler)($machine, $outcome);
         }
     }
 

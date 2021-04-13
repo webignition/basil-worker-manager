@@ -34,7 +34,6 @@ class MachineExistsHandler extends AbstractRemoteMachineRequestHandler implement
             })->withSuccessHandler(
                 function (
                     MachineInterface $machine,
-                    MachineProviderInterface $machineProvider,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteBooleanRequestSuccess && false === $outcome->getResult()) {

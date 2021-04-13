@@ -20,13 +20,9 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
@@ -331,150 +327,27 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         ];
     }
 
-    /**
-     * @dataProvider findDataProvider
-     *
-     * @param ResponseInterface[] $apiResponses
-     */
-    public function testFind(
-        ?MachineInterface $currentMachine,
-        ?MachineProviderInterface $currentMachineProvider,
-        array $apiResponses,
-        string $machineId,
-        ?MachineInterface $expectedMachine,
-        ?MachineProviderInterface $expectedMachineProvider
-    ): void {
-        $machineStore = self::$container->get(MachineStore::class);
-        \assert($machineStore instanceof MachineStore);
+    public function testFindRemoteMachineSuccess(): void
+    {
+        $dropletEntity = new DropletEntity([
+            'id' => 123,
+            'status' => RemoteMachine::STATE_NEW,
+        ]);
 
-        $machineProviderStore = self::$container->get(MachineProviderStore::class);
-        \assert($machineProviderStore instanceof MachineProviderStore);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$dropletEntity]));
 
-        if (null !== $currentMachine) {
-            $machineStore->store($currentMachine);
-        }
+        $remoteMachine = $this->machineManager->findRemoteMachine(self::MACHINE_ID);
 
-        if (null !== $currentMachineProvider) {
-            $machineProviderStore->store($currentMachineProvider);
-        }
-
-        $this->mockHandler->append(...$apiResponses);
-
-        $this->machineManager->find($machineId);
-
-        self::assertEquals($expectedMachine, $machineStore->find($machineId));
-        self::assertEquals($expectedMachineProvider, $machineProviderStore->find($machineId));
+        self::assertEquals(new RemoteMachine($dropletEntity), $remoteMachine);
     }
 
-    /**
-     * @return array[]
-     */
-    public function findDataProvider(): array
+    public function testFindRemoteMachineThrowsMachineNotFoundException(): void
     {
-        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
 
-        return [
-            'no machine, no machine provider, no remote machine' => [
-                'currentMachine' => null,
-                'machineProvider' => null,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => null,
-                'expectedMachineProvider' => null,
-            ],
-            'no machine, no machine provider, has remote machine' => [
-                'currentMachine' => null,
-                'machineProvider' => null,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([
-                        new DropletEntity([
-                            'id' => 123,
-                            'status' => RemoteMachine::STATE_NEW,
-                        ]),
-                    ])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_UP_STARTED),
-                'expectedMachineProvider' => $machineProvider,
-            ],
-            'no machine, has machine provider, no remote machine' => [
-                'currentMachine' => null,
-                'machineProvider' => $machineProvider,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => null,
-                'expectedMachineProvider' => $machineProvider,
-            ],
-            'no machine, has machine provider, has remote machine' => [
-                'currentMachine' => null,
-                'machineProvider' => $machineProvider,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([
-                        new DropletEntity([
-                            'id' => 123,
-                            'status' => RemoteMachine::STATE_ACTIVE,
-                        ]),
-                    ])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_UP_ACTIVE),
-                'expectedMachineProvider' => $machineProvider,
-            ],
-            'has machine, no machine provider, no remote machine' => [
-                'currentMachine' => new Machine(self::MACHINE_ID),
-                'machineProvider' => null,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED),
-                'expectedMachineProvider' => null,
-            ],
-            'has machine, no machine provider, has remote machine' => [
-                'currentMachine' => new Machine(self::MACHINE_ID),
-                'machineProvider' => null,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([
-                        new DropletEntity([
-                            'id' => 123,
-                            'status' => RemoteMachine::STATE_ACTIVE,
-                        ]),
-                    ])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_UP_ACTIVE),
-                'expectedMachineProvider' => $machineProvider,
-            ],
-            'has machine, has machine provider, no remote machine' => [
-                'currentMachine' => new Machine(self::MACHINE_ID),
-                'machineProvider' => $machineProvider,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED),
-                'expectedMachineProvider' => $machineProvider,
-            ],
-            'has machine, has machine provider, has remote machine' => [
-                'currentMachine' => new Machine(self::MACHINE_ID),
-                'machineProvider' => $machineProvider,
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([
-                        new DropletEntity([
-                            'id' => 123,
-                            'status' => RemoteMachine::STATE_ACTIVE,
-                        ]),
-                    ])
-                ],
-                'machineId' => self::MACHINE_ID,
-                'expectedMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_UP_ACTIVE),
-                'expectedMachineProvider' => $machineProvider,
-            ],
-        ];
+        self::expectExceptionObject(new MachineNotFoundException(self::MACHINE_ID));
+
+        $this->machineManager->findRemoteMachine(self::MACHINE_ID);
     }
 
     private function createMachineProvider(): MachineProviderInterface

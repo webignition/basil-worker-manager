@@ -23,7 +23,7 @@ interface MachineManagerInterface
      */
     public function remove(int $remoteId): void;
 
-    public function get(int $remoteId): RemoteMachineInterface;
+    public function get(string $name): ?RemoteMachineInterface;
 
     public function exists(int $remoteId): bool;
 }

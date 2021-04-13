@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services\MachineManager;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\MachineNotFoundException;
 use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\MachineManager\MachineManager;
@@ -65,9 +66,31 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function () {
-            return $this->machineManager->create($this->machineProvider);
-        });
+        $remoteId = 123;
+        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
+
+        $dropletData = [
+            'id' => $remoteId,
+            'networks' => (object) [
+                'v4' => [
+                    (object) [
+                        'ip_address' => $ipAddresses[0],
+                        'type' => 'public',
+                    ],
+                    (object) [
+                        'ip_address' => $ipAddresses[1],
+                        'type' => 'public',
+                    ],
+                ],
+            ],
+        ];
+
+        $expectedDropletEntity = new DropletEntity($dropletData);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
+
+        $remoteMachine = $this->machineManager->create($this->machineProvider);
+
+        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
     /**
@@ -122,9 +145,40 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testGetSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function () {
-            return $this->machineManager->get($this->machineProvider);
-        });
+        $remoteId = 123;
+        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
+
+        $dropletData = [
+            'id' => $remoteId,
+            'networks' => (object) [
+                'v4' => [
+                    (object) [
+                        'ip_address' => $ipAddresses[0],
+                        'type' => 'public',
+                    ],
+                    (object) [
+                        'ip_address' => $ipAddresses[1],
+                        'type' => 'public',
+                    ],
+                ],
+            ],
+        ];
+
+        $expectedDropletEntity = new DropletEntity($dropletData);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$expectedDropletEntity]));
+
+        $remoteMachine = $this->machineManager->get($this->machineProvider);
+
+        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
+    }
+
+    public function testGetThrowsMachineNotFoundException(): void
+    {
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
+
+        self::expectExceptionObject(new MachineNotFoundException($this->machineProvider));
+
+        $this->machineManager->get($this->machineProvider);
     }
 
     /**

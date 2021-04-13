@@ -102,7 +102,7 @@ class MachineManager
             throw $this->exceptionFactory->create($machineProvider->getId(), Action::ACTION_GET, $exception);
         }
 
-        throw new MachineNotFoundException($machineProvider);
+        throw new MachineNotFoundException($machineProvider->getId(), $machineProvider->getName());
     }
 
     /**

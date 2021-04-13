@@ -11,7 +11,7 @@ class MachineNotFoundException extends \Exception implements MachineNotFoundExce
      */
     public function __construct(
         private string $id,
-        private ?string $providerName,
+        private ?string $providerName = null,
     ) {
         parent::__construct();
     }

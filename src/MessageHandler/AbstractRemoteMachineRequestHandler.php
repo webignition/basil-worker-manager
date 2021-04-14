@@ -11,7 +11,7 @@ use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\ExceptionLogger;
-use App\Services\MachineManager\MachineManager;
+use App\Services\MachineManager;
 use App\Services\RemoteRequestRetryDecider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;

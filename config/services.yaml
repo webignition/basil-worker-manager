@@ -18,6 +18,7 @@ parameters:
     exists_retry_limit: '%env(EXISTS_RETRY_LIMIT)%'
     machine_is_active_dispatch_delay: '%env(MACHINE_IS_ACTIVE_DISPATCH_DELAY)%'
     delete_retry_limit: '%env(DELETE_RETRY_LIMIT)%'
+    find_retry_limit: '%env(FIND_RETRY_LIMIT)%'
 
 services:
     # default configuration for services in *this* file
@@ -121,6 +122,7 @@ services:
                 App\Message\GetMachine: '%get_retry_limit%'
                 App\Message\DeleteMachine: '%delete_retry_limit%'
                 App\Message\MachineExists: '%exists_retry_limit%'
+                App\Message\FindMachine: '%find_retry_limit%'
 
     webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher:
         arguments:

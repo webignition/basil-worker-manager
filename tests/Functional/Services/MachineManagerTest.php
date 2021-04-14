@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Exception\MachineNotFoundException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
-use App\Exception\MachineProvider\MachineNotFoundException;
+use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -162,7 +163,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
         $machineProvider = $this->createMachineProvider();
 
-        self::expectExceptionObject(new MachineNotFoundException(
+        self::expectExceptionObject(new ProviderMachineNotFoundException(
             $machineProvider->getId(),
             $machineProvider->getName()
         ));
@@ -347,14 +348,20 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
      * @dataProvider findRemoteMachineThrowsMachineNotFoundExceptionDataProvider
      *
      * @param ResponseInterface[] $apiResponses
+     * @param \Throwable[] $expectedExceptionStack
      */
-    public function testFindRemoteMachineThrowsMachineNotFoundException(array $apiResponses): void
-    {
+    public function testFindRemoteMachineThrowsMachineNotFoundException(
+        array $apiResponses,
+        array $expectedExceptionStack
+    ): void {
         $this->mockHandler->append(...$apiResponses);
 
-        self::expectExceptionObject(new MachineNotFoundException(self::MACHINE_ID));
-
-        $this->machineManager->findRemoteMachine(self::MACHINE_ID);
+        try {
+            $this->machineManager->findRemoteMachine(self::MACHINE_ID);
+            self::fail(MachineNotFoundException::class . ' not thrown');
+        } catch (MachineNotFoundException $machineNotFoundException) {
+            self::assertEquals($expectedExceptionStack, $machineNotFoundException->getExceptionStack());
+        }
     }
 
     /**
@@ -367,10 +374,18 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
                 'apiResponses' => [
                     HttpResponseFactory::fromDropletEntityCollection([]),
                 ],
+                'expectedExceptionStack' => [],
             ],
             'request failed' => [
                 'apiResponses' => [
                     new Response(503),
+                ],
+                'expectedExceptionStack' => [
+                    new HttpException(
+                        self::MACHINE_ID,
+                        RemoteRequestActionInterface::ACTION_GET,
+                        new RuntimeException('Service Unavailable', 503)
+                    ),
                 ],
             ],
         ];

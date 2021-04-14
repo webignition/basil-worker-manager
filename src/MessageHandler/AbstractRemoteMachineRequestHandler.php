@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Exception\MachineProvider\MachineNotFoundExceptionInterface;
+use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\RemoteMachineMessageInterface;
 use App\Model\RemoteRequestFailure;
@@ -66,7 +66,7 @@ abstract class AbstractRemoteMachineRequestHandler
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             $lastException = $unsupportedProviderException;
             $shouldRetry = false;
-        } catch (MachineNotFoundExceptionInterface $machineNotFoundException) {
+        } catch (ProviderMachineNotFoundException $machineNotFoundException) {
             $lastException = $machineNotFoundException;
             $shouldRetry = false;
         }

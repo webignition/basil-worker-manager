@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc396074be19771ede5938c641054769",
+    "content-hash": "348d068e603a6d81d9178139d897b9cb",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -6127,16 +6127,16 @@
         },
         {
             "name": "webignition/basil-worker-manager-persistence-bundle",
-            "version": "0.7",
+            "version": "0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/basil-worker-manager-persistence-bundle.git",
-                "reference": "1c13cafea5a4b014019202daa3647d8ab747e36d"
+                "reference": "39b6ef96d812d3c9522bf7beb9ccb79f8ce25039"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/basil-worker-manager-persistence-bundle/zipball/1c13cafea5a4b014019202daa3647d8ab747e36d",
-                "reference": "1c13cafea5a4b014019202daa3647d8ab747e36d",
+                "url": "https://api.github.com/repos/webignition/basil-worker-manager-persistence-bundle/zipball/39b6ef96d812d3c9522bf7beb9ccb79f8ce25039",
+                "reference": "39b6ef96d812d3c9522bf7beb9ccb79f8ce25039",
                 "shasum": ""
             },
             "require": {
@@ -6184,9 +6184,9 @@
             "homepage": "https://github.com/webignition/basil-worker-manager-persistence-bundle",
             "support": {
                 "issues": "https://github.com/webignition/basil-worker-manager-persistence-bundle/issues",
-                "source": "https://github.com/webignition/basil-worker-manager-persistence-bundle/tree/0/7"
+                "source": "https://github.com/webignition/basil-worker-manager-persistence-bundle/tree/0.9"
             },
-            "time": "2021-04-12T09:36:09+00:00"
+            "time": "2021-04-14T14:15:21+00:00"
         },
         {
             "name": "webignition/symfony-messenger-json-message-serializer-bundle",

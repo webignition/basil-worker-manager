@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Exception\MachineNotFindableException;
+use App\Exception\MachineNotFoundException;
 use App\Message\CheckMachineIsActive;
 use App\Message\FindMachine;
 use App\Services\ExceptionLogger;
@@ -58,9 +59,12 @@ class FindMachineHandler implements MessageHandlerInterface
                     $this->exceptionLogger->log($exception);
                 }
 
-                $machine->setState(MachineInterface::STATE_FIND_NOT_FOUND);
+                $machine->setState(MachineInterface::STATE_FIND_NOT_FINDABLE);
                 $this->machineStore->store($machine);
             }
+        } catch (MachineNotFoundException) {
+            $machine->setState(MachineInterface::STATE_FIND_NOT_FOUND);
+            $this->machineStore->store($machine);
         }
     }
 }

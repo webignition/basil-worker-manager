@@ -2,19 +2,23 @@
 
 namespace App\Exception\MachineProvider;
 
-use App\Exception\MachineNotFoundException;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
-class ProviderMachineNotFoundException extends MachineNotFoundException
+class ProviderMachineNotFoundException extends \Exception
 {
     /**
      * @param ProviderInterface::NAME_* $providerName
      */
     public function __construct(
-        string $id,
+        private string $id,
         private string $providerName,
     ) {
-        parent::__construct($id);
+        parent::__construct();
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
     }
 
     public function getProviderName(): string

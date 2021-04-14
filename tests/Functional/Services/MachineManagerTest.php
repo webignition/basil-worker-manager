@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Exception\MachineNotFoundException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
@@ -326,67 +325,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
                 'apiResponse' => new Response(400),
                 'expectedExceptionClass' => Exception::class,
                 'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
-            ],
-        ];
-    }
-
-    public function testFindRemoteMachineSuccess(): void
-    {
-        $dropletEntity = new DropletEntity([
-            'id' => 123,
-            'status' => RemoteMachine::STATE_NEW,
-        ]);
-
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$dropletEntity]));
-
-        $remoteMachine = $this->machineManager->findRemoteMachine(self::MACHINE_ID);
-
-        self::assertEquals(new RemoteMachine($dropletEntity), $remoteMachine);
-    }
-
-    /**
-     * @dataProvider findRemoteMachineThrowsMachineNotFoundExceptionDataProvider
-     *
-     * @param ResponseInterface[] $apiResponses
-     * @param \Throwable[] $expectedExceptionStack
-     */
-    public function testFindRemoteMachineThrowsMachineNotFoundException(
-        array $apiResponses,
-        array $expectedExceptionStack
-    ): void {
-        $this->mockHandler->append(...$apiResponses);
-
-        try {
-            $this->machineManager->findRemoteMachine(self::MACHINE_ID);
-            self::fail(MachineNotFoundException::class . ' not thrown');
-        } catch (MachineNotFoundException $machineNotFoundException) {
-            self::assertEquals($expectedExceptionStack, $machineNotFoundException->getExceptionStack());
-        }
-    }
-
-    /**
-     * @return array[]
-     */
-    public function findRemoteMachineThrowsMachineNotFoundExceptionDataProvider(): array
-    {
-        return [
-            'machine does not exist' => [
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([]),
-                ],
-                'expectedExceptionStack' => [],
-            ],
-            'request failed' => [
-                'apiResponses' => [
-                    new Response(503),
-                ],
-                'expectedExceptionStack' => [
-                    new HttpException(
-                        self::MACHINE_ID,
-                        RemoteRequestActionInterface::ACTION_GET,
-                        new RuntimeException('Service Unavailable', 503)
-                    ),
-                ],
             ],
         ];
     }

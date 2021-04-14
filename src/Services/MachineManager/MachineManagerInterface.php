@@ -23,7 +23,13 @@ interface MachineManagerInterface
      */
     public function remove(string $machineId, string $name): void;
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function get(string $machineId, string $name): ?RemoteMachineInterface;
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function exists(string $machineId, string $name): bool;
 }

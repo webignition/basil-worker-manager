@@ -9,7 +9,7 @@ use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use App\Services\ExceptionLogger;
-use App\Services\MachineManager\MachineManager;
+use App\Services\MachineManager;
 use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;

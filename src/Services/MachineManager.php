@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services\MachineManager;
+namespace App\Services;
 
 use App\Exception\MachineProvider\MachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
-use App\Services\MachineNameFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
@@ -15,12 +14,12 @@ use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface as Act
 class MachineManager
 {
     /**
-     * @var MachineManagerInterface[]
+     * @var ProviderMachineManagerInterface[]
      */
     private array $machineManagers;
 
     /**
-     * @param MachineManagerInterface[] $machineManagers
+     * @param ProviderMachineManagerInterface[] $machineManagers
      */
     public function __construct(
         array $machineManagers,
@@ -29,7 +28,7 @@ class MachineManager
         private MachineStore $machineStore,
     ) {
         $this->machineManagers = array_filter($machineManagers, function ($item) {
-            return $item instanceof MachineManagerInterface;
+            return $item instanceof ProviderMachineManagerInterface;
         });
     }
 
@@ -155,7 +154,7 @@ class MachineManager
         }
     }
 
-    private function findProvider(MachineProviderInterface $machineProvider): ?MachineManagerInterface
+    private function findProvider(MachineProviderInterface $machineProvider): ?ProviderMachineManagerInterface
     {
         $providerName = $machineProvider->getName();
 

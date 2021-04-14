@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Exception\MachineNotFoundException;
+use App\Message\CheckMachineIsActive;
 use App\Message\FindMachine;
 use App\Services\ExceptionLogger;
 use App\Services\MachineUpdater;
@@ -47,6 +48,8 @@ class FindMachineHandler implements MessageHandlerInterface
 
             $machineProvider = new MachineProvider($machineId, $remoteMachine->getProvider());
             $this->machineProviderStore->store($machineProvider);
+
+            $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
         } catch (MachineNotFoundException $machineNotFoundException) {
             $envelope = $this->dispatcher->dispatch($message->incrementRetryCount());
 

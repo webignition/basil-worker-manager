@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
+use App\Message\CheckMachineIsActive;
 use App\Message\FindMachine;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
@@ -97,7 +98,8 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals($expectedMachine, $this->machineStore->find(self::MACHINE_ID));
         self::assertEquals($expectedMachineProvider, $this->machineProviderStore->find(self::MACHINE_ID));
 
-        $this->messengerAsserter->assertQueueIsEmpty();
+        $this->messengerAsserter->assertQueueCount(1);
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, new CheckMachineIsActive(self::MACHINE_ID));
     }
 
     /**

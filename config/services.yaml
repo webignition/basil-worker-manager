@@ -88,6 +88,11 @@ services:
             $machineManagers:
                 - '@App\Services\DigitalOceanMachineManager'
 
+    App\Services\RemoteMachineFinder:
+        arguments:
+            $machineManagers:
+                - '@App\Services\DigitalOceanMachineManager'
+
     App\Services\RemoteRequestRetryDecider:
         arguments:
             $deciders:

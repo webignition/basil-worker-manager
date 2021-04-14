@@ -16,7 +16,7 @@ use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
-use App\Services\MachineManager\MachineManager;
+use App\Services\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Mock\Services\MockMachineManager;

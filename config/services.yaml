@@ -75,7 +75,7 @@ services:
             $tags:
                 - '%digitalocean_droplet_tag%'
 
-    App\Services\MachineManager\DigitalOceanMachineManager:
+    App\Services\DigitalOceanMachineManager:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
 
@@ -83,10 +83,10 @@ services:
         arguments:
             $environmentPrefix: '%machine_name_prefix%'
 
-    App\Services\MachineManager\MachineManager:
+    App\Services\MachineManager:
         arguments:
             $machineManagers:
-                - '@App\Services\MachineManager\DigitalOceanMachineManager'
+                - '@App\Services\DigitalOceanMachineManager'
 
     App\Services\RemoteRequestRetryDecider:
         arguments:

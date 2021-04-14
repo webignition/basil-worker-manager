@@ -9,8 +9,10 @@ use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class DigitalOceanMachineManager implements MachineManagerInterface
 {
@@ -30,13 +32,21 @@ class DigitalOceanMachineManager implements MachineManagerInterface
     }
 
     /**
-     * @throws VendorExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function create(string $name): RemoteMachineInterface
+    public function create(string $machineId, string $name): RemoteMachineInterface
     {
         $createArguments = new DropletApiCreateCallArguments($name, $this->dropletConfiguration);
 
-        $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
+        try {
+            $dropletEntity = $this->dropletApi->create(...$createArguments->asArray());
+        } catch (VendorExceptionInterface $exception) {
+            throw $this->exceptionFactory->create(
+                $machineId,
+                RemoteRequestActionInterface::ACTION_CREATE,
+                $exception
+            );
+        }
 
         return new RemoteMachine(
             $dropletEntity instanceof DropletEntity ? $dropletEntity : new DropletEntity([])
@@ -44,19 +54,35 @@ class DigitalOceanMachineManager implements MachineManagerInterface
     }
 
     /**
-     * @throws VendorExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function remove(string $name): void
+    public function remove(string $machineId, string $name): void
     {
-        $this->dropletApi->removeAll($name);
+        try {
+            $this->dropletApi->removeAll($name);
+        } catch (VendorExceptionInterface $exception) {
+            throw $this->exceptionFactory->create(
+                $machineId,
+                RemoteRequestActionInterface::ACTION_DELETE,
+                $exception
+            );
+        }
     }
 
     /**
-     * @throws VendorExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function get(string $name): ?RemoteMachineInterface
+    public function get(string $machineId, string $name): ?RemoteMachineInterface
     {
-        $droplets = $this->dropletApi->getAll($name);
+        try {
+            $droplets = $this->dropletApi->getAll($name);
+        } catch (VendorExceptionInterface $exception) {
+            throw $this->exceptionFactory->create(
+                $machineId,
+                RemoteRequestActionInterface::ACTION_GET,
+                $exception
+            );
+        }
 
         return 1 === count($droplets)
             ? new RemoteMachine($droplets[0])
@@ -64,10 +90,10 @@ class DigitalOceanMachineManager implements MachineManagerInterface
     }
 
     /**
-     * @throws VendorExceptionInterface
+     * @throws ExceptionInterface
      */
-    public function exists(string $name): bool
+    public function exists(string $machineId, string $name): bool
     {
-        return $this->get($name) instanceof RemoteMachineInterface;
+        return $this->get($machineId, $name) instanceof RemoteMachineInterface;
     }
 }

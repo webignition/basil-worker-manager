@@ -8,6 +8,7 @@ use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 
 abstract class AbstractBaseIntegrationTest extends AbstractBaseFunctionalTest
 {
@@ -24,11 +25,13 @@ abstract class AbstractBaseIntegrationTest extends AbstractBaseFunctionalTest
         }
 
         $this->removeAllEntities(Machine::class);
+        $this->removeAllEntities(MachineProvider::class);
     }
 
     protected function tearDown(): void
     {
         $this->removeAllEntities(Machine::class);
+        $this->removeAllEntities(MachineProvider::class);
 
         parent::tearDown();
     }

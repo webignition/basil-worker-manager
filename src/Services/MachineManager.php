@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exception\MachineNotFoundException;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
@@ -33,18 +34,20 @@ class MachineManager
     }
 
     /**
-     * @throws ProviderMachineNotFoundException
+     * @throws MachineNotFoundException
      */
     public function findRemoteMachine(string $machineId): RemoteMachineInterface
     {
         $machineName = $this->machineNameFactory->create($machineId);
 
+        $exceptionStack = [];
         $remoteMachine = null;
         foreach ($this->machineManagers as $machineManager) {
             if (null === $remoteMachine) {
                 try {
                     $remoteMachine = $machineManager->get($machineId, $machineName);
-                } catch (ExceptionInterface) {
+                } catch (ExceptionInterface $exception) {
+                    $exceptionStack[] = $exception;
                 }
 
                 if ($remoteMachine instanceof RemoteMachineInterface) {
@@ -53,7 +56,7 @@ class MachineManager
             }
         }
 
-        throw new ProviderMachineNotFoundException($machineId);
+        throw new MachineNotFoundException($machineId, $exceptionStack);
     }
 
     /**

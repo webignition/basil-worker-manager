@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Exception\MachineNotFoundException;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
@@ -12,51 +11,18 @@ use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface as Action;
 
-class MachineManager
+class MachineManager extends AbstractMachineManager
 {
-    /**
-     * @var ProviderMachineManagerInterface[]
-     */
-    private array $machineManagers;
-
     /**
      * @param ProviderMachineManagerInterface[] $machineManagers
      */
     public function __construct(
         array $machineManagers,
+        MachineNameFactory $machineNameFactory,
         private ExceptionFactory $exceptionFactory,
-        private MachineNameFactory $machineNameFactory,
         private MachineStore $machineStore,
     ) {
-        $this->machineManagers = array_filter($machineManagers, function ($item) {
-            return $item instanceof ProviderMachineManagerInterface;
-        });
-    }
-
-    /**
-     * @throws MachineNotFoundException
-     */
-    public function findRemoteMachine(string $machineId): RemoteMachineInterface
-    {
-        $machineName = $this->machineNameFactory->create($machineId);
-
-        $exceptionStack = [];
-        $remoteMachine = null;
-        foreach ($this->machineManagers as $machineManager) {
-            if (null === $remoteMachine) {
-                try {
-                    $remoteMachine = $machineManager->get($machineId, $machineName);
-                } catch (ExceptionInterface $exception) {
-                    $exceptionStack[] = $exception;
-                }
-
-                if ($remoteMachine instanceof RemoteMachineInterface) {
-                    return $remoteMachine;
-                }
-            }
-        }
-
-        throw new MachineNotFoundException($machineId, $exceptionStack);
+        parent::__construct($machineManagers, $machineNameFactory);
     }
 
     /**
@@ -66,7 +32,7 @@ class MachineManager
     public function create(MachineProviderInterface $machineProvider): RemoteMachineInterface
     {
         $machineId = $machineProvider->getId();
-        $machineName = $this->machineNameFactory->create($machineId);
+        $machineName = $this->createMachineName($machineId);
 
         $provider = $this->findProvider($machineProvider);
         if (null === $provider) {
@@ -90,7 +56,7 @@ class MachineManager
     public function get(MachineProviderInterface $machineProvider): RemoteMachineInterface
     {
         $machineId = $machineProvider->getId();
-        $machineName = $this->machineNameFactory->create($machineId);
+        $machineName = $this->createMachineName($machineId);
 
         $provider = $this->findProvider($machineProvider);
         if (null === $provider) {
@@ -118,7 +84,7 @@ class MachineManager
     public function delete(MachineProviderInterface $machineProvider): void
     {
         $machineId = $machineProvider->getId();
-        $machineName = $this->machineNameFactory->create($machineId);
+        $machineName = $this->createMachineName($machineId);
 
         $provider = $this->findProvider($machineProvider);
         if (null === $provider) {
@@ -141,7 +107,7 @@ class MachineManager
     public function exists(MachineProviderInterface $machineProvider): bool
     {
         $machineId = $machineProvider->getId();
-        $machineName = $this->machineNameFactory->create($machineId);
+        $machineName = $this->createMachineName($machineId);
 
         $provider = $this->findProvider($machineProvider);
         if (null === $provider) {
@@ -155,18 +121,5 @@ class MachineManager
         } catch (\Exception $exception) {
             throw $this->exceptionFactory->create($machineId, Action::ACTION_GET, $exception);
         }
-    }
-
-    private function findProvider(MachineProviderInterface $machineProvider): ?ProviderMachineManagerInterface
-    {
-        $providerName = $machineProvider->getName();
-
-        foreach ($this->machineManagers as $machineManager) {
-            if ($machineManager->getType() === $providerName) {
-                return $machineManager;
-            }
-        }
-
-        return null;
     }
 }

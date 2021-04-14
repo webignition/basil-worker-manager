@@ -210,7 +210,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals($machine, $this->machineStore->find(self::MACHINE_ID));
     }
 
-    public function testInvokeRemoteMachineNotFoundFailed(): void
+    public function testInvokeRemoteMachineNotFindable(): void
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
@@ -233,6 +233,32 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = $message->incrementRetryCount();
         $message = $message->incrementRetryCount();
         $message = $message->incrementRetryCount();
+
+        ($this->handler)($message);
+
+        $this->messengerAsserter->assertQueueIsEmpty();
+
+        self::assertSame(MachineInterface::STATE_FIND_NOT_FINDABLE, $machine->getState());
+        self::assertNull($this->machineProviderStore->find(self::MACHINE_ID));
+        self::assertEquals($machine, $this->machineStore->find(self::MACHINE_ID));
+    }
+
+    public function testInvokeRemoteMachineNotFound(): void
+    {
+        $this->messengerAsserter->assertQueueIsEmpty();
+
+        $this->setExceptionLoggerOnHandler(
+            (new MockExceptionLogger())
+                ->withoutLogCall()
+                ->getMock()
+        );
+
+        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED);
+        $this->machineStore->store($machine);
+
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
+
+        $message = new FindMachine(self::MACHINE_ID);
 
         ($this->handler)($message);
 

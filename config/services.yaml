@@ -126,7 +126,6 @@ services:
     App\Services\ExceptionFactory\MachineProvider\ExceptionFactory:
         arguments:
             $factories:
-                - '@App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory'
                 - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'
 
     webignition\JsonMessageSerializerBundle\Services\MessageFactory:

@@ -17,27 +17,18 @@ use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\Exception
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
-class DigitalOceanExceptionFactory implements ExceptionFactoryInterface
+class DigitalOceanExceptionFactory
 {
     public function __construct(
         private Client $digitalOceanClient,
     ) {
     }
 
-    public function handles(\Throwable $exception): bool
-    {
-        return $exception instanceof VendorExceptionInterface;
-    }
-
     /**
      * @param MachineActionInterface::ACTION_* $action
      */
-    public function create(string $resourceId, string $action, \Throwable $exception): ?ExceptionInterface
+    public function create(string $resourceId, string $action, VendorExceptionInterface $exception): ExceptionInterface
     {
-        if (!$exception instanceof VendorExceptionInterface) {
-            return null;
-        }
-
         if ($exception instanceof VendorApiLimitExceededException) {
             $lastResponse = $this->digitalOceanClient->getLastResponse();
             if ($lastResponse instanceof ResponseInterface) {

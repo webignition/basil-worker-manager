@@ -19,7 +19,6 @@ use DigitalOceanV2\Exception\ValidationFailedException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
@@ -344,13 +343,37 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteMachine($dropletEntity), $remoteMachine);
     }
 
-    public function testFindRemoteMachineThrowsMachineNotFoundException(): void
+    /**
+     * @dataProvider findRemoteMachineThrowsMachineNotFoundExceptionDataProvider
+     *
+     * @param ResponseInterface[] $apiResponses
+     */
+    public function testFindRemoteMachineThrowsMachineNotFoundException(array $apiResponses): void
     {
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
+        $this->mockHandler->append(...$apiResponses);
 
         self::expectExceptionObject(new MachineNotFoundException(self::MACHINE_ID));
 
         $this->machineManager->findRemoteMachine(self::MACHINE_ID);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function findRemoteMachineThrowsMachineNotFoundExceptionDataProvider(): array
+    {
+        return [
+            'machine does not exist' => [
+                'apiResponses' => [
+                    HttpResponseFactory::fromDropletEntityCollection([]),
+                ],
+            ],
+            'request failed' => [
+                'apiResponses' => [
+                    new Response(503),
+                ],
+            ],
+        ];
     }
 
     private function createMachineProvider(): MachineProviderInterface

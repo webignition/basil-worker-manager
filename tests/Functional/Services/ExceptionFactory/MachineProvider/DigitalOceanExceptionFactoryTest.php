@@ -38,14 +38,6 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
         }
     }
 
-    public function testHandles(): void
-    {
-        self::assertTrue($this->factory->handles(new VendorApiLimitExceededException()));
-        self::assertTrue($this->factory->handles(new RuntimeException()));
-        self::assertTrue($this->factory->handles(new ValidationFailedException()));
-        self::assertFalse($this->factory->handles(new \Exception()));
-    }
-
     /**
      * @dataProvider createDataProvider
      */
@@ -130,17 +122,6 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
                 self::ID,
                 MachineActionInterface::ACTION_CREATE,
                 $vendorApiLimitExceedException
-            )
-        );
-    }
-
-    public function testCreateForUnhandledException(): void
-    {
-        self::assertNull(
-            $this->factory->create(
-                self::ID,
-                MachineActionInterface::ACTION_GET,
-                new \Exception()
             )
         );
     }

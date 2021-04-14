@@ -43,7 +43,10 @@ class MachineManager
         $remoteMachine = null;
         foreach ($this->machineManagers as $machineManager) {
             if (null === $remoteMachine) {
-                $remoteMachine = $machineManager->get($machineName);
+                try {
+                    $remoteMachine = $machineManager->get($machineId, $machineName);
+                } catch (ExceptionInterface) {
+                }
 
                 if ($remoteMachine instanceof RemoteMachineInterface) {
                     return $remoteMachine;
@@ -60,14 +63,20 @@ class MachineManager
      */
     public function create(MachineProviderInterface $machineProvider): RemoteMachineInterface
     {
-        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+        $machineId = $machineProvider->getId();
+        $machineName = $this->machineNameFactory->create($machineId);
+
+        $provider = $this->findProvider($machineProvider);
+        if (null === $provider) {
+            throw new UnsupportedProviderException($machineProvider->getName());
+        }
 
         try {
-            return $this->findProvider($machineProvider)->create($machineName);
-        } catch (UnsupportedProviderException $unsupportedProviderException) {
-            throw $unsupportedProviderException;
+            return $provider->create($machineId, $machineName);
+        } catch (ExceptionInterface $exception) {
+            throw $exception;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create($machineProvider->getId(), Action::ACTION_CREATE, $exception);
+            throw $this->exceptionFactory->create($machineId, Action::ACTION_CREATE, $exception);
         }
     }
 
@@ -78,17 +87,23 @@ class MachineManager
      */
     public function get(MachineProviderInterface $machineProvider): RemoteMachineInterface
     {
-        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+        $machineId = $machineProvider->getId();
+        $machineName = $this->machineNameFactory->create($machineId);
+
+        $provider = $this->findProvider($machineProvider);
+        if (null === $provider) {
+            throw new UnsupportedProviderException($machineProvider->getName());
+        }
 
         try {
-            $machine = $this->findProvider($machineProvider)->get($machineName);
+            $machine = $provider->get($machineId, $machineName);
             if ($machine instanceof RemoteMachineInterface) {
                 return $machine;
             }
-        } catch (UnsupportedProviderException $unsupportedProviderException) {
-            throw $unsupportedProviderException;
+        } catch (ExceptionInterface $exception) {
+            throw $exception;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create($machineProvider->getId(), Action::ACTION_GET, $exception);
+            throw $this->exceptionFactory->create($machineId, Action::ACTION_GET, $exception);
         }
 
         throw new MachineNotFoundException($machineProvider->getId(), $machineProvider->getName());
@@ -100,14 +115,20 @@ class MachineManager
      */
     public function delete(MachineProviderInterface $machineProvider): void
     {
-        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+        $machineId = $machineProvider->getId();
+        $machineName = $this->machineNameFactory->create($machineId);
+
+        $provider = $this->findProvider($machineProvider);
+        if (null === $provider) {
+            throw new UnsupportedProviderException($machineProvider->getName());
+        }
 
         try {
-            $this->findProvider($machineProvider)->remove($machineName);
-        } catch (UnsupportedProviderException $unsupportedProviderException) {
-            throw $unsupportedProviderException;
+            $provider->remove($machineId, $machineName);
+        } catch (ExceptionInterface $exception) {
+            throw $exception;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create($machineProvider->getId(), Action::ACTION_DELETE, $exception);
+            throw $this->exceptionFactory->create($machineId, Action::ACTION_DELETE, $exception);
         }
     }
 
@@ -117,21 +138,24 @@ class MachineManager
      */
     public function exists(MachineProviderInterface $machineProvider): bool
     {
-        $machineName = $this->machineNameFactory->create($machineProvider->getId());
+        $machineId = $machineProvider->getId();
+        $machineName = $this->machineNameFactory->create($machineId);
+
+        $provider = $this->findProvider($machineProvider);
+        if (null === $provider) {
+            throw new UnsupportedProviderException($machineProvider->getName());
+        }
 
         try {
-            return $this->findProvider($machineProvider)->exists($machineName);
-        } catch (UnsupportedProviderException $unsupportedProviderException) {
-            throw $unsupportedProviderException;
+            return $provider->exists($machineId, $machineName);
+        } catch (ExceptionInterface $exception) {
+            throw $exception;
         } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create($machineProvider->getId(), Action::ACTION_EXISTS, $exception);
+            throw $this->exceptionFactory->create($machineId, Action::ACTION_GET, $exception);
         }
     }
 
-    /**
-     * @throws UnsupportedProviderException
-     */
-    private function findProvider(MachineProviderInterface $machineProvider): MachineManagerInterface
+    private function findProvider(MachineProviderInterface $machineProvider): ?MachineManagerInterface
     {
         $providerName = $machineProvider->getName();
 
@@ -141,6 +165,6 @@ class MachineManager
             }
         }
 
-        throw new UnsupportedProviderException($machineProvider->getName());
+        return null;
     }
 }

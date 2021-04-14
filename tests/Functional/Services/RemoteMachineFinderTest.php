@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
-use App\Exception\MachineNotFoundException;
+use App\Exception\MachineNotFindableException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\RemoteMachineFinder;
@@ -53,12 +53,12 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider findRemoteMachineThrowsMachineNotFoundExceptionDataProvider
+     * @dataProvider findMachineNotFindableDataProvider
      *
      * @param ResponseInterface[] $apiResponses
      * @param \Throwable[] $expectedExceptionStack
      */
-    public function testFindRemoteMachineThrowsMachineNotFoundException(
+    public function testFindMachineNotFindable(
         array $apiResponses,
         array $expectedExceptionStack
     ): void {
@@ -66,8 +66,8 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
 
         try {
             $this->finder->find(self::MACHINE_ID);
-            self::fail(MachineNotFoundException::class . ' not thrown');
-        } catch (MachineNotFoundException $machineNotFoundException) {
+            self::fail(MachineNotFindableException::class . ' not thrown');
+        } catch (MachineNotFindableException $machineNotFoundException) {
             self::assertEquals($expectedExceptionStack, $machineNotFoundException->getExceptionStack());
         }
     }
@@ -75,7 +75,7 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function findRemoteMachineThrowsMachineNotFoundExceptionDataProvider(): array
+    public function findMachineNotFindableDataProvider(): array
     {
         return [
             'machine does not exist' => [

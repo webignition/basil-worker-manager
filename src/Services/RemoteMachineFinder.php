@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Exception\MachineNotFoundException;
+use App\Exception\MachineNotFindableException;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 class RemoteMachineFinder extends AbstractMachineManager
 {
     /**
-     * @throws MachineNotFoundException
+     * @throws MachineNotFindableException
      */
     public function find(string $machineId): RemoteMachineInterface
     {
@@ -31,6 +31,6 @@ class RemoteMachineFinder extends AbstractMachineManager
             }
         }
 
-        throw new MachineNotFoundException($machineId, $exceptionStack);
+        throw new MachineNotFindableException($machineId, $exceptionStack);
     }
 }

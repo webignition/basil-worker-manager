@@ -4,7 +4,7 @@ namespace App\Exception\MachineProvider;
 
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
-class MachineNotFoundException extends \Exception implements MachineNotFoundExceptionInterface
+class ProviderMachineNotFoundException extends \Exception
 {
     /**
      * @param ProviderInterface::NAME_* $providerName|null

@@ -7,7 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
-use App\Exception\MachineProvider\MachineNotFoundException;
+use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -159,7 +159,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
         $machineProvider = $this->createMachineProvider();
 
-        self::expectExceptionObject(new MachineNotFoundException(
+        self::expectExceptionObject(new ProviderMachineNotFoundException(
             $machineProvider->getId(),
             $machineProvider->getName()
         ));
@@ -349,7 +349,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(...$apiResponses);
 
-        self::expectExceptionObject(new MachineNotFoundException(self::MACHINE_ID));
+        self::expectExceptionObject(new ProviderMachineNotFoundException(self::MACHINE_ID));
 
         $this->machineManager->findRemoteMachine(self::MACHINE_ID);
     }

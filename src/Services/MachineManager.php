@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exception\MachineProvider\MachineNotFoundException;
+use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
@@ -33,7 +33,7 @@ class MachineManager
     }
 
     /**
-     * @throws MachineNotFoundException
+     * @throws ProviderMachineNotFoundException
      */
     public function findRemoteMachine(string $machineId): RemoteMachineInterface
     {
@@ -53,7 +53,7 @@ class MachineManager
             }
         }
 
-        throw new MachineNotFoundException($machineId);
+        throw new ProviderMachineNotFoundException($machineId);
     }
 
     /**
@@ -82,7 +82,7 @@ class MachineManager
     /**
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
-     * @throws MachineNotFoundException
+     * @throws ProviderMachineNotFoundException
      */
     public function get(MachineProviderInterface $machineProvider): RemoteMachineInterface
     {
@@ -105,7 +105,7 @@ class MachineManager
             throw $this->exceptionFactory->create($machineId, Action::ACTION_GET, $exception);
         }
 
-        throw new MachineNotFoundException($machineProvider->getId(), $machineProvider->getName());
+        throw new ProviderMachineNotFoundException($machineProvider->getId(), $machineProvider->getName());
     }
 
     /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
-use App\Services\MachineManager\MachineManager;
+use App\Services\MachineManager;
 use Mockery\MockInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 

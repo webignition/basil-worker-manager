@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\MachineManager;
+namespace App\Services;
 
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
@@ -14,7 +14,7 @@ use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
-class DigitalOceanMachineManager implements MachineManagerInterface
+class DigitalOceanMachineManager implements ProviderMachineManagerInterface
 {
     public function __construct(
         private DropletApi $dropletApi,

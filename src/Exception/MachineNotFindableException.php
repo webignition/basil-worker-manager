@@ -2,7 +2,7 @@
 
 namespace App\Exception;
 
-class MachineNotFindableException extends \Exception
+class MachineNotFindableException extends MachineNotFoundException
 {
     /**
      * @var \Throwable[]
@@ -13,19 +13,14 @@ class MachineNotFindableException extends \Exception
      * @param \Throwable[] $exceptionStack
      */
     public function __construct(
-        private string $id,
+        string $id,
         array $exceptionStack = [],
     ) {
-        parent::__construct();
+        parent::__construct($id);
 
         $this->exceptionStack = array_filter($exceptionStack, function ($item) {
             return $item instanceof \Throwable;
         });
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Exception\MachineNotFindableException;
+use App\Exception\MachineNotFoundException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\RemoteMachineFinder;
@@ -14,7 +15,6 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
@@ -38,7 +38,7 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
         }
     }
 
-    public function testFindRemoteMachineSuccess(): void
+    public function testFindSuccess(): void
     {
         $dropletEntity = new DropletEntity([
             'id' => 123,
@@ -52,17 +52,17 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteMachine($dropletEntity), $remoteMachine);
     }
 
-    /**
-     * @dataProvider findMachineNotFindableDataProvider
-     *
-     * @param ResponseInterface[] $apiResponses
-     * @param \Throwable[] $expectedExceptionStack
-     */
-    public function testFindMachineNotFindable(
-        array $apiResponses,
-        array $expectedExceptionStack
-    ): void {
-        $this->mockHandler->append(...$apiResponses);
+    public function testFindMachineNotFindable(): void
+    {
+        $this->mockHandler->append(new Response(503));
+
+        $expectedExceptionStack = [
+            new HttpException(
+                self::MACHINE_ID,
+                RemoteRequestActionInterface::ACTION_GET,
+                new RuntimeException('Service Unavailable', 503)
+            ),
+        ];
 
         try {
             $this->finder->find(self::MACHINE_ID);
@@ -72,30 +72,12 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
         }
     }
 
-    /**
-     * @return array[]
-     */
-    public function findMachineNotFindableDataProvider(): array
+    public function testFindMachineDoesNotExist(): void
     {
-        return [
-            'machine does not exist' => [
-                'apiResponses' => [
-                    HttpResponseFactory::fromDropletEntityCollection([]),
-                ],
-                'expectedExceptionStack' => [],
-            ],
-            'request failed' => [
-                'apiResponses' => [
-                    new Response(503),
-                ],
-                'expectedExceptionStack' => [
-                    new HttpException(
-                        self::MACHINE_ID,
-                        RemoteRequestActionInterface::ACTION_GET,
-                        new RuntimeException('Service Unavailable', 503)
-                    ),
-                ],
-            ],
-        ];
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
+
+        self::expectExceptionObject(new MachineNotFoundException(self::MACHINE_ID));
+
+        $this->finder->find(self::MACHINE_ID);
     }
 }

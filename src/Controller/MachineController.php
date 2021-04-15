@@ -81,7 +81,8 @@ class MachineController
     ): Response {
         $machine = $machineStore->find($id);
         if (false === $machine instanceof MachineInterface) {
-            return new Response('', 404);
+            $machine = new Machine($id, MachineInterface::STATE_DELETE_RECEIVED);
+            $machineStore->store($machine);
         }
 
         $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));

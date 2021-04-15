@@ -19,7 +19,7 @@ class RemoteMachineFinder extends AbstractMachineManager
 
         $exceptionStack = [];
         $remoteMachine = null;
-        foreach ($this->machineManagers as $machineManager) {
+        foreach ($this->machineManagerStack->getManagers() as $machineManager) {
             if (null === $remoteMachine) {
                 try {
                     $remoteMachine = $machineManager->get($machineId, $machineName);

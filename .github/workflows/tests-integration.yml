@@ -44,7 +44,7 @@ jobs:
       - name: Setup integration environment
         run: |
           composer integration-setup
-          sleep 5
+          sleep 10
 
       - name: Run asynchronous tests
         env:

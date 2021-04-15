@@ -180,8 +180,9 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     public function testDeleteMachineNotFound(): void
     {
         $response = $this->makeDeleteRequest();
+        self::assertSame(202, $response->getStatusCode());
 
-        self::assertSame(404, $response->getStatusCode());
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, new DeleteMachine(self::MACHINE_ID));
     }
 
     /**

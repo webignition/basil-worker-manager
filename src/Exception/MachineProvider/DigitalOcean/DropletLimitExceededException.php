@@ -12,12 +12,12 @@ class DropletLimitExceededException extends Exception implements UnprocessableRe
     public const MESSAGE_IDENTIFIER = 'exceed your droplet limit';
 
     public function __construct(
-        string $resourceId,
+        string $machineId,
         string $action,
         \Throwable $remoteException
     ) {
         parent::__construct(
-            $resourceId,
+            $machineId,
             $action,
             $remoteException,
             UnprocessableRequestExceptionInterface::CODE_REMOTE_PROVIDER_RESOURCE_LIMIT_REACHED

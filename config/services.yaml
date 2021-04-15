@@ -143,3 +143,4 @@ services:
                 !php/const App\Message\DeleteMachine::TYPE: 'App\Message\DeleteMachine'
                 !php/const App\Message\GetMachine::TYPE: 'App\Message\GetMachine'
                 !php/const App\Message\MachineExists::TYPE: 'App\Message\MachineExists'
+                !php/const App\Message\FindMachine::TYPE: 'App\Message\FindMachine'

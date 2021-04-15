@@ -11,7 +11,7 @@ class FindMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 
-    public const TYPE = 'get-machine';
+    public const TYPE = 'find-machine';
 
     public function getAction(): string
     {

@@ -58,11 +58,13 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $machine = $this->entityManager->find(Machine::class, self::MACHINE_ID);
         self::assertInstanceOf(Machine::class, $machine);
+        \assert($machine instanceof Machine);
         self::assertSame(self::MACHINE_ID, $machine->getId());
 
         $machineProvider = $this->entityManager->find(MachineProvider::class, self::MACHINE_ID);
         self::assertInstanceOf(MachineProvider::class, $machineProvider);
         self::assertSame(self::MACHINE_ID, $machineProvider->getId());
+        \assert($machineProvider instanceof MachineProvider);
 
         $this->messengerAsserter->assertQueueCount(1);
 
@@ -93,7 +95,15 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     {
         $response = $this->makeStatusRequest();
 
-        self::assertSame(404, $response->getStatusCode());
+        self::assertInstanceOf(JsonResponse::class, $response);
+        self::assertJsonStringEqualsJsonString(
+            (string) json_encode([
+                'id' => self::MACHINE_ID,
+                'state' => MachineInterface::STATE_FIND_RECEIVED,
+                'ip_addresses' => [],
+            ]),
+            (string) $response->getContent()
+        );
     }
 
     public function testStatusWithoutCreateFailure(): void

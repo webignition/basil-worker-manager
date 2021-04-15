@@ -39,7 +39,7 @@ abstract class AbstractBaseIntegrationTest extends AbstractBaseFunctionalTest
     /**
      * @param class-string $entityClassName
      */
-    private function removeAllEntities(string $entityClassName): void
+    protected function removeAllEntities(string $entityClassName): void
     {
         $repository = $this->entityManager->getRepository($entityClassName);
         if ($repository instanceof ObjectRepository) {

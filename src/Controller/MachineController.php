@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
+use App\Message\FindMachine;
 use App\Response\BadMachineCreateRequestResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,10 +53,14 @@ class MachineController
         string $id,
         MachineStore $machineStore,
         CreateFailureStore $createFailureStore,
+        MessageDispatcher $messageDispatcher,
     ): Response {
         $machine = $machineStore->find($id);
-        if (false === $machine instanceof MachineInterface) {
-            return new Response('', 404);
+        if (!$machine instanceof MachineInterface) {
+            $machine = new Machine($id, MachineInterface::STATE_FIND_RECEIVED);
+            $machineStore->store($machine);
+
+            $messageDispatcher->dispatch(new FindMachine($id));
         }
 
         $responseData = $machine->jsonSerialize();

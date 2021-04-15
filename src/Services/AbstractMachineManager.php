@@ -6,21 +6,10 @@ use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 abstract class AbstractMachineManager
 {
-    /**
-     * @var ProviderMachineManagerInterface[]
-     */
-    protected array $machineManagers;
-
-    /**
-     * @param ProviderMachineManagerInterface[] $machineManagers
-     */
     public function __construct(
-        array $machineManagers,
+        protected MachineManagerStack $machineManagerStack,
         private MachineNameFactory $machineNameFactory,
     ) {
-        $this->machineManagers = array_filter($machineManagers, function ($item) {
-            return $item instanceof ProviderMachineManagerInterface;
-        });
     }
 
     protected function createMachineName(string $machineId): string
@@ -32,7 +21,7 @@ abstract class AbstractMachineManager
     {
         $providerName = $machineProvider->getName();
 
-        foreach ($this->machineManagers as $machineManager) {
+        foreach ($this->machineManagerStack->getManagers() as $machineManager) {
             if ($machineManager->getType() === $providerName) {
                 return $machineManager;
             }

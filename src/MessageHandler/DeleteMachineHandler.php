@@ -4,35 +4,53 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Exception\MachineNotRemovableException;
 use App\Message\DeleteMachine;
 use App\Message\MachineExists;
-use App\Model\RemoteBooleanRequestSuccess;
-use App\Model\RemoteRequestOutcomeInterface;
+use App\Services\ExceptionLogger;
+use App\Services\RemoteMachineRemover;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
+use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
-class DeleteMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
+class DeleteMachineHandler implements MessageHandlerInterface
 {
-    public function __invoke(DeleteMachine $message): RemoteRequestOutcomeInterface
-    {
-        return $this->handle(
-            $message,
-            (new RemoteMachineActionHandler(
-                function (MachineProviderInterface $machineProvider) {
-                    $this->machineManager->delete($machineProvider);
+    public function __construct(
+        private MachineStore $machineStore,
+        private RemoteMachineRemover $remoteMachineRemover,
+        private MessageDispatcher $dispatcher,
+        private ExceptionLogger $exceptionLogger,
+    ) {
+    }
 
-                    return new RemoteBooleanRequestSuccess(true);
+    public function __invoke(DeleteMachine $message): void
+    {
+        $machineId = $message->getMachineId();
+
+        $machine = $this->machineStore->find($machineId);
+        if (!$machine instanceof MachineInterface) {
+            return;
+        }
+
+        $machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
+        $this->machineStore->store($machine);
+
+        try {
+            $this->remoteMachineRemover->remove($machineId);
+
+            $this->dispatcher->dispatch(new MachineExists($machine->getId()));
+        } catch (MachineNotRemovableException $machineNotRemovableException) {
+            $envelope = $this->dispatcher->dispatch($message->incrementRetryCount());
+
+            if (false === MessageDispatcher::isDispatchable($envelope)) {
+                foreach ($machineNotRemovableException->getExceptionStack() as $exception) {
+                    $this->exceptionLogger->log($exception);
                 }
-            ))->withBeforeRequestHandler(function (MachineInterface $machine) {
-                $machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
-                $this->machineStore->store($machine);
-            })->withSuccessHandler(function (MachineInterface $machine) {
-                $this->dispatcher->dispatch(new MachineExists($machine->getId()));
-            })->withFailureHandler(function (MachineInterface $machine) {
+
                 $machine->setState(MachineInterface::STATE_DELETE_FAILED);
                 $this->machineStore->store($machine);
-            })
-        );
+            }
+        }
     }
 }

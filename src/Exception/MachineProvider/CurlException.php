@@ -12,11 +12,11 @@ class CurlException extends Exception implements CurlExceptionInterface
      */
     public function __construct(
         private int $curlCode,
-        string $resourceId,
+        string $machineId,
         string $action,
         \Throwable $remoteException
     ) {
-        parent::__construct($resourceId, $action, $remoteException);
+        parent::__construct($machineId, $action, $remoteException);
     }
 
     public function getCurlCode(): int

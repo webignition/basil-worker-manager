@@ -11,12 +11,17 @@ class Exception extends \Exception implements ExceptionInterface
      * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function __construct(
-        private string $resourceId,
+        private string $machineId,
         private string $action,
         private \Throwable $remoteException,
         int $code = 0
     ) {
-        parent::__construct(self::createMessage($resourceId, $action), $code, $remoteException);
+        parent::__construct(self::createMessage($machineId, $action), $code, $remoteException);
+    }
+
+    public function getMachineId(): string
+    {
+        return $this->machineId;
     }
 
     public function getAction(): string
@@ -29,12 +34,12 @@ class Exception extends \Exception implements ExceptionInterface
         return $this->remoteException;
     }
 
-    private static function createMessage(string $resourceId, string $action): string
+    private static function createMessage(string $machineId, string $action): string
     {
         return sprintf(
             'Unable to perform action %s for resource %s ',
             $action,
-            (string) $resourceId
+            (string) $machineId
         );
     }
 }

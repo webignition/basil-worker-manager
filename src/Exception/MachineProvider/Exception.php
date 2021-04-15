@@ -2,26 +2,22 @@
 
 namespace App\Exception\MachineProvider;
 
+use App\Exception\AbstractMachineException;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
-class Exception extends \Exception implements ExceptionInterface
+class Exception extends AbstractMachineException implements ExceptionInterface
 {
     /**
      * @param RemoteRequestActionInterface::ACTION_* $action
      */
     public function __construct(
-        private string $machineId,
+        string $machineId,
         private string $action,
         private \Throwable $remoteException,
         int $code = 0
     ) {
-        parent::__construct(self::createMessage($machineId, $action), $code, $remoteException);
-    }
-
-    public function getMachineId(): string
-    {
-        return $this->machineId;
+        parent::__construct($machineId, self::createMessage($machineId, $action), $code, $remoteException);
     }
 
     public function getAction(): string

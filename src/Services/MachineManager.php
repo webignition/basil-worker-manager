@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface as Action;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
@@ -13,16 +12,12 @@ use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 class MachineManager extends AbstractMachineManager
 {
-    /**
-     * @param ProviderMachineManagerInterface[] $machineManagers
-     */
     public function __construct(
-        array $machineManagers,
+        MachineManagerStack $machineManagerStack,
         MachineNameFactory $machineNameFactory,
         private ExceptionFactory $exceptionFactory,
-        private MachineStore $machineStore,
     ) {
-        parent::__construct($machineManagers, $machineNameFactory);
+        parent::__construct($machineManagerStack, $machineNameFactory);
     }
 
     /**

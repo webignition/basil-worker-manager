@@ -80,6 +80,11 @@ services:
         arguments:
             $dropletConfiguration: '@app.digitalocean.droplet_configuration.default'
 
+    App\Services\MachineManagerStack:
+        arguments:
+            $machineManagers:
+                - '@App\Services\DigitalOceanMachineManager'
+
     App\Services\MachineNameFactory:
         arguments:
             $environmentPrefix: '%machine_name_prefix%'

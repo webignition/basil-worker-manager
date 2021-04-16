@@ -6,15 +6,16 @@ namespace App\MessageHandler;
 
 use App\Exception\MachineNotFindableException;
 use App\Exception\MachineNotFoundException;
-use App\Message\CheckMachineIsActive;
 use App\Message\FindMachine;
 use App\Services\ExceptionLogger;
+use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteMachineFinder;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
@@ -25,7 +26,7 @@ class FindMachineHandler implements MessageHandlerInterface
         private MachineProviderStore $machineProviderStore,
         private RemoteMachineFinder $remoteMachineFinder,
         private MachineUpdater $machineUpdater,
-        private MessageDispatcher $dispatcher,
+        private MachineRequestDispatcher $machineRequestDispatcher,
         private ExceptionLogger $exceptionLogger,
     ) {
     }
@@ -50,9 +51,9 @@ class FindMachineHandler implements MessageHandlerInterface
             $machineProvider = new MachineProvider($machineId, $remoteMachine->getProvider());
             $this->machineProviderStore->store($machineProvider);
 
-            $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
+            $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_CHECK_IS_ACTIVE);
         } catch (MachineNotFindableException $machineNotFoundException) {
-            $envelope = $this->dispatcher->dispatch($message->incrementRetryCount());
+            $envelope = $this->machineRequestDispatcher->reDispatch($message);
 
             if (false === MessageDispatcher::isDispatchable($envelope)) {
                 foreach ($machineNotFoundException->getExceptionStack() as $exception) {

@@ -12,6 +12,7 @@ use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineManager;
+use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteRequestRetryDecider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
@@ -28,7 +29,7 @@ abstract class AbstractRemoteMachineRequestHandler
         protected ExceptionLogger $exceptionLogger,
         protected MachineStore $machineStore,
         protected MachineProviderStore $machineProviderStore,
-        protected MessageDispatcher $dispatcher,
+        protected MachineRequestDispatcher $machineRequestDispatcher,
     ) {
     }
 
@@ -72,7 +73,7 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome || $shouldRetry) {
-            $envelope = $this->dispatcher->dispatch($message->incrementRetryCount());
+            $envelope = $this->machineRequestDispatcher->reDispatch($message);
 
             if (MessageDispatcher::isDispatchable($envelope)) {
                 $outcome = RemoteRequestOutcome::retrying();

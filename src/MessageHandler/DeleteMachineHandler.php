@@ -6,11 +6,12 @@ namespace App\MessageHandler;
 
 use App\Exception\MachineNotRemovableException;
 use App\Message\DeleteMachine;
-use App\Message\MachineExists;
 use App\Services\ExceptionLogger;
+use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteMachineRemover;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
@@ -19,7 +20,7 @@ class DeleteMachineHandler implements MessageHandlerInterface
     public function __construct(
         private MachineStore $machineStore,
         private RemoteMachineRemover $remoteMachineRemover,
-        private MessageDispatcher $dispatcher,
+        private MachineRequestDispatcher $machineRequestDispatcher,
         private ExceptionLogger $exceptionLogger,
     ) {
     }
@@ -38,10 +39,9 @@ class DeleteMachineHandler implements MessageHandlerInterface
 
         try {
             $this->remoteMachineRemover->remove($machineId);
-
-            $this->dispatcher->dispatch(new MachineExists($machine->getId()));
+            $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_EXISTS);
         } catch (MachineNotRemovableException $machineNotRemovableException) {
-            $envelope = $this->dispatcher->dispatch($message->incrementRetryCount());
+            $envelope = $this->machineRequestDispatcher->reDispatch($message);
 
             if (false === MessageDispatcher::isDispatchable($envelope)) {
                 foreach ($machineNotRemovableException->getExceptionStack() as $exception) {

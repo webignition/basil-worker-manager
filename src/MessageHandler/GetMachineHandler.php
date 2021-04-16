@@ -10,6 +10,7 @@ use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineManager;
+use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -17,7 +18,6 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProvi
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
@@ -27,7 +27,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
         MachineProviderStore $machineProviderStore,
-        MessageDispatcher $dispatcher,
+        MachineRequestDispatcher $machineRequestDispatcher,
         private MachineUpdater $machineUpdater,
     ) {
         parent::__construct(
@@ -36,7 +36,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
             $exceptionLogger,
             $machineStore,
             $machineProviderStore,
-            $dispatcher,
+            $machineRequestDispatcher,
         );
     }
 

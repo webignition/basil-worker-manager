@@ -12,7 +12,7 @@ use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class RemoteMachineRemoverTest extends AbstractBaseFunctionalTest
 {
@@ -51,7 +51,7 @@ class RemoteMachineRemoverTest extends AbstractBaseFunctionalTest
         $expectedExceptionStack = [
             new HttpException(
                 self::MACHINE_ID,
-                RemoteRequestActionInterface::ACTION_DELETE,
+                MachineActionInterface::ACTION_DELETE,
                 new RuntimeException('Service Unavailable', 503)
             ),
         ];

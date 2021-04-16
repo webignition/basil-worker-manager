@@ -15,7 +15,7 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
 {
@@ -59,7 +59,7 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
         $expectedExceptionStack = [
             new HttpException(
                 self::MACHINE_ID,
-                RemoteRequestActionInterface::ACTION_GET,
+                MachineActionInterface::ACTION_GET,
                 new RuntimeException('Service Unavailable', 503)
             ),
         ];

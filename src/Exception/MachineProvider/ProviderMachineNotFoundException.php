@@ -14,7 +14,14 @@ class ProviderMachineNotFoundException extends AbstractMachineException
         string $id,
         private string $providerName,
     ) {
-        parent::__construct($id);
+        parent::__construct(
+            $id,
+            sprintf(
+                'Machine "%s" not found with provider "%s"',
+                $id,
+                $providerName
+            )
+        );
     }
 
     public function getProviderName(): string

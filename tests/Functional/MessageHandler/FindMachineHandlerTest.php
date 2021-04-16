@@ -9,7 +9,10 @@ use App\Message\CheckMachineIsActive;
 use App\Message\FindMachine;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineActionProperties;
 use App\Services\ExceptionLogger;
+use App\Services\MachineActionPropertiesFactory;
+use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -41,6 +44,8 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
     private MockHandler $mockHandler;
     private MachineStore $machineStore;
     private MachineProviderStore $machineProviderStore;
+    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
+    private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
     {
@@ -65,6 +70,14 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         $machineProviderStore = self::$container->get(MachineProviderStore::class);
         \assert($machineProviderStore instanceof MachineProviderStore);
         $this->machineProviderStore = $machineProviderStore;
+
+        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
+        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
+        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
+
+        $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
+        \assert($machineRequestFactory instanceof MachineRequestFactory);
+        $this->machineRequestFactory = $machineRequestFactory;
     }
 
     /**
@@ -92,14 +105,29 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
             $this->machineProviderStore->store($machineProvider);
         }
 
-        $message = new FindMachine($machine->getId());
+        $message = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
+        );
+        self::assertInstanceOf(FindMachine::class, $message);
+
         ($this->handler)($message);
 
         self::assertEquals($expectedMachine, $this->machineStore->find(self::MACHINE_ID));
         self::assertEquals($expectedMachineProvider, $this->machineProviderStore->find(self::MACHINE_ID));
 
         $this->messengerAsserter->assertQueueCount(1);
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, new CheckMachineIsActive(self::MACHINE_ID));
+        $this->messengerAsserter->assertMessageAtPositionEquals(
+            0,
+            new CheckMachineIsActive(
+                self::MACHINE_ID,
+                [
+                    new MachineActionProperties(
+                        MachineActionInterface::ACTION_GET,
+                        self::MACHINE_ID
+                    )
+                ]
+            )
+        );
     }
 
     /**
@@ -198,7 +226,11 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append(new Response(503));
 
-        $message = new FindMachine(self::MACHINE_ID);
+        $message = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
+        );
+        \assert($message instanceof FindMachine);
+        self::assertInstanceOf(FindMachine::class, $message);
 
         ($this->handler)($message);
 

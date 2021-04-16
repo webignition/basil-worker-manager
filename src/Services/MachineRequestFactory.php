@@ -9,17 +9,22 @@ use App\Message\FindMachine;
 use App\Message\GetMachine;
 use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
+use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class MachineRequestFactory
 {
-    /**
-     * @param MachineActionInterface::ACTION_*|string $action
-     */
-    public function create(string $machineId, string $action): ?MachineRequestInterface
+    public function create(MachineActionPropertiesInterface $properties): ?MachineRequestInterface
     {
+        $action = $properties->getAction();
+        $machineId = $properties->getMachineId();
+
         if (MachineActionInterface::ACTION_CREATE === $action) {
-            return new CreateMachine($machineId);
+            return new CreateMachine(
+                $machineId,
+                $properties->getOnSuccessCollection(),
+                $properties->getOnFailureCollection()
+            );
         }
 
         if (MachineActionInterface::ACTION_GET === $action) {
@@ -27,7 +32,11 @@ class MachineRequestFactory
         }
 
         if (MachineActionInterface::ACTION_DELETE === $action) {
-            return new DeleteMachine($machineId);
+            return new DeleteMachine(
+                $machineId,
+                $properties->getOnSuccessCollection(),
+                $properties->getOnFailureCollection()
+            );
         }
 
         if (MachineActionInterface::ACTION_EXISTS === $action) {
@@ -35,11 +44,19 @@ class MachineRequestFactory
         }
 
         if (MachineActionInterface::ACTION_FIND === $action) {
-            return new FindMachine($machineId);
+            return new FindMachine(
+                $machineId,
+                $properties->getOnSuccessCollection(),
+                $properties->getOnFailureCollection()
+            );
         }
 
         if (MachineActionInterface::ACTION_CHECK_IS_ACTIVE === $action) {
-            return new CheckMachineIsActive($machineId);
+            return new CheckMachineIsActive(
+                $machineId,
+                $properties->getOnSuccessCollection(),
+                $properties->getOnFailureCollection()
+            );
         }
 
         return null;

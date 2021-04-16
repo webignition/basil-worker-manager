@@ -11,6 +11,7 @@ use App\Message\FindMachine;
 use App\Message\GetMachine;
 use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
+use App\Model\MachineActionProperties;
 use App\Services\MachineRequestDispatcher;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -46,7 +47,7 @@ class MachineRequestDispatcherTest extends AbstractBaseFunctionalTest
     ): void {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $this->dispatcher->dispatch(self::MACHINE_ID, $action);
+        $this->dispatcher->dispatch(new MachineActionProperties($action, self::MACHINE_ID));
 
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedDispatchedRequest);
     }
@@ -88,7 +89,7 @@ class MachineRequestDispatcherTest extends AbstractBaseFunctionalTest
     {
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        $this->dispatcher->dispatch('machine-id', 'unknown-action');
+        $this->dispatcher->dispatch(new MachineActionProperties('unknown-action', 'machine-id'));
 
         $this->messengerAsserter->assertQueueIsEmpty();
     }

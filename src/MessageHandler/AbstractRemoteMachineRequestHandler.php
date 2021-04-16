@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
+use App\Message\ChainedMachineRequestInterface;
 use App\Message\RemoteMachineMessageInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -83,6 +84,12 @@ abstract class AbstractRemoteMachineRequestHandler
 
         if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
             $actionHandler->onSuccess($machine, $outcome);
+
+            if ($message instanceof ChainedMachineRequestInterface) {
+                foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
+                    $this->machineRequestDispatcher->dispatch($machineActionProperties);
+                }
+            }
         }
 
         if ($lastException instanceof \Throwable) {

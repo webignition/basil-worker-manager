@@ -9,6 +9,8 @@ use App\Message\DeleteMachine;
 use App\Message\MachineExists;
 use App\MessageHandler\DeleteMachineHandler;
 use App\Services\ExceptionLogger;
+use App\Services\MachineActionPropertiesFactory;
+use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -32,6 +34,8 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineInterface $machine;
+    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
+    private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
     {
@@ -57,6 +61,14 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         $mockHandler = self::$container->get(MockHandler::class);
         \assert($mockHandler instanceof MockHandler);
         $this->mockHandler = $mockHandler;
+
+        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
+        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
+        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
+
+        $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
+        \assert($machineRequestFactory instanceof MachineRequestFactory);
+        $this->machineRequestFactory = $machineRequestFactory;
     }
 
     public function testInvokeSuccess(): void
@@ -72,7 +84,11 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append(new Response(204));
 
-        $message = new DeleteMachine(self::MACHINE_ID);
+        $message = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForDelete(self::MACHINE_ID)
+        );
+
+        self::assertInstanceOf(DeleteMachine::class, $message);
 
         ($this->handler)($message);
 

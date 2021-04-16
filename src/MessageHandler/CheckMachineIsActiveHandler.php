@@ -8,7 +8,6 @@ use App\Message\CheckMachineIsActive;
 use App\Services\MachineRequestDispatcher;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class CheckMachineIsActiveHandler implements MessageHandlerInterface
@@ -35,9 +34,11 @@ class CheckMachineIsActiveHandler implements MessageHandlerInterface
             return;
         }
 
-        $machineId = $machine->getId();
+        $onSuccessMachineActionProperties = $message->getOnSuccessCollection();
+        $onSuccessMachineActionProperties[] = $message->getSelfProperties();
 
-        $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_GET);
-        $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_CHECK_IS_ACTIVE);
+        foreach ($onSuccessMachineActionProperties as $machineActionProperties) {
+            $this->machineRequestDispatcher->dispatch($machineActionProperties);
+        }
     }
 }

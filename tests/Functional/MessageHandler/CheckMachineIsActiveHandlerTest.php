@@ -7,6 +7,8 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Message\CheckMachineIsActive;
 use App\Message\GetMachine;
 use App\MessageHandler\CheckMachineIsActiveHandler;
+use App\Services\MachineActionPropertiesFactory;
+use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -24,6 +26,8 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
     private CheckMachineIsActiveHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MachineStore $machineStore;
+    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
+    private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
     {
@@ -40,14 +44,22 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
         $this->messengerAsserter = $messengerAsserter;
+
+        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
+        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
+        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
+
+        $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
+        \assert($machineRequestFactory instanceof MachineRequestFactory);
+        $this->machineRequestFactory = $machineRequestFactory;
     }
 
     /**
-     * @dataProvider handleMachineIsActiveOrEndedDataProvider
+     * @dataProvider invokeMachineIsActiveOrEndedDataProvider
      *
      * @param MachineInterface::STATE_* $state
      */
-    public function testHandleMachineIsActiveOrEnded(string $state): void
+    public function testInvokeMachineIsActiveOrEnded(string $state): void
     {
         $machine = new Machine(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $machine->setState($state);
@@ -61,7 +73,7 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @return array[]
      */
-    public function handleMachineIsActiveOrEndedDataProvider(): array
+    public function invokeMachineIsActiveOrEndedDataProvider(): array
     {
         return [
             MachineInterface::STATE_CREATE_FAILED => [
@@ -96,17 +108,19 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
         $machine->setState($state);
         $this->machineStore->store($machine);
 
-        ($this->handler)(new CheckMachineIsActive(self::MACHINE_ID));
+        $request = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForCheckIsActive(self::MACHINE_ID)
+        );
+        self::assertInstanceOf(CheckMachineIsActive::class, $request);
+
+        ($this->handler)($request);
 
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
             new GetMachine(self::MACHINE_ID),
         );
 
-        $this->messengerAsserter->assertMessageAtPositionEquals(
-            1,
-            new CheckMachineIsActive(self::MACHINE_ID),
-        );
+        $this->messengerAsserter->assertMessageAtPositionEquals(1, $request);
     }
 
     /**

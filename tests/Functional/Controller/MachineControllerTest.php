@@ -8,6 +8,9 @@ use App\Controller\MachineController;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
+use App\Message\FindMachine;
+use App\Services\MachineActionPropertiesFactory;
+use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,6 +29,8 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
     private EntityManagerInterface $entityManager;
     private MessengerAsserter $messengerAsserter;
+    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
+    private MachineRequestFactory $machineRequestFactory;
     private string $machineUrl;
 
     protected function setUp(): void
@@ -39,6 +44,14 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
         $this->messengerAsserter = $messengerAsserter;
+
+        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
+        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
+        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
+
+        $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
+        \assert($machineRequestFactory instanceof MachineRequestFactory);
+        $this->machineRequestFactory = $machineRequestFactory;
 
         $this->machineUrl = str_replace(
             MachineController::PATH_COMPONENT_ID,
@@ -68,8 +81,11 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueCount(1);
 
-        $expectedMessage = new CreateMachine($machine->getId());
-        self::assertGreaterThan(0, $expectedMessage->getMachineId());
+        $expectedMessage = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForCreate(self::MACHINE_ID)
+        );
+        self::assertInstanceOf(CreateMachine::class, $expectedMessage);
+
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 
@@ -104,6 +120,15 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
             ]),
             (string) $response->getContent()
         );
+
+        $this->messengerAsserter->assertQueueCount(1);
+
+        $expectedMessage = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
+        );
+        self::assertInstanceOf(FindMachine::class, $expectedMessage);
+
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 
     public function testStatusWithoutCreateFailure(): void
@@ -123,6 +148,8 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
             ]),
             (string) $response->getContent()
         );
+
+        $this->messengerAsserter->assertQueueIsEmpty();
     }
 
     public function testStatusWithCreateFailure(): void
@@ -163,9 +190,11 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
             ]),
             (string) $response->getContent()
         );
+
+        $this->messengerAsserter->assertQueueIsEmpty();
     }
 
-    public function testDeleteSuccess(): void
+    public function testDeleteLocalMachineExists(): void
     {
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
@@ -174,15 +203,32 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         $response = $this->makeDeleteRequest();
         self::assertSame(202, $response->getStatusCode());
 
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, new DeleteMachine(self::MACHINE_ID));
+        $this->messengerAsserter->assertQueueCount(1);
+
+        $expectedMessage = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForDelete(self::MACHINE_ID)
+        );
+        self::assertInstanceOf(DeleteMachine::class, $expectedMessage);
+
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 
-    public function testDeleteMachineNotFound(): void
+    public function testDeleteLocalMachineDoesNotExist(): void
     {
+        self::assertNull($this->entityManager->find(Machine::class, self::MACHINE_ID));
+
         $response = $this->makeDeleteRequest();
         self::assertSame(202, $response->getStatusCode());
 
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, new DeleteMachine(self::MACHINE_ID));
+        self::assertInstanceOf(Machine::class, $this->entityManager->find(Machine::class, self::MACHINE_ID));
+        $this->messengerAsserter->assertQueueCount(1);
+
+        $expectedMessage = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForDelete(self::MACHINE_ID)
+        );
+        self::assertInstanceOf(DeleteMachine::class, $expectedMessage);
+
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 
     /**

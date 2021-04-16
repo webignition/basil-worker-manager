@@ -35,9 +35,11 @@ class DeleteMachine extends AbstractRemoteMachineRequest
 
     public static function createFromArray(array $data): JsonSerializableMessageInterface
     {
-        $machine = new self($data['machine_id']);
-        $machine->retryCount = $data['retry_count'];
+        $message = parent::createFromArray($data);
+        if ($message instanceof DeleteMachine) {
+            $message->retryCount = $data['retry_count'];
+        }
 
-        return $machine;
+        return $message;
     }
 }

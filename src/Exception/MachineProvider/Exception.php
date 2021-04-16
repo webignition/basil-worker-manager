@@ -3,12 +3,12 @@
 namespace App\Exception\MachineProvider;
 
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class Exception extends \Exception implements ExceptionInterface
 {
     /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
+     * @param MachineActionInterface::ACTION_* $action
      */
     public function __construct(
         private string $resourceId,

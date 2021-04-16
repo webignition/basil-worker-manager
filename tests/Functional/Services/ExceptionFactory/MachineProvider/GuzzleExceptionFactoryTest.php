@@ -10,12 +10,12 @@ use App\Tests\AbstractBaseFunctionalTest;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\RequestInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
     private const ID = 'resource_id';
-    private const ACTION = RemoteRequestActionInterface::ACTION_CREATE;
+    private const ACTION = MachineActionInterface::ACTION_CREATE;
 
     private GuzzleExceptionFactory $factory;
 
@@ -42,7 +42,7 @@ class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
     {
         self::assertEquals(
             $expectedException,
-            $this->factory->create(self::ID, RemoteRequestActionInterface::ACTION_CREATE, $exception)
+            $this->factory->create(self::ID, MachineActionInterface::ACTION_CREATE, $exception)
         );
     }
 
@@ -80,7 +80,7 @@ class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
         self::assertNull(
             $this->factory->create(
                 self::ID,
-                RemoteRequestActionInterface::ACTION_GET,
+                MachineActionInterface::ACTION_GET,
                 new \Exception()
             )
         );

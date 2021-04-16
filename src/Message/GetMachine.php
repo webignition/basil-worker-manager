@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
 
 class GetMachine extends AbstractRemoteMachineRequest
@@ -15,7 +15,7 @@ class GetMachine extends AbstractRemoteMachineRequest
 
     public function getAction(): string
     {
-        return RemoteRequestActionInterface::ACTION_GET;
+        return MachineActionInterface::ACTION_GET;
     }
 
     public function getType(): string

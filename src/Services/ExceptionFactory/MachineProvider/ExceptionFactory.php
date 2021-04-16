@@ -4,7 +4,7 @@ namespace App\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\UnknownException;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class ExceptionFactory
 {
@@ -24,7 +24,7 @@ class ExceptionFactory
     }
 
     /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
+     * @param MachineActionInterface::ACTION_* $action
      */
     public function create(string $resourceId, string $action, \Throwable $exception): ExceptionInterface
     {

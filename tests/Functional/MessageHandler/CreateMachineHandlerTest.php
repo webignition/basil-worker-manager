@@ -32,10 +32,10 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
@@ -255,7 +255,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
                 'exception' => new ApiLimitExceededException(
                     123,
                     self::MACHINE_ID,
-                    RemoteRequestActionInterface::ACTION_GET,
+                    MachineActionInterface::ACTION_GET,
                     new VendorApiLimitExceededExceptionAlias()
                 ),
                 'retryCount' => 0,
@@ -271,7 +271,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
             'requires retry, retry limit reached (3)' => [
                 'exception' => new HttpException(
                     self::MACHINE_ID,
-                    RemoteRequestActionInterface::ACTION_GET,
+                    MachineActionInterface::ACTION_GET,
                     new RuntimeException('Internal Server Error', 500)
                 ),
                 'retryCount' => 3,

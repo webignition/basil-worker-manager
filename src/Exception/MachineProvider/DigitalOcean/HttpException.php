@@ -5,12 +5,12 @@ namespace App\Exception\MachineProvider\DigitalOcean;
 use App\Exception\MachineProvider\Exception;
 use DigitalOceanV2\Exception\RuntimeException;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\HttpExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class HttpException extends Exception implements HttpExceptionInterface
 {
     /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
+     * @param MachineActionInterface::ACTION_* $action
      */
     public function __construct(
         string $resourceId,

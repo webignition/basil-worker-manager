@@ -14,8 +14,8 @@ use DigitalOceanV2\Exception\InvalidRecordException;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class DigitalOceanRemoteRequestRetryDeciderTest extends TestCase
 {
@@ -36,7 +36,7 @@ class DigitalOceanRemoteRequestRetryDeciderTest extends TestCase
     /**
      * @dataProvider decideDataProvider
      *
-     * @param RemoteRequestActionInterface::ACTION_* $action
+     * @param MachineActionInterface::ACTION_* $action
      */
     public function testDecide(\Throwable $exception, string $action, bool $expectedDecision): void
     {
@@ -51,57 +51,57 @@ class DigitalOceanRemoteRequestRetryDeciderTest extends TestCase
         return [
             ApiLimitExceededException::class => [
                 'exception' => new ApiLimitExceededException(),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => false,
             ],
             ValidationFailedException::class => [
                 'exception' => new ValidationFailedException(),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             RuntimeException::class . ' non-401' => [
                 'exception' => new RuntimeException(),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             RuntimeException::class . ' 401' => [
                 'exception' => new RuntimeException('message', 401),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => false,
             ],
             RuntimeException::class . ' 404, CREATE' => [
                 'exception' => new RuntimeException('message', 404),
-                'action' => RemoteRequestActionInterface::ACTION_CREATE,
+                'action' => MachineActionInterface::ACTION_CREATE,
                 'expectedDecision' => false,
             ],
             RuntimeException::class . ' 404, GET' => [
                 'exception' => new RuntimeException('message', 404),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             DiscoveryFailedException::class => [
                 'exception' => new DiscoveryFailedException(),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             ErrorException::class => [
                 'exception' => new ErrorException(),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             InvalidRecordException::class => [
                 'exception' => new InvalidRecordException(),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             InvalidArgumentException::class => [
                 'exception' => new InvalidArgumentException(),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => true,
             ],
             DropletLimitExceededException::class => [
                 'exception' => \Mockery::mock(DropletLimitExceededException::class),
-                'action' => RemoteRequestActionInterface::ACTION_GET,
+                'action' => MachineActionInterface::ACTION_GET,
                 'expectedDecision' => false,
             ],
         ];

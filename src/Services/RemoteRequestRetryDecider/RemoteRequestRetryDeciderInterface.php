@@ -2,8 +2,8 @@
 
 namespace App\Services\RemoteRequestRetryDecider;
 
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 interface RemoteRequestRetryDeciderInterface
 {
@@ -13,7 +13,7 @@ interface RemoteRequestRetryDeciderInterface
     public function handles(string $type): bool;
 
     /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
+     * @param MachineActionInterface::ACTION_* $action
      */
     public function decide(string $action, \Throwable $exception): bool;
 }

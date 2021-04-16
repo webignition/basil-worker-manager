@@ -17,8 +17,8 @@ use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFailureFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class MachineControllerTest extends AbstractBaseFunctionalTest
 {
@@ -130,7 +130,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
             new ApiLimitExceededException(
                 123,
                 self::MACHINE_ID,
-                RemoteRequestActionInterface::ACTION_GET,
+                MachineActionInterface::ACTION_GET,
                 new \Exception()
             )
         );

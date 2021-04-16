@@ -6,9 +6,9 @@ use App\Exception\UnsupportedProviderException;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use App\Services\MachineNameFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface as Action;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface as Action;
 
 class MachineManager
 {

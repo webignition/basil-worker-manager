@@ -17,6 +17,6 @@ class CheckMachineIsActive extends AbstractMachineRequest
 
     public static function createFromArray(array $data): JsonSerializableMessageInterface
     {
-        return new CheckMachineIsActive($data['machine_id']);
+        return new self($data['machine_id']);
     }
 }

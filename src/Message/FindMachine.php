@@ -35,7 +35,7 @@ class FindMachine extends AbstractRemoteMachineRequest
 
     public static function createFromArray(array $data): JsonSerializableMessageInterface
     {
-        $machine = new FindMachine($data['machine_id']);
+        $machine = new self($data['machine_id']);
         $machine->retryCount = $data['retry_count'];
 
         return $machine;

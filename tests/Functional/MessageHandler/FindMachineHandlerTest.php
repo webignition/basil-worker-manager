@@ -24,10 +24,10 @@ use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FindMachineHandlerTest extends AbstractBaseFunctionalTest
@@ -218,7 +218,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
             (new MockExceptionLogger())
                 ->withLogCall(new HttpException(
                     self::MACHINE_ID,
-                    RemoteRequestActionInterface::ACTION_GET,
+                    MachineActionInterface::ACTION_GET,
                     new RuntimeException('Service Unavailable', 503)
                 ))
                 ->getMock()

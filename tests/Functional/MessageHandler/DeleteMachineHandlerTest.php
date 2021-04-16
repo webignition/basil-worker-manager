@@ -18,8 +18,8 @@ use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
@@ -104,7 +104,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
             (new MockExceptionLogger())
                 ->withLogCall(new HttpException(
                     self::MACHINE_ID,
-                    RemoteRequestActionInterface::ACTION_DELETE,
+                    MachineActionInterface::ACTION_DELETE,
                     new RuntimeException('Service Unavailable', 503)
                 ))
                 ->getMock()

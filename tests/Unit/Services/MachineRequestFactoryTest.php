@@ -56,9 +56,21 @@ class MachineRequestFactoryTest extends TestCase
                 'properties' => new MachineActionProperties(MachineActionInterface::ACTION_FIND, $machineId),
                 'expectedRequest' => new FindMachine($machineId),
             ],
-            MachineActionInterface::ACTION_CHECK_IS_ACTIVE => [
+            MachineActionInterface::ACTION_CHECK_IS_ACTIVE . ' without on success actions' => [
                 'properties' => new MachineActionProperties(MachineActionInterface::ACTION_CHECK_IS_ACTIVE, $machineId),
                 'expectedRequest' => new CheckMachineIsActive($machineId),
+            ],
+            MachineActionInterface::ACTION_CHECK_IS_ACTIVE . ' with on success actions' => [
+                'properties' => new MachineActionProperties(
+                    MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
+                    $machineId,
+                    [
+                        new MachineActionProperties(MachineActionInterface::ACTION_GET, $machineId),
+                    ],
+                ),
+                'expectedRequest' => new CheckMachineIsActive($machineId, [
+                    new MachineActionProperties(MachineActionInterface::ACTION_GET, $machineId),
+                ]),
             ],
             'unknown action' => [
                 'properties' => new MachineActionProperties('unknown', $machineId),

@@ -40,7 +40,11 @@ class MachineRequestFactory
         }
 
         if (MachineActionInterface::ACTION_CHECK_IS_ACTIVE === $action) {
-            return new CheckMachineIsActive($machineId);
+            return new CheckMachineIsActive(
+                $machineId,
+                $properties->getOnSuccessCollection(),
+                $properties->getOnFailureCollection()
+            );
         }
 
         return null;

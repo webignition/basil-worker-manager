@@ -8,7 +8,7 @@ use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class DropletLimitExceededExceptionTest extends TestCase
 {
@@ -23,7 +23,7 @@ class DropletLimitExceededExceptionTest extends TestCase
 
         $this->exception = new DropletLimitExceededException(
             'machine id',
-            RemoteRequestActionInterface::ACTION_CREATE,
+            MachineActionInterface::ACTION_CREATE,
             $providerException
         );
     }

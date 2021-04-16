@@ -12,12 +12,12 @@ use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\RequestInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class ExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
     private const ID = 'resource_id';
-    private const ACTION = RemoteRequestActionInterface::ACTION_CREATE;
+    private const ACTION = MachineActionInterface::ACTION_CREATE;
 
     private ExceptionFactory $factory;
 

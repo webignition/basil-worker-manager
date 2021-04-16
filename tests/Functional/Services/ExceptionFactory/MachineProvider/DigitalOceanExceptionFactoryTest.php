@@ -18,13 +18,13 @@ use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
 {
     private const ID = 'resource_id';
-    private const ACTION = RemoteRequestActionInterface::ACTION_CREATE;
+    private const ACTION = MachineActionInterface::ACTION_CREATE;
 
     private DigitalOceanExceptionFactory $factory;
 
@@ -53,7 +53,7 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
     {
         self::assertEquals(
             $expectedException,
-            $this->factory->create(self::ID, RemoteRequestActionInterface::ACTION_CREATE, $exception)
+            $this->factory->create(self::ID, MachineActionInterface::ACTION_CREATE, $exception)
         );
     }
 
@@ -128,7 +128,7 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
             $expectedException,
             $this->factory->create(
                 self::ID,
-                RemoteRequestActionInterface::ACTION_CREATE,
+                MachineActionInterface::ACTION_CREATE,
                 $vendorApiLimitExceedException
             )
         );
@@ -139,7 +139,7 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
         self::assertNull(
             $this->factory->create(
                 self::ID,
-                RemoteRequestActionInterface::ACTION_GET,
+                MachineActionInterface::ACTION_GET,
                 new \Exception()
             )
         );

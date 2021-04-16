@@ -24,9 +24,9 @@ use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineManagerTest extends AbstractBaseFunctionalTest
@@ -87,7 +87,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->create($this->machineProvider);
             },
-            RemoteRequestActionInterface::ACTION_CREATE,
+            MachineActionInterface::ACTION_CREATE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -144,7 +144,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->get($this->machineProvider);
             },
-            RemoteRequestActionInterface::ACTION_GET,
+            MachineActionInterface::ACTION_GET,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -176,7 +176,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->delete($this->machineProvider);
             },
-            RemoteRequestActionInterface::ACTION_DELETE,
+            MachineActionInterface::ACTION_DELETE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -260,7 +260,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->exists($this->machineProvider);
             },
-            RemoteRequestActionInterface::ACTION_EXISTS,
+            MachineActionInterface::ACTION_EXISTS,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -268,7 +268,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
+     * @param MachineActionInterface::ACTION_* $action
      * @param class-string $expectedExceptionClass
      */
     private function doActionThrowsExceptionTest(

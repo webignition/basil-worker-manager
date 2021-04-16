@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4693222ed01b2d6a2c69d59eab8be19c",
+    "content-hash": "73146d84e2a881e531dfd1762e443f57",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -6083,16 +6083,16 @@
         },
         {
             "name": "webignition/basil-worker-manager-interfaces",
-            "version": "0.19",
+            "version": "0.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/basil-worker-manager-interfaces.git",
-                "reference": "40e9fe096e9022209ffcdcdde9596d68563c4034"
+                "reference": "b61eb919d2f288303c6144128d65e42f54494e8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/basil-worker-manager-interfaces/zipball/40e9fe096e9022209ffcdcdde9596d68563c4034",
-                "reference": "40e9fe096e9022209ffcdcdde9596d68563c4034",
+                "url": "https://api.github.com/repos/webignition/basil-worker-manager-interfaces/zipball/b61eb919d2f288303c6144128d65e42f54494e8d",
+                "reference": "b61eb919d2f288303c6144128d65e42f54494e8d",
                 "shasum": ""
             },
             "require": {
@@ -6124,9 +6124,9 @@
             "homepage": "https://github.com/webignition/basil-worker-manager-interfaces",
             "support": {
                 "issues": "https://github.com/webignition/basil-worker-manager-interfaces/issues",
-                "source": "https://github.com/webignition/basil-worker-manager-interfaces/tree/0.19"
+                "source": "https://github.com/webignition/basil-worker-manager-interfaces/tree/0.20"
             },
-            "time": "2021-04-16T08:41:05+00:00"
+            "time": "2021-04-16T16:33:10+00:00"
         },
         {
             "name": "webignition/basil-worker-manager-persistence-bundle",

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Exception\UnsupportedProviderException;
-use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineManager;
+use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
@@ -19,9 +19,9 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFail
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
@@ -31,7 +31,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         ExceptionLogger $exceptionLogger,
         MachineStore $machineStore,
         MachineProviderStore $machineProviderStore,
-        MessageDispatcher $dispatcher,
+        MachineRequestDispatcher $machineRequestDispatcher,
         private CreateFailureFactory $createFailureFactory,
         private MachineUpdater $machineUpdater,
     ) {
@@ -41,7 +41,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
             $exceptionLogger,
             $machineStore,
             $machineProviderStore,
-            $dispatcher,
+            $machineRequestDispatcher,
         );
     }
 
@@ -65,8 +65,10 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
                         $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
-
-                        $this->dispatcher->dispatch(new CheckMachineIsActive($machine->getId()));
+                        $this->machineRequestDispatcher->dispatch(
+                            $machine->getId(),
+                            MachineActionInterface::ACTION_CHECK_IS_ACTIVE
+                        );
                     }
                 }
             )->withFailureHandler(

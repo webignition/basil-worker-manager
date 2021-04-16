@@ -9,15 +9,16 @@ use App\Message\FindMachine;
 use App\Message\GetMachine;
 use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
+use App\Model\MachineActionProperties;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class MachineRequestFactory
 {
-    /**
-     * @param MachineActionInterface::ACTION_*|string $action
-     */
-    public function create(string $machineId, string $action): ?MachineRequestInterface
+    public function create(MachineActionProperties $properties): ?MachineRequestInterface
     {
+        $action = $properties->getAction();
+        $machineId = $properties->getMachineId();
+
         if (MachineActionInterface::ACTION_CREATE === $action) {
             return new CreateMachine($machineId);
         }

@@ -7,6 +7,7 @@ namespace App\MessageHandler;
 use App\Exception\MachineNotFindableException;
 use App\Exception\MachineNotFoundException;
 use App\Message\FindMachine;
+use App\Model\MachineActionProperties;
 use App\Services\ExceptionLogger;
 use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
@@ -51,7 +52,10 @@ class FindMachineHandler implements MessageHandlerInterface
             $machineProvider = new MachineProvider($machineId, $remoteMachine->getProvider());
             $this->machineProviderStore->store($machineProvider);
 
-            $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_CHECK_IS_ACTIVE);
+            $this->machineRequestDispatcher->dispatch(new MachineActionProperties(
+                MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
+                $machineId
+            ));
         } catch (MachineNotFindableException $machineNotFoundException) {
             $envelope = $this->machineRequestDispatcher->reDispatch($message);
 

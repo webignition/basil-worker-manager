@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
+use App\Model\MachineActionProperties;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
@@ -65,10 +66,10 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
                         $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
-                        $this->machineRequestDispatcher->dispatch(
-                            $machine->getId(),
-                            MachineActionInterface::ACTION_CHECK_IS_ACTIVE
-                        );
+                        $this->machineRequestDispatcher->dispatch(new MachineActionProperties(
+                            MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
+                            $machine->getId()
+                        ));
                     }
                 }
             )->withFailureHandler(

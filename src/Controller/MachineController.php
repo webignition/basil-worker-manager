@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Model\MachineActionProperties;
 use App\Response\BadMachineCreateRequestResponse;
 use App\Services\MachineRequestDispatcher;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -40,7 +41,10 @@ class MachineController
 
         $machineStore->store(new Machine($id));
         $machineProviderStore->store(new MachineProvider($id, ProviderInterface::NAME_DIGITALOCEAN));
-        $machineRequestDispatcher->dispatch($id, MachineActionInterface::ACTION_CREATE);
+        $machineRequestDispatcher->dispatch(new MachineActionProperties(
+            MachineActionInterface::ACTION_CREATE,
+            $id
+        ));
 
         return new Response('', 202);
     }
@@ -56,7 +60,10 @@ class MachineController
         if (!$machine instanceof MachineInterface) {
             $machine = new Machine($id, MachineInterface::STATE_FIND_RECEIVED);
             $machineStore->store($machine);
-            $machineRequestDispatcher->dispatch($id, MachineActionInterface::ACTION_FIND);
+            $machineRequestDispatcher->dispatch(new MachineActionProperties(
+                MachineActionInterface::ACTION_FIND,
+                $id
+            ));
         }
 
         $responseData = $machine->jsonSerialize();
@@ -81,7 +88,10 @@ class MachineController
             $machineStore->store($machine);
         }
 
-        $machineRequestDispatcher->dispatch($id, MachineActionInterface::ACTION_DELETE);
+        $machineRequestDispatcher->dispatch(new MachineActionProperties(
+            MachineActionInterface::ACTION_DELETE,
+            $id
+        ));
 
         return new Response('', 202);
     }

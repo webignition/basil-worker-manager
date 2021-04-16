@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Message\CheckMachineIsActive;
+use App\Model\MachineActionProperties;
 use App\Services\MachineRequestDispatcher;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
@@ -37,7 +38,13 @@ class CheckMachineIsActiveHandler implements MessageHandlerInterface
 
         $machineId = $machine->getId();
 
-        $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_GET);
-        $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_CHECK_IS_ACTIVE);
+        $this->machineRequestDispatcher->dispatch(new MachineActionProperties(
+            MachineActionInterface::ACTION_GET,
+            $machineId
+        ));
+        $this->machineRequestDispatcher->dispatch(new MachineActionProperties(
+            MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
+            $machineId
+        ));
     }
 }

@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Exception\MachineNotRemovableException;
 use App\Message\DeleteMachine;
+use App\Model\MachineActionProperties;
 use App\Services\ExceptionLogger;
 use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteMachineRemover;
@@ -39,7 +40,10 @@ class DeleteMachineHandler implements MessageHandlerInterface
 
         try {
             $this->remoteMachineRemover->remove($machineId);
-            $this->machineRequestDispatcher->dispatch($machineId, MachineActionInterface::ACTION_EXISTS);
+            $this->machineRequestDispatcher->dispatch(new MachineActionProperties(
+                MachineActionInterface::ACTION_EXISTS,
+                $machineId
+            ));
         } catch (MachineNotRemovableException $machineNotRemovableException) {
             $envelope = $this->machineRequestDispatcher->reDispatch($message);
 

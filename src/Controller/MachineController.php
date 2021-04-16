@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Message\CreateMachine;
-use App\Message\DeleteMachine;
-use App\Message\FindMachine;
 use App\Response\BadMachineCreateRequestResponse;
+use App\Services\MachineRequestDispatcher;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,10 +13,10 @@ use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\CreateFailureStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class MachineController
 {
@@ -30,7 +28,7 @@ class MachineController
         string $id,
         MachineStore $machineStore,
         MachineProviderStore $machineProviderStore,
-        MessageDispatcher $messageDispatcher,
+        MachineRequestDispatcher $machineRequestDispatcher,
     ): Response {
         if ($machineStore->find($id) instanceof MachineInterface) {
             return BadMachineCreateRequestResponse::createIdTakenResponse();
@@ -42,8 +40,7 @@ class MachineController
 
         $machineStore->store(new Machine($id));
         $machineProviderStore->store(new MachineProvider($id, ProviderInterface::NAME_DIGITALOCEAN));
-
-        $messageDispatcher->dispatch(new CreateMachine($id));
+        $machineRequestDispatcher->dispatch($id, MachineActionInterface::ACTION_CREATE);
 
         return new Response('', 202);
     }
@@ -53,14 +50,13 @@ class MachineController
         string $id,
         MachineStore $machineStore,
         CreateFailureStore $createFailureStore,
-        MessageDispatcher $messageDispatcher,
+        MachineRequestDispatcher $machineRequestDispatcher,
     ): Response {
         $machine = $machineStore->find($id);
         if (!$machine instanceof MachineInterface) {
             $machine = new Machine($id, MachineInterface::STATE_FIND_RECEIVED);
             $machineStore->store($machine);
-
-            $messageDispatcher->dispatch(new FindMachine($id));
+            $machineRequestDispatcher->dispatch($id, MachineActionInterface::ACTION_FIND);
         }
 
         $responseData = $machine->jsonSerialize();
@@ -77,7 +73,7 @@ class MachineController
     public function delete(
         string $id,
         MachineStore $machineStore,
-        MessageDispatcher $messageDispatcher,
+        MachineRequestDispatcher $machineRequestDispatcher,
     ): Response {
         $machine = $machineStore->find($id);
         if (false === $machine instanceof MachineInterface) {
@@ -85,7 +81,7 @@ class MachineController
             $machineStore->store($machine);
         }
 
-        $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));
+        $machineRequestDispatcher->dispatch($id, MachineActionInterface::ACTION_DELETE);
 
         return new Response('', 202);
     }

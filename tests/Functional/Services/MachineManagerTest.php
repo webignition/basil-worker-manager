@@ -25,7 +25,6 @@ use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\Exception
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\ObjectReflector\ObjectReflector;
 
 class MachineManagerTest extends AbstractBaseFunctionalTest
 {
@@ -225,8 +224,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
      */
     public function testExists(ResponseInterface $apiResponse, bool $expectedExists): void
     {
-//        ObjectReflector::setProperty($this->machine, Machine::class, 'remote_id', 123);
-
         $this->mockHandler->append($apiResponse);
 
         $exists = $this->machineManager->exists($this->createMachineProvider());
@@ -268,7 +265,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->exists($this->createMachineProvider());
             },
-            MachineActionInterface::ACTION_EXISTS,
+            MachineActionInterface::ACTION_GET,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException

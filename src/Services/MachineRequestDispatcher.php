@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Message\MachineRequestInterface;
 use App\Message\RemoteMachineMessageInterface;
-use App\Model\MachineActionProperties;
+use App\Model\MachineActionPropertiesInterface;
 use Symfony\Component\Messenger\Envelope;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
@@ -16,7 +16,7 @@ class MachineRequestDispatcher
     ) {
     }
 
-    public function dispatch(MachineActionProperties $properties): ?Envelope
+    public function dispatch(MachineActionPropertiesInterface $properties): ?Envelope
     {
         $request = $this->machineRequestFactory->create($properties);
 

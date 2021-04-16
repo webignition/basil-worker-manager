@@ -6,7 +6,6 @@ namespace App\MessageHandler;
 
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
-use App\Model\MachineActionProperties;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
@@ -20,7 +19,6 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\CreateFail
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
@@ -66,10 +64,6 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
                         $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
-                        $this->machineRequestDispatcher->dispatch(new MachineActionProperties(
-                            MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
-                            $machine->getId()
-                        ));
                     }
                 }
             )->withFailureHandler(

@@ -7,7 +7,6 @@ namespace App\MessageHandler;
 use App\Exception\MachineNotFindableException;
 use App\Exception\MachineNotFoundException;
 use App\Message\FindMachine;
-use App\Model\MachineActionProperties;
 use App\Services\ExceptionLogger;
 use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
@@ -16,7 +15,6 @@ use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
@@ -52,10 +50,9 @@ class FindMachineHandler implements MessageHandlerInterface
             $machineProvider = new MachineProvider($machineId, $remoteMachine->getProvider());
             $this->machineProviderStore->store($machineProvider);
 
-            $this->machineRequestDispatcher->dispatch(new MachineActionProperties(
-                MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
-                $machineId
-            ));
+            foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
+                $this->machineRequestDispatcher->dispatch($machineActionProperties);
+            }
         } catch (MachineNotFindableException $machineNotFoundException) {
             $envelope = $this->machineRequestDispatcher->reDispatch($message);
 

@@ -6,36 +6,44 @@ namespace App\Message;
 
 use App\Model\MachineActionProperties;
 use App\Model\MachineActionPropertiesInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
 
-class CheckMachineIsActive extends AbstractMachineRequest implements ChainedMachineRequestInterface
+class CheckMachineIsActive extends AbstractMachineRequest implements
+    ChainedMachineRequestInterface,
+    HasSelfPropertiesInterface
 {
     public const TYPE = 'check-machine-is-active';
 
     /**
-     * @var MachineActionProperties[]
+     * @var MachineActionPropertiesInterface[]
      */
-    private array $onSuccessCollection = [];
+    private array $onSuccessCollection;
 
     /**
-     * @var MachineActionProperties[]
+     * @var MachineActionPropertiesInterface[]
      */
-    private array $onFailureCollection = [];
+    private array $onFailureCollection;
 
     /**
+     * @param string $machineId
+     *
      * @param MachineActionPropertiesInterface[] $onSuccessCollection
      * @param MachineActionPropertiesInterface[] $onFailureCollection
      */
-    public function __construct(string $machineId, array $onSuccessCollection = [], array $onFailureCollection = [])
-    {
+    public function __construct(
+        string $machineId,
+        array $onSuccessCollection = [],
+        array $onFailureCollection = []
+    ) {
         parent::__construct($machineId);
 
         $this->onSuccessCollection = array_filter($onSuccessCollection, function ($value) {
-            return $value instanceof MachineActionProperties;
+            return $value instanceof MachineActionPropertiesInterface;
         });
 
         $this->onFailureCollection = array_filter($onFailureCollection, function ($value) {
-            return $value instanceof MachineActionProperties;
+            return $value instanceof MachineActionPropertiesInterface;
         });
     }
 
@@ -46,21 +54,10 @@ class CheckMachineIsActive extends AbstractMachineRequest implements ChainedMach
 
     public function getPayload(): array
     {
-        $serializedOnSuccessProperties = [];
-        foreach ($this->onSuccessCollection as $item) {
-            $serializedOnSuccessProperties[] = $item->jsonSerialize();
-        }
-
-        $serializedOnFailureProperties = [];
-        foreach ($this->onFailureCollection as $item) {
-            $serializedOnFailureProperties[] = $item->jsonSerialize();
-        }
-
         return array_merge(
             parent::getPayload(),
             [
-                'on_success' => $serializedOnSuccessProperties,
-                'on_failure' => $serializedOnFailureProperties,
+                'self_properties' => $this->getSelfProperties()->jsonSerialize(),
             ]
         );
     }
@@ -72,27 +69,18 @@ class CheckMachineIsActive extends AbstractMachineRequest implements ChainedMach
             $machineId = '';
         }
 
-        $onSuccessCollectionData = $data['on_success_properties'];
-        $onSuccessCollection = [];
-        if (is_array($onSuccessCollectionData)) {
-            foreach ($onSuccessCollectionData as $itemData) {
-                if (is_array($itemData)) {
-                    $onSuccessCollection[] = MachineActionProperties::createFromArray($itemData);
-                }
-            }
+        $selfPropertiesData = $data['self_properties'] ?? [];
+        if (!is_array($selfPropertiesData)) {
+            $selfPropertiesData = [];
         }
 
-        $onFailureCollectionData = $data['on_success_properties'];
-        $onFailureCollection = [];
-        if (is_array($onFailureCollectionData)) {
-            foreach ($onFailureCollectionData as $itemData) {
-                if (is_array($itemData)) {
-                    $onFailureCollection[] = MachineActionProperties::createFromArray($itemData);
-                }
-            }
-        }
+        $selfProperties = MachineActionProperties::createFromArray($selfPropertiesData);
 
-        return new self($machineId, $onSuccessCollection, $onFailureCollection);
+        return new self(
+            $machineId,
+            $selfProperties->getOnSuccessCollection(),
+            $selfProperties->getOnFailureCollection()
+        );
     }
 
     /**
@@ -103,12 +91,21 @@ class CheckMachineIsActive extends AbstractMachineRequest implements ChainedMach
         return $this->onSuccessCollection;
     }
 
-
     /**
      * @return MachineActionPropertiesInterface[]
      */
     public function getOnFailureCollection(): array
     {
         return $this->onFailureCollection;
+    }
+
+    public function getSelfProperties(): MachineActionPropertiesInterface
+    {
+        return new MachineActionProperties(
+            MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
+            $this->getMachineId(),
+            $this->getOnSuccessCollection(),
+            $this->getOnFailureCollection()
+        );
     }
 }

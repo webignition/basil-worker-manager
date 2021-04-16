@@ -10,9 +10,9 @@ use DigitalOceanV2\Api\Droplet as DropletApi;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class DigitalOceanMachineManager implements ProviderMachineManagerInterface
 {
@@ -43,7 +43,7 @@ class DigitalOceanMachineManager implements ProviderMachineManagerInterface
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
                 $machineId,
-                RemoteRequestActionInterface::ACTION_CREATE,
+                MachineActionInterface::ACTION_CREATE,
                 $exception
             );
         }
@@ -63,7 +63,7 @@ class DigitalOceanMachineManager implements ProviderMachineManagerInterface
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
                 $machineId,
-                RemoteRequestActionInterface::ACTION_DELETE,
+                MachineActionInterface::ACTION_DELETE,
                 $exception
             );
         }
@@ -79,7 +79,7 @@ class DigitalOceanMachineManager implements ProviderMachineManagerInterface
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
                 $machineId,
-                RemoteRequestActionInterface::ACTION_GET,
+                MachineActionInterface::ACTION_GET,
                 $exception
             );
         }

@@ -21,8 +21,8 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteRequestActionInterface;
 
 class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 {
@@ -97,7 +97,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->create(self::MACHINE_ID, $this->machineName);
             },
-            RemoteRequestActionInterface::ACTION_CREATE,
+            MachineActionInterface::ACTION_CREATE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -184,7 +184,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->get(self::MACHINE_ID, $this->machineName);
             },
-            RemoteRequestActionInterface::ACTION_GET,
+            MachineActionInterface::ACTION_GET,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -213,7 +213,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->remove(self::MACHINE_ID, $this->machineName);
             },
-            RemoteRequestActionInterface::ACTION_DELETE,
+            MachineActionInterface::ACTION_DELETE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -267,7 +267,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
             function () {
                 $this->machineManager->exists(self::MACHINE_ID, $this->machineName);
             },
-            RemoteRequestActionInterface::ACTION_GET,
+            MachineActionInterface::ACTION_GET,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -275,7 +275,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @param RemoteRequestActionInterface::ACTION_* $action
+     * @param MachineActionInterface::ACTION_* $action
      * @param class-string $expectedExceptionClass
      */
     private function doActionThrowsExceptionTest(

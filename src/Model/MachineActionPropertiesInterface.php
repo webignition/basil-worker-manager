@@ -23,6 +23,11 @@ interface MachineActionPropertiesInterface extends \JsonSerializable
     public function getOnFailureCollection(): array;
 
     /**
+     * @return array<string, int|string>
+     */
+    public function getAdditionalArguments(): array;
+
+    /**
      * @param array<string, string> $data
      */
     public static function createFromArray(array $data): MachineActionPropertiesInterface;

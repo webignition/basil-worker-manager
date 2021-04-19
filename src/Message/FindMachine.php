@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
@@ -15,9 +16,18 @@ class FindMachine extends AbstractRemoteMachineRequest
     public const TYPE = 'find-machine';
 
     /**
-     * @var MachineInterface::STATE_*
+     * @param MachineActionPropertiesInterface[] $onSuccessCollection
+     * @param MachineActionPropertiesInterface[] $onFailureCollection
+     * @param MachineInterface::STATE_* $onNotFoundState
      */
-    private string $onNotFoundState = MachineInterface::STATE_FIND_NOT_FOUND;
+    public function __construct(
+        string $machineId,
+        array $onSuccessCollection = [],
+        array $onFailureCollection = [],
+        private string $onNotFoundState = MachineInterface::STATE_FIND_NOT_FOUND,
+    ) {
+        parent::__construct($machineId, $onSuccessCollection, $onFailureCollection);
+    }
 
     public function getAction(): string
     {

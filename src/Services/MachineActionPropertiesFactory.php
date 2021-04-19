@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Model\MachineActionProperties;
 use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineActionPropertiesFactory
 {
@@ -41,7 +42,7 @@ class MachineActionPropertiesFactory
             MachineActionInterface::ACTION_DELETE,
             $machineId,
             [
-                $this->createForFind($machineId),
+                $this->createForFind($machineId, [], [], MachineInterface::STATE_DELETE_DELETED),
             ]
         );
     }
@@ -75,12 +76,16 @@ class MachineActionPropertiesFactory
         string $machineId,
         array $onSuccessCollection = [],
         array $onFailureCollection = [],
+        string $onNotFoundState = MachineInterface::STATE_FIND_NOT_FOUND
     ): MachineActionPropertiesInterface {
         return new MachineActionProperties(
             MachineActionInterface::ACTION_FIND,
             $machineId,
             $onSuccessCollection,
-            $onFailureCollection
+            $onFailureCollection,
+            [
+                'on_not_found_state' => $onNotFoundState,
+            ]
         );
     }
 }

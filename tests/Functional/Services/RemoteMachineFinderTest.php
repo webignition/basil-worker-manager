@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services;
 
 use App\Exception\MachineNotFindableException;
-use App\Exception\MachineNotFoundException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\RemoteMachineFinder;
@@ -76,8 +75,6 @@ class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
 
-        self::expectExceptionObject(new MachineNotFoundException(self::MACHINE_ID));
-
-        $this->finder->find(self::MACHINE_ID);
+        self::assertNull($this->finder->find(self::MACHINE_ID));
     }
 }

@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageDispatcher;
 use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Message\GetMachine;
-use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -84,10 +83,6 @@ class MessageDispatcherTest extends AbstractBaseFunctionalTest
             'get' => [
                 'message' => new GetMachine(self::MACHINE_ID),
                 'expectedDelayStamp' => null,
-            ],
-            'exists' => [
-                'message' => new MachineExists(self::MACHINE_ID),
-                'expectedDelayStamp' => new DelayStamp(5000),
             ],
             'check machine is active' => [
                 'message' => new CheckMachineIsActive(self::MACHINE_ID),

@@ -7,7 +7,6 @@ use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\Message\GetMachine;
-use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
 use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
@@ -37,10 +36,6 @@ class MachineRequestFactory
                 $properties->getOnSuccessCollection(),
                 $properties->getOnFailureCollection()
             );
-        }
-
-        if (MachineActionInterface::ACTION_EXISTS === $action) {
-            return new MachineExists($machineId);
         }
 
         if (MachineActionInterface::ACTION_FIND === $action) {

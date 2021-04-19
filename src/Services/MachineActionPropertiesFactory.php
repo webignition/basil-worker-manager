@@ -13,11 +13,6 @@ class MachineActionPropertiesFactory
         return new MachineActionProperties(MachineActionInterface::ACTION_GET, $machineId);
     }
 
-    public function createForExists(string $machineId): MachineActionPropertiesInterface
-    {
-        return new MachineActionProperties(MachineActionInterface::ACTION_EXISTS, $machineId);
-    }
-
     public function createForCheckIsActive(string $machineId): MachineActionPropertiesInterface
     {
         return new MachineActionProperties(
@@ -46,7 +41,7 @@ class MachineActionPropertiesFactory
             MachineActionInterface::ACTION_DELETE,
             $machineId,
             [
-                $this->createForExists($machineId),
+                $this->createForFind($machineId),
             ]
         );
     }

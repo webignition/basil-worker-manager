@@ -6,7 +6,7 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Message\DeleteMachine;
-use App\Message\MachineExists;
+use App\Message\FindMachine;
 use App\MessageHandler\DeleteMachineHandler;
 use App\Services\ExceptionLogger;
 use App\Services\MachineActionPropertiesFactory;
@@ -93,7 +93,14 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         ($this->handler)($message);
 
         self::assertSame(MachineInterface::STATE_DELETE_REQUESTED, $this->machine->getState());
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, new MachineExists(self::MACHINE_ID));
+
+        $expectedMessage = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
+        );
+        self::assertInstanceOf(FindMachine::class, $expectedMessage);
+
+
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
 
     public function testInvokeMachineEntityMissing(): void

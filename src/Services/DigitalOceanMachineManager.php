@@ -88,12 +88,4 @@ class DigitalOceanMachineManager implements ProviderMachineManagerInterface
             ? new RemoteMachine($droplets[0])
             : null;
     }
-
-    /**
-     * @throws ExceptionInterface
-     */
-    public function exists(string $machineId, string $name): bool
-    {
-        return $this->get($machineId, $name) instanceof RemoteMachineInterface;
-    }
 }

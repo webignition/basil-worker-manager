@@ -140,11 +140,11 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         $response = $this->client->getResponse();
         self::assertSame(202, $response->getStatusCode());
 
-        $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_DELETE_DELETED);
+        $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_FIND_NOT_FOUND);
         if (false === $waitResult) {
-            $this->fail('Timed out waiting for expected machine state: ' . MachineInterface::STATE_DELETE_DELETED);
+            $this->fail('Timed out waiting for expected machine state: ' . MachineInterface::STATE_FIND_NOT_FOUND);
         }
 
-        self::assertSame(MachineInterface::STATE_DELETE_DELETED, $this->getMachine()->getState());
+        self::assertSame(MachineInterface::STATE_FIND_NOT_FOUND, $this->getMachine()->getState());
     }
 }

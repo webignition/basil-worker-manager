@@ -13,9 +13,7 @@ parameters:
     create_retry_limit: '%env(CREATE_RETRY_LIMIT)%'
     update_machine_dispatch_delay: '%env(UPDATE_MACHINE_DISPATCH_DELAY)%'
     get_retry_limit: '%env(GET_RETRY_LIMIT)%'
-    machine_exists_dispatch_delay: '%env(MACHINE_EXISTS_DISPATCH_DELAY)%'
-    machine_exists_initial_dispatch_delay: '%env(MACHINE_EXISTS_INITIAL_DISPATCH_DELAY)%'
-    exists_retry_limit: '%env(EXISTS_RETRY_LIMIT)%'
+    find_machine_dispatch_delay: '%env(FIND_MACHINE_DISPATCH_DELAY)%'
     machine_is_active_dispatch_delay: '%env(MACHINE_IS_ACTIVE_DISPATCH_DELAY)%'
     delete_retry_limit: '%env(DELETE_RETRY_LIMIT)%'
     find_retry_limit: '%env(FIND_RETRY_LIMIT)%'
@@ -99,16 +97,16 @@ services:
         arguments:
             $delayInMilliseconds: '%machine_is_active_dispatch_delay%'
 
-    app.message_dispatcher.backoff_strategy.machine_exists:
+    app.message_dispatcher.backoff_strategy.find_machine:
         class: webignition\SymfonyMessengerMessageDispatcher\Middleware\DelayedMessage\FixedBackoffStrategy
         arguments:
-            $delayInMilliseconds: '%machine_exists_dispatch_delay%'
+            $delayInMilliseconds: '%find_machine_dispatch_delay%'
 
     webignition\SymfonyMessengerMessageDispatcher\Middleware\DelayedMessage\DelayedMessageMiddleware:
         arguments:
             $backoffStrategies:
                 App\Message\CheckMachineIsActive: '@app.message_dispatcher.backoff_strategy.check_machine_is_active'
-                App\Message\MachineExists: '@app.message_dispatcher.backoff_strategy.machine_exists'
+                App\Message\FindMachine: '@app.message_dispatcher.backoff_strategy.find_machine'
 
     webignition\SymfonyMessengerMessageDispatcher\Middleware\RetryByLimitMiddleware:
         arguments:
@@ -116,7 +114,6 @@ services:
                 App\Message\CreateMachine: '%create_retry_limit%'
                 App\Message\GetMachine: '%get_retry_limit%'
                 App\Message\DeleteMachine: '%delete_retry_limit%'
-                App\Message\MachineExists: '%exists_retry_limit%'
                 App\Message\FindMachine: '%find_retry_limit%'
 
     webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher:
@@ -137,5 +134,4 @@ services:
                 !php/const App\Message\CreateMachine::TYPE: 'App\Message\CreateMachine'
                 !php/const App\Message\DeleteMachine::TYPE: 'App\Message\DeleteMachine'
                 !php/const App\Message\GetMachine::TYPE: 'App\Message\GetMachine'
-                !php/const App\Message\MachineExists::TYPE: 'App\Message\MachineExists'
                 !php/const App\Message\FindMachine::TYPE: 'App\Message\FindMachine'

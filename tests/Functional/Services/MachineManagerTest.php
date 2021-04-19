@@ -220,59 +220,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @dataProvider existsDataProvider
-     */
-    public function testExists(ResponseInterface $apiResponse, bool $expectedExists): void
-    {
-        $this->mockHandler->append($apiResponse);
-
-        $exists = $this->machineManager->exists($this->createMachineProvider());
-        self::assertSame($expectedExists, $exists);
-    }
-
-    /**
-     * @return array[]
-     */
-    public function existsDataProvider(): array
-    {
-        return [
-            'exists' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([
-                    new DropletEntity([
-                        'id' => 123,
-                    ]),
-                ]),
-                'expectedExists' => true,
-            ],
-            'not exists' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([]),
-                'expectedExists' => false,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider remoteRequestThrowsExceptionDataProvider
-     *
-     * @param class-string $expectedExceptionClass
-     */
-    public function testExistsThrowsException(
-        ResponseInterface $apiResponse,
-        string $expectedExceptionClass,
-        \Exception $expectedRemoveException
-    ): void {
-        $this->doActionThrowsExceptionTest(
-            function () {
-                $this->machineManager->exists($this->createMachineProvider());
-            },
-            MachineActionInterface::ACTION_GET,
-            $apiResponse,
-            $expectedExceptionClass,
-            $expectedRemoveException
-        );
-    }
-
-    /**
      * @param MachineActionInterface::ACTION_* $action
      * @param class-string $expectedExceptionClass
      */

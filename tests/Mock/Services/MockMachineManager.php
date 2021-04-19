@@ -33,17 +33,6 @@ class MockMachineManager
         return $this;
     }
 
-    public function withExistsCallThrowingException(
-        MachineProviderInterface $machineProvider,
-        \Exception $exception
-    ): self {
-        if ($this->mock instanceof MockInterface) {
-            $this->withCallThrowingException('exists', $machineProvider, $exception);
-        }
-
-        return $this;
-    }
-
     public function withDeleteCallThrowingException(
         MachineProviderInterface $machineProvider,
         \Exception $exception

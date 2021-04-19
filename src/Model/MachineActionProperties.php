@@ -17,14 +17,21 @@ class MachineActionProperties implements MachineActionPropertiesInterface
     private array $onFailureCollection;
 
     /**
+     * @var array<string, int|string>
+     */
+    private array $additionalArguments;
+
+    /**
      * @param MachineActionPropertiesInterface[] $onSuccessCollection
      * @param MachineActionPropertiesInterface[] $onFailureCollection
+     * @param array<string, int|string> $additionalArguments
      */
     public function __construct(
         private string $action,
         private string $machineId,
         array $onSuccessCollection = [],
         array $onFailureCollection = [],
+        array $additionalArguments = []
     ) {
         $this->onSuccessCollection = array_filter($onSuccessCollection, function ($value) {
             return $value instanceof MachineActionPropertiesInterface;
@@ -33,6 +40,8 @@ class MachineActionProperties implements MachineActionPropertiesInterface
         $this->onFailureCollection = array_filter($onFailureCollection, function ($value) {
             return $value instanceof MachineActionPropertiesInterface;
         });
+
+        $this->additionalArguments = $additionalArguments;
     }
 
     /**
@@ -65,6 +74,14 @@ class MachineActionProperties implements MachineActionPropertiesInterface
     }
 
     /**
+     * @return array<string, int|string>
+     */
+    public function getAdditionalArguments(): array
+    {
+        return $this->additionalArguments;
+    }
+
+    /**
      * @return array<mixed>
      */
     public function jsonSerialize(): array
@@ -84,6 +101,7 @@ class MachineActionProperties implements MachineActionPropertiesInterface
             'machine_id' => $this->machineId,
             'on_success' => $serializedOnSuccessCollection,
             'on_failure' => $serializedOnFailureCollection,
+            'additional_arguments' => $this->additionalArguments,
         ];
     }
 
@@ -122,6 +140,11 @@ class MachineActionProperties implements MachineActionPropertiesInterface
             }
         }
 
-        return new self($action, $machineId, $onSuccessCollection, $onFailureCollection);
+        $additionalArguments = $data['additional_arguments'] ?? [];
+        if (!is_array($additionalArguments)) {
+            $additionalArguments = [];
+        }
+
+        return new self($action, $machineId, $onSuccessCollection, $onFailureCollection, $additionalArguments);
     }
 }

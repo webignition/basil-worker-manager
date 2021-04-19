@@ -10,6 +10,7 @@ use App\Message\GetMachine;
 use App\Message\MachineRequestInterface;
 use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
+use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineRequestFactory
 {
@@ -39,10 +40,14 @@ class MachineRequestFactory
         }
 
         if (MachineActionInterface::ACTION_FIND === $action) {
+            $additionalArguments = $properties->getAdditionalArguments();
+            $onNotFoundState = $additionalArguments['on_not_found_state'] ?? MachineInterface::STATE_FIND_NOT_FOUND;
+
             return new FindMachine(
                 $machineId,
                 $properties->getOnSuccessCollection(),
-                $properties->getOnFailureCollection()
+                $properties->getOnFailureCollection(),
+                (string) $onNotFoundState
             );
         }
 

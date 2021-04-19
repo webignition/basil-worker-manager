@@ -46,14 +46,41 @@ class MachineActionPropertiesFactory
         );
     }
 
-    public function createForFind(string $machineId): MachineActionPropertiesInterface
+    public function createForFindThenCheckIsActive(string $machineId): MachineActionPropertiesInterface
     {
-        return new MachineActionProperties(
-            MachineActionInterface::ACTION_FIND,
+        return $this->createForFind(
             $machineId,
             [
                 $this->createForCheckIsActive($machineId),
             ]
+        );
+    }
+
+    public function createForFindThenCreate(string $machineId): MachineActionPropertiesInterface
+    {
+        return $this->createForFind(
+            $machineId,
+            [],
+            [
+                $this->createForCreate($machineId),
+            ]
+        );
+    }
+
+    /**
+     * @param MachineActionPropertiesInterface[] $onSuccessCollection
+     * @param MachineActionPropertiesInterface[] $onFailureCollection
+     */
+    public function createForFind(
+        string $machineId,
+        array $onSuccessCollection = [],
+        array $onFailureCollection = [],
+    ): MachineActionPropertiesInterface {
+        return new MachineActionProperties(
+            MachineActionInterface::ACTION_FIND,
+            $machineId,
+            $onSuccessCollection,
+            $onFailureCollection
         );
     }
 }

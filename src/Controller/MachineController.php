@@ -44,7 +44,7 @@ class MachineController
         $this->machineStore->store(new Machine($id));
         $machineProviderStore->store(new MachineProvider($id, ProviderInterface::NAME_DIGITALOCEAN));
         $this->machineRequestDispatcher->dispatch(
-            $this->machineActionPropertiesFactory->createForCreate($id)
+            $this->machineActionPropertiesFactory->createForFindThenCreate($id)
         );
 
         return new Response('', 202);
@@ -59,7 +59,7 @@ class MachineController
             $this->machineStore->store($machine);
 
             $this->machineRequestDispatcher->dispatch(
-                $this->machineActionPropertiesFactory->createForFind($id)
+                $this->machineActionPropertiesFactory->createForFindThenCheckIsActive($id)
             );
         }
 

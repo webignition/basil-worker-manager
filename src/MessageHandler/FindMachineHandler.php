@@ -55,7 +55,7 @@ class FindMachineHandler implements MessageHandlerInterface
                     $this->machineRequestDispatcher->dispatch($machineActionProperties);
                 }
             } else {
-                $machine->setState(MachineInterface::STATE_FIND_NOT_FOUND);
+                $machine->setState($message->getOnNotFoundState());
                 $this->machineStore->store($machine);
 
                 foreach ($message->getOnFailureCollection() as $machineActionProperties) {

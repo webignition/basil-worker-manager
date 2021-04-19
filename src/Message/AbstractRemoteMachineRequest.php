@@ -6,7 +6,6 @@ namespace App\Message;
 
 use App\Model\MachineActionProperties;
 use App\Model\MachineActionPropertiesInterface;
-use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
 
 abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest implements
     ChainedMachineRequestInterface,
@@ -28,7 +27,7 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
      * @param MachineActionPropertiesInterface[] $onSuccessCollection
      * @param MachineActionPropertiesInterface[] $onFailureCollection
      */
-    final public function __construct(
+    public function __construct(
         string $machineId,
         array $onSuccessCollection = [],
         array $onFailureCollection = []
@@ -85,17 +84,6 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
         );
     }
 
-    public static function createFromArray(array $data): JsonSerializableMessageInterface
-    {
-        $machineId = $data['machine_id'] ?? '';
-
-        return new static(
-            $machineId,
-            self::createMachineActionPropertiesCollection($data['on_success'] ?? []),
-            self::createMachineActionPropertiesCollection($data['on_failure'] ?? [])
-        );
-    }
-
     /**
      * @param array<mixed> $data
      *
@@ -111,5 +99,21 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
         }
 
         return $collection;
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return array<mixed>
+     */
+    protected static function createCommonConstructorArguments(array $data): array
+    {
+        $machineId = $data['machine_id'] ?? '';
+
+        return [
+            $machineId,
+            self::createMachineActionPropertiesCollection($data['on_success'] ?? []),
+            self::createMachineActionPropertiesCollection($data['on_failure'] ?? [])
+        ];
     }
 }

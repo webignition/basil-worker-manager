@@ -2,7 +2,7 @@
 
 namespace App\Exception;
 
-class MachineNotFindableException extends MachineNotFoundException
+class MachineNotFindableException extends AbstractMachineException
 {
     /**
      * @var \Throwable[]

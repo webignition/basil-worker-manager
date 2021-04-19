@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Exception\MachineNotFindableException;
-use App\Exception\MachineNotFoundException;
 use App\Message\FindMachine;
 use App\Services\ExceptionLogger;
 use App\Services\MachineRequestDispatcher;
@@ -16,6 +15,7 @@ use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class FindMachineHandler implements MessageHandlerInterface
@@ -45,13 +45,18 @@ class FindMachineHandler implements MessageHandlerInterface
         try {
             $remoteMachine = $this->remoteMachineFinder->find($machineId);
 
-            $this->machineUpdater->updateFromRemoteMachine($machine, $remoteMachine);
+            if ($remoteMachine instanceof RemoteMachineInterface) {
+                $this->machineUpdater->updateFromRemoteMachine($machine, $remoteMachine);
 
-            $machineProvider = new MachineProvider($machineId, $remoteMachine->getProvider());
-            $this->machineProviderStore->store($machineProvider);
+                $machineProvider = new MachineProvider($machineId, $remoteMachine->getProvider());
+                $this->machineProviderStore->store($machineProvider);
 
-            foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
-                $this->machineRequestDispatcher->dispatch($machineActionProperties);
+                foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
+                    $this->machineRequestDispatcher->dispatch($machineActionProperties);
+                }
+            } else {
+                $machine->setState(MachineInterface::STATE_FIND_NOT_FOUND);
+                $this->machineStore->store($machine);
             }
         } catch (MachineNotFindableException $machineNotFoundException) {
             $envelope = $this->machineRequestDispatcher->reDispatch($message);
@@ -64,9 +69,6 @@ class FindMachineHandler implements MessageHandlerInterface
                 $machine->setState(MachineInterface::STATE_FIND_NOT_FINDABLE);
                 $this->machineStore->store($machine);
             }
-        } catch (MachineNotFoundException) {
-            $machine->setState(MachineInterface::STATE_FIND_NOT_FOUND);
-            $this->machineStore->store($machine);
         }
     }
 }

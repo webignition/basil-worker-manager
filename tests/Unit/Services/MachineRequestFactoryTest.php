@@ -9,7 +9,6 @@ use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\Message\GetMachine;
-use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
 use App\Model\MachineActionProperties;
 use App\Services\MachineRequestFactory;
@@ -47,10 +46,6 @@ class MachineRequestFactoryTest extends TestCase
             MachineActionInterface::ACTION_DELETE => [
                 'properties' => new MachineActionProperties(MachineActionInterface::ACTION_DELETE, $machineId),
                 'expectedRequest' => new DeleteMachine($machineId),
-            ],
-            MachineActionInterface::ACTION_EXISTS => [
-                'properties' => new MachineActionProperties(MachineActionInterface::ACTION_EXISTS, $machineId),
-                'expectedRequest' => new MachineExists($machineId),
             ],
             MachineActionInterface::ACTION_FIND => [
                 'properties' => new MachineActionProperties(MachineActionInterface::ACTION_FIND, $machineId),

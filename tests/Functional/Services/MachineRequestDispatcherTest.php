@@ -9,7 +9,6 @@ use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\Message\GetMachine;
-use App\Message\MachineExists;
 use App\Message\MachineRequestInterface;
 use App\Model\MachineActionProperties;
 use App\Services\MachineRequestDispatcher;
@@ -69,10 +68,6 @@ class MachineRequestDispatcherTest extends AbstractBaseFunctionalTest
             MachineActionInterface::ACTION_DELETE => [
                 'action' => MachineActionInterface::ACTION_DELETE,
                 'expectedDispatchedRequest' => new DeleteMachine(self::MACHINE_ID),
-            ],
-            MachineActionInterface::ACTION_EXISTS => [
-                'action' => MachineActionInterface::ACTION_EXISTS,
-                'expectedDispatchedRequest' => new MachineExists(self::MACHINE_ID),
             ],
             MachineActionInterface::ACTION_FIND => [
                 'action' => MachineActionInterface::ACTION_FIND,

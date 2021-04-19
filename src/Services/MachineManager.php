@@ -94,27 +94,4 @@ class MachineManager extends AbstractMachineManager
             throw $this->exceptionFactory->create($machineId, Action::ACTION_DELETE, $exception);
         }
     }
-
-    /**
-     * @throws ExceptionInterface
-     * @throws UnsupportedProviderException
-     */
-    public function exists(MachineProviderInterface $machineProvider): bool
-    {
-        $machineId = $machineProvider->getId();
-        $machineName = $this->createMachineName($machineId);
-
-        $provider = $this->findProvider($machineProvider);
-        if (null === $provider) {
-            throw new UnsupportedProviderException($machineProvider->getName());
-        }
-
-        try {
-            return $provider->exists($machineId, $machineName);
-        } catch (ExceptionInterface $exception) {
-            throw $exception;
-        } catch (\Exception $exception) {
-            throw $this->exceptionFactory->create($machineId, Action::ACTION_GET, $exception);
-        }
-    }
 }

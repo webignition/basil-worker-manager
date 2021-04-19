@@ -4,30 +4,24 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Exception\MachineProvider\Exception;
-use App\Exception\UnsupportedProviderException;
+use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Message\DeleteMachine;
-use App\Message\MachineExists;
+use App\Message\FindMachine;
 use App\MessageHandler\DeleteMachineHandler;
-use App\Model\RemoteRequestFailure;
-use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
-use App\Services\MachineManager\MachineManager;
+use App\Services\MachineActionPropertiesFactory;
+use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
-use App\Tests\Mock\Services\MockMachineManager;
 use App\Tests\Services\Asserter\MessengerAsserter;
-use DigitalOceanV2\Exception\ApiLimitExceededException;
-use DigitalOceanV2\Exception\InvalidArgumentException;
+use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
@@ -40,7 +34,8 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineInterface $machine;
-    private MachineProviderInterface $machineProvider;
+    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
+    private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
     {
@@ -56,15 +51,8 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $this->machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
+        $this->machine->setState(MachineInterface::STATE_DELETE_RECEIVED);
         $machineStore->store($this->machine);
-
-        $machineProviderFactory = self::$container->get(MachineProviderFactory::class);
-        \assert($machineProviderFactory instanceof MachineProviderFactory);
-        $this->machineProvider = $machineProviderFactory->create(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN
-        );
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
@@ -73,156 +61,94 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         $mockHandler = self::$container->get(MockHandler::class);
         \assert($mockHandler instanceof MockHandler);
         $this->mockHandler = $mockHandler;
+
+        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
+        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
+        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
+
+        $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
+        \assert($machineRequestFactory instanceof MachineRequestFactory);
+        $this->machineRequestFactory = $machineRequestFactory;
     }
 
     public function testInvokeSuccess(): void
     {
-        $machineState = $this->machine->getState();
+        $this->messengerAsserter->assertQueueIsEmpty();
+        self::assertSame(MachineInterface::STATE_DELETE_RECEIVED, $this->machine->getState());
+
+        $this->setExceptionLoggerOnHandler(
+            (new MockExceptionLogger())
+                ->withoutLogCall()
+                ->getMock()
+        );
 
         $this->mockHandler->append(new Response(204));
 
-        $message = new DeleteMachine(self::MACHINE_ID);
+        $message = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForDelete(self::MACHINE_ID)
+        );
+
+        self::assertInstanceOf(DeleteMachine::class, $message);
 
         ($this->handler)($message);
 
-        self::assertSame($machineState, $this->machine->getState());
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, new MachineExists(self::MACHINE_ID));
-    }
+        self::assertSame(MachineInterface::STATE_DELETE_REQUESTED, $this->machine->getState());
 
-    public function testHandleWithUnsupportedProviderException(): void
-    {
-        $exception = \Mockery::mock(UnsupportedProviderException::class);
-
-        $message = new DeleteMachine(self::MACHINE_ID);
-
-        $machineManager = (new MockMachineManager())
-            ->withDeleteCallThrowingException($this->machineProvider, $exception)
-            ->getMock();
-
-        $exceptionLogger = (new MockExceptionLogger())
-            ->withLogCall($exception)
-            ->getMock();
-
-        $this->prepareHandler($machineManager, $exceptionLogger);
-
-        $outcome = ($this->handler)($message);
-        self::assertEquals(new RemoteRequestFailure($exception), $outcome);
-
-        $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
-        self::assertSame(0, $message->getRetryCount());
-    }
-
-    /**
-     * @dataProvider handleWithExceptionWithRetryDataProvider
-     */
-    public function testHandleExceptionWithRetry(\Throwable $previous, int $retryCount): void
-    {
-        $message = new DeleteMachine(self::MACHINE_ID);
-        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
-
-        $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
-
-        $machineManager = (new MockMachineManager())
-            ->withDeleteCallThrowingException($this->machineProvider, $exception)
-            ->getMock();
-
-        $exceptionLogger = (new MockExceptionLogger())
-            ->withoutLogCall()
-            ->getMock();
-
-        $this->prepareHandler($machineManager, $exceptionLogger);
-
-        $outcome = ($this->handler)($message);
-        self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
-
-        $expectedMessage = $message->incrementRetryCount();
-
-        $this->messengerAsserter->assertQueueCount(1);
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
-
-        self::assertNotSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
-    }
-
-    /**
-     * @return array[]
-     */
-    public function handleWithExceptionWithRetryDataProvider(): array
-    {
-        return [
-            'requires retry, retry limit not reached (0)' => [
-                'previous' => \Mockery::mock(InvalidArgumentException::class),
-                'retryCount' => 0,
-            ],
-            'requires retry, retry limit not reached (1)' => [
-                'previous' => \Mockery::mock(InvalidArgumentException::class),
-                'retryCount' => 1,
-            ],
-            'requires retry, retry limit not reached (2)' => [
-                'previous' => \Mockery::mock(InvalidArgumentException::class),
-                'retryCount' => 2,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider handleWithExceptionWithoutRetryDataProvider
-     */
-    public function testHandleExceptionWithoutRetry(\Throwable $previous, int $retryCount): void
-    {
-        $message = new DeleteMachine(self::MACHINE_ID);
-        ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
-
-        $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);
-
-        $machineManager = (new MockMachineManager())
-            ->withDeleteCallThrowingException($this->machineProvider, $exception)
-            ->getMock();
-
-        $exceptionLogger = (new MockExceptionLogger())
-            ->withLogCall($exception)
-            ->getMock();
-
-        $this->prepareHandler($machineManager, $exceptionLogger);
-
-        $outcome = ($this->handler)($message);
-        self::assertEquals(new RemoteRequestFailure($exception), $outcome);
-
-        $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
-    }
-
-    /**
-     * @return array[]
-     */
-    public function handleWithExceptionWithoutRetryDataProvider(): array
-    {
-        return [
-            'does not require retry' => [
-                'previous' => \Mockery::mock(ApiLimitExceededException::class),
-                'retryCount' => 0,
-            ],
-            'requires retry, retry limit reached (11)' => [
-                'previous' => \Mockery::mock(InvalidArgumentException::class),
-                'retryCount' => 11,
-            ],
-        ];
-    }
-
-    private function prepareHandler(MachineManager $machineManager, ExceptionLogger $exceptionLogger): void
-    {
-        $this->setMachineManagerOnHandler($machineManager);
-        $this->setExceptionLoggerOnHandler($exceptionLogger);
-    }
-
-    private function setMachineManagerOnHandler(MachineManager $machineManager): void
-    {
-        ObjectReflector::setProperty(
-            $this->handler,
-            DeleteMachineHandler::class,
-            'machineManager',
-            $machineManager
+        $expectedMessage = $this->machineRequestFactory->create(
+            $this->machineActionPropertiesFactory->createForFind(
+                self::MACHINE_ID,
+                [],
+                [],
+                MachineInterface::STATE_DELETE_DELETED
+            )
         );
+        self::assertInstanceOf(FindMachine::class, $expectedMessage);
+
+
+        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
+    }
+
+    public function testInvokeMachineEntityMissing(): void
+    {
+        $this->messengerAsserter->assertQueueIsEmpty();
+        $machineId = 'invalid machine id';
+
+        $this->setExceptionLoggerOnHandler(
+            (new MockExceptionLogger())
+                ->withoutLogCall()
+                ->getMock()
+        );
+
+        ($this->handler)(new DeleteMachine($machineId));
+
+        $this->messengerAsserter->assertQueueIsEmpty();
+    }
+
+    public function testInvokeRemoteMachineNotRemovable(): void
+    {
+        $this->messengerAsserter->assertQueueIsEmpty();
+
+        $this->setExceptionLoggerOnHandler(
+            (new MockExceptionLogger())
+                ->withLogCall(new HttpException(
+                    self::MACHINE_ID,
+                    MachineActionInterface::ACTION_DELETE,
+                    new RuntimeException('Service Unavailable', 503)
+                ))
+                ->getMock()
+        );
+
+        $this->mockHandler->append(new Response(503));
+
+        $message = new DeleteMachine(self::MACHINE_ID);
+        ObjectReflector::setProperty($message, DeleteMachine::class, 'retryCount', 11);
+
+        ($this->handler)($message);
+
+        $this->messengerAsserter->assertQueueIsEmpty();
+
+        self::assertSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
+        $this->messengerAsserter->assertQueueIsEmpty();
     }
 
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services\MachineManager;
+namespace App\Services;
 
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
-interface MachineManagerInterface
+interface ProviderMachineManagerInterface
 {
     /**
      * @return ProviderInterface::NAME_* $type
@@ -16,14 +16,15 @@ interface MachineManagerInterface
     /**
      * @throws ExceptionInterface
      */
-    public function create(string $name): RemoteMachineInterface;
+    public function create(string $machineId, string $name): RemoteMachineInterface;
 
     /**
      * @throws ExceptionInterface
      */
-    public function remove(int $remoteId): void;
+    public function remove(string $machineId, string $name): void;
 
-    public function get(int $remoteId): RemoteMachineInterface;
-
-    public function exists(int $remoteId): bool;
+    /**
+     * @throws ExceptionInterface
+     */
+    public function get(string $machineId, string $name): ?RemoteMachineInterface;
 }

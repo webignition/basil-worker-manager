@@ -20,4 +20,12 @@ trait RetryableRequestTrait
 
         return $new;
     }
+
+    private function withRetryCount(int $retryCount): static
+    {
+        $new = clone $this;
+        $new->retryCount = $retryCount;
+
+        return $new;
+    }
 }

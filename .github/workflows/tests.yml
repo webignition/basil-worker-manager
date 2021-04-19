@@ -65,8 +65,8 @@ jobs:
         with:
           args: --ignore-platform-reqs --quiet
 
-      - name: Run DB migrations
-        run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+      - name: Create DB schema
+        run: composer db-setup
         env:
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:${{ job.services.postgres.ports[5432] }}/postgres?charset=UTF-8
 

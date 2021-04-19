@@ -11,11 +11,11 @@ class UnknownRemoteMachineException extends Exception implements UnknownRemoteMa
      */
     public function __construct(
         private string $provider,
-        string $resourceId,
+        string $machineId,
         string $action,
         \Throwable $remoteException
     ) {
-        parent::__construct($resourceId, $action, $remoteException);
+        parent::__construct($machineId, $action, $remoteException);
     }
 
     public function getProvider(): string

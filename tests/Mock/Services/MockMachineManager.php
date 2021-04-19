@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
-use App\Services\MachineManager\MachineManager;
+use App\Services\MachineManager;
 use Mockery\MockInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
@@ -28,17 +28,6 @@ class MockMachineManager
     ): self {
         if ($this->mock instanceof MockInterface) {
             $this->withCallThrowingException('create', $machineProvider, $exception);
-        }
-
-        return $this;
-    }
-
-    public function withExistsCallThrowingException(
-        MachineProviderInterface $machineProvider,
-        \Exception $exception
-    ): self {
-        if ($this->mock instanceof MockInterface) {
-            $this->withCallThrowingException('exists', $machineProvider, $exception);
         }
 
         return $this;

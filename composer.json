@@ -1,9 +1,9 @@
 {
-  "repositories": [
-      {
-        "type": "vcs",
-        "url": "https://github.com/webignition/Client"
-      }
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webignition/Client"
+        }
     ],
     "type": "project",
     "license": "proprietary",
@@ -17,7 +17,6 @@
         "ext-json": "*",
         "composer/package-versions-deprecated": "1.11.99.1",
         "doctrine/doctrine-bundle": "^2.2",
-        "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.8",
         "guzzlehttp/guzzle": "^7.2",
         "http-interop/http-factory-guzzle": "^1.0",
@@ -30,8 +29,8 @@
         "symfony/proxy-manager-bridge": "5.2.*",
         "symfony/yaml": "5.2.*",
         "toin0u/digitalocean-v2": "dev-delete-droplet-by-tag",
-        "webignition/basil-worker-manager-interfaces": ">=0.22,<1",
-        "webignition/basil-worker-manager-persistence-bundle": "^0.10.0",
+        "webignition/basil-worker-manager-interfaces": ">=0.23,<1",
+        "webignition/basil-worker-manager-persistence-bundle": "^0.11.0",
         "webignition/symfony-messenger-json-message-serializer-bundle": "^0.2.0",
         "webignition/symfony-messenger-message-dispatcher": ">=0.4,<1"
     },
@@ -85,7 +84,7 @@
         ],
         "db-setup": [
             "php bin/console doctrine:database:create --if-not-exists --quiet",
-            "php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --quiet"
+            "php bin/console doctrine:schema:update --force --quiet"
         ],
         "db-destroy": [
             "php bin/console doctrine:database:drop --if-exists --force --quiet"

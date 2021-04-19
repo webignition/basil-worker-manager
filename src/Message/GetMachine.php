@@ -35,9 +35,8 @@ class GetMachine extends AbstractRemoteMachineRequest
 
     public static function createFromArray(array $data): JsonSerializableMessageInterface
     {
-        $machine = new GetMachine($data['machine_id']);
-        $machine->retryCount = $data['retry_count'];
+        $message = new self(...parent::createCommonConstructorArguments($data));
 
-        return $machine;
+        return $message->withRetryCount((int) ($data['retry_count'] ?? 0));
     }
 }

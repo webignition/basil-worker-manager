@@ -13,11 +13,11 @@ class HttpException extends Exception implements HttpExceptionInterface
      * @param MachineActionInterface::ACTION_* $action
      */
     public function __construct(
-        string $resourceId,
+        string $machineId,
         string $action,
         RuntimeException $remoteException
     ) {
-        parent::__construct($resourceId, $action, $remoteException);
+        parent::__construct($machineId, $action, $remoteException);
     }
 
     public function getStatusCode(): int

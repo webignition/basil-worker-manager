@@ -92,11 +92,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $expectedMachineProvider = clone $machineProvider;
@@ -162,7 +158,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         return [
             'updated within initial remote id and initial remote state' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity($createdDropletEntity),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$createdDropletEntity]),
                 'machine' => new Machine(self::MACHINE_ID),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
                     new RemoteMachine($createdDropletEntity)
@@ -173,7 +169,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
             ],
             'updated within initial ip addresses' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity($upNewDropletEntity),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity]),
                 'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_UP_STARTED),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
                     new RemoteMachine($upNewDropletEntity)
@@ -185,7 +181,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
             ],
             'updated within active remote state' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity($upActiveDropletEntity),
+                'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$upActiveDropletEntity]),
                 'machine' => new Machine(
                     self::MACHINE_ID,
                     MachineInterface::STATE_UP_STARTED,
@@ -270,11 +266,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $message = new GetMachine($machine->getId());
@@ -310,11 +302,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $message = new GetMachine($machine->getId());
@@ -361,11 +349,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         ObjectReflector::setProperty($machineProvider, MachineProvider::class, 'provider', $invalidProvider);
         $this->machineProviderStore->store($machineProvider);
 
@@ -390,11 +374,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $message = new GetMachine($machine->getId());

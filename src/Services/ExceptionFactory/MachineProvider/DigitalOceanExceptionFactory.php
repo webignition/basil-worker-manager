@@ -17,33 +17,24 @@ use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\Exception
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
-class DigitalOceanExceptionFactory implements ExceptionFactoryInterface
+class DigitalOceanExceptionFactory
 {
     public function __construct(
         private Client $digitalOceanClient,
     ) {
     }
 
-    public function handles(\Throwable $exception): bool
-    {
-        return $exception instanceof VendorExceptionInterface;
-    }
-
     /**
      * @param MachineActionInterface::ACTION_* $action
      */
-    public function create(string $resourceId, string $action, \Throwable $exception): ?ExceptionInterface
+    public function create(string $machineId, string $action, VendorExceptionInterface $exception): ExceptionInterface
     {
-        if (!$exception instanceof VendorExceptionInterface) {
-            return null;
-        }
-
         if ($exception instanceof VendorApiLimitExceededException) {
             $lastResponse = $this->digitalOceanClient->getLastResponse();
             if ($lastResponse instanceof ResponseInterface) {
                 return new ApiLimitExceededException(
                     (int) $lastResponse->getHeaderLine('RateLimit-Reset'),
-                    $resourceId,
+                    $machineId,
                     $action,
                     $exception
                 );
@@ -51,26 +42,26 @@ class DigitalOceanExceptionFactory implements ExceptionFactoryInterface
         }
 
         if (DropletLimitExceededException::is($exception)) {
-            return new DropletLimitExceededException($resourceId, $action, $exception);
+            return new DropletLimitExceededException($machineId, $action, $exception);
         }
 
         if ($exception instanceof RuntimeException) {
             if (401 === $exception->getCode()) {
-                return new AuthenticationException($resourceId, $action, $exception);
+                return new AuthenticationException($machineId, $action, $exception);
             }
 
             if (404 === $exception->getCode()) {
                 return new UnknownRemoteMachineException(
                     ProviderInterface::NAME_DIGITALOCEAN,
-                    $resourceId,
+                    $machineId,
                     $action,
                     $exception
                 );
             }
 
-            return new HttpException($resourceId, $action, $exception);
+            return new HttpException($machineId, $action, $exception);
         }
 
-        return new Exception($resourceId, $action, $exception);
+        return new Exception($machineId, $action, $exception);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Message\CreateMachine;
-use App\Message\DeleteMachine;
 use App\Response\BadMachineCreateRequestResponse;
+use App\Services\MachineActionPropertiesFactory;
+use App\Services\MachineRequestDispatcher;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,47 +15,53 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\CreateFailur
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class MachineController
 {
     public const PATH_COMPONENT_ID = '{id}';
     public const PATH_MACHINE = '/' . self::PATH_COMPONENT_ID . '/machine';
 
+    public function __construct(
+        private MachineStore $machineStore,
+        private MachineActionPropertiesFactory $machineActionPropertiesFactory,
+        private MachineRequestDispatcher $machineRequestDispatcher,
+    ) {
+    }
+
     #[Route(self::PATH_MACHINE, name: 'create', methods: ['POST'])]
-    public function create(
-        string $id,
-        MachineStore $machineStore,
-        MachineProviderStore $machineProviderStore,
-        MessageDispatcher $messageDispatcher,
-    ): Response {
-        if ($machineStore->find($id) instanceof MachineInterface) {
-            return BadMachineCreateRequestResponse::createIdTakenResponse();
+    public function create(string $id, MachineProviderStore $machineProviderStore): Response
+    {
+        $machine = $this->machineStore->find($id);
+        if ($machine instanceof MachineInterface) {
+            if (in_array($machine->getState(), MachineInterface::RESETTABLE_STATES)) {
+                $machine->reset();
+                $this->machineStore->persist($machine);
+            } else {
+                return BadMachineCreateRequestResponse::createIdTakenResponse();
+            }
         }
 
-        if ($machineProviderStore->find($id) instanceof MachineProviderInterface) {
-            return BadMachineCreateRequestResponse::createIdTakenResponse();
-        }
-
-        $machineStore->store(new Machine($id));
+        $this->machineStore->store(new Machine($id));
         $machineProviderStore->store(new MachineProvider($id, ProviderInterface::NAME_DIGITALOCEAN));
-
-        $messageDispatcher->dispatch(new CreateMachine($id));
+        $this->machineRequestDispatcher->dispatch(
+            $this->machineActionPropertiesFactory->createForFindThenCreate($id)
+        );
 
         return new Response('', 202);
     }
 
     #[Route(self::PATH_MACHINE, name: 'status', methods: ['GET', 'HEAD'])]
-    public function status(
-        string $id,
-        MachineStore $machineStore,
-        CreateFailureStore $createFailureStore,
-    ): Response {
-        $machine = $machineStore->find($id);
-        if (false === $machine instanceof MachineInterface) {
-            return new Response('', 404);
+    public function status(string $id, CreateFailureStore $createFailureStore): Response
+    {
+        $machine = $this->machineStore->find($id);
+        if (!$machine instanceof MachineInterface) {
+            $machine = new Machine($id, MachineInterface::STATE_FIND_RECEIVED);
+            $this->machineStore->store($machine);
+
+            $this->machineRequestDispatcher->dispatch(
+                $this->machineActionPropertiesFactory->createForFindThenCheckIsActive($id)
+            );
         }
 
         $responseData = $machine->jsonSerialize();
@@ -69,17 +75,17 @@ class MachineController
     }
 
     #[Route(self::PATH_MACHINE, name: 'delete', methods: ['DELETE'])]
-    public function delete(
-        string $id,
-        MachineStore $machineStore,
-        MessageDispatcher $messageDispatcher,
-    ): Response {
-        $machine = $machineStore->find($id);
+    public function delete(string $id): Response
+    {
+        $machine = $this->machineStore->find($id);
         if (false === $machine instanceof MachineInterface) {
-            return new Response('', 404);
+            $machine = new Machine($id, MachineInterface::STATE_DELETE_RECEIVED);
+            $this->machineStore->store($machine);
         }
 
-        $messageDispatcher->dispatch(new DeleteMachine($machine->getId()));
+        $this->machineRequestDispatcher->dispatch(
+            $this->machineActionPropertiesFactory->createForDelete($id)
+        );
 
         return new Response('', 202);
     }

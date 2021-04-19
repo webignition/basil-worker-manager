@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\MachineManager;
+namespace App\Tests\Functional\Services;
 
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
-use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Services\MachineManager\MachineManager;
+use App\Services\DigitalOceanMachineManager;
+use App\Services\MachineNameFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
@@ -19,60 +19,70 @@ use DigitalOceanV2\Exception\ValidationFailedException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\ObjectReflector\ObjectReflector;
 
-class MachineManagerTest extends AbstractBaseFunctionalTest
+class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 {
     private const MACHINE_ID = 'machine id';
 
-    private MachineManager $machineManager;
+    private DigitalOceanMachineManager $machineManager;
     private MachineInterface $machine;
-    private MachineProvider $machineProvider;
     private MockHandler $mockHandler;
+    private string $machineName;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $machineManager = self::$container->get(MachineManager::class);
-        \assert($machineManager instanceof MachineManager);
+        $machineManager = self::$container->get(DigitalOceanMachineManager::class);
+        \assert($machineManager instanceof DigitalOceanMachineManager);
         $this->machineManager = $machineManager;
 
         $machineFactory = self::$container->get(MachineFactory::class);
         \assert($machineFactory instanceof MachineFactory);
         $this->machine = $machineFactory->create(self::MACHINE_ID);
 
-        $machineProviderFactory = self::$container->get(MachineProviderFactory::class);
-        \assert($machineProviderFactory instanceof MachineProviderFactory);
-        $this->machineProvider = $machineProviderFactory->create(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN
-        );
+        $machineNameFactory = self::$container->get(MachineNameFactory::class);
+        \assert($machineNameFactory instanceof MachineNameFactory);
+        $this->machineName = $machineNameFactory->create(self::MACHINE_ID);
 
         $mockHandler = self::$container->get(MockHandler::class);
-        if ($mockHandler instanceof MockHandler) {
-            $this->mockHandler = $mockHandler;
-        }
+        \assert($mockHandler instanceof MockHandler);
+        $this->mockHandler = $mockHandler;
     }
 
     public function testCreateSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function () {
-            return $this->machineManager->create($this->machineProvider);
-        });
+        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
+
+        $dropletData = [
+            'networks' => (object) [
+                'v4' => [
+                    (object) [
+                        'ip_address' => $ipAddresses[0],
+                        'type' => 'public',
+                    ],
+                    (object) [
+                        'ip_address' => $ipAddresses[1],
+                        'type' => 'public',
+                    ],
+                ],
+            ],
+        ];
+
+        $expectedDropletEntity = new DropletEntity($dropletData);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
+
+        $remoteMachine = $this->machineManager->create(self::MACHINE_ID, $this->machineName);
+
+        self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
      *
      * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
@@ -85,7 +95,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineManager->create($this->machineProvider);
+                $this->machineManager->create(self::MACHINE_ID, $this->machineName);
             },
             MachineActionInterface::ACTION_CREATE,
             $apiResponse,
@@ -110,7 +120,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         );
 
         try {
-            $this->machineManager->create($this->machineProvider);
+            $this->machineManager->create(self::MACHINE_ID, $this->machineName);
             self::fail(ExceptionInterface::class . ' not thrown');
         } catch (ExceptionInterface $exception) {
             self::assertEquals(
@@ -122,74 +132,11 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testGetSuccess(): void
     {
-        $this->assertRetrieveRemoteMachine(function () {
-            return $this->machineManager->get($this->machineProvider);
-        });
-    }
-
-    /**
-     * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
-     *
-     * @param ResponseInterface $apiResponse
-     * @param class-string $expectedExceptionClass
-     * @param \Exception $expectedRemoveException
-     */
-    public function testGetThrowsException(
-        ResponseInterface $apiResponse,
-        string $expectedExceptionClass,
-        \Exception $expectedRemoveException
-    ): void {
-        $this->doActionThrowsExceptionTest(
-            function () {
-                $this->machineManager->get($this->machineProvider);
-            },
-            MachineActionInterface::ACTION_GET,
-            $apiResponse,
-            $expectedExceptionClass,
-            $expectedRemoveException
-        );
-    }
-
-    public function testDeleteSuccess(): void
-    {
-        ObjectReflector::setProperty($this->machineProvider, Machine::class, 'remote_id', 123);
-
-        $this->mockHandler->append(new Response(204));
-
-        $this->machineManager->delete($this->machineProvider);
-        self::expectNotToPerformAssertions();
-    }
-
-    /**
-     * @dataProvider remoteRequestThrowsExceptionDataProvider
-     * @dataProvider remoteMachineDoesNotExistDataProvider
-     *
-     * @param class-string $expectedExceptionClass
-     */
-    public function testDeleteThrowsException(
-        ResponseInterface $apiResponse,
-        string $expectedExceptionClass,
-        \Exception $expectedRemoveException
-    ): void {
-        $this->doActionThrowsExceptionTest(
-            function () {
-                $this->machineManager->delete($this->machineProvider);
-            },
-            MachineActionInterface::ACTION_DELETE,
-            $apiResponse,
-            $expectedExceptionClass,
-            $expectedRemoveException
-        );
-    }
-
-    private function assertRetrieveRemoteMachine(callable $callable): void
-    {
-        $remoteId = 123;
         $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
 
+        self::assertSame([], $this->machine->getIpAddresses());
+
         $dropletData = [
-            'id' => $remoteId,
             'networks' => (object) [
                 'v4' => [
                     (object) [
@@ -205,45 +152,51 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         ];
 
         $expectedDropletEntity = new DropletEntity($dropletData);
-        $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([$expectedDropletEntity]));
 
-        $remoteMachine = $callable();
+        $remoteMachine = $this->machineManager->get(self::MACHINE_ID, $this->machineName);
 
         self::assertEquals(new RemoteMachine($expectedDropletEntity), $remoteMachine);
     }
 
-    /**
-     * @dataProvider existsDataProvider
-     */
-    public function testExists(ResponseInterface $apiResponse, bool $expectedExists): void
+    public function testGetMachineNotFound(): void
     {
-        ObjectReflector::setProperty($this->machine, Machine::class, 'remote_id', 123);
+        $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
 
-        $this->mockHandler->append($apiResponse);
+        $remoteMachine = $this->machineManager->get(self::MACHINE_ID, $this->machineName);
 
-        $exists = $this->machineManager->exists($this->machineProvider);
-        self::assertSame($expectedExists, $exists);
+        self::assertNull($remoteMachine);
     }
 
     /**
-     * @return array[]
+     * @dataProvider remoteRequestThrowsExceptionDataProvider
+     *
+     * @param ResponseInterface $apiResponse
+     * @param class-string $expectedExceptionClass
+     * @param \Exception $expectedRemoveException
      */
-    public function existsDataProvider(): array
+    public function testGetThrowsException(
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Exception $expectedRemoveException
+    ): void {
+        $this->doActionThrowsExceptionTest(
+            function () {
+                $this->machineManager->get(self::MACHINE_ID, $this->machineName);
+            },
+            MachineActionInterface::ACTION_GET,
+            $apiResponse,
+            $expectedExceptionClass,
+            $expectedRemoveException
+        );
+    }
+
+    public function testRemoveSuccess(): void
     {
-        return [
-            'exists' => [
-                'apiResponse' => HttpResponseFactory::fromDropletEntity(
-                    new DropletEntity([
-                        'id' => 123,
-                    ])
-                ),
-                'expectedExists' => true,
-            ],
-            'not exists' => [
-                'apiResponse' => new Response(404),
-                'expectedExists' => false,
-            ],
-        ];
+        $this->mockHandler->append(new Response(204));
+        $this->machineManager->remove(self::MACHINE_ID, $this->machineName);
+
+        self::expectNotToPerformAssertions();
     }
 
     /**
@@ -251,16 +204,16 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
      *
      * @param class-string $expectedExceptionClass
      */
-    public function testExistsThrowsException(
+    public function testRemoveThrowsException(
         ResponseInterface $apiResponse,
         string $expectedExceptionClass,
         \Exception $expectedRemoveException
     ): void {
         $this->doActionThrowsExceptionTest(
             function () {
-                $this->machineManager->exists($this->machineProvider);
+                $this->machineManager->remove(self::MACHINE_ID, $this->machineName);
             },
-            MachineActionInterface::ACTION_EXISTS,
+            MachineActionInterface::ACTION_DELETE,
             $apiResponse,
             $expectedExceptionClass,
             $expectedRemoveException
@@ -315,20 +268,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
                 'apiResponse' => new Response(400),
                 'expectedExceptionClass' => Exception::class,
                 'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
-            ],
-        ];
-    }
-
-    /**
-     * @return array[]
-     */
-    public function remoteMachineDoesNotExistDataProvider(): array
-    {
-        return [
-            'remote machine does not exist' => [
-                'apiResponse' => new Response(404),
-                'expectedExceptionClass' => UnknownRemoteMachineException::class,
-                'expectedRemoteException' => new RuntimeException('Not Found', 404),
             ],
         ];
     }

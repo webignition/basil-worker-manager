@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
+use App\Message\ChainedMachineRequestInterface;
 use App\Message\RemoteMachineMessageInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\ExceptionLogger;
-use App\Services\MachineManager\MachineManager;
+use App\Services\MachineManager;
+use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteRequestRetryDecider;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
@@ -27,7 +30,7 @@ abstract class AbstractRemoteMachineRequestHandler
         protected ExceptionLogger $exceptionLogger,
         protected MachineStore $machineStore,
         protected MachineProviderStore $machineProviderStore,
-        protected MessageDispatcher $dispatcher,
+        protected MachineRequestDispatcher $machineRequestDispatcher,
     ) {
     }
 
@@ -65,10 +68,13 @@ abstract class AbstractRemoteMachineRequestHandler
         } catch (UnsupportedProviderException $unsupportedProviderException) {
             $lastException = $unsupportedProviderException;
             $shouldRetry = false;
+        } catch (ProviderMachineNotFoundException $machineNotFoundException) {
+            $lastException = $machineNotFoundException;
+            $shouldRetry = false;
         }
 
         if (RemoteRequestOutcomeInterface::STATE_RETRYING === (string) $outcome || $shouldRetry) {
-            $envelope = $this->dispatcher->dispatch($message->incrementRetryCount());
+            $envelope = $this->machineRequestDispatcher->reDispatch($message);
 
             if (MessageDispatcher::isDispatchable($envelope)) {
                 $outcome = RemoteRequestOutcome::retrying();
@@ -77,7 +83,13 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         if (RemoteRequestOutcomeInterface::STATE_SUCCESS === (string) $outcome) {
-            $actionHandler->onSuccess($machine, $machineProvider, $outcome);
+            $actionHandler->onSuccess($machine, $outcome);
+
+            if ($message instanceof ChainedMachineRequestInterface) {
+                foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
+                    $this->machineRequestDispatcher->dispatch($machineActionProperties);
+                }
+            }
         }
 
         if ($lastException instanceof \Throwable) {

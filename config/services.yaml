@@ -13,7 +13,6 @@ parameters:
     create_retry_limit: '%env(CREATE_RETRY_LIMIT)%'
     update_machine_dispatch_delay: '%env(UPDATE_MACHINE_DISPATCH_DELAY)%'
     get_retry_limit: '%env(GET_RETRY_LIMIT)%'
-    find_machine_dispatch_delay: '%env(FIND_MACHINE_DISPATCH_DELAY)%'
     machine_is_active_dispatch_delay: '%env(MACHINE_IS_ACTIVE_DISPATCH_DELAY)%'
     delete_retry_limit: '%env(DELETE_RETRY_LIMIT)%'
     find_retry_limit: '%env(FIND_RETRY_LIMIT)%'
@@ -98,9 +97,7 @@ services:
             $delayInMilliseconds: '%machine_is_active_dispatch_delay%'
 
     app.message_dispatcher.backoff_strategy.find_machine:
-        class: webignition\SymfonyMessengerMessageDispatcher\Middleware\DelayedMessage\FixedBackoffStrategy
-        arguments:
-            $delayInMilliseconds: '%find_machine_dispatch_delay%'
+        class: webignition\SymfonyMessengerMessageDispatcher\Middleware\DelayedMessage\ExponentialBackoffStrategy
 
     webignition\SymfonyMessengerMessageDispatcher\Middleware\DelayedMessage\DelayedMessageMiddleware:
         arguments:

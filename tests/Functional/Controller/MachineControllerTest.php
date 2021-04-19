@@ -6,7 +6,6 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\MachineController;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
-use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\Services\MachineActionPropertiesFactory;
@@ -82,9 +81,9 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
 
         $expectedMessage = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForCreate(self::MACHINE_ID)
+            $this->machineActionPropertiesFactory->createForFindThenCreate(self::MACHINE_ID)
         );
-        self::assertInstanceOf(CreateMachine::class, $expectedMessage);
+        self::assertInstanceOf(FindMachine::class, $expectedMessage);
 
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }
@@ -124,7 +123,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
 
         $expectedMessage = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
+            $this->machineActionPropertiesFactory->createForFindThenCheckIsActive(self::MACHINE_ID)
         );
         self::assertInstanceOf(FindMachine::class, $expectedMessage);
 

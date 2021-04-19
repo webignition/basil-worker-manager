@@ -59,7 +59,7 @@ class MachineController
             $this->machineStore->store($machine);
 
             $this->machineRequestDispatcher->dispatch(
-                $this->machineActionPropertiesFactory->createForFind($id)
+                $this->machineActionPropertiesFactory->createForFindThenCheckIsActive($id)
             );
         }
 

@@ -124,7 +124,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
 
         $expectedMessage = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
+            $this->machineActionPropertiesFactory->createForFindThenCheckIsActive(self::MACHINE_ID)
         );
         self::assertInstanceOf(FindMachine::class, $expectedMessage);
 

@@ -46,7 +46,7 @@ class MachineActionPropertiesFactory
         );
     }
 
-    public function createForFind(string $machineId): MachineActionPropertiesInterface
+    public function createForFindThenCheckIsActive(string $machineId): MachineActionPropertiesInterface
     {
         return new MachineActionProperties(
             MachineActionInterface::ACTION_FIND,
@@ -54,6 +54,20 @@ class MachineActionPropertiesFactory
             [
                 $this->createForCheckIsActive($machineId),
             ]
+        );
+    }
+
+    /**
+     * @param MachineActionPropertiesInterface[] $onSuccessCollection
+     */
+    public function createForFind(
+        string $machineId,
+        array $onSuccessCollection = []
+    ): MachineActionPropertiesInterface {
+        return new MachineActionProperties(
+            MachineActionInterface::ACTION_FIND,
+            $machineId,
+            $onSuccessCollection
         );
     }
 }

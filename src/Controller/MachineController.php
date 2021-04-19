@@ -15,7 +15,6 @@ use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\CreateFailur
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
 use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineController
@@ -33,12 +32,14 @@ class MachineController
     #[Route(self::PATH_MACHINE, name: 'create', methods: ['POST'])]
     public function create(string $id, MachineProviderStore $machineProviderStore): Response
     {
-        if ($this->machineStore->find($id) instanceof MachineInterface) {
-            return BadMachineCreateRequestResponse::createIdTakenResponse();
-        }
-
-        if ($machineProviderStore->find($id) instanceof MachineProviderInterface) {
-            return BadMachineCreateRequestResponse::createIdTakenResponse();
+        $machine = $this->machineStore->find($id);
+        if ($machine instanceof MachineInterface) {
+            if (in_array($machine->getState(), MachineInterface::RESETTABLE_STATES)) {
+                $machine->reset();
+                $this->machineStore->persist($machine);
+            } else {
+                return BadMachineCreateRequestResponse::createIdTakenResponse();
+            }
         }
 
         $this->machineStore->store(new Machine($id));

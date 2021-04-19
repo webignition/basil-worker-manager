@@ -59,8 +59,19 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         );
     }
 
-    public function testCreateSuccess(): void
+    /**
+     * @dataProvider createSuccessDataProvider
+     *
+     * @param MachineInterface|null $existingMachine
+     */
+    public function testCreateSuccess(?MachineInterface $existingMachine): void
     {
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        if ($existingMachine instanceof MachineInterface) {
+            $machineStore->store($existingMachine);
+        }
+
         $this->messengerAsserter->assertQueueIsEmpty();
 
         $response = $this->makeCreateRequest();
@@ -86,6 +97,24 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertInstanceOf(FindMachine::class, $expectedMessage);
 
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function createSuccessDataProvider(): array
+    {
+        return [
+            'no existing machine' => [
+                'existingMachine' => null,
+            ],
+            'existing machine state: find/not-found' => [
+                'existingMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_NOT_FOUND),
+            ],
+            'existing machine state: create/failed' => [
+                'existingMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_FAILED),
+            ],
+        ];
     }
 
     public function testCreateIdTaken(): void

@@ -92,11 +92,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $expectedMachineProvider = clone $machineProvider;
@@ -270,11 +266,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $message = new GetMachine($machine->getId());
@@ -310,11 +302,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $message = new GetMachine($machine->getId());
@@ -361,11 +349,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         ObjectReflector::setProperty($machineProvider, MachineProvider::class, 'provider', $invalidProvider);
         $this->machineProviderStore->store($machineProvider);
 
@@ -390,11 +374,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
-        $machineProvider = new MachineProvider(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN,
-            self::REMOTE_ID
-        );
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
         $this->machineProviderStore->store($machineProvider);
 
         $message = new GetMachine($machine->getId());

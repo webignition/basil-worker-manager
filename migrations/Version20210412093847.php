@@ -30,9 +30,9 @@ final class Version20210412093847 extends AbstractMigration
         $this->addSql('
             CREATE TABLE machine (
                 id VARCHAR(32) NOT NULL,
-                 state VARCHAR(255) NOT NULL, 
-                 ip_addresses TEXT DEFAULT NULL,
-                  PRIMARY KEY(id)
+                state VARCHAR(255) NOT NULL, 
+                ip_addresses TEXT DEFAULT NULL,
+                PRIMARY KEY(id)
             )
         ');
         $this->addSql('COMMENT ON COLUMN machine.ip_addresses IS \'(DC2Type:simple_array)\'');
@@ -40,9 +40,8 @@ final class Version20210412093847 extends AbstractMigration
         $this->addSql('
             CREATE TABLE machine_provider (
                 id VARCHAR(32) NOT NULL, 
-                remote_id INT DEFAULT NULL,
-                 provider VARCHAR(255) NOT NULL, 
-                 PRIMARY KEY(id)
+                provider VARCHAR(255) NOT NULL, 
+                PRIMARY KEY(id)
             )
         ');
     }

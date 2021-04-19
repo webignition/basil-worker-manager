@@ -6,10 +6,12 @@ namespace App\Tests\Functional\MessageHandler;
 
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Message\CheckMachineIsActive;
+use App\Message\CreateMachine;
 use App\Message\FindMachine;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineActionProperties;
+use App\Model\MachineActionPropertiesInterface;
 use App\Services\ExceptionLogger;
 use App\Services\MachineActionPropertiesFactory;
 use App\Services\MachineRequestFactory;
@@ -83,14 +85,21 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider invokeSuccessDataProvider
      *
+     * @param MachineActionPropertiesInterface[] $messageOnSuccessCollection
+     * @param MachineActionPropertiesInterface[] $messageOnFailureCollection
      * @param ResponseInterface[] $apiResponses
+     * @param object[] $expectedQueuedMessages
      */
     public function testInvokeSuccess(
         MachineInterface $machine,
         ?MachineProviderInterface $machineProvider,
+        array $messageOnSuccessCollection,
+        array $messageOnFailureCollection,
         array $apiResponses,
         MachineInterface $expectedMachine,
-        MachineProviderInterface $expectedMachineProvider
+        MachineProviderInterface $expectedMachineProvider,
+        int $expectedQueueCount,
+        array $expectedQueuedMessages
     ): void {
         $this->setExceptionLoggerOnHandler(
             (new MockExceptionLogger())
@@ -105,29 +114,21 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
             $this->machineProviderStore->store($machineProvider);
         }
 
-        $message = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
-        );
-        self::assertInstanceOf(FindMachine::class, $message);
-
+        $message = new FindMachine(self::MACHINE_ID, $messageOnSuccessCollection, $messageOnFailureCollection);
         ($this->handler)($message);
 
         self::assertEquals($expectedMachine, $this->machineStore->find(self::MACHINE_ID));
         self::assertEquals($expectedMachineProvider, $this->machineProviderStore->find(self::MACHINE_ID));
 
-        $this->messengerAsserter->assertQueueCount(1);
-        $this->messengerAsserter->assertMessageAtPositionEquals(
-            0,
-            new CheckMachineIsActive(
-                self::MACHINE_ID,
-                [
-                    new MachineActionProperties(
-                        MachineActionInterface::ACTION_GET,
-                        self::MACHINE_ID
-                    )
-                ]
-            )
-        );
+        $this->messengerAsserter->assertQueueCount($expectedQueueCount);
+        self::assertCount($expectedQueueCount, $expectedQueuedMessages);
+
+        foreach ($expectedQueuedMessages as $expectedIndex => $expectedMessage) {
+            $this->messengerAsserter->assertMessageAtPositionEquals(
+                $expectedIndex,
+                $expectedMessage
+            );
+        }
     }
 
     /**
@@ -159,6 +160,10 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
             'remote machine found and updated, no existing provider' => [
                 'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
                 'machineProvider' => null,
+                'messageOnSuccessCollection' => [
+                    $this->getMachineActionPropertiesFactory()->createForCheckIsActive(self::MACHINE_ID),
+                ],
+                'messageOnFailureCollection' => [],
                 'apiResponses' => [
                     HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity])
                 ],
@@ -173,10 +178,26 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                     self::MACHINE_ID,
                     ProviderInterface::NAME_DIGITALOCEAN
                 ),
+                'expectedQueueCount' => 1,
+                'expectedQueuedMessages' => [
+                    new CheckMachineIsActive(
+                        self::MACHINE_ID,
+                        [
+                            new MachineActionProperties(
+                                MachineActionInterface::ACTION_GET,
+                                self::MACHINE_ID
+                            )
+                        ]
+                    ),
+                ],
             ],
             'remote machine found and updated, has existing provider' => [
                 'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
                 'machineProvider' => $nonDigitalOceanMachineProvider,
+                'messageOnSuccessCollection' => [
+                    $this->getMachineActionPropertiesFactory()->createForCheckIsActive(self::MACHINE_ID),
+                ],
+                'messageOnFailureCollection' => [],
                 'apiResponses' => [
                     HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity])
                 ],
@@ -191,6 +212,46 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                     self::MACHINE_ID,
                     ProviderInterface::NAME_DIGITALOCEAN
                 ),
+                'expectedQueueCount' => 1,
+                'expectedQueuedMessages' => [
+                    new CheckMachineIsActive(
+                        self::MACHINE_ID,
+                        [
+                            new MachineActionProperties(
+                                MachineActionInterface::ACTION_GET,
+                                self::MACHINE_ID
+                            )
+                        ]
+                    ),
+                ],
+            ],
+            'remote machine not found, create requested' => [
+                'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
+                'machineProvider' => $nonDigitalOceanMachineProvider,
+                'messageOnSuccessCollection' => [],
+                'messageOnFailureCollection' => [
+                    $this->getMachineActionPropertiesFactory()->createForCreate(self::MACHINE_ID)
+                ],
+                'apiResponses' => [
+                    HttpResponseFactory::fromDropletEntityCollection([])
+                ],
+                'expectedMachine' => new Machine(
+                    self::MACHINE_ID,
+                    MachineInterface::STATE_FIND_NOT_FOUND
+                ),
+                'expectedMachineProvider' => new MachineProvider(
+                    self::MACHINE_ID,
+                    ProviderInterface::NAME_DIGITALOCEAN
+                ),
+                'expectedQueueCount' => 1,
+                'expectedQueuedMessages' => [
+                    new CreateMachine(
+                        self::MACHINE_ID,
+                        [
+                            $this->getMachineActionPropertiesFactory()->createForCheckIsActive(self::MACHINE_ID),
+                        ]
+                    ),
+                ],
             ],
         ];
     }
@@ -309,5 +370,10 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
             'exceptionLogger',
             $exceptionLogger
         );
+    }
+
+    private function getMachineActionPropertiesFactory(): MachineActionPropertiesFactory
+    {
+        return new MachineActionPropertiesFactory();
     }
 }

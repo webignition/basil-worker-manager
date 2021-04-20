@@ -1,4 +1,4 @@
-FROM php:8-cli-buster
+FROM php:8-fpm-buster
 
 WORKDIR /app
 

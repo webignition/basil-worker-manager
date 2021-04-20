@@ -2,6 +2,14 @@ FROM php:8-cli-buster
 
 WORKDIR /app
 
+ARG APP_ENV=prod
+ARG DATABASE_URL=postgresql://database_user:database_password@0.0.0.0:5432/database_name?serverVersion=12&charset=utf8
+ARG MESSENGER_TRANSPORT_DSN=amqp://rabbitmq_user:rabbitmq_password@rabbitmq_host:5672/%2f/messages
+
+ENV APP_ENV=$APP_ENV
+ENV DATABASE_URL=$DATABASE_URL
+ENV MESSENGER_TRANSPORT_DSN=$MESSENGER_TRANSPORT_DSN
+
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
 COPY composer.json composer.lock /app/
@@ -28,4 +36,6 @@ RUN apt-get -qq update && apt-get -qq -y install  \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && composer check-platform-reqs --ansi \
   && composer install --no-dev --no-scripts \
-  && rm composer.lock
+  && rm composer.lock \
+  && touch /app/.env \
+  && php bin/console cache:clear --env=prod

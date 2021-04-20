@@ -1,1 +1,1 @@
-FROM php:8-fpm-buster
+FROM php:8-cli-buster

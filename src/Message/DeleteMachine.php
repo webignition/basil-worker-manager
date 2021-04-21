@@ -14,17 +14,4 @@ class DeleteMachine extends AbstractRemoteMachineRequest
     {
         return MachineActionInterface::ACTION_DELETE;
     }
-
-    /**
-     * @return array<mixed>
-     */
-    public function getPayload(): array
-    {
-        return array_merge(
-            parent::getPayload(),
-            [
-                'retry_count' => $this->getRetryCount(),
-            ]
-        );
-    }
 }

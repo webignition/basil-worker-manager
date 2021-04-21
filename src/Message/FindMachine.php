@@ -38,18 +38,4 @@ class FindMachine extends AbstractRemoteMachineRequest
     {
         return $this->onNotFoundState;
     }
-
-    /**
-     * @return array<mixed>
-     */
-    public function getPayload(): array
-    {
-        return array_merge(
-            parent::getPayload(),
-            [
-                'retry_count' => $this->getRetryCount(),
-                'on_not_found_state' => $this->onNotFoundState,
-            ]
-        );
-    }
 }

@@ -60,34 +60,6 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
     }
 
     /**
-     * @return array<mixed>
-     */
-    public function getPayload(): array
-    {
-        $onSuccessData = [];
-        foreach ($this->onSuccessCollection as $item) {
-            if ($item instanceof MachineActionPropertiesInterface) {
-                $onSuccessData[] = $item->jsonSerialize();
-            }
-        }
-
-        $onFailureData = [];
-        foreach ($this->onFailureCollection as $item) {
-            if ($item instanceof MachineActionPropertiesInterface) {
-                $onFailureData[] = $item->jsonSerialize();
-            }
-        }
-
-        return array_merge(
-            parent::getPayload(),
-            [
-                'on_success' => $onSuccessData,
-                'on_failure' => $onFailureData,
-            ]
-        );
-    }
-
-    /**
      * @param array<mixed> $data
      *
      * @return MachineActionPropertiesInterface[]

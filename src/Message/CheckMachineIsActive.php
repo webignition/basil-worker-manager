@@ -45,19 +45,6 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
     }
 
     /**
-     * @return array<mixed>
-     */
-    public function getPayload(): array
-    {
-        return array_merge(
-            parent::getPayload(),
-            [
-                'self_properties' => $this->getSelfProperties()->jsonSerialize(),
-            ]
-        );
-    }
-
-    /**
      * @return MachineActionPropertiesInterface[]
      */
     public function getOnSuccessCollection(): array

@@ -14,17 +14,4 @@ class GetMachine extends AbstractRemoteMachineRequest
     {
         return MachineActionInterface::ACTION_GET;
     }
-
-    /**
-     * @return array<mixed>
-     */
-    public function getPayload(): array
-    {
-        return array_merge(
-            parent::getPayload(),
-            [
-                'retry_count' => $this->getRetryCount(),
-            ]
-        );
-    }
 }

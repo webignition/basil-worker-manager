@@ -15,14 +15,4 @@ abstract class AbstractMachineRequest implements MachineRequestInterface
     {
         return $this->machineId;
     }
-
-    /**
-     * @return array<mixed>
-     */
-    public function getPayload(): array
-    {
-        return [
-            'machine_id' => $this->getMachineId(),
-        ];
-    }
 }

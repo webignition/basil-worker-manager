@@ -17,8 +17,8 @@ jobs:
         php-versions: ['8']
     runs-on: ${{ matrix.operating-system }}
 
-    env:
-      DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-db?charset=UTF-8
+#    env:
+#      DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-db?charset=UTF-8
 
     steps:
       - name: Checkout
@@ -44,6 +44,7 @@ jobs:
       - name: Run asynchronous tests
         env:
           APP_DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
+          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
         run: |
           composer integration-setup
           composer test-integration-async

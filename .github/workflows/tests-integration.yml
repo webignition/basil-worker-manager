@@ -38,11 +38,17 @@ jobs:
       - name: Docker layer caching
         uses: satackey/action-docker-layer-caching@v0.0.11
 
-      - name: Run asynchronous tests
+      - name: Setup integration environment
         env:
           APP_DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
         run: |
           composer integration-setup
           sleep 10
+
+      - name: Run asynchronous tests
+        env:
+          APP_DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
+          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
+        run: |
           composer test-integration-async

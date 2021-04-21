@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use webignition\JsonMessageSerializerBundle\Message\AbstractSerializableMessage;
-
-abstract class AbstractMachineRequest extends AbstractSerializableMessage implements MachineRequestInterface
+abstract class AbstractMachineRequest implements MachineRequestInterface
 {
     public function __construct(
         private string $machineId,
@@ -18,6 +16,9 @@ abstract class AbstractMachineRequest extends AbstractSerializableMessage implem
         return $this->machineId;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getPayload(): array
     {
         return [

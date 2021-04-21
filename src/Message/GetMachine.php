@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Message;
 
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
 
 class GetMachine extends AbstractRemoteMachineRequest
 {
@@ -23,6 +22,9 @@ class GetMachine extends AbstractRemoteMachineRequest
         return self::TYPE;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getPayload(): array
     {
         return array_merge(
@@ -31,12 +33,5 @@ class GetMachine extends AbstractRemoteMachineRequest
                 'retry_count' => $this->getRetryCount(),
             ]
         );
-    }
-
-    public static function createFromArray(array $data): JsonSerializableMessageInterface
-    {
-        $message = new self(...parent::createCommonConstructorArguments($data));
-
-        return $message->withRetryCount((int) ($data['retry_count'] ?? 0));
     }
 }

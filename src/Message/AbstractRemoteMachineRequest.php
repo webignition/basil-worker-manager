@@ -59,6 +59,9 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
         return $this->onFailureCollection;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getPayload(): array
     {
         $onSuccessData = [];

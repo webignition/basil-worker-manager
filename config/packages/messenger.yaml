@@ -3,7 +3,6 @@ framework:
         transports:
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                serializer: 'webignition\JsonMessageSerializerBundle\Services\Serializer'
 
         routing:
             '*': async

@@ -7,7 +7,6 @@ namespace App\Message;
 use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
 
 class FindMachine extends AbstractRemoteMachineRequest
 {
@@ -47,6 +46,9 @@ class FindMachine extends AbstractRemoteMachineRequest
         return $this->onNotFoundState;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getPayload(): array
     {
         return array_merge(
@@ -56,19 +58,5 @@ class FindMachine extends AbstractRemoteMachineRequest
                 'on_not_found_state' => $this->onNotFoundState,
             ]
         );
-    }
-
-    public static function createFromArray(array $data): JsonSerializableMessageInterface
-    {
-        $message = new self(...parent::createCommonConstructorArguments($data));
-
-        $onNotFoundState = $data['on_not_found_state'] ?? null;
-        if (!is_string($onNotFoundState)) {
-            $onNotFoundState = MachineInterface::STATE_FIND_NOT_FOUND;
-        }
-
-        $message->onNotFoundState = $onNotFoundState;
-
-        return $message->withRetryCount((int) ($data['retry_count'] ?? 0));
     }
 }

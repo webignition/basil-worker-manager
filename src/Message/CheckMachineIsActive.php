@@ -7,7 +7,6 @@ namespace App\Message;
 use App\Model\MachineActionProperties;
 use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
 
 class CheckMachineIsActive extends AbstractMachineRequest implements
     ChainedMachineRequestInterface,
@@ -52,6 +51,9 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
         return self::TYPE;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getPayload(): array
     {
         return array_merge(
@@ -59,27 +61,6 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
             [
                 'self_properties' => $this->getSelfProperties()->jsonSerialize(),
             ]
-        );
-    }
-
-    public static function createFromArray(array $data): JsonSerializableMessageInterface
-    {
-        $machineId = $data['machine_id'] ?? '';
-        if (!is_string($machineId)) {
-            $machineId = '';
-        }
-
-        $selfPropertiesData = $data['self_properties'] ?? [];
-        if (!is_array($selfPropertiesData)) {
-            $selfPropertiesData = [];
-        }
-
-        $selfProperties = MachineActionProperties::createFromArray($selfPropertiesData);
-
-        return new self(
-            $machineId,
-            $selfProperties->getOnSuccessCollection(),
-            $selfProperties->getOnFailureCollection()
         );
     }
 

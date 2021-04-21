@@ -3,17 +3,17 @@ version: "3"
 services:
   postgres:
     image: postgres:13
-    container_name: ${POSTGRES_CONTAINER_NAME}
+    container_name: postgres
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - ${POSTGRES_EXPOSED_PORT}:5432
+      - 5432:5432
 
   rabbitmq:
     image: rabbitmq:3
-    container_name: ${RABBITMQ_CONTAINER_NAME}
+    container_name: rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     ports:
-      - ${RABBITMQ_EXPOSED_PORT}:5672
+      - 5672:5672

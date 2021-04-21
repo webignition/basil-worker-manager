@@ -45,8 +45,10 @@ jobs:
         run: |
           composer integration-setup
           sleep 10
+          ls -la var/log
           docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml logs nginx
           curl http:/localhost:9090/foo/machine
+          ls -la var/log
           docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml logs nginx
 
 #          curl http:/0.0.0.0:9090/foo/machine

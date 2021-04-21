@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: ../..
+      args:
+        DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:${POSTGRES_EXPOSED_PORT}/basil-worker-manager-db?serverVersion=12&charset=utf8
+        MESSENGER_TRANSPORT_DSN: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672/%2f/messages
+        APP_DIGITALOCEAN_ACCESS_TOKEN: ${APP_DIGITALOCEAN_ACCESS_TOKEN}
+    container_name: test-basil-worker-manager
+    volumes:
+      - ../../var:/app/var:rw
+    depends_on:
+      - postgres
+      - rabbitmq

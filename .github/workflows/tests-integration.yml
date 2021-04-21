@@ -17,9 +17,6 @@ jobs:
         php-versions: ['8']
     runs-on: ${{ matrix.operating-system }}
 
-    env:
-      DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-db?charset=UTF-8
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,15 +38,11 @@ jobs:
       - name: Docker layer caching
         uses: satackey/action-docker-layer-caching@v0.0.11
 
-      - name: Setup integration environment
+      - name: Run asynchronous tests
+        env:
+          APP_DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
+          DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
         run: |
           composer integration-setup
           sleep 10
-
-      - name: Run asynchronous tests
-        env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
-        run: |
-          php bin/console --env=integration_async messenger:consume async > /dev/null &
           composer test-integration-async
-          php bin/console --env=integration_async messenger:stop

@@ -19,12 +19,12 @@
   </coverage>
   <php>
     <ini name="error_reporting" value="-1"/>
-    <server name="APP_ENV" value="integration_async" force="true"/>
+    <server name="APP_ENV" value="test" force="true"/>
     <server name="SHELL_VERBOSITY" value="-1"/>
   </php>
   <testsuites>
     <testsuite name="Project Test Suite">
-      <directory>tests/Integration/Asynchronous</directory>
+      <directory>tests/Integration</directory>
     </testsuite>
   </testsuites>
   <extensions>

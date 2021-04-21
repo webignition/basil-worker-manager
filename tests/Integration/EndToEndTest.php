@@ -2,22 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Asynchronous;
+namespace App\Tests\Integration;
 
 use App\Controller\MachineController;
-use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Model\Machine;
 use GuzzleHttp\Client;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine as MachineEntity;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
+use PHPUnit\Framework\TestCase;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
-class EndToEndTest extends AbstractBaseIntegrationTest
+class EndToEndTest extends TestCase
 {
     private const MAX_DURATION_IN_SECONDS = 120;
     private const MICROSECONDS_PER_SECOND = 1000000;
 
-    private string $machineId;
     private string $machineUrl;
 
     private Client $httpClient;
@@ -26,26 +23,20 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     {
         parent::setUp();
 
-        $this->machineId = md5((string) rand());
-        $this->machineUrl = str_replace('{id}', $this->machineId, MachineController::PATH_MACHINE);
+        $machineId = md5((string) rand());
+        $this->machineUrl = str_replace('{id}', $machineId, MachineController::PATH_MACHINE);
 
         $this->httpClient = new Client([
             'base_uri' => 'http://localhost:9090/'
         ]);
+
+        shell_exec('php bin/console --env=test app:test:clear-database');
     }
 
     public function testCreateRemoteMachine(): void
     {
         $response = $this->httpClient->post($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
-
-        self::assertTrue(in_array(
-            $this->getMachine()->getState(),
-            [
-                MachineInterface::STATE_CREATE_RECEIVED,
-                MachineInterface::STATE_CREATE_REQUESTED,
-            ]
-        ));
 
         $this->waitUntilMachineIsActive();
         $this->removeMachine();
@@ -58,11 +49,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
         sleep(3);
 
-        $this->removeAllEntities(MachineEntity::class);
-        $this->removeAllEntities(MachineProvider::class);
-
-        self::assertNull($this->entityManager->find(MachineEntity::class, $this->machineId));
-        self::assertNull($this->entityManager->find(MachineProvider::class, $this->machineId));
+        shell_exec('php bin/console --env=test app:test:clear-database');
 
         $response = $this->httpClient->get($this->machineUrl);
         self::assertSame(200, $response->getStatusCode());

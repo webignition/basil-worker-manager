@@ -101,7 +101,7 @@
         "static-analysis": "./vendor/bin/phpstan analyse --ansi",
         "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors=always tests/Functional",
-        "test-integration-async": "./vendor/bin/phpunit -c phpunit.integration_async.xml",
+        "test-integration": "./vendor/bin/phpunit -c phpunit.integration.xml",
         "test": [
             "@test-unit",
             "@test-functional"

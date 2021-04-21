@@ -38,14 +38,6 @@ class EndToEndTest extends TestCase
         $response = $this->httpClient->post($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
 
-        self::assertTrue(in_array(
-            $this->getMachine()->getState(),
-            [
-                MachineInterface::STATE_CREATE_RECEIVED,
-                MachineInterface::STATE_CREATE_REQUESTED,
-            ]
-        ));
-
         $this->waitUntilMachineIsActive();
         $this->removeMachine();
     }

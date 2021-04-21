@@ -50,6 +50,7 @@ jobs:
           curl http:/localhost:9090/foo/machine
           ls -la var/log
           docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml logs nginx
+          cat var/log/prod.log
 
 #          curl http:/0.0.0.0:9090/foo/machine
 #          composer test-integration-async

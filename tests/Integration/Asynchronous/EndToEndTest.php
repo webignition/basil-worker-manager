@@ -7,6 +7,7 @@ namespace App\Tests\Integration\Asynchronous;
 use App\Controller\MachineController;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Model\Machine;
+use GuzzleHttp\Client;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine as MachineEntity;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
@@ -19,6 +20,8 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     private string $machineId;
     private string $machineUrl;
 
+    private Client $httpClient;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,14 +29,14 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         $this->machineId = md5((string) rand());
         $this->machineUrl = str_replace('{id}', $this->machineId, MachineController::PATH_MACHINE);
 
-        echo "\n" . $this->getObfuscatedDigitalOceanAccessToken(2, 2) . "\n\n";
+        $this->httpClient = new Client([
+            'base_uri' => 'http://localhost:9090/'
+        ]);
     }
 
     public function testCreateRemoteMachine(): void
     {
-        $this->client->request('POST', $this->machineUrl);
-
-        $response = $this->client->getResponse();
+        $response = $this->httpClient->post($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
 
         self::assertTrue(in_array(
@@ -50,9 +53,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
     public function testStatusForMissingLocalMachine(): void
     {
-        $this->client->request('POST', $this->machineUrl);
-
-        $response = $this->client->getResponse();
+        $response = $this->httpClient->post($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
 
         sleep(3);
@@ -63,9 +64,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         self::assertNull($this->entityManager->find(MachineEntity::class, $this->machineId));
         self::assertNull($this->entityManager->find(MachineProvider::class, $this->machineId));
 
-        $this->client->request('GET', $this->machineUrl);
-
-        $response = $this->client->getResponse();
+        $response = $this->httpClient->get($this->machineUrl);
         self::assertSame(200, $response->getStatusCode());
 
         self::assertTrue(in_array(
@@ -101,26 +100,12 @@ class EndToEndTest extends AbstractBaseIntegrationTest
         return true;
     }
 
-    private function getObfuscatedDigitalOceanAccessToken(int $prefixLength, int $suffixLength): string
-    {
-        $token = $_SERVER['DIGITALOCEAN_ACCESS_TOKEN'] ?? '';
-
-        $length = strlen($token);
-
-        return
-            substr($token, 0, $prefixLength) .
-            str_repeat('*', $length - ($prefixLength + $suffixLength)) .
-            substr($token, $length - $suffixLength);
-    }
-
     private function getMachine(): Machine
     {
-        $this->client->request('GET', $this->machineUrl);
-
-        $response = $this->client->getResponse();
+        $response = $this->httpClient->get($this->machineUrl);
         self::assertSame(200, $response->getStatusCode());
 
-        return new Machine(json_decode((string) $response->getContent(), true));
+        return new Machine(json_decode((string) $response->getBody()->getContents(), true));
     }
 
     private function waitUntilMachineIsActive(): void
@@ -135,9 +120,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
     private function removeMachine(): void
     {
-        $this->client->request('DELETE', $this->machineUrl);
-
-        $response = $this->client->getResponse();
+        $response = $this->httpClient->delete($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
 
         $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_DELETE_DELETED);

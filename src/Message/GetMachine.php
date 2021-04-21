@@ -10,16 +10,9 @@ class GetMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 
-    public const TYPE = 'get-machine';
-
     public function getAction(): string
     {
         return MachineActionInterface::ACTION_GET;
-    }
-
-    public function getType(): string
-    {
-        return self::TYPE;
     }
 
     /**

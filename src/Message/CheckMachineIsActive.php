@@ -12,8 +12,6 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
     ChainedMachineRequestInterface,
     HasSelfPropertiesInterface
 {
-    public const TYPE = 'check-machine-is-active';
-
     /**
      * @var MachineActionPropertiesInterface[]
      */
@@ -44,11 +42,6 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
         $this->onFailureCollection = array_filter($onFailureCollection, function ($value) {
             return $value instanceof MachineActionPropertiesInterface;
         });
-    }
-
-    public function getType(): string
-    {
-        return self::TYPE;
     }
 
     /**

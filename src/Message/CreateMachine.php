@@ -10,16 +10,9 @@ class CreateMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 
-    public const TYPE = 'create-machine';
-
     public function getAction(): string
     {
         return MachineActionInterface::ACTION_CREATE;
-    }
-
-    public function getType(): string
-    {
-        return self::TYPE;
     }
 
     /**

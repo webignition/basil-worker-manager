@@ -10,16 +10,9 @@ class DeleteMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 
-    public const TYPE = 'delete-machine';
-
     public function getAction(): string
     {
         return MachineActionInterface::ACTION_DELETE;
-    }
-
-    public function getType(): string
-    {
-        return self::TYPE;
     }
 
     /**

@@ -12,8 +12,6 @@ class FindMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 
-    public const TYPE = 'find-machine';
-
     /**
      * @param MachineActionPropertiesInterface[] $onSuccessCollection
      * @param MachineActionPropertiesInterface[] $onFailureCollection
@@ -31,11 +29,6 @@ class FindMachine extends AbstractRemoteMachineRequest
     public function getAction(): string
     {
         return MachineActionInterface::ACTION_FIND;
-    }
-
-    public function getType(): string
-    {
-        return self::TYPE;
     }
 
     /**

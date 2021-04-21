@@ -51,4 +51,4 @@ jobs:
           APP_DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
         run: |
-          composer test-integration-async
+          composer test-integration

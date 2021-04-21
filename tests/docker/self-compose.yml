@@ -10,8 +10,8 @@ services:
       - 9090:80
     links:
       - app:app
-    volumes:
-      - ../../var/log/nginx:/var/log/nginx:rw
+#    volumes:
+#      - ../../var/log/nginx:/var/log/nginx:rw
 
   app:
     build:

@@ -1,6 +1,6 @@
 FROM nginx:1.19
 
-RUN mkdir -p var/log/nginx-app
+#RUN mkdir -p var/log/nginx
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY site.conf /etc/nginx/conf.d/default.conf

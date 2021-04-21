@@ -8,8 +8,6 @@ use App\Controller\MachineController;
 use App\Tests\Integration\AbstractBaseIntegrationTest;
 use App\Tests\Model\Machine;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\ServerException;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine as MachineEntity;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
@@ -38,12 +36,7 @@ class EndToEndTest extends AbstractBaseIntegrationTest
 
     public function testCreateRemoteMachine(): void
     {
-        try {
-            $response = $this->httpClient->post($this->machineUrl);
-        } catch (ServerException $exception) {
-            echo "\n\n" . $exception->getResponse()->getBody()->getContents() . "\n\n";
-        }
-
+        $response = $this->httpClient->post($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
 
         self::assertTrue(in_array(

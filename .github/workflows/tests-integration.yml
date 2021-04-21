@@ -45,6 +45,9 @@ jobs:
         run: |
           composer integration-setup
           sleep 10
+          docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml logs nginx
           curl http:/localhost:9090/foo/machine
-          curl http:/0.0.0.0:9090/foo/machine
-          composer test-integration-async
+          docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml logs nginx
+
+#          curl http:/0.0.0.0:9090/foo/machine
+#          composer test-integration-async

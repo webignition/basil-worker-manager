@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\MachineActionProperties;
-use App\Model\MachineActionPropertiesInterface;
-
 abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest implements
     ChainedMachineRequestInterface,
     RemoteMachineMessageInterface
 {
     /**
-     * @var MachineActionPropertiesInterface[]
+     * @var MachineRequestInterface[]
      */
     protected array $onSuccessCollection;
 
     /**
-     * @var MachineActionPropertiesInterface[]
+     * @var MachineRequestInterface[]
      */
     protected array $onFailureCollection;
 
     /**
      * @param string $machineId
      *
-     * @param MachineActionPropertiesInterface[] $onSuccessCollection
-     * @param MachineActionPropertiesInterface[] $onFailureCollection
+     * @param MachineRequestInterface[] $onSuccessCollection
+     * @param MachineRequestInterface[] $onFailureCollection
      */
     public function __construct(
         string $machineId,
@@ -35,16 +32,16 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
         parent::__construct($machineId);
 
         $this->onSuccessCollection = array_filter($onSuccessCollection, function ($value) {
-            return $value instanceof MachineActionPropertiesInterface;
+            return $value instanceof MachineRequestInterface;
         });
 
         $this->onFailureCollection = array_filter($onFailureCollection, function ($value) {
-            return $value instanceof MachineActionPropertiesInterface;
+            return $value instanceof MachineRequestInterface;
         });
     }
 
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnSuccessCollection(): array
     {
@@ -52,43 +49,10 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
     }
 
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnFailureCollection(): array
     {
         return $this->onFailureCollection;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return MachineActionPropertiesInterface[]
-     */
-    protected static function createMachineActionPropertiesCollection(array $data): array
-    {
-        $collection = [];
-        foreach ($data as $item) {
-            if (is_array($item)) {
-                $collection[] = MachineActionProperties::createFromArray($item);
-            }
-        }
-
-        return $collection;
-    }
-
-    /**
-     * @param array<mixed> $data
-     *
-     * @return array<mixed>
-     */
-    protected static function createCommonConstructorArguments(array $data): array
-    {
-        $machineId = $data['machine_id'] ?? '';
-
-        return [
-            $machineId,
-            self::createMachineActionPropertiesCollection($data['on_success'] ?? []),
-            self::createMachineActionPropertiesCollection($data['on_failure'] ?? [])
-        ];
     }
 }

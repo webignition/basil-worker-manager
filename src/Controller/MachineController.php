@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Response\BadMachineCreateRequestResponse;
-use App\Services\MachineActionPropertiesFactory;
 use App\Services\MachineRequestDispatcher;
+use App\Services\MachineRequestFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,8 +24,8 @@ class MachineController
 
     public function __construct(
         private MachineStore $machineStore,
-        private MachineActionPropertiesFactory $machineActionPropertiesFactory,
         private MachineRequestDispatcher $machineRequestDispatcher,
+        private MachineRequestFactory $machineRequestFactory,
     ) {
     }
 
@@ -45,7 +45,7 @@ class MachineController
         $this->machineStore->store(new Machine($id));
         $machineProviderStore->store(new MachineProvider($id, ProviderInterface::NAME_DIGITALOCEAN));
         $this->machineRequestDispatcher->dispatch(
-            $this->machineActionPropertiesFactory->createForFindThenCreate($id)
+            $this->machineRequestFactory->createFindThenCreate($id)
         );
 
         return new Response('', 202);
@@ -60,7 +60,7 @@ class MachineController
             $this->machineStore->store($machine);
 
             $this->machineRequestDispatcher->dispatch(
-                $this->machineActionPropertiesFactory->createForFindThenCheckIsActive($id)
+                $this->machineRequestFactory->createFindThenCheckIsActive($id)
             );
         }
 
@@ -84,7 +84,7 @@ class MachineController
         }
 
         $this->machineRequestDispatcher->dispatch(
-            $this->machineActionPropertiesFactory->createForDelete($id)
+            $this->machineRequestFactory->createDelete($id)
         );
 
         return new Response('', 202);

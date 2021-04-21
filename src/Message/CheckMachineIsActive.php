@@ -4,29 +4,23 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\MachineActionProperties;
-use App\Model\MachineActionPropertiesInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-
-class CheckMachineIsActive extends AbstractMachineRequest implements
-    ChainedMachineRequestInterface,
-    HasSelfPropertiesInterface
+class CheckMachineIsActive extends AbstractMachineRequest implements ChainedMachineRequestInterface
 {
     /**
-     * @var MachineActionPropertiesInterface[]
+     * @var MachineRequestInterface[]
      */
     private array $onSuccessCollection;
 
     /**
-     * @var MachineActionPropertiesInterface[]
+     * @var MachineRequestInterface[]
      */
     private array $onFailureCollection;
 
     /**
      * @param string $machineId
      *
-     * @param MachineActionPropertiesInterface[] $onSuccessCollection
-     * @param MachineActionPropertiesInterface[] $onFailureCollection
+     * @param MachineRequestInterface[] $onSuccessCollection
+     * @param MachineRequestInterface[] $onFailureCollection
      */
     public function __construct(
         string $machineId,
@@ -36,16 +30,16 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
         parent::__construct($machineId);
 
         $this->onSuccessCollection = array_filter($onSuccessCollection, function ($value) {
-            return $value instanceof MachineActionPropertiesInterface;
+            return $value instanceof MachineRequestInterface;
         });
 
         $this->onFailureCollection = array_filter($onFailureCollection, function ($value) {
-            return $value instanceof MachineActionPropertiesInterface;
+            return $value instanceof MachineRequestInterface;
         });
     }
 
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnSuccessCollection(): array
     {
@@ -53,20 +47,10 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
     }
 
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnFailureCollection(): array
     {
         return $this->onFailureCollection;
-    }
-
-    public function getSelfProperties(): MachineActionPropertiesInterface
-    {
-        return new MachineActionProperties(
-            MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
-            $this->getMachineId(),
-            $this->getOnSuccessCollection(),
-            $this->getOnFailureCollection()
-        );
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\MachineActionPropertiesInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
@@ -13,8 +12,8 @@ class FindMachine extends AbstractRemoteMachineRequest
     use RetryableRequestTrait;
 
     /**
-     * @param MachineActionPropertiesInterface[] $onSuccessCollection
-     * @param MachineActionPropertiesInterface[] $onFailureCollection
+     * @param MachineRequestInterface[] $onSuccessCollection
+     * @param MachineRequestInterface[] $onFailureCollection
      * @param MachineInterface::STATE_* $onNotFoundState
      */
     public function __construct(

@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
-use App\Message\CheckMachineIsActive;
-use App\Message\CreateMachine;
 use App\Message\FindMachine;
+use App\Message\MachineRequestInterface;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\MachineActionProperties;
-use App\Model\MachineActionPropertiesInterface;
 use App\Services\ExceptionLogger;
-use App\Services\MachineActionPropertiesFactory;
 use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
@@ -46,7 +42,6 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
     private MockHandler $mockHandler;
     private MachineStore $machineStore;
     private MachineProviderStore $machineProviderStore;
-    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
     private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
@@ -73,10 +68,6 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($machineProviderStore instanceof MachineProviderStore);
         $this->machineProviderStore = $machineProviderStore;
 
-        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
-        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
-        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
-
         $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
         \assert($machineRequestFactory instanceof MachineRequestFactory);
         $this->machineRequestFactory = $machineRequestFactory;
@@ -85,8 +76,8 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider invokeSuccessDataProvider
      *
-     * @param MachineActionPropertiesInterface[] $messageOnSuccessCollection
-     * @param MachineActionPropertiesInterface[] $messageOnFailureCollection
+     * @param MachineRequestInterface[] $messageOnSuccessCollection
+     * @param MachineRequestInterface[] $messageOnFailureCollection
      * @param ResponseInterface[] $apiResponses
      * @param object[] $expectedQueuedMessages
      */
@@ -115,6 +106,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         }
 
         $message = new FindMachine(self::MACHINE_ID, $messageOnSuccessCollection, $messageOnFailureCollection);
+
         ($this->handler)($message);
 
         self::assertEquals($expectedMachine, $this->machineStore->find(self::MACHINE_ID));
@@ -161,7 +153,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
                 'machineProvider' => null,
                 'messageOnSuccessCollection' => [
-                    $this->getMachineActionPropertiesFactory()->createForCheckIsActive(self::MACHINE_ID),
+                    $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
                 ],
                 'messageOnFailureCollection' => [],
                 'apiResponses' => [
@@ -180,22 +172,14 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
                 'expectedQueueCount' => 1,
                 'expectedQueuedMessages' => [
-                    new CheckMachineIsActive(
-                        self::MACHINE_ID,
-                        [
-                            new MachineActionProperties(
-                                MachineActionInterface::ACTION_GET,
-                                self::MACHINE_ID
-                            )
-                        ]
-                    ),
+                    $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
                 ],
             ],
             'remote machine found and updated, has existing provider' => [
                 'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
                 'machineProvider' => $nonDigitalOceanMachineProvider,
                 'messageOnSuccessCollection' => [
-                    $this->getMachineActionPropertiesFactory()->createForCheckIsActive(self::MACHINE_ID),
+                    $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
                 ],
                 'messageOnFailureCollection' => [],
                 'apiResponses' => [
@@ -214,15 +198,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
                 'expectedQueueCount' => 1,
                 'expectedQueuedMessages' => [
-                    new CheckMachineIsActive(
-                        self::MACHINE_ID,
-                        [
-                            new MachineActionProperties(
-                                MachineActionInterface::ACTION_GET,
-                                self::MACHINE_ID
-                            )
-                        ]
-                    ),
+                    $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
                 ],
             ],
             'remote machine not found, create requested' => [
@@ -230,7 +206,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 'machineProvider' => $nonDigitalOceanMachineProvider,
                 'messageOnSuccessCollection' => [],
                 'messageOnFailureCollection' => [
-                    $this->getMachineActionPropertiesFactory()->createForCreate(self::MACHINE_ID)
+                    $this->getMachineRequestFactory()->createCreate(self::MACHINE_ID)
                 ],
                 'apiResponses' => [
                     HttpResponseFactory::fromDropletEntityCollection([])
@@ -245,12 +221,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
                 'expectedQueueCount' => 1,
                 'expectedQueuedMessages' => [
-                    new CreateMachine(
-                        self::MACHINE_ID,
-                        [
-                            $this->getMachineActionPropertiesFactory()->createForCheckIsActive(self::MACHINE_ID),
-                        ]
-                    ),
+                    $this->getMachineRequestFactory()->createCreate(self::MACHINE_ID),
                 ],
             ],
         ];
@@ -287,11 +258,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append(new Response(503));
 
-        $message = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForFind(self::MACHINE_ID)
-        );
-        \assert($message instanceof FindMachine);
-        self::assertInstanceOf(FindMachine::class, $message);
+        $message = $this->machineRequestFactory->createFind(self::MACHINE_ID);
 
         ($this->handler)($message);
 
@@ -372,8 +339,8 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         );
     }
 
-    private function getMachineActionPropertiesFactory(): MachineActionPropertiesFactory
+    private function getMachineRequestFactory(): MachineRequestFactory
     {
-        return new MachineActionPropertiesFactory();
+        return new MachineRequestFactory();
     }
 }

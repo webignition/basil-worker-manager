@@ -86,9 +86,7 @@ abstract class AbstractRemoteMachineRequestHandler
             $actionHandler->onSuccess($machine, $outcome);
 
             if ($message instanceof ChainedMachineRequestInterface) {
-                foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
-                    $this->machineRequestDispatcher->dispatch($machineActionProperties);
-                }
+                $this->machineRequestDispatcher->dispatchCollection($message->getOnSuccessCollection());
             }
         }
 

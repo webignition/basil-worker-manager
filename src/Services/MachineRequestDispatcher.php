@@ -4,25 +4,37 @@ namespace App\Services;
 
 use App\Message\MachineRequestInterface;
 use App\Message\RemoteMachineMessageInterface;
-use App\Model\MachineActionPropertiesInterface;
 use Symfony\Component\Messenger\Envelope;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class MachineRequestDispatcher
 {
     public function __construct(
-        private MessageDispatcher $messageDispatcher,
-        private MachineRequestFactory $machineRequestFactory,
+        private MessageDispatcher $messageDispatcher
     ) {
     }
 
-    public function dispatch(MachineActionPropertiesInterface $properties): ?Envelope
+    public function dispatch(MachineRequestInterface $request): Envelope
     {
-        $request = $this->machineRequestFactory->create($properties);
+        return $this->messageDispatcher->dispatch($request);
+    }
 
-        return null === $request
-            ? null
-            : $this->messageDispatcher->dispatch($request);
+    /**
+     * @param MachineRequestInterface[] $collection
+     *
+     * @return Envelope[]
+     */
+    public function dispatchCollection(array $collection): array
+    {
+        $envelopes = [];
+
+        foreach ($collection as $request) {
+            if ($request instanceof MachineRequestInterface) {
+                $envelopes[] = $this->dispatch($request);
+            }
+        }
+
+        return $envelopes;
     }
 
     public function reDispatch(MachineRequestInterface $request): Envelope
@@ -31,6 +43,6 @@ class MachineRequestDispatcher
             $request = $request->incrementRetryCount();
         }
 
-        return $this->messageDispatcher->dispatch($request);
+        return $this->dispatch($request);
     }
 }

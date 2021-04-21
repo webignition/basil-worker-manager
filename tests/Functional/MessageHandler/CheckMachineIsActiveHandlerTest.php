@@ -7,7 +7,6 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Message\CheckMachineIsActive;
 use App\Message\GetMachine;
 use App\MessageHandler\CheckMachineIsActiveHandler;
-use App\Services\MachineActionPropertiesFactory;
 use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -26,7 +25,6 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
     private CheckMachineIsActiveHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MachineStore $machineStore;
-    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
     private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
@@ -44,10 +42,6 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
         $this->messengerAsserter = $messengerAsserter;
-
-        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
-        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
-        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
 
         $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
         \assert($machineRequestFactory instanceof MachineRequestFactory);
@@ -108,10 +102,7 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
         $machine->setState($state);
         $this->machineStore->store($machine);
 
-        $request = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForCheckIsActive(self::MACHINE_ID)
-        );
-        self::assertInstanceOf(CheckMachineIsActive::class, $request);
+        $request = $this->machineRequestFactory->createCheckIsActive(self::MACHINE_ID);
 
         ($this->handler)($request);
 

@@ -8,16 +8,13 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\UnsupportedProviderException;
-use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\MachineActionProperties;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Services\ExceptionLogger;
-use App\Services\MachineActionPropertiesFactory;
 use App\Services\MachineManager;
 use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -53,7 +50,6 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     private MachineInterface $machine;
     private MachineProviderInterface $machineProvider;
     private EntityManagerInterface $entityManager;
-    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
     private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
@@ -87,10 +83,6 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($entityManager instanceof EntityManagerInterface);
         $this->entityManager = $entityManager;
 
-        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
-        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
-        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
-
         $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
         \assert($machineRequestFactory instanceof MachineRequestFactory);
         $this->machineRequestFactory = $machineRequestFactory;
@@ -120,10 +112,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $expectedDropletEntity = new DropletEntity($dropletData);
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntity($expectedDropletEntity));
 
-        $message = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForCreate(self::MACHINE_ID)
-        );
-        self::assertInstanceOf(CreateMachine::class, $message);
+        $message = $this->machineRequestFactory->createCreate(self::MACHINE_ID);
 
         $outcome = ($this->handler)($message);
 
@@ -133,15 +122,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
             0,
-            new CheckMachineIsActive(
-                self::MACHINE_ID,
-                [
-                    new MachineActionProperties(
-                        MachineActionInterface::ACTION_GET,
-                        self::MACHINE_ID
-                    )
-                ]
-            )
+            $this->machineRequestFactory->createCheckIsActive(self::MACHINE_ID)
         );
 
         self::assertSame($expectedRemoteMachine->getState(), $this->machine->getState());
@@ -190,11 +171,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeExceptionWithRetry(\Throwable $previous, int $retryCount): void
     {
-        $message = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForCreate(self::MACHINE_ID)
-        );
-        self::assertInstanceOf(CreateMachine::class, $message);
-        \assert($message instanceof CreateMachine);
+        $message = $this->machineRequestFactory->createCreate(self::MACHINE_ID);
         ObjectReflector::setProperty($message, $message::class, 'retryCount', $retryCount);
 
         $exception = new Exception(self::MACHINE_ID, $message->getAction(), $previous);

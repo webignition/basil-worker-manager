@@ -37,6 +37,11 @@ class EndToEndTest extends AbstractBaseIntegrationTest
     public function testCreateRemoteMachine(): void
     {
         $response = $this->httpClient->post($this->machineUrl);
+
+        if (202 !== $response->getStatusCode()) {
+            echo "\n\n" . $response->getBody()->getContents() . "\n\n";
+        }
+
         self::assertSame(202, $response->getStatusCode());
 
         self::assertTrue(in_array(

@@ -5,8 +5,8 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
+#    branches:
+#      - main
 
 jobs:
   integration:
@@ -41,15 +41,9 @@ jobs:
       - name: Docker layer caching
         uses: satackey/action-docker-layer-caching@v0.0.11
 
-      - name: Setup integration environment
-        run: |
-          composer integration-setup
-          sleep 10
-
       - name: Run asynchronous tests
         env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
+          APP_DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
         run: |
-          php bin/console --env=integration_async messenger:consume async > /dev/null &
+          composer integration-setup
           composer test-integration-async
-          php bin/console --env=integration_async messenger:stop

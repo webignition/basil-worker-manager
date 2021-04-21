@@ -47,4 +47,5 @@ jobs:
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
         run: |
           composer integration-setup
+          sleep 10
           composer test-integration-async

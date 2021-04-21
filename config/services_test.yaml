@@ -6,6 +6,9 @@ services:
     App\Services\RemoteMachineRemover:
         public: true
 
+    App\Tests\Command\ClearDatabaseCommand:
+        tags: ['console.command']
+
     Symfony\Component\Messenger\Transport\InMemoryTransport:
         alias: 'messenger.transport.async'
 

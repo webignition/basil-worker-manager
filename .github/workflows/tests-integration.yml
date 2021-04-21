@@ -43,6 +43,7 @@ jobs:
           APP_DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN_TEST }}
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
         run: |
+          ls -la var/cache
           composer integration-setup
           sleep 10
           ls -la var/log

@@ -5,8 +5,8 @@ on:
     branches:
       - main
   pull_request:
-#    branches:
-#      - main
+    branches:
+      - main
 
 jobs:
   integration:
@@ -16,9 +16,6 @@ jobs:
         operating-system: [ubuntu-latest]
         php-versions: ['8']
     runs-on: ${{ matrix.operating-system }}
-
-#    env:
-#      DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-db?charset=UTF-8
 
     steps:
       - name: Checkout

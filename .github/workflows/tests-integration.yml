@@ -35,8 +35,8 @@ jobs:
       - name: Pull images
         run: composer integration-pull
 
-      - name: Docker layer caching
-        uses: satackey/action-docker-layer-caching@v0.0.11
+#      - name: Docker layer caching
+#        uses: satackey/action-docker-layer-caching@v0.0.11
 
       - name: Setup integration environment
         env:

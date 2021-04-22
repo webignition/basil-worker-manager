@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Message\GetMachine;
-use App\Model\MachineProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
@@ -46,7 +46,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (MachineProviderInterface $machineProvider) {
+                function (MachineProvider $machineProvider) {
                     return new RemoteMachineRequestSuccess(
                         $this->machineManager->get($machineProvider)
                     );

@@ -12,7 +12,6 @@ use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineActionInterface;
-use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\MachineManager;
@@ -268,7 +267,7 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         ];
     }
 
-    private function createMachineProvider(): MachineProviderInterface
+    private function createMachineProvider(): MachineProvider
     {
         $machineProviderStore = self::$container->get(MachineProviderStore::class);
         \assert($machineProviderStore instanceof MachineProviderStore);

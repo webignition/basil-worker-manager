@@ -12,7 +12,6 @@ use App\Message\MachineRequestInterface;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineActionInterface;
-use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
@@ -82,12 +81,12 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeSuccess(
         Machine $machine,
-        ?MachineProviderInterface $machineProvider,
+        ?MachineProvider $machineProvider,
         array $messageOnSuccessCollection,
         array $messageOnFailureCollection,
         array $apiResponses,
         Machine $expectedMachine,
-        MachineProviderInterface $expectedMachineProvider,
+        MachineProvider $expectedMachineProvider,
         int $expectedQueueCount,
         array $expectedQueuedMessages
     ): void {
@@ -100,7 +99,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->mockHandler->append(...$apiResponses);
         $this->machineStore->store($machine);
 
-        if ($machineProvider instanceof MachineProviderInterface) {
+        if ($machineProvider instanceof MachineProvider) {
             $this->machineProviderStore->store($machineProvider);
         }
 

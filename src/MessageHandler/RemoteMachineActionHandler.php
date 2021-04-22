@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
-use App\Model\MachineProviderInterface;
+use App\Entity\MachineProvider;
 use App\Model\RemoteRequestOutcomeInterface;
 
 class RemoteMachineActionHandler implements RemoteMachineActionHandlerInterface
@@ -68,7 +68,7 @@ class RemoteMachineActionHandler implements RemoteMachineActionHandlerInterface
         return $this;
     }
 
-    public function performAction(MachineProviderInterface $machineProvider): RemoteRequestOutcomeInterface
+    public function performAction(MachineProvider $machineProvider): RemoteRequestOutcomeInterface
     {
         return ($this->action)($machineProvider);
     }

@@ -15,7 +15,6 @@ use App\Message\CreateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineActionInterface;
-use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
@@ -49,7 +48,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private Machine $machine;
-    private MachineProviderInterface $machineProvider;
+    private MachineProvider $machineProvider;
     private EntityManagerInterface $entityManager;
     private MachineRequestFactory $machineRequestFactory;
 

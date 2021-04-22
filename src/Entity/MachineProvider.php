@@ -2,14 +2,13 @@
 
 namespace App\Entity;
 
-use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  */
-class MachineProvider implements MachineProviderInterface
+class MachineProvider
 {
     /**
      * @ORM\Id
@@ -46,7 +45,7 @@ class MachineProvider implements MachineProviderInterface
         return $this->provider;
     }
 
-    public function merge(MachineProviderInterface $machineProvider): self
+    public function merge(MachineProvider $machineProvider): self
     {
         $this->provider = $machineProvider->getName();
 

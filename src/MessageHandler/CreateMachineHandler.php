@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
-use App\Model\MachineProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
 use App\Model\RemoteRequestSuccessInterface;
@@ -49,7 +49,7 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (MachineProviderInterface $machineProvider) {
+                function (MachineProvider $machineProvider) {
                     return new RemoteMachineRequestSuccess(
                         $this->machineManager->create($machineProvider)
                     );

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\ChainedMachineRequestInterface;
 use App\Message\RemoteMachineMessageInterface;
-use App\Model\MachineProviderInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -44,7 +44,7 @@ abstract class AbstractRemoteMachineRequestHandler
         }
 
         $machineProvider = $this->machineProviderStore->find($message->getMachineId());
-        if (!$machineProvider instanceof MachineProviderInterface) {
+        if (!$machineProvider instanceof MachineProvider) {
             return RemoteRequestOutcome::invalid();
         }
 

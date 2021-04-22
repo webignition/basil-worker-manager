@@ -3,7 +3,6 @@
 namespace App\Services\Entity\Store;
 
 use App\Entity\MachineProvider;
-use App\Model\MachineProviderInterface;
 
 class MachineProviderStore extends AbstractMachineEntityStore
 {
@@ -14,15 +13,13 @@ class MachineProviderStore extends AbstractMachineEntityStore
         return $entity instanceof MachineProvider ? $entity : null;
     }
 
-    public function store(MachineProviderInterface $entity): void
+    public function store(MachineProvider $entity): void
     {
         $existingEntity = $this->find($entity->getId());
         if ($existingEntity instanceof MachineProvider) {
             $entity = $existingEntity->merge($entity);
         }
 
-        if ($entity instanceof MachineProvider) {
-            $this->doStore($entity);
-        }
+        $this->doStore($entity);
     }
 }

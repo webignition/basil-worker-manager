@@ -13,7 +13,6 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\GetMachine;
 use App\MessageHandler\GetMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
@@ -206,7 +205,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeRetrying(
         ResponseInterface $apiResponse,
         Machine $machine,
-        MachineProviderInterface $machineProvider,
+        MachineProvider $machineProvider,
         RemoteRequestOutcomeInterface $expectedOutcome,
         array $expectedDispatchedMessages,
     ): void {

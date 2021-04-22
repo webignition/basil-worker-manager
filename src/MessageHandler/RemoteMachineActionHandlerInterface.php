@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
-use App\Model\MachineProviderInterface;
 use App\Model\RemoteRequestOutcomeInterface;
 
 interface RemoteMachineActionHandlerInterface
@@ -18,7 +18,7 @@ interface RemoteMachineActionHandlerInterface
      * @throws ExceptionInterface
      * @throws ProviderMachineNotFoundException
      */
-    public function performAction(MachineProviderInterface $machineProvider): RemoteRequestOutcomeInterface;
+    public function performAction(MachineProvider $machineProvider): RemoteRequestOutcomeInterface;
 
     public function onOutcome(RemoteRequestOutcomeInterface $outcome): RemoteRequestOutcomeInterface;
 

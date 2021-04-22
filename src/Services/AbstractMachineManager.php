@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\MachineProviderInterface;
+use App\Entity\MachineProvider;
 
 abstract class AbstractMachineManager
 {
@@ -17,7 +17,7 @@ abstract class AbstractMachineManager
         return $this->machineNameFactory->create($machineId);
     }
 
-    protected function findProvider(MachineProviderInterface $machineProvider): ?ProviderMachineManagerInterface
+    protected function findProvider(MachineProvider $machineProvider): ?ProviderMachineManagerInterface
     {
         $providerName = $machineProvider->getName();
 

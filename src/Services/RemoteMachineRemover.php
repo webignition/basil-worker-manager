@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Exception\MachineNotRemovableException;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
+use App\Exception\MachineProvider\ExceptionInterface;
 
 class RemoteMachineRemover extends AbstractMachineManager
 {

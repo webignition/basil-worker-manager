@@ -8,13 +8,12 @@ use App\Entity\Machine;
 use App\Message\CheckMachineIsActive;
 use App\Message\GetMachine;
 use App\MessageHandler\CheckMachineIsActiveHandler;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
 {
@@ -51,7 +50,7 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider invokeMachineIsActiveOrEndedDataProvider
      *
-     * @param MachineInterface::STATE_* $state
+     * @param Machine::STATE_* $state
      */
     public function testInvokeMachineIsActiveOrEnded(string $state): void
     {
@@ -70,23 +69,23 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
     public function invokeMachineIsActiveOrEndedDataProvider(): array
     {
         return [
-            MachineInterface::STATE_CREATE_FAILED => [
-                'state' => MachineInterface::STATE_CREATE_FAILED,
+            Machine::STATE_CREATE_FAILED => [
+                'state' => Machine::STATE_CREATE_FAILED,
             ],
-            MachineInterface::STATE_UP_ACTIVE => [
-                'state' => MachineInterface::STATE_UP_ACTIVE,
+            Machine::STATE_UP_ACTIVE => [
+                'state' => Machine::STATE_UP_ACTIVE,
             ],
-            MachineInterface::STATE_DELETE_RECEIVED => [
-                'state' => MachineInterface::STATE_DELETE_RECEIVED,
+            Machine::STATE_DELETE_RECEIVED => [
+                'state' => Machine::STATE_DELETE_RECEIVED,
             ],
-            MachineInterface::STATE_DELETE_REQUESTED => [
-                'state' => MachineInterface::STATE_DELETE_REQUESTED,
+            Machine::STATE_DELETE_REQUESTED => [
+                'state' => Machine::STATE_DELETE_REQUESTED,
             ],
-            MachineInterface::STATE_DELETE_FAILED => [
-                'state' => MachineInterface::STATE_DELETE_FAILED,
+            Machine::STATE_DELETE_FAILED => [
+                'state' => Machine::STATE_DELETE_FAILED,
             ],
-            MachineInterface::STATE_DELETE_DELETED => [
-                'state' => MachineInterface::STATE_DELETE_DELETED,
+            Machine::STATE_DELETE_DELETED => [
+                'state' => Machine::STATE_DELETE_DELETED,
             ],
         ];
     }
@@ -94,7 +93,7 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider handleMachineIsPreActiveDataProvider
      *
-     * @param MachineInterface::STATE_* $state
+     * @param Machine::STATE_* $state
      */
     public function testHandleMachineIsPreActive(string $state): void
     {
@@ -120,14 +119,14 @@ class CheckMachineIsActiveHandlerTest extends AbstractBaseFunctionalTest
     public function handleMachineIsPreActiveDataProvider(): array
     {
         return [
-            MachineInterface::STATE_CREATE_RECEIVED => [
-                'state' => MachineInterface::STATE_CREATE_RECEIVED,
+            Machine::STATE_CREATE_RECEIVED => [
+                'state' => Machine::STATE_CREATE_RECEIVED,
             ],
-            MachineInterface::STATE_CREATE_REQUESTED => [
-                'state' => MachineInterface::STATE_CREATE_REQUESTED,
+            Machine::STATE_CREATE_REQUESTED => [
+                'state' => Machine::STATE_CREATE_REQUESTED,
             ],
-            MachineInterface::STATE_UP_STARTED => [
-                'state' => MachineInterface::STATE_UP_STARTED,
+            Machine::STATE_UP_STARTED => [
+                'state' => Machine::STATE_UP_STARTED,
             ],
         ];
     }

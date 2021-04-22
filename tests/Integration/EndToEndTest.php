@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Controller\MachineController;
+use App\Entity\Machine as MachineEntity;
 use App\Tests\Model\Machine;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class EndToEndTest extends TestCase
 {
@@ -38,9 +38,9 @@ class EndToEndTest extends TestCase
         $response = $this->httpClient->post($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
 
-        $this->assertEventualMachineState(MachineInterface::STATE_UP_ACTIVE);
+        $this->assertEventualMachineState(MachineEntity::STATE_UP_ACTIVE);
         $this->deleteMachine();
-        $this->assertEventualMachineState(MachineInterface::STATE_DELETE_DELETED);
+        $this->assertEventualMachineState(MachineEntity::STATE_DELETE_DELETED);
     }
 
     public function testStatusForMissingLocalMachine(): void
@@ -58,18 +58,18 @@ class EndToEndTest extends TestCase
         self::assertTrue(in_array(
             $this->getMachine()->getState(),
             [
-                MachineInterface::STATE_FIND_RECEIVED,
-                MachineInterface::STATE_FIND_FINDING,
+                MachineEntity::STATE_FIND_RECEIVED,
+                MachineEntity::STATE_FIND_FINDING,
             ]
         ));
 
-        $this->assertEventualMachineState(MachineInterface::STATE_UP_ACTIVE);
+        $this->assertEventualMachineState(MachineEntity::STATE_UP_ACTIVE);
         $this->deleteMachine();
-        $this->assertEventualMachineState(MachineInterface::STATE_DELETE_DELETED);
+        $this->assertEventualMachineState(MachineEntity::STATE_DELETE_DELETED);
     }
 
     /**
-     * @param MachineInterface::STATE_* $stopState
+     * @param MachineEntity::STATE_* $stopState
      */
     private function waitUntilMachineStateIs(string $stopState): bool
     {
@@ -104,7 +104,7 @@ class EndToEndTest extends TestCase
     }
 
     /**
-     * @param MachineInterface::STATE_* $state
+     * @param MachineEntity::STATE_* $state
      */
     private function assertEventualMachineState(string $state): void
     {

@@ -5,27 +5,26 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\Entity\Factory;
 
 use App\Entity\CreateFailure;
+use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\AuthenticationException;
+use App\Exception\MachineProvider\AuthenticationExceptionInterface;
 use App\Exception\MachineProvider\CurlException;
+use App\Exception\MachineProvider\CurlExceptionInterface;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
+use App\Exception\MachineProvider\ExceptionInterface;
+use App\Exception\MachineProvider\HttpExceptionInterface;
 use App\Exception\MachineProvider\UnknownException;
+use App\Exception\MachineProvider\UnknownExceptionInterface;
+use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
 use App\Exception\UnsupportedProviderException;
+use App\Model\MachineActionInterface;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Factory\CreateFailureFactory;
 use App\Tests\Functional\AbstractEntityTest;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ApiLimitExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\AuthenticationExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\CurlExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\HttpExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnknownExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\UnsupportedProviderExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class CreateFailureFactoryTest extends AbstractEntityTest
 {
@@ -44,7 +43,7 @@ class CreateFailureFactoryTest extends AbstractEntityTest
      * @dataProvider createDataProvider
      */
     public function testCreate(
-        ExceptionInterface | UnsupportedProviderExceptionInterface $exception,
+        ExceptionInterface | UnsupportedProviderException $exception,
         CreateFailure $expectedCreateFailure
     ): void {
         $createFailure = $this->factory->create(self::MACHINE_ID, $exception);
@@ -61,11 +60,8 @@ class CreateFailureFactoryTest extends AbstractEntityTest
      */
     public function createDataProvider(): array
     {
-//        $unprocessableRequestException = \Mockery::mock(UnprocessableRequestExceptionInterface::class);
-//        $unknownException = \Mockery::mock(UnknownExceptionInterface::class);
-
         return [
-            UnsupportedProviderExceptionInterface::class => [
+            UnsupportedProviderException::class => [
                 'exception' => new UnsupportedProviderException(ProviderInterface::NAME_DIGITALOCEAN),
                 'expectedCreateFailure' => new CreateFailure(
                     self::MACHINE_ID,

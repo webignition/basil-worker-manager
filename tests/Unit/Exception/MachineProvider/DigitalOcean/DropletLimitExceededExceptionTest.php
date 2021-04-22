@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Exception\MachineProvider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
+use App\Model\MachineActionInterface;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class DropletLimitExceededExceptionTest extends TestCase
 {

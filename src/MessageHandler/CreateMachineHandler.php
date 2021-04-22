@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
 use App\Model\RemoteMachineRequestSuccess;
@@ -18,9 +21,6 @@ use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
@@ -49,17 +49,17 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (MachineProviderInterface $machineProvider) {
+                function (MachineProvider $machineProvider) {
                     return new RemoteMachineRequestSuccess(
                         $this->machineManager->create($machineProvider)
                     );
                 }
-            ))->withBeforeRequestHandler(function (MachineInterface $machine) {
-                $machine->setState(MachineInterface::STATE_CREATE_REQUESTED);
+            ))->withBeforeRequestHandler(function (Machine $machine) {
+                $machine->setState(Machine::STATE_CREATE_REQUESTED);
                 $this->machineStore->store($machine);
             })->withSuccessHandler(
                 function (
-                    MachineInterface $machine,
+                    Machine $machine,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
@@ -67,8 +67,8 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                     }
                 }
             )->withFailureHandler(
-                function (MachineInterface $machine, ExceptionInterface | UnsupportedProviderException $exception) {
-                    $machine->setState(MachineInterface::STATE_CREATE_FAILED);
+                function (Machine $machine, ExceptionInterface | UnsupportedProviderException $exception) {
+                    $machine->setState(Machine::STATE_CREATE_FAILED);
                     $this->machineStore->store($machine);
 
                     $this->createFailureFactory->create($machine->getId(), $exception);

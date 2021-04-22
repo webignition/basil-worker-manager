@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Message\GetMachine;
 use App\Model\RemoteMachineRequestSuccess;
@@ -17,8 +19,6 @@ use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {
@@ -46,14 +46,14 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
         return $this->handle(
             $message,
             (new RemoteMachineActionHandler(
-                function (MachineProviderInterface $machineProvider) {
+                function (MachineProvider $machineProvider) {
                     return new RemoteMachineRequestSuccess(
                         $this->machineManager->get($machineProvider)
                     );
                 }
             ))->withSuccessHandler(
                 function (
-                    MachineInterface $machine,
+                    Machine $machine,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
@@ -61,9 +61,9 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
                     }
                 }
             )->withFailureHandler(
-                function (MachineInterface $machine, \Throwable $exception) {
+                function (Machine $machine, \Throwable $exception) {
                     if ($exception instanceof ProviderMachineNotFoundException) {
-                        $machine->setState(MachineInterface::STATE_FIND_NOT_FOUND);
+                        $machine->setState(Machine::STATE_FIND_NOT_FOUND);
                         $this->machineStore->store($machine);
                     }
                 }

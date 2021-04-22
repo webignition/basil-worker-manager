@@ -2,10 +2,10 @@
 
 namespace App\Model\DigitalOcean;
 
+use App\Entity\Machine;
+use App\Model\ProviderInterface;
+use App\Model\RemoteMachineInterface;
 use DigitalOceanV2\Entity\Droplet as DropletEntity;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 class RemoteMachine implements RemoteMachineInterface
 {
@@ -50,16 +50,16 @@ class RemoteMachine implements RemoteMachineInterface
     }
 
     /**
-     * @return MachineInterface::STATE_UP_STARTED|MachineInterface::STATE_UP_ACTIVE|null
+     * @return Machine::STATE_UP_STARTED|Machine::STATE_UP_ACTIVE|null
      */
     public function getState(): ?string
     {
         if (self::STATE_NEW === $this->droplet->status) {
-            return MachineInterface::STATE_UP_STARTED;
+            return Machine::STATE_UP_STARTED;
         }
 
         if (self::STATE_ACTIVE === $this->droplet->status) {
-            return MachineInterface::STATE_UP_ACTIVE;
+            return Machine::STATE_UP_ACTIVE;
         }
 
         return null;

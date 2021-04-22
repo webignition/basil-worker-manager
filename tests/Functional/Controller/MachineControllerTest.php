@@ -8,6 +8,7 @@ use App\Controller\MachineController;
 use App\Entity\Machine;
 use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
+use App\Model\MachineActionInterface;
 use App\Services\Entity\Factory\CreateFailureFactory;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\MachineRequestFactory;
@@ -16,8 +17,6 @@ use App\Tests\Services\Asserter\MessengerAsserter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineControllerTest extends AbstractBaseFunctionalTest
 {
@@ -54,13 +53,13 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider createSuccessDataProvider
      *
-     * @param MachineInterface|null $existingMachine
+     * @param Machine|null $existingMachine
      */
-    public function testCreateSuccess(?MachineInterface $existingMachine): void
+    public function testCreateSuccess(?Machine $existingMachine): void
     {
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        if ($existingMachine instanceof MachineInterface) {
+        if ($existingMachine instanceof Machine) {
             $machineStore->store($existingMachine);
         }
 
@@ -97,10 +96,10 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
                 'existingMachine' => null,
             ],
             'existing machine state: find/not-found' => [
-                'existingMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_NOT_FOUND),
+                'existingMachine' => new Machine(self::MACHINE_ID, Machine::STATE_FIND_NOT_FOUND),
             ],
             'existing machine state: create/failed' => [
-                'existingMachine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_FAILED),
+                'existingMachine' => new Machine(self::MACHINE_ID, Machine::STATE_CREATE_FAILED),
             ],
         ];
     }
@@ -131,7 +130,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'id' => self::MACHINE_ID,
-                'state' => MachineInterface::STATE_FIND_RECEIVED,
+                'state' => Machine::STATE_FIND_RECEIVED,
                 'ip_addresses' => [],
             ]),
             (string) $response->getContent()
@@ -155,7 +154,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'id' => self::MACHINE_ID,
-                'state' => MachineInterface::STATE_CREATE_RECEIVED,
+                'state' => Machine::STATE_CREATE_RECEIVED,
                 'ip_addresses' => [],
             ]),
             (string) $response->getContent()
@@ -168,7 +167,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
     {
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_FAILED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_CREATE_FAILED);
 
         $machineStore->store($machine);
 
@@ -190,7 +189,7 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'id' => self::MACHINE_ID,
-                'state' => MachineInterface::STATE_CREATE_FAILED,
+                'state' => Machine::STATE_CREATE_FAILED,
                 'ip_addresses' => [],
                 'create_failure' => [
                     'code' => 2,

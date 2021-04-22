@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Model;
 
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use App\Entity\Machine as MachineEntity;
 
 class Machine
 {
@@ -22,10 +22,10 @@ class Machine
     }
 
     /**
-     * @return MachineInterface::STATE_*
+     * @return MachineEntity::STATE_*
      */
     public function getState(): string
     {
-        return $this->data['state'] ?? MachineInterface::STATE_CREATE_RECEIVED;
+        return $this->data['state'] ?? MachineEntity::STATE_CREATE_RECEIVED;
     }
 }

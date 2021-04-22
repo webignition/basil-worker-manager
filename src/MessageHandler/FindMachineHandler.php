@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
 use App\Entity\MachineProvider;
 use App\Exception\MachineNotFindableException;
 use App\Message\FindMachine;
+use App\Model\RemoteMachineInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
@@ -14,8 +16,6 @@ use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteMachineFinder;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class FindMachineHandler implements MessageHandlerInterface
@@ -35,11 +35,11 @@ class FindMachineHandler implements MessageHandlerInterface
         $machineId = $message->getMachineId();
 
         $machine = $this->machineStore->find($machineId);
-        if (!$machine instanceof MachineInterface) {
+        if (!$machine instanceof Machine) {
             return;
         }
 
-        $machine->setState(MachineInterface::STATE_FIND_FINDING);
+        $machine->setState(Machine::STATE_FIND_FINDING);
         $this->machineStore->store($machine);
 
         try {
@@ -66,7 +66,7 @@ class FindMachineHandler implements MessageHandlerInterface
                     $this->exceptionLogger->log($exception);
                 }
 
-                $machine->setState(MachineInterface::STATE_FIND_NOT_FINDABLE);
+                $machine->setState(Machine::STATE_FIND_NOT_FINDABLE);
                 $this->machineStore->store($machine);
             }
         }

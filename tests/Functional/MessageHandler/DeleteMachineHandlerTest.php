@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\MessageHandler\DeleteMachineHandler;
+use App\Model\MachineActionInterface;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
 use App\Services\MachineRequestFactory;
@@ -19,8 +20,6 @@ use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
@@ -32,7 +31,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
     private DeleteMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
-    private MachineInterface $machine;
+    private Machine $machine;
     private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
@@ -50,7 +49,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $machineStore = self::$container->get(MachineStore::class);
         \assert($machineStore instanceof MachineStore);
-        $this->machine->setState(MachineInterface::STATE_DELETE_RECEIVED);
+        $this->machine->setState(Machine::STATE_DELETE_RECEIVED);
         $machineStore->store($this->machine);
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
@@ -69,7 +68,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeSuccess(): void
     {
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(MachineInterface::STATE_DELETE_RECEIVED, $this->machine->getState());
+        self::assertSame(Machine::STATE_DELETE_RECEIVED, $this->machine->getState());
 
         $this->setExceptionLoggerOnHandler(
             (new MockExceptionLogger())
@@ -83,13 +82,13 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         ($this->handler)($message);
 
-        self::assertSame(MachineInterface::STATE_DELETE_REQUESTED, $this->machine->getState());
+        self::assertSame(Machine::STATE_DELETE_REQUESTED, $this->machine->getState());
 
         $expectedMessage = $this->machineRequestFactory->createFind(
             self::MACHINE_ID,
             [],
             [],
-            MachineInterface::STATE_DELETE_DELETED
+            Machine::STATE_DELETE_DELETED
         );
 
         self::assertInstanceOf(FindMachine::class, $expectedMessage);
@@ -136,7 +135,7 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        self::assertSame(MachineInterface::STATE_DELETE_FAILED, $this->machine->getState());
+        self::assertSame(Machine::STATE_DELETE_FAILED, $this->machine->getState());
         $this->messengerAsserter->assertQueueIsEmpty();
     }
 

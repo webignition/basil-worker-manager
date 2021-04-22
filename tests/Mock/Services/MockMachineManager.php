@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Mock\Services;
 
+use App\Entity\MachineProvider;
 use App\Services\MachineManager;
 use Mockery\MockInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class MockMachineManager
 {
@@ -23,7 +23,7 @@ class MockMachineManager
     }
 
     public function withCreateCallThrowingException(
-        MachineProviderInterface $machineProvider,
+        MachineProvider $machineProvider,
         \Exception $exception
     ): self {
         if ($this->mock instanceof MockInterface) {
@@ -34,7 +34,7 @@ class MockMachineManager
     }
 
     public function withDeleteCallThrowingException(
-        MachineProviderInterface $machineProvider,
+        MachineProvider $machineProvider,
         \Exception $exception
     ): self {
         if ($this->mock instanceof MockInterface) {
@@ -46,7 +46,7 @@ class MockMachineManager
 
     private function withCallThrowingException(
         string $method,
-        MachineProviderInterface $machineProvider,
+        MachineProvider $machineProvider,
         \Exception $exception
     ): self {
         if ($this->mock instanceof MockInterface) {

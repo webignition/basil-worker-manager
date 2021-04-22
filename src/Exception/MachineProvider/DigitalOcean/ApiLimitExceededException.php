@@ -2,9 +2,9 @@
 
 namespace App\Exception\MachineProvider\DigitalOcean;
 
+use App\Exception\MachineProvider\ApiLimitExceptionInterface;
 use App\Exception\MachineProvider\Exception;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ApiLimitExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
+use App\Model\MachineActionInterface;
 
 class ApiLimitExceededException extends Exception implements ApiLimitExceptionInterface
 {

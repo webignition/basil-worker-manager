@@ -3,11 +3,11 @@
 namespace App\Services\RemoteRequestRetryDecider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Model\MachineActionInterface;
+use App\Model\ProviderInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
 use DigitalOceanV2\Exception\RuntimeException;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class DigitalOceanRemoteRequestRetryDecider implements RemoteRequestRetryDeciderInterface
 {

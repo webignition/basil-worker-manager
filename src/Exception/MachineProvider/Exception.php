@@ -3,8 +3,7 @@
 namespace App\Exception\MachineProvider;
 
 use App\Exception\AbstractMachineException;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
+use App\Model\MachineActionInterface;
 
 class Exception extends AbstractMachineException implements ExceptionInterface
 {

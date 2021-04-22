@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\ChainedMachineRequestInterface;
@@ -17,9 +20,6 @@ use App\Services\ExceptionLogger;
 use App\Services\MachineManager;
 use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteRequestRetryDecider;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 abstract class AbstractRemoteMachineRequestHandler
@@ -39,12 +39,12 @@ abstract class AbstractRemoteMachineRequestHandler
         RemoteMachineActionHandlerInterface $actionHandler
     ): RemoteRequestOutcomeInterface {
         $machine = $this->machineStore->find($message->getMachineId());
-        if (!$machine instanceof MachineInterface) {
+        if (!$machine instanceof Machine) {
             return RemoteRequestOutcome::invalid();
         }
 
         $machineProvider = $this->machineProviderStore->find($message->getMachineId());
-        if (!$machineProvider instanceof MachineProviderInterface) {
+        if (!$machineProvider instanceof MachineProvider) {
             return RemoteRequestOutcome::invalid();
         }
 

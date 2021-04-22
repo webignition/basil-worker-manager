@@ -2,9 +2,7 @@
 
 namespace App\Exception;
 
-use webignition\BasilWorkerManagerInterfaces\Exception\UnsupportedProviderExceptionInterface;
-
-class UnsupportedProviderException extends \Exception implements UnsupportedProviderExceptionInterface
+class UnsupportedProviderException extends \Exception
 {
     private const MESSAGE = 'Unsupported provider "%s"';
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use App\Entity\Machine;
+use App\Model\MachineActionInterface;
 
 class FindMachine extends AbstractRemoteMachineRequest
 {
@@ -14,13 +14,13 @@ class FindMachine extends AbstractRemoteMachineRequest
     /**
      * @param MachineRequestInterface[] $onSuccessCollection
      * @param MachineRequestInterface[] $onFailureCollection
-     * @param MachineInterface::STATE_* $onNotFoundState
+     * @param Machine::STATE_* $onNotFoundState
      */
     public function __construct(
         string $machineId,
         array $onSuccessCollection = [],
         array $onFailureCollection = [],
-        private string $onNotFoundState = MachineInterface::STATE_FIND_NOT_FOUND,
+        private string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND,
     ) {
         parent::__construct($machineId, $onSuccessCollection, $onFailureCollection);
     }
@@ -31,7 +31,7 @@ class FindMachine extends AbstractRemoteMachineRequest
     }
 
     /**
-     * @return MachineInterface::STATE_*
+     * @return Machine::STATE_*
      */
     public function getOnNotFoundState(): string
     {

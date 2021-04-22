@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
 use App\Exception\MachineNotRemovableException;
 use App\Message\DeleteMachine;
 use App\Services\Entity\Store\MachineStore;
@@ -11,7 +12,6 @@ use App\Services\ExceptionLogger;
 use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteMachineRemover;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class DeleteMachineHandler implements MessageHandlerInterface
@@ -29,11 +29,11 @@ class DeleteMachineHandler implements MessageHandlerInterface
         $machineId = $message->getMachineId();
 
         $machine = $this->machineStore->find($machineId);
-        if (!$machine instanceof MachineInterface) {
+        if (!$machine instanceof Machine) {
             return;
         }
 
-        $machine->setState(MachineInterface::STATE_DELETE_REQUESTED);
+        $machine->setState(Machine::STATE_DELETE_REQUESTED);
         $this->machineStore->store($machine);
 
         try {
@@ -48,7 +48,7 @@ class DeleteMachineHandler implements MessageHandlerInterface
                     $this->exceptionLogger->log($exception);
                 }
 
-                $machine->setState(MachineInterface::STATE_DELETE_FAILED);
+                $machine->setState(Machine::STATE_DELETE_FAILED);
                 $this->machineStore->store($machine);
             }
         }

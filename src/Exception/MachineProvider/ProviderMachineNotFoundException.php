@@ -3,7 +3,7 @@
 namespace App\Exception\MachineProvider;
 
 use App\Exception\AbstractMachineException;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use App\Model\ProviderInterface;
 
 class ProviderMachineNotFoundException extends AbstractMachineException
 {

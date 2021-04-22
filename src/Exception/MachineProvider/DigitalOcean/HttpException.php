@@ -3,9 +3,9 @@
 namespace App\Exception\MachineProvider\DigitalOcean;
 
 use App\Exception\MachineProvider\Exception;
+use App\Exception\MachineProvider\HttpExceptionInterface;
+use App\Model\MachineActionInterface;
 use DigitalOceanV2\Exception\RuntimeException;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\HttpExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class HttpException extends Exception implements HttpExceptionInterface
 {

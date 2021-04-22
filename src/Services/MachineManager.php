@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
+use App\Entity\MachineProvider;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
+use App\Model\MachineActionInterface as Action;
+use App\Model\RemoteMachineInterface;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface as Action;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 class MachineManager extends AbstractMachineManager
 {
@@ -24,7 +24,7 @@ class MachineManager extends AbstractMachineManager
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function create(MachineProviderInterface $machineProvider): RemoteMachineInterface
+    public function create(MachineProvider $machineProvider): RemoteMachineInterface
     {
         $machineId = $machineProvider->getId();
         $machineName = $this->createMachineName($machineId);
@@ -48,7 +48,7 @@ class MachineManager extends AbstractMachineManager
      * @throws UnsupportedProviderException
      * @throws ProviderMachineNotFoundException
      */
-    public function get(MachineProviderInterface $machineProvider): RemoteMachineInterface
+    public function get(MachineProvider $machineProvider): RemoteMachineInterface
     {
         $machineId = $machineProvider->getId();
         $machineName = $this->createMachineName($machineId);
@@ -76,7 +76,7 @@ class MachineManager extends AbstractMachineManager
      * @throws ExceptionInterface
      * @throws UnsupportedProviderException
      */
-    public function delete(MachineProviderInterface $machineProvider): void
+    public function delete(MachineProvider $machineProvider): void
     {
         $machineId = $machineProvider->getId();
         $machineName = $this->createMachineName($machineId);

@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Message\RemoteMachineMessageInterface;
+use App\Model\ProviderInterface;
 use App\Services\RemoteRequestRetryDecider\RemoteRequestRetryDeciderInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class RemoteRequestRetryDecider
 {

@@ -3,7 +3,6 @@
 namespace App\Services\Entity\Store;
 
 use App\Entity\Machine;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineStore extends AbstractMachineEntityStore
 {
@@ -14,31 +13,27 @@ class MachineStore extends AbstractMachineEntityStore
         return $entity instanceof Machine ? $entity : null;
     }
 
-    public function store(MachineInterface $entity): void
+    public function store(Machine $entity): void
     {
-        $this->save($entity, function (MachineInterface $entity, MachineInterface $existingEntity) {
-            return $existingEntity instanceof Machine
-                ? $existingEntity->merge($entity)
-                : $existingEntity;
+        $this->save($entity, function (Machine $entity, Machine $existingEntity) {
+            return $existingEntity->merge($entity);
         });
     }
 
-    public function persist(MachineInterface $entity): void
+    public function persist(Machine $entity): void
     {
-        $this->save($entity, function (MachineInterface $entity, MachineInterface $existingEntity) {
+        $this->save($entity, function (Machine $entity, Machine $existingEntity) {
             return $existingEntity;
         });
     }
 
-    private function save(MachineInterface $entity, callable $existingEntityHandler): void
+    private function save(Machine $entity, callable $existingEntityHandler): void
     {
         $existingEntity = $this->find($entity->getId());
         if ($existingEntity instanceof Machine) {
             $entity = $existingEntityHandler($entity, $existingEntity);
         }
 
-        if ($entity instanceof Machine) {
-            $this->doStore($entity);
-        }
+        $this->doStore($entity);
     }
 }

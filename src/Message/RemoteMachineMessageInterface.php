@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
+use App\Model\MachineActionInterface;
 use webignition\SymfonyMessengerMessageDispatcher\Message\RetryableMessageInterface;
 
 interface RemoteMachineMessageInterface extends MachineRequestInterface, RetryableMessageInterface

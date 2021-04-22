@@ -2,8 +2,7 @@
 
 namespace App\Exception\MachineProvider;
 
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
+use App\Model\ProviderInterface;
 
 interface UnknownRemoteMachineExceptionInterface extends ExceptionInterface
 {

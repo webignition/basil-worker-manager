@@ -11,6 +11,8 @@ use App\Message\FindMachine;
 use App\Message\MachineRequestInterface;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineActionInterface;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
@@ -25,10 +27,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FindMachineHandlerTest extends AbstractBaseFunctionalTest
@@ -82,13 +80,13 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
      * @param object[] $expectedQueuedMessages
      */
     public function testInvokeSuccess(
-        MachineInterface $machine,
-        ?MachineProviderInterface $machineProvider,
+        Machine $machine,
+        ?MachineProvider $machineProvider,
         array $messageOnSuccessCollection,
         array $messageOnFailureCollection,
         array $apiResponses,
-        MachineInterface $expectedMachine,
-        MachineProviderInterface $expectedMachineProvider,
+        Machine $expectedMachine,
+        MachineProvider $expectedMachineProvider,
         int $expectedQueueCount,
         array $expectedQueuedMessages
     ): void {
@@ -101,7 +99,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->mockHandler->append(...$apiResponses);
         $this->machineStore->store($machine);
 
-        if ($machineProvider instanceof MachineProviderInterface) {
+        if ($machineProvider instanceof MachineProvider) {
             $this->machineProviderStore->store($machineProvider);
         }
 
@@ -150,7 +148,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
 
         return [
             'remote machine found and updated, no existing provider' => [
-                'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
+                'machine' => new Machine(self::MACHINE_ID, Machine::STATE_FIND_RECEIVED),
                 'machineProvider' => null,
                 'messageOnSuccessCollection' => [
                     $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
@@ -161,7 +159,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ],
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
-                    MachineInterface::STATE_UP_STARTED,
+                    Machine::STATE_UP_STARTED,
                     [
                         '10.0.0.1',
                     ]
@@ -176,7 +174,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ],
             ],
             'remote machine found and updated, has existing provider' => [
-                'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
+                'machine' => new Machine(self::MACHINE_ID, Machine::STATE_FIND_RECEIVED),
                 'machineProvider' => $nonDigitalOceanMachineProvider,
                 'messageOnSuccessCollection' => [
                     $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
@@ -187,7 +185,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ],
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
-                    MachineInterface::STATE_UP_STARTED,
+                    Machine::STATE_UP_STARTED,
                     [
                         '10.0.0.1',
                     ]
@@ -202,7 +200,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ],
             ],
             'remote machine not found, create requested' => [
-                'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED),
+                'machine' => new Machine(self::MACHINE_ID, Machine::STATE_FIND_RECEIVED),
                 'machineProvider' => $nonDigitalOceanMachineProvider,
                 'messageOnSuccessCollection' => [],
                 'messageOnFailureCollection' => [
@@ -213,7 +211,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ],
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
-                    MachineInterface::STATE_FIND_NOT_FOUND
+                    Machine::STATE_FIND_NOT_FOUND
                 ),
                 'expectedMachineProvider' => new MachineProvider(
                     self::MACHINE_ID,
@@ -253,7 +251,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ->getMock()
         );
 
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_FIND_RECEIVED);
         $this->machineStore->store($machine);
 
         $this->mockHandler->append(new Response(503));
@@ -265,7 +263,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $message->incrementRetryCount());
 
-        self::assertSame(MachineInterface::STATE_FIND_FINDING, $machine->getState());
+        self::assertSame(Machine::STATE_FIND_FINDING, $machine->getState());
         self::assertNull($this->machineProviderStore->find(self::MACHINE_ID));
         self::assertEquals($machine, $this->machineStore->find(self::MACHINE_ID));
     }
@@ -284,7 +282,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ->getMock()
         );
 
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_FIND_RECEIVED);
         $this->machineStore->store($machine);
 
         $this->mockHandler->append(new Response(503));
@@ -298,7 +296,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        self::assertSame(MachineInterface::STATE_FIND_NOT_FINDABLE, $machine->getState());
+        self::assertSame(Machine::STATE_FIND_NOT_FINDABLE, $machine->getState());
         self::assertNull($this->machineProviderStore->find(self::MACHINE_ID));
         self::assertEquals($machine, $this->machineStore->find(self::MACHINE_ID));
     }
@@ -313,7 +311,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 ->getMock()
         );
 
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_FIND_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_FIND_RECEIVED);
         $this->machineStore->store($machine);
 
         $this->mockHandler->append(HttpResponseFactory::fromDropletEntityCollection([]));
@@ -324,7 +322,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->messengerAsserter->assertQueueIsEmpty();
 
-        self::assertSame(MachineInterface::STATE_FIND_NOT_FOUND, $machine->getState());
+        self::assertSame(Machine::STATE_FIND_NOT_FOUND, $machine->getState());
         self::assertNull($this->machineProviderStore->find(self::MACHINE_ID));
         self::assertEquals($machine, $this->machineStore->find(self::MACHINE_ID));
     }

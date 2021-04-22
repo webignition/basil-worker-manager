@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Exception\MachineNotFindableException;
+use App\Model\RemoteMachineInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 class RemoteMachineFinder extends AbstractMachineManager
 {

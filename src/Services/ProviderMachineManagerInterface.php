@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Model\RemoteMachineInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 
 interface ProviderMachineManagerInterface
 {

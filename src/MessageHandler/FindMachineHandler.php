@@ -7,6 +7,7 @@ namespace App\MessageHandler;
 use App\Entity\MachineProvider;
 use App\Exception\MachineNotFindableException;
 use App\Message\FindMachine;
+use App\Model\RemoteMachineInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
@@ -15,7 +16,6 @@ use App\Services\MachineUpdater;
 use App\Services\RemoteMachineFinder;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class FindMachineHandler implements MessageHandlerInterface

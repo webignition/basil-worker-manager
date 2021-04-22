@@ -14,6 +14,7 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineActionInterface;
 use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
@@ -37,7 +38,6 @@ use DigitalOceanV2\Exception\RuntimeException;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class CreateMachineHandlerTest extends AbstractBaseFunctionalTest

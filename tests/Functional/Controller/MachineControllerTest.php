@@ -8,6 +8,7 @@ use App\Controller\MachineController;
 use App\Entity\Machine;
 use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
+use App\Model\MachineActionInterface;
 use App\Model\MachineInterface;
 use App\Services\Entity\Factory\CreateFailureFactory;
 use App\Services\Entity\Store\MachineStore;
@@ -17,7 +18,6 @@ use App\Tests\Services\Asserter\MessengerAsserter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class MachineControllerTest extends AbstractBaseFunctionalTest
 {

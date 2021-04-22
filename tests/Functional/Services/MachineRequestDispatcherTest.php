@@ -7,10 +7,10 @@ namespace App\Tests\Functional\Services;
 use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Message\MachineRequestInterface;
+use App\Model\MachineActionInterface;
 use App\Services\MachineRequestDispatcher;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class MachineRequestDispatcherTest extends AbstractBaseFunctionalTest
 {

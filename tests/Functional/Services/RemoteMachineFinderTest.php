@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Services;
 use App\Exception\MachineNotFindableException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineActionInterface;
 use App\Services\RemoteMachineFinder;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
@@ -14,7 +15,6 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class RemoteMachineFinderTest extends AbstractBaseFunctionalTest
 {

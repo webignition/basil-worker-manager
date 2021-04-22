@@ -7,12 +7,12 @@ namespace App\Tests\Functional\Services;
 use App\Exception\MachineNotFindableException;
 use App\Exception\MachineNotRemovableException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
+use App\Model\MachineActionInterface;
 use App\Services\RemoteMachineRemover;
 use App\Tests\AbstractBaseFunctionalTest;
 use DigitalOceanV2\Exception\RuntimeException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class RemoteMachineRemoverTest extends AbstractBaseFunctionalTest
 {

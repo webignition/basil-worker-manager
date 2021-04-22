@@ -11,6 +11,7 @@ use App\Message\FindMachine;
 use App\Message\MachineRequestInterface;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineActionInterface;
 use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
@@ -28,7 +29,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FindMachineHandlerTest extends AbstractBaseFunctionalTest

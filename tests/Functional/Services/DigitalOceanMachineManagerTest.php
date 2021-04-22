@@ -9,6 +9,7 @@ use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineActionInterface;
 use App\Model\MachineInterface;
 use App\Services\DigitalOceanMachineManager;
 use App\Services\Entity\Store\MachineStore;
@@ -23,7 +24,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 {

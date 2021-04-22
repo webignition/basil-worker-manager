@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\Model\MachineActionInterface;
 use App\Model\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class FindMachine extends AbstractRemoteMachineRequest
 {

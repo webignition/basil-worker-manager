@@ -3,8 +3,8 @@
 namespace App\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\UnknownException;
+use App\Model\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class ExceptionFactory
 {

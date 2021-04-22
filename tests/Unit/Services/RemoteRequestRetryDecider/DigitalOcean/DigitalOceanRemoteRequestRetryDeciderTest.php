@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Services\RemoteRequestRetryDecider\DigitalOcean;
 
 use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
+use App\Model\MachineActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\RemoteRequestRetryDecider\DigitalOcean\DigitalOceanRemoteRequestRetryDecider;
 use DigitalOceanV2\Exception\ApiLimitExceededException;
@@ -15,7 +16,6 @@ use DigitalOceanV2\Exception\InvalidRecordException;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
 use PHPUnit\Framework\TestCase;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class DigitalOceanRemoteRequestRetryDeciderTest extends TestCase
 {

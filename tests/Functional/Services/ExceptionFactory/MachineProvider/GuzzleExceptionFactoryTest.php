@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\CurlException;
+use App\Model\MachineActionInterface;
 use App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\RequestInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class GuzzleExceptionFactoryTest extends AbstractBaseFunctionalTest
 {

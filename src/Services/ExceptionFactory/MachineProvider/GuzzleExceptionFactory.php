@@ -3,9 +3,9 @@
 namespace App\Services\ExceptionFactory\MachineProvider;
 
 use App\Exception\MachineProvider\CurlException;
+use App\Model\MachineActionInterface;
 use GuzzleHttp\Exception\ConnectException;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 
 class GuzzleExceptionFactory implements ExceptionFactoryInterface
 {

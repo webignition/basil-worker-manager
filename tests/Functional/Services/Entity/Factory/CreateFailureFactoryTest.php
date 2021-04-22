@@ -19,7 +19,6 @@ use App\Exception\MachineProvider\UnknownException;
 use App\Exception\MachineProvider\UnknownExceptionInterface;
 use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
 use App\Exception\UnsupportedProviderException;
-use App\Exception\UnsupportedProviderExceptionInterface;
 use App\Model\MachineActionInterface;
 use App\Model\ProviderInterface;
 use App\Services\Entity\Factory\CreateFailureFactory;
@@ -44,7 +43,7 @@ class CreateFailureFactoryTest extends AbstractEntityTest
      * @dataProvider createDataProvider
      */
     public function testCreate(
-        ExceptionInterface | UnsupportedProviderExceptionInterface $exception,
+        ExceptionInterface | UnsupportedProviderException $exception,
         CreateFailure $expectedCreateFailure
     ): void {
         $createFailure = $this->factory->create(self::MACHINE_ID, $exception);
@@ -61,11 +60,8 @@ class CreateFailureFactoryTest extends AbstractEntityTest
      */
     public function createDataProvider(): array
     {
-//        $unprocessableRequestException = \Mockery::mock(UnprocessableRequestExceptionInterface::class);
-//        $unknownException = \Mockery::mock(UnknownExceptionInterface::class);
-
         return [
-            UnsupportedProviderExceptionInterface::class => [
+            UnsupportedProviderException::class => [
                 'exception' => new UnsupportedProviderException(ProviderInterface::NAME_DIGITALOCEAN),
                 'expectedCreateFailure' => new CreateFailure(
                     self::MACHINE_ID,

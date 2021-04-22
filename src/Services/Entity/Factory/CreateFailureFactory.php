@@ -9,7 +9,7 @@ use App\Exception\MachineProvider\CurlExceptionInterface;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\HttpExceptionInterface;
 use App\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
-use App\Exception\UnsupportedProviderExceptionInterface;
+use App\Exception\UnsupportedProviderException;
 use App\Services\Entity\Store\CreateFailureStore;
 
 class CreateFailureFactory
@@ -33,7 +33,7 @@ class CreateFailureFactory
 
     public function create(
         string $machineId,
-        ExceptionInterface | UnsupportedProviderExceptionInterface $exception
+        ExceptionInterface | UnsupportedProviderException $exception
     ): CreateFailure {
         $existingEntity = $this->store->find($machineId);
         if ($existingEntity instanceof CreateFailure) {
@@ -49,13 +49,13 @@ class CreateFailureFactory
     }
 
     /**
-     * @param ExceptionInterface|UnsupportedProviderExceptionInterface $exception
+     * @param ExceptionInterface|UnsupportedProviderException $exception
      *
      * @return CreateFailure::CODE_*
      */
-    private function findCode(ExceptionInterface | UnsupportedProviderExceptionInterface $exception): int
+    private function findCode(ExceptionInterface | UnsupportedProviderException $exception): int
     {
-        if ($exception instanceof UnsupportedProviderExceptionInterface) {
+        if ($exception instanceof UnsupportedProviderException) {
             return CreateFailure::CODE_UNSUPPORTED_PROVIDER;
         }
 
@@ -95,7 +95,7 @@ class CreateFailureFactory
     /**
      * @return array<string, string|int>
      */
-    private function createContext(ExceptionInterface | UnsupportedProviderExceptionInterface $exception): array
+    private function createContext(ExceptionInterface | UnsupportedProviderException $exception): array
     {
         if ($exception instanceof ApiLimitExceptionInterface) {
             return [

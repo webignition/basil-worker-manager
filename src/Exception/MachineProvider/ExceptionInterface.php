@@ -2,7 +2,7 @@
 
 namespace App\Exception\MachineProvider;
 
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
+use App\Model\MachineActionInterface;
 
 interface ExceptionInterface extends \Throwable
 {

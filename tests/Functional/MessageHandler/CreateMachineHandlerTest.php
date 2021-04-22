@@ -232,7 +232,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareHandler($machineManager, $exceptionLogger);
 
-         ($this->handler)($message);
+        ($this->handler)($message);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(Machine::STATE_CREATE_FAILED, $this->machine->getState());

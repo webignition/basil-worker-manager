@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Exception;
 
 use App\Exception\LoggableException;
-use App\Exception\LoggableExceptionInterface;
 use PHPUnit\Framework\TestCase;
 
 class LoggableExceptionTest extends TestCase
@@ -15,7 +14,7 @@ class LoggableExceptionTest extends TestCase
      *
      * @param array<mixed> $expectedData
      */
-    public function testJsonSerialize(LoggableExceptionInterface $exception, array $expectedData): void
+    public function testJsonSerialize(LoggableException $exception, array $expectedData): void
     {
         self::assertExceptionData($expectedData, $exception->jsonSerialize());
     }

@@ -2,7 +2,7 @@
 
 namespace App\Exception;
 
-class LoggableException extends \Exception implements LoggableExceptionInterface
+class LoggableException extends \Exception
 {
     private const TRACE_FILE_KEY = 'file';
     private const TRACE_LINE_KEY = 'line';

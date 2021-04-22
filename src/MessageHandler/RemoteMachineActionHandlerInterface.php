@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\RemoteRequestOutcomeInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 
 interface RemoteMachineActionHandlerInterface
 {

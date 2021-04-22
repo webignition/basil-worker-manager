@@ -3,7 +3,6 @@
 namespace App\Exception\MachineProvider;
 
 use App\Model\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\CurlExceptionInterface;
 
 class CurlException extends Exception implements CurlExceptionInterface
 {

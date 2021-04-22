@@ -4,7 +4,6 @@ namespace App\Exception\MachineProvider;
 
 use App\Exception\AbstractMachineException;
 use App\Model\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 
 class Exception extends AbstractMachineException implements ExceptionInterface
 {

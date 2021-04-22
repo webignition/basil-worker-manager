@@ -2,8 +2,8 @@
 
 namespace App\Services\ExceptionFactory\MachineProvider;
 
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 
 interface ExceptionFactoryInterface
 {

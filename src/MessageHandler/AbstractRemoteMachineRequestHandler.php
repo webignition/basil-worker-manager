@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\ChainedMachineRequestInterface;
@@ -19,7 +20,6 @@ use App\Services\ExceptionLogger;
 use App\Services\MachineManager;
 use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteRequestRetryDecider;
-use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 abstract class AbstractRemoteMachineRequestHandler

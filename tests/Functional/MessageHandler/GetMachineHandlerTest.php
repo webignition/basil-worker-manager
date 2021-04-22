@@ -8,16 +8,11 @@ use App\Entity\Machine;
 use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
-use App\Exception\MachineProvider\UnknownRemoteMachineException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\GetMachine;
 use App\MessageHandler\GetMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\ProviderInterface;
-use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestFailure;
-use App\Model\RemoteRequestOutcome;
-use App\Model\RemoteRequestOutcomeInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
@@ -77,7 +72,6 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
     public function testInvokeSuccess(
         ResponseInterface $apiResponse,
         Machine $machine,
-        RemoteRequestOutcomeInterface $expectedOutcome,
         Machine $expectedMachine,
     ): void {
         $this->setExceptionLoggerOnHandler(
@@ -96,9 +90,8 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $expectedMachineProvider = clone $machineProvider;
 
         $message = new GetMachine($machine->getId());
-        $outcome = ($this->handler)($message);
+        ($this->handler)($message);
 
-        self::assertEquals($expectedOutcome, $outcome);
         self::assertEquals($expectedMachine, $machine);
         self::assertEquals($expectedMachineProvider, $machineProvider);
 
@@ -158,9 +151,6 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
             'updated within initial remote id and initial remote state' => [
                 'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$createdDropletEntity]),
                 'machine' => new Machine(self::MACHINE_ID),
-                'expectedOutcome' => new RemoteMachineRequestSuccess(
-                    new RemoteMachine($createdDropletEntity)
-                ),
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
                     Machine::STATE_UP_STARTED
@@ -169,9 +159,6 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
             'updated within initial ip addresses' => [
                 'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity]),
                 'machine' => new Machine(self::MACHINE_ID, Machine::STATE_UP_STARTED),
-                'expectedOutcome' => new RemoteMachineRequestSuccess(
-                    new RemoteMachine($upNewDropletEntity)
-                ),
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
                     Machine::STATE_UP_STARTED,
@@ -184,9 +171,6 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                     self::MACHINE_ID,
                     Machine::STATE_UP_STARTED,
                     $ipAddresses
-                ),
-                'expectedOutcome' => new RemoteMachineRequestSuccess(
-                    new RemoteMachine($upActiveDropletEntity)
                 ),
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
@@ -206,7 +190,6 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         ResponseInterface $apiResponse,
         Machine $machine,
         MachineProvider $machineProvider,
-        RemoteRequestOutcomeInterface $expectedOutcome,
         array $expectedDispatchedMessages,
     ): void {
         $this->setExceptionLoggerOnHandler(
@@ -224,9 +207,8 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $expectedMachineProvider = clone $machineProvider;
 
         $message = new GetMachine($machine->getId());
-        $outcome = ($this->handler)($message);
+        ($this->handler)($message);
 
-        self::assertEquals($expectedOutcome, $outcome);
         self::assertEquals($expectedMachine, $machine);
         self::assertEquals($expectedMachineProvider, $machineProvider);
 
@@ -249,7 +231,6 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 'httpFixtures' => new Response(503),
                 'machine' => $machine,
                 'machineProvider' => $machineProvider,
-                'expectedOutcome' => RemoteRequestOutcome::retrying(),
                 'expectedDispatchedMessages' => [
                     (new GetMachine(self::MACHINE_ID))->incrementRetryCount()
                 ],
@@ -281,8 +262,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = ($this->handler)($message);
-        self::assertEquals(new RemoteRequestFailure($expectedLoggedException), $outcome);
+        ($this->handler)($message);
 
         $this->messengerAsserter->assertQueueIsEmpty();
     }
@@ -318,9 +298,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
-        $outcome = ($this->handler)($message);
-
-        self::assertEquals(new RemoteRequestFailure($expectedLoggedException), $outcome);
+        ($this->handler)($message);
 
         $this->messengerAsserter->assertQueueIsEmpty();
     }
@@ -358,9 +336,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->setExceptionLoggerOnHandler($exceptionLogger);
 
         $message = new GetMachine($machine->getId());
-        $outcome = ($this->handler)($message);
-
-        self::assertEquals(new RemoteRequestFailure($expectedLoggedException), $outcome);
+        ($this->handler)($message);
 
         $this->messengerAsserter->assertQueueIsEmpty();
     }
@@ -378,19 +354,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $message = new GetMachine($machine->getId());
         ObjectReflector::setProperty($message, $message::class, 'retryCount', 11);
 
-        $outcome = ($this->handler)($message);
-
-        self::assertEquals(
-            new RemoteRequestFailure(
-                new UnknownRemoteMachineException(
-                    $machineProvider->getName(),
-                    $machine->getId(),
-                    $message->getAction(),
-                    new RuntimeException('Not Found', 404)
-                )
-            ),
-            $outcome
-        );
+        ($this->handler)($message);
 
         self::assertSame(Machine::STATE_CREATE_RECEIVED, $machine->getState());
     }

@@ -6,11 +6,10 @@ namespace App\MessageHandler;
 
 use App\Entity\Machine;
 use App\Entity\MachineProvider;
+use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
+use App\Exception\UnsupportedProviderException;
 use App\Message\GetMachine;
-use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestOutcomeInterface;
-use App\Model\RemoteRequestSuccessInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
@@ -19,55 +18,66 @@ use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
-class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
+class GetMachineHandler implements MessageHandlerInterface
 {
     public function __construct(
-        MachineManager $machineManager,
-        RemoteRequestRetryDecider $retryDecider,
-        ExceptionLogger $exceptionLogger,
-        MachineStore $machineStore,
-        MachineProviderStore $machineProviderStore,
-        MachineRequestDispatcher $machineRequestDispatcher,
+        private MachineManager $machineManager,
+        private RemoteRequestRetryDecider $retryDecider,
+        private ExceptionLogger $exceptionLogger,
+        private MachineStore $machineStore,
+        private MachineProviderStore $machineProviderStore,
+        private MachineRequestDispatcher $machineRequestDispatcher,
         private MachineUpdater $machineUpdater,
     ) {
-        parent::__construct(
-            $machineManager,
-            $retryDecider,
-            $exceptionLogger,
-            $machineStore,
-            $machineProviderStore,
-            $machineRequestDispatcher,
-        );
     }
 
-    public function __invoke(GetMachine $message): RemoteRequestOutcomeInterface
+    public function __invoke(GetMachine $message): void
     {
-        return $this->handle(
-            $message,
-            (new RemoteMachineActionHandler(
-                function (MachineProvider $machineProvider) {
-                    return new RemoteMachineRequestSuccess(
-                        $this->machineManager->get($machineProvider)
-                    );
+        $machine = $this->machineStore->find($message->getMachineId());
+        if (!$machine instanceof Machine) {
+            return;
+        }
+
+        $machineProvider = $this->machineProviderStore->find($message->getMachineId());
+        if (!$machineProvider instanceof MachineProvider) {
+            return;
+        }
+
+        $lastException = null;
+
+        try {
+            $remoteMachine = $this->machineManager->get($machineProvider);
+            $this->machineUpdater->updateFromRemoteMachine($machine, $remoteMachine);
+            $this->machineRequestDispatcher->dispatchCollection($message->getOnSuccessCollection());
+        } catch (ExceptionInterface $exception) {
+            $shouldRetry = $this->retryDecider->decide(
+                $machineProvider->getName(),
+                $message,
+                $exception->getRemoteException()
+            );
+
+            $lastException = $exception;
+
+            if ($shouldRetry) {
+                $envelope = $this->machineRequestDispatcher->reDispatch($message);
+
+                if (MessageDispatcher::isDispatchable($envelope)) {
+                    $lastException = null;
                 }
-            ))->withSuccessHandler(
-                function (
-                    Machine $machine,
-                    RemoteRequestSuccessInterface $outcome
-                ) {
-                    if ($outcome instanceof RemoteMachineRequestSuccess) {
-                        $this->machineUpdater->updateFromRemoteMachine($machine, $outcome->getRemoteMachine());
-                    }
-                }
-            )->withFailureHandler(
-                function (Machine $machine, \Throwable $exception) {
-                    if ($exception instanceof ProviderMachineNotFoundException) {
-                        $machine->setState(Machine::STATE_FIND_NOT_FOUND);
-                        $this->machineStore->store($machine);
-                    }
-                }
-            )
-        );
+            }
+        } catch (UnsupportedProviderException $unsupportedProviderException) {
+            $lastException = $unsupportedProviderException;
+        } catch (ProviderMachineNotFoundException $machineNotFoundException) {
+            $machine->setState(Machine::STATE_FIND_NOT_FOUND);
+            $this->machineStore->store($machine);
+
+            $lastException = $machineNotFoundException;
+        }
+
+        if ($lastException instanceof \Throwable) {
+            $this->exceptionLogger->log($lastException);
+        }
     }
 }

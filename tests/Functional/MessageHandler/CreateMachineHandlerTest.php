@@ -16,9 +16,6 @@ use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineActionInterface;
 use App\Model\ProviderInterface;
-use App\Model\RemoteMachineRequestSuccess;
-use App\Model\RemoteRequestFailure;
-use App\Model\RemoteRequestOutcome;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
@@ -113,10 +110,9 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $message = $this->machineRequestFactory->createCreate(self::MACHINE_ID);
 
-        $outcome = ($this->handler)($message);
+        ($this->handler)($message);
 
         $expectedRemoteMachine = new RemoteMachine($expectedDropletEntity);
-        self::assertEquals(new RemoteMachineRequestSuccess($expectedRemoteMachine), $outcome);
 
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(
@@ -147,8 +143,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareHandler($machineManager, $exceptionLogger);
 
-        $outcome = ($this->handler)($message);
-        self::assertEquals(new RemoteRequestFailure($exception), $outcome);
+        ($this->handler)($message);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(Machine::STATE_CREATE_FAILED, $this->machine->getState());
@@ -185,8 +180,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareHandler($machineManager, $exceptionLogger);
 
-        $outcome = ($this->handler)($message);
-        self::assertEquals(RemoteRequestOutcome::retrying(), $outcome);
+        ($this->handler)($message);
 
         $expectedMessage = $message->incrementRetryCount();
 
@@ -238,8 +232,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->prepareHandler($machineManager, $exceptionLogger);
 
-        $outcome = ($this->handler)($message);
-        self::assertEquals(new RemoteRequestFailure($exception), $outcome);
+        ($this->handler)($message);
 
         $this->messengerAsserter->assertQueueIsEmpty();
         self::assertSame(Machine::STATE_CREATE_FAILED, $this->machine->getState());

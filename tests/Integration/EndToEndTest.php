@@ -38,8 +38,9 @@ class EndToEndTest extends TestCase
         $response = $this->httpClient->post($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
 
-        $this->waitUntilMachineIsActive();
-        $this->removeMachine();
+        $this->assertEventualMachineState(MachineInterface::STATE_UP_ACTIVE);
+        $this->deleteMachine();
+        $this->assertEventualMachineState(MachineInterface::STATE_DELETE_DELETED);
     }
 
     public function testStatusForMissingLocalMachine(): void
@@ -62,8 +63,9 @@ class EndToEndTest extends TestCase
             ]
         ));
 
-        $this->waitUntilMachineIsActive();
-        $this->removeMachine();
+        $this->assertEventualMachineState(MachineInterface::STATE_UP_ACTIVE);
+        $this->deleteMachine();
+        $this->assertEventualMachineState(MachineInterface::STATE_DELETE_DELETED);
     }
 
     /**
@@ -95,26 +97,26 @@ class EndToEndTest extends TestCase
         return new Machine(json_decode((string) $response->getBody()->getContents(), true));
     }
 
-    private function waitUntilMachineIsActive(): void
-    {
-        $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_UP_ACTIVE);
-        if (false === $waitResult) {
-            $this->fail('Timed out waiting for expected machine state: ' . MachineInterface::STATE_UP_ACTIVE);
-        }
-
-        self::assertSame(MachineInterface::STATE_UP_ACTIVE, $this->getMachine()->getState());
-    }
-
-    private function removeMachine(): void
+    private function deleteMachine(): void
     {
         $response = $this->httpClient->delete($this->machineUrl);
         self::assertSame(202, $response->getStatusCode());
+    }
 
-        $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_DELETE_DELETED);
+    /**
+     * @param MachineInterface::STATE_* $state
+     */
+    private function assertEventualMachineState(string $state): void
+    {
+        $waitResult = $this->waitUntilMachineStateIs($state);
         if (false === $waitResult) {
-            $this->fail('Timed out waiting for expected machine state: ' . MachineInterface::STATE_DELETE_DELETED);
+            $this->fail(sprintf(
+                'Timed out waiting for expected machine state. Expected: %s, actual: %s',
+                $state,
+                $this->getMachine()->getState()
+            ));
         }
 
-        self::assertSame(MachineInterface::STATE_DELETE_DELETED, $this->getMachine()->getState());
+        self::assertSame($state, $this->getMachine()->getState());
     }
 }

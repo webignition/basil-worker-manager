@@ -7,17 +7,13 @@ namespace App\Tests\Integration;
 use App\Controller\MachineController;
 use App\Entity\Machine as MachineEntity;
 use App\Tests\Model\Machine;
-use GuzzleHttp\Client;
-use PHPUnit\Framework\TestCase;
 
-class EndToEndTest extends TestCase
+class MachineCreationTest extends AbstractIntegrationTest
 {
     private const MAX_DURATION_IN_SECONDS = 120;
     private const MICROSECONDS_PER_SECOND = 1000000;
 
     private string $machineUrl;
-
-    private Client $httpClient;
 
     protected function setUp(): void
     {
@@ -25,10 +21,6 @@ class EndToEndTest extends TestCase
 
         $machineId = md5((string) rand());
         $this->machineUrl = str_replace('{id}', $machineId, MachineController::PATH_MACHINE);
-
-        $this->httpClient = new Client([
-            'base_uri' => 'http://localhost:9090/'
-        ]);
 
         shell_exec('php bin/console --env=test app:test:clear-database');
     }

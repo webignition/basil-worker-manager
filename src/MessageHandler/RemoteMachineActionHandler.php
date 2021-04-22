@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Model\MachineProviderInterface;
 use App\Model\RemoteRequestOutcomeInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class RemoteMachineActionHandler implements RemoteMachineActionHandlerInterface
 {

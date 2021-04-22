@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
+use App\Model\MachineProviderInterface;
 
 abstract class AbstractMachineManager
 {

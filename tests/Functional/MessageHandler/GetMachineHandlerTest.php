@@ -13,6 +13,7 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\GetMachine;
 use App\MessageHandler\GetMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
@@ -32,7 +33,6 @@ use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class GetMachineHandlerTest extends AbstractBaseFunctionalTest

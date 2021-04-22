@@ -6,10 +6,10 @@ namespace App\MessageHandler;
 
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
+use App\Model\MachineProviderInterface;
 use App\Model\RemoteRequestOutcomeInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 interface RemoteMachineActionHandlerInterface
 {

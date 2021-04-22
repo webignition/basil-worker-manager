@@ -4,11 +4,11 @@ namespace App\Services;
 
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
+use App\Model\MachineProviderInterface;
 use App\Model\RemoteMachineInterface;
 use App\Services\ExceptionFactory\MachineProvider\ExceptionFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface as Action;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
 
 class MachineManager extends AbstractMachineManager
 {

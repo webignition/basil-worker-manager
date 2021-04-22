@@ -3,7 +3,7 @@
 namespace App\Services\Entity\Store;
 
 use App\Entity\MachineProvider;
-use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
+use App\Model\MachineProviderInterface;
 
 class MachineProviderStore extends AbstractMachineEntityStore
 {

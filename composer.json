@@ -98,9 +98,15 @@
         "static-analysis": "./vendor/bin/phpstan analyse --ansi",
         "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",
         "test-functional": "./vendor/bin/phpunit --colors=always tests/Functional",
-        "test-integration": [
-            "./vendor/bin/phpunit tests/Integration/HealthCheckTest.php",
+        "test-integration-machine-creation": [
             "./vendor/bin/phpunit tests/Integration/MachineCreationTest.php"
+        ],
+        "test-integration-health-check": [
+            "./vendor/bin/phpunit tests/Integration/HealthCheckTest.php"
+        ],
+        "test-integration": [
+            "@test-integration-machine-creation",
+            "@test-integration-health-check"
         ],
         "test": [
             "@test-unit",

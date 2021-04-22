@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Entity\Machine;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Services\DigitalOceanMachineManager;
+use App\Services\Entity\Store\MachineStore;
 use App\Services\MachineNameFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
@@ -19,7 +21,6 @@ use DigitalOceanV2\Exception\ValidationFailedException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
@@ -41,9 +42,10 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
         \assert($machineManager instanceof DigitalOceanMachineManager);
         $this->machineManager = $machineManager;
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
-        $this->machine = $machineFactory->create(self::MACHINE_ID);
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $this->machine = new Machine(self::MACHINE_ID);
+        $machineStore->store($this->machine);
 
         $machineNameFactory = self::$container->get(MachineNameFactory::class);
         \assert($machineNameFactory instanceof MachineNameFactory);

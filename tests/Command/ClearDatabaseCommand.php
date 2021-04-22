@@ -2,13 +2,13 @@
 
 namespace App\Tests\Command;
 
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 
 class ClearDatabaseCommand extends Command
 {

@@ -2,18 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\CreateFailure;
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Response\BadMachineCreateRequestResponse;
+use App\Services\Entity\Store\CreateFailureStore;
+use App\Services\Entity\Store\MachineProviderStore;
+use App\Services\Entity\Store\MachineStore;
 use App\Services\MachineRequestDispatcher;
 use App\Services\MachineRequestFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\CreateFailureStore;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineProviderStore;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 

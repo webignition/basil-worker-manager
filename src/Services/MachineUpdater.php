@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Store\MachineStore;
+use App\Services\Entity\Store\MachineStore;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\RemoteMachineInterface;
 

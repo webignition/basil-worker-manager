@@ -12,10 +12,9 @@ use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\Entity\Factory\CreateFailureFactory;
-use App\Tests\AbstractBaseFunctionalTest;
+use App\Tests\Functional\Services\Entity\AbstractEntityTest;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
-use Doctrine\ORM\EntityManagerInterface;
 use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ApiLimitExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\AuthenticationExceptionInterface;
@@ -28,12 +27,9 @@ use webignition\BasilWorkerManagerInterfaces\Exception\UnsupportedProviderExcept
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
-class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
+class CreateFailureFactoryTest extends AbstractEntityTest
 {
-    private const MACHINE_ID = 'machine id';
-
     private CreateFailureFactory $factory;
-    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -42,10 +38,6 @@ class CreateFailureFactoryTest extends AbstractBaseFunctionalTest
         $factory = self::$container->get(CreateFailureFactory::class);
         \assert($factory instanceof CreateFailureFactory);
         $this->factory = $factory;
-
-        $entityManager = self::$container->get(EntityManagerInterface::class);
-        \assert($entityManager instanceof EntityManagerInterface);
-        $this->entityManager = $entityManager;
     }
 
     /**

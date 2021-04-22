@@ -11,7 +11,6 @@ use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineActionInterface;
-use App\Model\MachineInterface;
 use App\Services\DigitalOceanMachineManager;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\MachineNameFactory;
@@ -30,7 +29,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
     private const MACHINE_ID = 'machine id';
 
     private DigitalOceanMachineManager $machineManager;
-    private MachineInterface $machine;
+    private Machine $machine;
     private MockHandler $mockHandler;
     private string $machineName;
 

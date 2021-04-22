@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
+use App\Entity\Machine;
 use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\Message\GetMachine;
 use App\Message\MachineRequestInterface;
-use App\Model\MachineInterface;
 
 class MachineRequestFactory
 {
@@ -53,7 +53,7 @@ class MachineRequestFactory
         return new DeleteMachine(
             $machineId,
             [
-                $this->createFind($machineId, [], [], MachineInterface::STATE_DELETE_DELETED),
+                $this->createFind($machineId, [], [], Machine::STATE_DELETE_DELETED),
             ]
         );
     }
@@ -79,7 +79,7 @@ class MachineRequestFactory
         string $machineId,
         array $onSuccessCollection = [],
         array $onFailureCollection = [],
-        string $onNotFoundState = MachineInterface::STATE_FIND_NOT_FOUND
+        string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND
     ): FindMachine {
         return new FindMachine($machineId, $onSuccessCollection, $onFailureCollection, $onNotFoundState);
     }

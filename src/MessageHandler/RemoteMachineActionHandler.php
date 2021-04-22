@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
-use App\Model\MachineInterface;
+use App\Entity\Machine;
 use App\Model\MachineProviderInterface;
 use App\Model\RemoteRequestOutcomeInterface;
 
@@ -83,7 +83,7 @@ class RemoteMachineActionHandler implements RemoteMachineActionHandlerInterface
     }
 
     public function onSuccess(
-        MachineInterface $machine,
+        Machine $machine,
         RemoteRequestOutcomeInterface $outcome
     ): void {
         if (is_callable($this->successHandler)) {
@@ -91,14 +91,14 @@ class RemoteMachineActionHandler implements RemoteMachineActionHandlerInterface
         }
     }
 
-    public function onFailure(MachineInterface $machine, \Throwable $exception): void
+    public function onFailure(Machine $machine, \Throwable $exception): void
     {
         if (is_callable($this->failureHandler)) {
             ($this->failureHandler)($machine, $exception);
         }
     }
 
-    public function onBeforeRequest(MachineInterface $machine): void
+    public function onBeforeRequest(Machine $machine): void
     {
         if (is_callable($this->beforeRequestHandler)) {
             ($this->beforeRequestHandler)($machine);

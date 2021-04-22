@@ -13,7 +13,6 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\GetMachine;
 use App\MessageHandler\GetMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
-use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
@@ -78,9 +77,9 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeSuccess(
         ResponseInterface $apiResponse,
-        MachineInterface $machine,
+        Machine $machine,
         RemoteRequestOutcomeInterface $expectedOutcome,
-        MachineInterface $expectedMachine,
+        Machine $expectedMachine,
     ): void {
         $this->setExceptionLoggerOnHandler(
             (new MockExceptionLogger())
@@ -165,18 +164,18 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
-                    MachineInterface::STATE_UP_STARTED
+                    Machine::STATE_UP_STARTED
                 ),
             ],
             'updated within initial ip addresses' => [
                 'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity]),
-                'machine' => new Machine(self::MACHINE_ID, MachineInterface::STATE_UP_STARTED),
+                'machine' => new Machine(self::MACHINE_ID, Machine::STATE_UP_STARTED),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
                     new RemoteMachine($upNewDropletEntity)
                 ),
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
-                    MachineInterface::STATE_UP_STARTED,
+                    Machine::STATE_UP_STARTED,
                     $ipAddresses
                 ),
             ],
@@ -184,7 +183,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 'apiResponse' => HttpResponseFactory::fromDropletEntityCollection([$upActiveDropletEntity]),
                 'machine' => new Machine(
                     self::MACHINE_ID,
-                    MachineInterface::STATE_UP_STARTED,
+                    Machine::STATE_UP_STARTED,
                     $ipAddresses
                 ),
                 'expectedOutcome' => new RemoteMachineRequestSuccess(
@@ -192,7 +191,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
                 ),
                 'expectedMachine' => new Machine(
                     self::MACHINE_ID,
-                    MachineInterface::STATE_UP_ACTIVE,
+                    Machine::STATE_UP_ACTIVE,
                     $ipAddresses
                 ),
             ],
@@ -206,7 +205,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function testInvokeRetrying(
         ResponseInterface $apiResponse,
-        MachineInterface $machine,
+        Machine $machine,
         MachineProviderInterface $machineProvider,
         RemoteRequestOutcomeInterface $expectedOutcome,
         array $expectedDispatchedMessages,
@@ -243,7 +242,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
      */
     public function invokeRetryingDataProvider(): array
     {
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_CREATE_RECEIVED);
         $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
 
         return [
@@ -263,7 +262,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(401));
 
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
         $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
@@ -299,7 +298,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
     ): void {
         $this->mockHandler->append($apiResponse);
 
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
         $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
@@ -346,7 +345,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
         $invalidProvider = 'invalid';
         $expectedLoggedException = new UnsupportedProviderException($invalidProvider);
 
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
         $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
@@ -371,7 +370,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
     {
         $this->mockHandler->append(new Response(404));
 
-        $machine = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_RECEIVED);
+        $machine = new Machine(self::MACHINE_ID, Machine::STATE_CREATE_RECEIVED);
         $this->machineStore->store($machine);
 
         $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
@@ -394,7 +393,7 @@ class GetMachineHandlerTest extends AbstractBaseFunctionalTest
             $outcome
         );
 
-        self::assertSame(MachineInterface::STATE_CREATE_RECEIVED, $machine->getState());
+        self::assertSame(Machine::STATE_CREATE_RECEIVED, $machine->getState());
     }
 
     private function setExceptionLoggerOnHandler(ExceptionLogger $exceptionLogger): void

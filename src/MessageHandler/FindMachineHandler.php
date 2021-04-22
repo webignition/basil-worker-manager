@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
 use App\Entity\MachineProvider;
 use App\Exception\MachineNotFindableException;
 use App\Message\FindMachine;
-use App\Model\MachineInterface;
 use App\Model\RemoteMachineInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
@@ -35,11 +35,11 @@ class FindMachineHandler implements MessageHandlerInterface
         $machineId = $message->getMachineId();
 
         $machine = $this->machineStore->find($machineId);
-        if (!$machine instanceof MachineInterface) {
+        if (!$machine instanceof Machine) {
             return;
         }
 
-        $machine->setState(MachineInterface::STATE_FIND_FINDING);
+        $machine->setState(Machine::STATE_FIND_FINDING);
         $this->machineStore->store($machine);
 
         try {
@@ -66,7 +66,7 @@ class FindMachineHandler implements MessageHandlerInterface
                     $this->exceptionLogger->log($exception);
                 }
 
-                $machine->setState(MachineInterface::STATE_FIND_NOT_FINDABLE);
+                $machine->setState(Machine::STATE_FIND_NOT_FINDABLE);
                 $this->machineStore->store($machine);
             }
         }

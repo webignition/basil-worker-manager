@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\Entity\Store;
 
 use App\Entity\Machine;
-use App\Model\MachineInterface;
 use App\Services\Entity\Store\MachineStore;
 use App\Tests\Functional\AbstractEntityTest;
 
@@ -43,7 +42,7 @@ class MachineStoreTest extends AbstractEntityTest
         $this->store->store($existingEntity);
         self::assertCount(1, $repository->findAll());
 
-        $newEntity = new Machine(self::MACHINE_ID, MachineInterface::STATE_UP_ACTIVE, ['127.0.0.1']);
+        $newEntity = new Machine(self::MACHINE_ID, Machine::STATE_UP_ACTIVE, ['127.0.0.1']);
         $this->store->store($newEntity);
         self::assertCount(1, $repository->findAll());
     }
@@ -53,20 +52,20 @@ class MachineStoreTest extends AbstractEntityTest
         $repository = $this->entityManager->getRepository(Machine::class);
         self::assertCount(0, $repository->findAll());
 
-        $entity = new Machine(self::MACHINE_ID, MachineInterface::STATE_CREATE_FAILED, ['10.0.0.1']);
+        $entity = new Machine(self::MACHINE_ID, Machine::STATE_CREATE_FAILED, ['10.0.0.1']);
         $this->store->store($entity);
         self::assertCount(1, $repository->findAll());
 
         $retrievedEntity = $repository->find(self::MACHINE_ID);
         self::assertInstanceOf(Machine::class, $retrievedEntity);
 
-        self::assertSame(MachineInterface::STATE_CREATE_FAILED, $retrievedEntity->getState());
+        self::assertSame(Machine::STATE_CREATE_FAILED, $retrievedEntity->getState());
         self::assertSame(['10.0.0.1'], $retrievedEntity->getIpAddresses());
 
         $entity->reset();
         $this->store->persist($entity);
 
-        self::assertSame(MachineInterface::STATE_CREATE_RECEIVED, $retrievedEntity->getState());
+        self::assertSame(Machine::STATE_CREATE_RECEIVED, $retrievedEntity->getState());
         self::assertSame([], $retrievedEntity->getIpAddresses());
     }
 

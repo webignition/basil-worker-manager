@@ -15,7 +15,6 @@ use App\Message\CreateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\MachineActionInterface;
-use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
@@ -49,7 +48,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
     private CreateMachineHandler $handler;
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
-    private MachineInterface $machine;
+    private Machine $machine;
     private MachineProviderInterface $machineProvider;
     private EntityManagerInterface $entityManager;
     private MachineRequestFactory $machineRequestFactory;
@@ -153,7 +152,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
+        self::assertSame(Machine::STATE_CREATE_FAILED, $this->machine->getState());
         self::assertSame(0, $message->getRetryCount());
 
         $createFailure = $this->entityManager->find(CreateFailure::class, $this->machine->getId());
@@ -195,7 +194,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         $this->messengerAsserter->assertQueueCount(1);
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
 
-        self::assertNotSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
+        self::assertNotSame(Machine::STATE_CREATE_FAILED, $this->machine->getState());
     }
 
     /**
@@ -244,7 +243,7 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         self::assertEquals(new RemoteRequestFailure($exception), $outcome);
 
         $this->messengerAsserter->assertQueueIsEmpty();
-        self::assertSame(MachineInterface::STATE_CREATE_FAILED, $this->machine->getState());
+        self::assertSame(Machine::STATE_CREATE_FAILED, $this->machine->getState());
 
         $createFailure = $this->entityManager->find(CreateFailure::class, $this->machine->getId());
         self::assertEquals($expectedCreateFailure, $createFailure);

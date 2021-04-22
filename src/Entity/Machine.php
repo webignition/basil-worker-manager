@@ -2,14 +2,47 @@
 
 namespace App\Entity;
 
-use App\Model\MachineInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  */
-class Machine implements MachineInterface
+class Machine
 {
+    public const STATE_UNKNOWN = 'unknown';
+    public const STATE_FIND_RECEIVED = 'find/received';
+    public const STATE_FIND_FINDING = 'find/finding';
+    public const STATE_FIND_NOT_FOUND = 'find/not-found';
+    public const STATE_FIND_NOT_FINDABLE = 'find/not-findable';
+    public const STATE_CREATE_RECEIVED = 'create/received';
+    public const STATE_CREATE_REQUESTED = 'create/requested';
+    public const STATE_CREATE_FAILED = 'create/failed';
+    public const STATE_UP_STARTED = 'up/started';
+    public const STATE_UP_ACTIVE = 'up/active';
+    public const STATE_DELETE_RECEIVED = 'delete/received';
+    public const STATE_DELETE_REQUESTED = 'delete/requested';
+    public const STATE_DELETE_FAILED = 'delete/failed';
+    public const STATE_DELETE_DELETED = 'delete/deleted';
+
+    public const PRE_ACTIVE_STATES = [
+        self::STATE_CREATE_RECEIVED,
+        self::STATE_CREATE_REQUESTED,
+        self::STATE_UP_STARTED,
+    ];
+
+    public const END_STATES = [
+        self::STATE_CREATE_FAILED,
+        self::STATE_DELETE_FAILED,
+        self::STATE_DELETE_DELETED,
+        self::STATE_FIND_NOT_FINDABLE,
+        self::STATE_FIND_NOT_FOUND,
+    ];
+
+    public const RESETTABLE_STATES = [
+        self::STATE_FIND_NOT_FOUND,
+        self::STATE_CREATE_FAILED,
+    ];
+
     private const NAME = 'worker-%s';
 
     /**
@@ -21,7 +54,7 @@ class Machine implements MachineInterface
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * @var MachineInterface::STATE_*
+     * @var self::STATE_*
      */
     private string $state;
 
@@ -33,12 +66,12 @@ class Machine implements MachineInterface
     private array $ip_addresses;
 
     /**
-     * @param MachineInterface::STATE_* $state
+     * @param self::STATE_* $state
      * @param string[] $ipAddresses
      */
     public function __construct(
         string $id,
-        string $state = MachineInterface::STATE_CREATE_RECEIVED,
+        string $state = self::STATE_CREATE_RECEIVED,
         array $ipAddresses = [],
     ) {
         $this->id = $id;
@@ -57,7 +90,7 @@ class Machine implements MachineInterface
     }
 
     /**
-     * @return MachineInterface::STATE_*
+     * @return self::STATE_*
      */
     public function getState(): string
     {
@@ -65,7 +98,7 @@ class Machine implements MachineInterface
     }
 
     /**
-     * @param MachineInterface::STATE_* $state
+     * @param self::STATE_* $state
      */
     public function setState(string $state): void
     {
@@ -80,6 +113,9 @@ class Machine implements MachineInterface
         return $this->ip_addresses;
     }
 
+    /**
+     * @param string[] $ipAddresses
+     */
     public function setIpAddresses(array $ipAddresses): void
     {
         $this->ip_addresses = $ipAddresses;
@@ -87,7 +123,7 @@ class Machine implements MachineInterface
 
     public function reset(): void
     {
-        $this->state = MachineInterface::STATE_CREATE_RECEIVED;
+        $this->state = self::STATE_CREATE_RECEIVED;
         $this->ip_addresses = [];
     }
 
@@ -103,7 +139,7 @@ class Machine implements MachineInterface
         ];
     }
 
-    public function merge(MachineInterface $machine): self
+    public function merge(Machine $machine): self
     {
         $this->state = $machine->getState();
 

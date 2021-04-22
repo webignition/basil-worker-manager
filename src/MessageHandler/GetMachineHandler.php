@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Message\GetMachine;
-use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -53,7 +53,7 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
                 }
             ))->withSuccessHandler(
                 function (
-                    MachineInterface $machine,
+                    Machine $machine,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
@@ -61,9 +61,9 @@ class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements M
                     }
                 }
             )->withFailureHandler(
-                function (MachineInterface $machine, \Throwable $exception) {
+                function (Machine $machine, \Throwable $exception) {
                     if ($exception instanceof ProviderMachineNotFoundException) {
-                        $machine->setState(MachineInterface::STATE_FIND_NOT_FOUND);
+                        $machine->setState(Machine::STATE_FIND_NOT_FOUND);
                         $this->machineStore->store($machine);
                     }
                 }

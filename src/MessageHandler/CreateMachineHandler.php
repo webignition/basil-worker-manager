@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\MessageHandler;
 
+use App\Entity\Machine;
 use App\Exception\MachineProvider\ExceptionInterface;
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
-use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -54,12 +54,12 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                         $this->machineManager->create($machineProvider)
                     );
                 }
-            ))->withBeforeRequestHandler(function (MachineInterface $machine) {
-                $machine->setState(MachineInterface::STATE_CREATE_REQUESTED);
+            ))->withBeforeRequestHandler(function (Machine $machine) {
+                $machine->setState(Machine::STATE_CREATE_REQUESTED);
                 $this->machineStore->store($machine);
             })->withSuccessHandler(
                 function (
-                    MachineInterface $machine,
+                    Machine $machine,
                     RemoteRequestSuccessInterface $outcome
                 ) {
                     if ($outcome instanceof RemoteMachineRequestSuccess) {
@@ -67,8 +67,8 @@ class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implement
                     }
                 }
             )->withFailureHandler(
-                function (MachineInterface $machine, ExceptionInterface | UnsupportedProviderException $exception) {
-                    $machine->setState(MachineInterface::STATE_CREATE_FAILED);
+                function (Machine $machine, ExceptionInterface | UnsupportedProviderException $exception) {
+                    $machine->setState(Machine::STATE_CREATE_FAILED);
                     $this->machineStore->store($machine);
 
                     $this->createFailureFactory->create($machine->getId(), $exception);

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Model\MachineInterface;
+use App\Entity\Machine;
 use App\Model\RemoteMachineInterface;
 use App\Services\Entity\Store\MachineStore;
 
@@ -14,11 +14,11 @@ class MachineUpdater
     }
 
     public function updateFromRemoteMachine(
-        MachineInterface $machine,
+        Machine $machine,
         RemoteMachineInterface $remoteMachine
-    ): MachineInterface {
+    ): Machine {
         $remoteMachineState = $remoteMachine->getState();
-        $remoteMachineState = $remoteMachineState ?? MachineInterface::STATE_CREATE_REQUESTED;
+        $remoteMachineState = $remoteMachineState ?? Machine::STATE_CREATE_REQUESTED;
 
         $machine->setState($remoteMachineState);
         $machine->setIpAddresses($remoteMachine->getIpAddresses());

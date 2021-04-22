@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\CreateFailure;
 use App\Entity\Machine;
 use App\Entity\MachineProvider;
-use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Response\BadMachineCreateRequestResponse;
 use App\Services\Entity\Store\CreateFailureStore;
@@ -33,8 +32,8 @@ class MachineController
     public function create(string $id, MachineProviderStore $machineProviderStore): Response
     {
         $machine = $this->machineStore->find($id);
-        if ($machine instanceof MachineInterface) {
-            if (in_array($machine->getState(), MachineInterface::RESETTABLE_STATES)) {
+        if ($machine instanceof Machine) {
+            if (in_array($machine->getState(), Machine::RESETTABLE_STATES)) {
                 $machine->reset();
                 $this->machineStore->persist($machine);
             } else {
@@ -55,8 +54,8 @@ class MachineController
     public function status(string $id, CreateFailureStore $createFailureStore): Response
     {
         $machine = $this->machineStore->find($id);
-        if (!$machine instanceof MachineInterface) {
-            $machine = new Machine($id, MachineInterface::STATE_FIND_RECEIVED);
+        if (!$machine instanceof Machine) {
+            $machine = new Machine($id, Machine::STATE_FIND_RECEIVED);
             $this->machineStore->store($machine);
 
             $this->machineRequestDispatcher->dispatch(
@@ -78,8 +77,8 @@ class MachineController
     public function delete(string $id): Response
     {
         $machine = $this->machineStore->find($id);
-        if (false === $machine instanceof MachineInterface) {
-            $machine = new Machine($id, MachineInterface::STATE_DELETE_RECEIVED);
+        if (false === $machine instanceof Machine) {
+            $machine = new Machine($id, Machine::STATE_DELETE_RECEIVED);
             $this->machineStore->store($machine);
         }
 

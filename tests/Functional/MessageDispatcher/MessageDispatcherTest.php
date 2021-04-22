@@ -9,13 +9,13 @@ use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
 use App\Message\GetMachine;
 use App\Message\MachineRequestInterface;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineStore;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class MessageDispatcherTest extends AbstractBaseFunctionalTest

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Model\DigitalOcean\DropletApiCreateCallArguments;
 use App\Model\DigitalOcean\DropletConfiguration;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\ProviderInterface;
 use App\Model\RemoteMachineInterface;
 use App\Services\ExceptionFactory\MachineProvider\DigitalOceanExceptionFactory;
 use DigitalOceanV2\Api\Droplet as DropletApi;
@@ -12,7 +13,6 @@ use DigitalOceanV2\Entity\Droplet as DropletEntity;
 use DigitalOceanV2\Exception\ExceptionInterface as VendorExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class DigitalOceanMachineManager implements ProviderMachineManagerInterface
 {

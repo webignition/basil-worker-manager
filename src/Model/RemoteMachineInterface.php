@@ -3,7 +3,6 @@
 namespace App\Model;
 
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 interface RemoteMachineInterface
 {

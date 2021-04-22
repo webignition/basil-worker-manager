@@ -11,6 +11,7 @@ use App\Message\FindMachine;
 use App\Message\MachineRequestInterface;
 use App\MessageHandler\FindMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
@@ -28,7 +29,6 @@ use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class FindMachineHandlerTest extends AbstractBaseFunctionalTest

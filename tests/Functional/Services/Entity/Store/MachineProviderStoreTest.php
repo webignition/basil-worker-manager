@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\Entity\Store;
 
 use App\Entity\MachineProvider;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Tests\Functional\AbstractEntityTest;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class MachineProviderStoreTest extends AbstractEntityTest

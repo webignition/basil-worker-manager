@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Model\ProviderInterface;
 use Doctrine\ORM\Mapping as ORM;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 /**
  * @ORM\Entity

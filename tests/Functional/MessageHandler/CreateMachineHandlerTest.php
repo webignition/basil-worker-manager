@@ -14,6 +14,7 @@ use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
 use App\MessageHandler\CreateMachineHandler;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\ProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -37,7 +38,6 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 
 class CreateMachineHandlerTest extends AbstractBaseFunctionalTest

@@ -10,6 +10,7 @@ use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
@@ -24,7 +25,6 @@ use Psr\Http\Message\ResponseInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class MachineManagerTest extends AbstractBaseFunctionalTest
 {

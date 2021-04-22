@@ -12,6 +12,7 @@ use App\Exception\MachineProvider\DigitalOcean\DropletLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownException;
 use App\Exception\UnsupportedProviderException;
+use App\Model\ProviderInterface;
 use App\Services\Entity\Factory\CreateFailureFactory;
 use App\Tests\Functional\AbstractEntityTest;
 use DigitalOceanV2\Exception\RuntimeException;
@@ -25,7 +26,6 @@ use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnknownEx
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\UnsupportedProviderExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 
 class CreateFailureFactoryTest extends AbstractEntityTest
 {

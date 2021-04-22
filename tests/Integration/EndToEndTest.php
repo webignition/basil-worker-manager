@@ -39,7 +39,8 @@ class EndToEndTest extends TestCase
         self::assertSame(202, $response->getStatusCode());
 
         $this->waitUntilMachineIsActive();
-        $this->removeMachine();
+        $this->deleteMachine();
+        $this->waitUntilMachineIsDeleted();
     }
 
     public function testStatusForMissingLocalMachine(): void
@@ -63,7 +64,8 @@ class EndToEndTest extends TestCase
         ));
 
         $this->waitUntilMachineIsActive();
-        $this->removeMachine();
+        $this->deleteMachine();
+        $this->waitUntilMachineIsDeleted();
     }
 
     /**
@@ -95,6 +97,12 @@ class EndToEndTest extends TestCase
         return new Machine(json_decode((string) $response->getBody()->getContents(), true));
     }
 
+    private function deleteMachine(): void
+    {
+        $response = $this->httpClient->delete($this->machineUrl);
+        self::assertSame(202, $response->getStatusCode());
+    }
+
     private function waitUntilMachineIsActive(): void
     {
         $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_UP_ACTIVE);
@@ -105,11 +113,8 @@ class EndToEndTest extends TestCase
         self::assertSame(MachineInterface::STATE_UP_ACTIVE, $this->getMachine()->getState());
     }
 
-    private function removeMachine(): void
+    private function waitUntilMachineIsDeleted(): void
     {
-        $response = $this->httpClient->delete($this->machineUrl);
-        self::assertSame(202, $response->getStatusCode());
-
         $waitResult = $this->waitUntilMachineStateIs(MachineInterface::STATE_DELETE_DELETED);
         if (false === $waitResult) {
             $this->fail('Timed out waiting for expected machine state: ' . MachineInterface::STATE_DELETE_DELETED);

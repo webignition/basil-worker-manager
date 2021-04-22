@@ -36,14 +36,6 @@ ENV DOCKERIZE_VERSION="v2.1.0"
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
-COPY composer.json composer.lock /app/
-COPY bin/console /app/bin/console
-COPY public/index.php public/
-COPY src /app/src
-COPY config/bundles.php config/services.yaml /app/config/
-COPY config/packages/*.yaml /app/config/packages/
-COPY config/packages/prod /app/config/packages/prod
-COPY config/routes/annotations.yaml /app/config/routes/
 
 RUN apt-get -qq update && apt-get -qq -y install  \
   librabbitmq-dev \
@@ -58,19 +50,30 @@ RUN apt-get -qq update && apt-get -qq -y install  \
   && rm /usr/bin/install-php-extensions \
   && docker-php-ext-enable amqp \
   && apt-get autoremove -y \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-  && composer check-platform-reqs --ansi \
-  && composer install --no-dev --no-scripts \
-  && rm composer.lock \
-  && touch /app/.env \
-  && curl -L --output dockerize.tar.gz \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN curl -L --output dockerize.tar.gz \
      https://github.com/presslabs/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
   && tar -C /usr/local/bin -xzvf dockerize.tar.gz \
   && rm dockerize.tar.gz \
-  && mkdir -p var/log/supervisor \
-  && php bin/console cache:clear --env=prod
+  && mkdir -p var/log/supervisor
 
 COPY build/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 COPY build/supervisor/conf.d/app.conf /etc/supervisor/conf.d/supervisord.conf
+
+COPY composer.json composer.lock /app/
+COPY bin/console /app/bin/console
+COPY public/index.php public/
+COPY src /app/src
+COPY config/bundles.php config/services.yaml /app/config/
+COPY config/packages/*.yaml /app/config/packages/
+COPY config/packages/prod /app/config/packages/prod
+COPY config/routes/annotations.yaml /app/config/routes/
+
+RUN composer check-platform-reqs --ansi \
+  && composer install --no-dev --no-scripts \
+  && rm composer.lock \
+  && touch /app/.env \
+  && php bin/console cache:clear --env=prod
 
 CMD dockerize -wait tcp://rabbitmq:5672 -timeout 30s -wait tcp://postgres:5432 -timeout 30s supervisord -c /etc/supervisor/supervisord.conf

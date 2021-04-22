@@ -39,9 +39,7 @@ class DeleteMachineHandler implements MessageHandlerInterface
         try {
             $this->remoteMachineRemover->remove($machineId);
 
-            foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
-                $this->machineRequestDispatcher->dispatch($machineActionProperties);
-            }
+            $this->machineRequestDispatcher->dispatchCollection($message->getOnSuccessCollection());
         } catch (MachineNotRemovableException $machineNotRemovableException) {
             $envelope = $this->machineRequestDispatcher->reDispatch($message);
 

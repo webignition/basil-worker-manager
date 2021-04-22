@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\MachineActionPropertiesInterface;
-
 interface ChainedMachineRequestInterface extends MachineRequestInterface
 {
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnSuccessCollection(): array;
 
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnFailureCollection(): array;
 }

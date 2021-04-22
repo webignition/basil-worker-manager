@@ -123,12 +123,3 @@ services:
         arguments:
             $factories:
                 - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'
-
-    webignition\JsonMessageSerializerBundle\Services\MessageFactory:
-        arguments:
-            $typeToMessageClassMap:
-                !php/const App\Message\CheckMachineIsActive::TYPE: 'App\Message\CheckMachineIsActive'
-                !php/const App\Message\CreateMachine::TYPE: 'App\Message\CreateMachine'
-                !php/const App\Message\DeleteMachine::TYPE: 'App\Message\DeleteMachine'
-                !php/const App\Message\GetMachine::TYPE: 'App\Message\GetMachine'
-                !php/const App\Message\FindMachine::TYPE: 'App\Message\FindMachine'

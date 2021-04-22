@@ -4,32 +4,23 @@ declare(strict_types=1);
 
 namespace App\Message;
 
-use App\Model\MachineActionProperties;
-use App\Model\MachineActionPropertiesInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
-use webignition\JsonMessageSerializerBundle\Message\JsonSerializableMessageInterface;
-
-class CheckMachineIsActive extends AbstractMachineRequest implements
-    ChainedMachineRequestInterface,
-    HasSelfPropertiesInterface
+class CheckMachineIsActive extends AbstractMachineRequest implements ChainedMachineRequestInterface
 {
-    public const TYPE = 'check-machine-is-active';
-
     /**
-     * @var MachineActionPropertiesInterface[]
+     * @var MachineRequestInterface[]
      */
     private array $onSuccessCollection;
 
     /**
-     * @var MachineActionPropertiesInterface[]
+     * @var MachineRequestInterface[]
      */
     private array $onFailureCollection;
 
     /**
      * @param string $machineId
      *
-     * @param MachineActionPropertiesInterface[] $onSuccessCollection
-     * @param MachineActionPropertiesInterface[] $onFailureCollection
+     * @param MachineRequestInterface[] $onSuccessCollection
+     * @param MachineRequestInterface[] $onFailureCollection
      */
     public function __construct(
         string $machineId,
@@ -39,52 +30,16 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
         parent::__construct($machineId);
 
         $this->onSuccessCollection = array_filter($onSuccessCollection, function ($value) {
-            return $value instanceof MachineActionPropertiesInterface;
+            return $value instanceof MachineRequestInterface;
         });
 
         $this->onFailureCollection = array_filter($onFailureCollection, function ($value) {
-            return $value instanceof MachineActionPropertiesInterface;
+            return $value instanceof MachineRequestInterface;
         });
     }
 
-    public function getType(): string
-    {
-        return self::TYPE;
-    }
-
-    public function getPayload(): array
-    {
-        return array_merge(
-            parent::getPayload(),
-            [
-                'self_properties' => $this->getSelfProperties()->jsonSerialize(),
-            ]
-        );
-    }
-
-    public static function createFromArray(array $data): JsonSerializableMessageInterface
-    {
-        $machineId = $data['machine_id'] ?? '';
-        if (!is_string($machineId)) {
-            $machineId = '';
-        }
-
-        $selfPropertiesData = $data['self_properties'] ?? [];
-        if (!is_array($selfPropertiesData)) {
-            $selfPropertiesData = [];
-        }
-
-        $selfProperties = MachineActionProperties::createFromArray($selfPropertiesData);
-
-        return new self(
-            $machineId,
-            $selfProperties->getOnSuccessCollection(),
-            $selfProperties->getOnFailureCollection()
-        );
-    }
-
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnSuccessCollection(): array
     {
@@ -92,20 +47,10 @@ class CheckMachineIsActive extends AbstractMachineRequest implements
     }
 
     /**
-     * @return MachineActionPropertiesInterface[]
+     * @return MachineRequestInterface[]
      */
     public function getOnFailureCollection(): array
     {
         return $this->onFailureCollection;
-    }
-
-    public function getSelfProperties(): MachineActionPropertiesInterface
-    {
-        return new MachineActionProperties(
-            MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
-            $this->getMachineId(),
-            $this->getOnSuccessCollection(),
-            $this->getOnFailureCollection()
-        );
     }
 }

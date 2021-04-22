@@ -34,11 +34,9 @@ class CheckMachineIsActiveHandler implements MessageHandlerInterface
             return;
         }
 
-        $onSuccessMachineActionProperties = $message->getOnSuccessCollection();
-        $onSuccessMachineActionProperties[] = $message->getSelfProperties();
+        $onSuccessRequests = $message->getOnSuccessCollection();
+        $onSuccessRequests[] = $message;
 
-        foreach ($onSuccessMachineActionProperties as $machineActionProperties) {
-            $this->machineRequestDispatcher->dispatch($machineActionProperties);
-        }
+        $this->machineRequestDispatcher->dispatchCollection($onSuccessRequests);
     }
 }

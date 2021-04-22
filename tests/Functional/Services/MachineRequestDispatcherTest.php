@@ -6,11 +6,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Message\CheckMachineIsActive;
 use App\Message\CreateMachine;
-use App\Message\DeleteMachine;
-use App\Message\FindMachine;
-use App\Message\GetMachine;
 use App\Message\MachineRequestInterface;
-use App\Model\MachineActionProperties;
 use App\Services\MachineRequestDispatcher;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\Asserter\MessengerAsserter;
@@ -35,58 +31,6 @@ class MachineRequestDispatcherTest extends AbstractBaseFunctionalTest
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);
         $this->messengerAsserter = $messengerAsserter;
-    }
-
-    /**
-     * @dataProvider dispatchMessageDispatchedDataProvider
-     */
-    public function testDispatchMessageDispatched(
-        string $action,
-        MachineRequestInterface $expectedDispatchedRequest
-    ): void {
-        $this->messengerAsserter->assertQueueIsEmpty();
-
-        $this->dispatcher->dispatch(new MachineActionProperties($action, self::MACHINE_ID));
-
-        $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedDispatchedRequest);
-    }
-
-    /**
-     * @return array[]
-     */
-    public function dispatchMessageDispatchedDataProvider(): array
-    {
-        return [
-            MachineActionInterface::ACTION_CREATE => [
-                'action' => MachineActionInterface::ACTION_CREATE,
-                'expectedDispatchedRequest' => new CreateMachine(self::MACHINE_ID),
-            ],
-            MachineActionInterface::ACTION_GET => [
-                'action' => MachineActionInterface::ACTION_GET,
-                'expectedDispatchedRequest' => new GetMachine(self::MACHINE_ID),
-            ],
-            MachineActionInterface::ACTION_DELETE => [
-                'action' => MachineActionInterface::ACTION_DELETE,
-                'expectedDispatchedRequest' => new DeleteMachine(self::MACHINE_ID),
-            ],
-            MachineActionInterface::ACTION_FIND => [
-                'action' => MachineActionInterface::ACTION_FIND,
-                'expectedDispatchedRequest' => new FindMachine(self::MACHINE_ID),
-            ],
-            MachineActionInterface::ACTION_CHECK_IS_ACTIVE => [
-                'action' => MachineActionInterface::ACTION_CHECK_IS_ACTIVE,
-                'expectedDispatchedRequest' => new CheckMachineIsActive(self::MACHINE_ID),
-            ],
-        ];
-    }
-
-    public function testDispatchMessageNotDispatched(): void
-    {
-        $this->messengerAsserter->assertQueueIsEmpty();
-
-        $this->dispatcher->dispatch(new MachineActionProperties('unknown-action', 'machine-id'));
-
-        $this->messengerAsserter->assertQueueIsEmpty();
     }
 
     /**

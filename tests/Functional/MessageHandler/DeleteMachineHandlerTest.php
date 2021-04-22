@@ -9,7 +9,6 @@ use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\MessageHandler\DeleteMachineHandler;
 use App\Services\ExceptionLogger;
-use App\Services\MachineActionPropertiesFactory;
 use App\Services\MachineRequestFactory;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Mock\Services\MockExceptionLogger;
@@ -34,7 +33,6 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
     private MessengerAsserter $messengerAsserter;
     private MockHandler $mockHandler;
     private MachineInterface $machine;
-    private MachineActionPropertiesFactory $machineActionPropertiesFactory;
     private MachineRequestFactory $machineRequestFactory;
 
     protected function setUp(): void
@@ -62,10 +60,6 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($mockHandler instanceof MockHandler);
         $this->mockHandler = $mockHandler;
 
-        $machineActionPropertiesFactory = self::$container->get(MachineActionPropertiesFactory::class);
-        \assert($machineActionPropertiesFactory instanceof MachineActionPropertiesFactory);
-        $this->machineActionPropertiesFactory = $machineActionPropertiesFactory;
-
         $machineRequestFactory = self::$container->get(MachineRequestFactory::class);
         \assert($machineRequestFactory instanceof MachineRequestFactory);
         $this->machineRequestFactory = $machineRequestFactory;
@@ -84,26 +78,20 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $this->mockHandler->append(new Response(204));
 
-        $message = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForDelete(self::MACHINE_ID)
-        );
-
-        self::assertInstanceOf(DeleteMachine::class, $message);
+        $message = $this->machineRequestFactory->createDelete(self::MACHINE_ID);
 
         ($this->handler)($message);
 
         self::assertSame(MachineInterface::STATE_DELETE_REQUESTED, $this->machine->getState());
 
-        $expectedMessage = $this->machineRequestFactory->create(
-            $this->machineActionPropertiesFactory->createForFind(
-                self::MACHINE_ID,
-                [],
-                [],
-                MachineInterface::STATE_DELETE_DELETED
-            )
+        $expectedMessage = $this->machineRequestFactory->createFind(
+            self::MACHINE_ID,
+            [],
+            [],
+            MachineInterface::STATE_DELETE_DELETED
         );
-        self::assertInstanceOf(FindMachine::class, $expectedMessage);
 
+        self::assertInstanceOf(FindMachine::class, $expectedMessage);
 
         $this->messengerAsserter->assertMessageAtPositionEquals(0, $expectedMessage);
     }

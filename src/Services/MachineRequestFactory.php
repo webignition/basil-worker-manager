@@ -8,57 +8,79 @@ use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\Message\GetMachine;
 use App\Message\MachineRequestInterface;
-use App\Model\MachineActionPropertiesInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineRequestFactory
 {
-    public function create(MachineActionPropertiesInterface $properties): ?MachineRequestInterface
+    public function createFindThenCreate(string $machineId): FindMachine
     {
-        $action = $properties->getAction();
-        $machineId = $properties->getMachineId();
+        return $this->createFind(
+            $machineId,
+            [],
+            [
+                $this->createCreate($machineId),
+            ]
+        );
+    }
 
-        if (MachineActionInterface::ACTION_CREATE === $action) {
-            return new CreateMachine(
-                $machineId,
-                $properties->getOnSuccessCollection(),
-                $properties->getOnFailureCollection()
-            );
-        }
+    public function createCreate(string $machineId): CreateMachine
+    {
+        return new CreateMachine(
+            $machineId,
+            [
+                $this->createCheckIsActive($machineId),
+            ]
+        );
+    }
 
-        if (MachineActionInterface::ACTION_GET === $action) {
-            return new GetMachine($machineId);
-        }
+    public function createCheckIsActive(string $machineId): CheckMachineIsActive
+    {
+        return new CheckMachineIsActive(
+            $machineId,
+            [
+                $this->createGet($machineId),
+            ]
+        );
+    }
 
-        if (MachineActionInterface::ACTION_DELETE === $action) {
-            return new DeleteMachine(
-                $machineId,
-                $properties->getOnSuccessCollection(),
-                $properties->getOnFailureCollection()
-            );
-        }
+    public function createGet(string $machineId): GetMachine
+    {
+        return new GetMachine($machineId);
+    }
 
-        if (MachineActionInterface::ACTION_FIND === $action) {
-            $additionalArguments = $properties->getAdditionalArguments();
-            $onNotFoundState = $additionalArguments['on_not_found_state'] ?? MachineInterface::STATE_FIND_NOT_FOUND;
+    public function createDelete(string $machineId): DeleteMachine
+    {
+        return new DeleteMachine(
+            $machineId,
+            [
+                $this->createFind($machineId, [], [], MachineInterface::STATE_DELETE_DELETED),
+            ]
+        );
+    }
 
-            return new FindMachine(
-                $machineId,
-                $properties->getOnSuccessCollection(),
-                $properties->getOnFailureCollection(),
-                (string) $onNotFoundState
-            );
-        }
+    public function createFindThenCheckIsActive(string $machineId): FindMachine
+    {
+        return $this->createFind(
+            $machineId,
+            [
+                $this->createCheckIsActive($machineId),
+            ]
+        );
+    }
 
-        if (MachineActionInterface::ACTION_CHECK_IS_ACTIVE === $action) {
-            return new CheckMachineIsActive(
-                $machineId,
-                $properties->getOnSuccessCollection(),
-                $properties->getOnFailureCollection()
-            );
-        }
-
-        return null;
+    /**
+     * @param string $machineId
+     * @param MachineRequestInterface[] $onSuccessCollection
+     * @param MachineRequestInterface[] $onFailureCollection
+     * @param string $onNotFoundState
+     * @return FindMachine
+     */
+    public function createFind(
+        string $machineId,
+        array $onSuccessCollection = [],
+        array $onFailureCollection = [],
+        string $onNotFoundState = MachineInterface::STATE_FIND_NOT_FOUND
+    ): FindMachine {
+        return new FindMachine($machineId, $onSuccessCollection, $onFailureCollection, $onNotFoundState);
     }
 }

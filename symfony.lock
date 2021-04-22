@@ -584,9 +584,6 @@
     "webignition/object-reflector": {
         "version": "1.0"
     },
-    "webignition/symfony-messenger-json-message-serializer-bundle": {
-        "version": "0.2"
-    },
     "webignition/symfony-messenger-message-dispatcher": {
         "version": "0.1"
     },

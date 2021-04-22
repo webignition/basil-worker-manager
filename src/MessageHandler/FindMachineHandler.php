@@ -51,16 +51,12 @@ class FindMachineHandler implements MessageHandlerInterface
                 $machineProvider = new MachineProvider($machineId, $remoteMachine->getProvider());
                 $this->machineProviderStore->store($machineProvider);
 
-                foreach ($message->getOnSuccessCollection() as $machineActionProperties) {
-                    $this->machineRequestDispatcher->dispatch($machineActionProperties);
-                }
+                $this->machineRequestDispatcher->dispatchCollection($message->getOnSuccessCollection());
             } else {
                 $machine->setState($message->getOnNotFoundState());
                 $this->machineStore->store($machine);
 
-                foreach ($message->getOnFailureCollection() as $machineActionProperties) {
-                    $this->machineRequestDispatcher->dispatch($machineActionProperties);
-                }
+                $this->machineRequestDispatcher->dispatchCollection($message->getOnFailureCollection());
             }
         } catch (MachineNotFindableException $machineNotFoundException) {
             $envelope = $this->machineRequestDispatcher->reDispatch($message);

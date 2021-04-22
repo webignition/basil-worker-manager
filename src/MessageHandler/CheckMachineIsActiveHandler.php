@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Message\CheckMachineIsActive;
+use App\Model\MachineInterface;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\MachineRequestDispatcher;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class CheckMachineIsActiveHandler implements MessageHandlerInterface
 {

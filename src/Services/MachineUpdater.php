@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Model\MachineInterface;
 use App\Model\RemoteMachineInterface;
 use App\Services\Entity\Store\MachineStore;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineUpdater
 {

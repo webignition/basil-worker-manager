@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Controller\MachineController;
+use App\Model\MachineInterface;
 use App\Tests\Model\Machine;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class EndToEndTest extends TestCase
 {

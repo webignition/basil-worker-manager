@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Model\MachineInterface;
 use Doctrine\ORM\Mapping as ORM;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 /**
  * @ORM\Entity

@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Exception\UnsupportedProviderException;
 use App\Message\CreateMachine;
+use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -20,7 +21,6 @@ use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class CreateMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {

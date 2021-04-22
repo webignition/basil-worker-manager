@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Services\Entity\Store;
 
 use App\Entity\Machine;
+use App\Model\MachineInterface;
 use App\Services\Entity\Store\MachineStore;
 use App\Tests\Functional\AbstractEntityTest;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineStoreTest extends AbstractEntityTest
 {

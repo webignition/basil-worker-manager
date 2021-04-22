@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Message\GetMachine;
+use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestOutcomeInterface;
@@ -18,7 +19,6 @@ use App\Services\MachineRequestDispatcher;
 use App\Services\MachineUpdater;
 use App\Services\RemoteRequestRetryDecider;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class GetMachineHandler extends AbstractRemoteMachineRequestHandler implements MessageHandlerInterface
 {

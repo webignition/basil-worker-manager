@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
-
 interface RemoteMachineInterface
 {
     /**

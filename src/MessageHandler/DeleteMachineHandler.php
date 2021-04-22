@@ -6,12 +6,12 @@ namespace App\MessageHandler;
 
 use App\Exception\MachineNotRemovableException;
 use App\Message\DeleteMachine;
+use App\Model\MachineInterface;
 use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
 use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteMachineRemover;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 class DeleteMachineHandler implements MessageHandlerInterface

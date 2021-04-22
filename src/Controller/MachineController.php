@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\CreateFailure;
 use App\Entity\Machine;
 use App\Entity\MachineProvider;
+use App\Model\MachineInterface;
 use App\Model\ProviderInterface;
 use App\Response\BadMachineCreateRequestResponse;
 use App\Services\Entity\Store\CreateFailureStore;
@@ -15,7 +16,6 @@ use App\Services\MachineRequestFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineController
 {

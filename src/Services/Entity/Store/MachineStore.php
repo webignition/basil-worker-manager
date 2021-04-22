@@ -3,7 +3,7 @@
 namespace App\Services\Entity\Store;
 
 use App\Entity\Machine;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use App\Model\MachineInterface;
 
 class MachineStore extends AbstractMachineEntityStore
 {

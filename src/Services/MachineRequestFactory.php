@@ -8,7 +8,7 @@ use App\Message\DeleteMachine;
 use App\Message\FindMachine;
 use App\Message\GetMachine;
 use App\Message\MachineRequestInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
+use App\Model\MachineInterface;
 
 class MachineRequestFactory
 {

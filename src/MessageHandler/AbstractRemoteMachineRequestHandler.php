@@ -8,6 +8,7 @@ use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Exception\UnsupportedProviderException;
 use App\Message\ChainedMachineRequestInterface;
 use App\Message\RemoteMachineMessageInterface;
+use App\Model\MachineInterface;
 use App\Model\MachineProviderInterface;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
@@ -19,7 +20,6 @@ use App\Services\MachineManager;
 use App\Services\MachineRequestDispatcher;
 use App\Services\RemoteRequestRetryDecider;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\SymfonyMessengerMessageDispatcher\MessageDispatcher;
 
 abstract class AbstractRemoteMachineRequestHandler

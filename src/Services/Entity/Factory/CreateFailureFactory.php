@@ -3,6 +3,7 @@
 namespace App\Services\Entity\Factory;
 
 use App\Entity\CreateFailure;
+use App\Exception\UnsupportedProviderExceptionInterface;
 use App\Services\Entity\Store\CreateFailureStore;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ApiLimitExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\AuthenticationExceptionInterface;
@@ -10,7 +11,6 @@ use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\CurlExcep
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\HttpExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\UnprocessableRequestExceptionInterface;
-use webignition\BasilWorkerManagerInterfaces\Exception\UnsupportedProviderExceptionInterface;
 
 class CreateFailureFactory
 {

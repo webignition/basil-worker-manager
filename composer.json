@@ -29,7 +29,6 @@
         "symfony/proxy-manager-bridge": "5.2.*",
         "symfony/yaml": "5.2.*",
         "toin0u/digitalocean-v2": "dev-delete-droplet-by-tag",
-        "webignition/basil-worker-manager-interfaces": ">=0.23,<1",
         "webignition/symfony-messenger-message-dispatcher": ">=0.4,<1"
     },
     "require-dev": {

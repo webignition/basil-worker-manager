@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\Entity\Store;
 
+use App\Entity\CreateFailure;
 use App\Services\Entity\Store\CreateFailureStore;
-use App\Tests\Functional\Services\Entity\AbstractEntityTest;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
+use App\Tests\Functional\AbstractEntityTest;
 
 class CreateFailureStoreTest extends AbstractEntityTest
 {

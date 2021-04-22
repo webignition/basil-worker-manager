@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\CreateFailure;
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
@@ -14,6 +17,8 @@ use App\Model\DigitalOcean\RemoteMachine;
 use App\Model\RemoteMachineRequestSuccess;
 use App\Model\RemoteRequestFailure;
 use App\Model\RemoteRequestOutcome;
+use App\Services\Entity\Store\MachineProviderStore;
+use App\Services\Entity\Store\MachineStore;
 use App\Services\ExceptionLogger;
 use App\Services\MachineManager;
 use App\Services\MachineRequestFactory;
@@ -29,9 +34,6 @@ use DigitalOceanV2\Exception\RuntimeException;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
@@ -60,16 +62,15 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
         \assert($handler instanceof CreateMachineHandler);
         $this->handler = $handler;
 
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
-        $this->machine = $machineFactory->create(self::MACHINE_ID);
+        $machineStore = self::$container->get(MachineStore::class);
+        \assert($machineStore instanceof MachineStore);
+        $this->machine = new Machine(self::MACHINE_ID);
+        $machineStore->store($this->machine);
 
-        $machineProviderFactory = self::$container->get(MachineProviderFactory::class);
-        \assert($machineProviderFactory instanceof MachineProviderFactory);
-        $this->machineProvider = $machineProviderFactory->create(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN
-        );
+        $machineProviderStore = self::$container->get(MachineProviderStore::class);
+        \assert($machineProviderStore instanceof MachineProviderStore);
+        $this->machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
+        $machineProviderStore->store($this->machineProvider);
 
         $messengerAsserter = self::$container->get(MessengerAsserter::class);
         \assert($messengerAsserter instanceof MessengerAsserter);

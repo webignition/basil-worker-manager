@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\MessageHandler;
 
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Message\FindMachine;
 use App\Message\MachineRequestInterface;
@@ -23,8 +25,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;

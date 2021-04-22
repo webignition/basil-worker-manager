@@ -2,10 +2,10 @@
 
 namespace App\Services\Entity\Store;
 
+use App\Entity\CreateFailure;
+use App\Entity\Machine;
+use App\Entity\MachineProvider;
 use Doctrine\ORM\EntityManagerInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
 
 abstract class AbstractMachineEntityStore
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Services\Entity;
+namespace App\Tests\Functional;
 
 use App\Tests\AbstractBaseFunctionalTest;
 use Doctrine\ORM\EntityManagerInterface;

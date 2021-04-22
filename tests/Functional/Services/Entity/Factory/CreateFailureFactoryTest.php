@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\Entity\Factory;
 
+use App\Entity\CreateFailure;
 use App\Exception\MachineProvider\AuthenticationException;
 use App\Exception\MachineProvider\CurlException;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
@@ -12,10 +13,9 @@ use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\UnknownException;
 use App\Exception\UnsupportedProviderException;
 use App\Services\Entity\Factory\CreateFailureFactory;
-use App\Tests\Functional\Services\Entity\AbstractEntityTest;
+use App\Tests\Functional\AbstractEntityTest;
 use DigitalOceanV2\Exception\RuntimeException;
 use DigitalOceanV2\Exception\ValidationFailedException;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ApiLimitExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\AuthenticationExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\CurlExceptionInterface;

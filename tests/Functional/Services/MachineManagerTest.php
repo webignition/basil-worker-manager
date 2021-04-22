@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services;
 
+use App\Entity\MachineProvider;
 use App\Exception\MachineProvider\DigitalOcean\ApiLimitExceededException;
 use App\Exception\MachineProvider\DigitalOcean\HttpException;
 use App\Exception\MachineProvider\Exception;
 use App\Exception\MachineProvider\ProviderMachineNotFoundException;
 use App\Model\DigitalOcean\RemoteMachine;
+use App\Services\Entity\Store\MachineProviderStore;
 use App\Services\MachineManager;
 use App\Tests\AbstractBaseFunctionalTest;
 use App\Tests\Services\HttpResponseFactory;
@@ -19,8 +21,6 @@ use DigitalOceanV2\Exception\ValidationFailedException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineFactory;
-use webignition\BasilWorkerManager\PersistenceBundle\Services\Factory\MachineProviderFactory;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineActionInterface;
 use webignition\BasilWorkerManagerInterfaces\MachineProviderInterface;
@@ -40,9 +40,6 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
         $machineManager = self::$container->get(MachineManager::class);
         \assert($machineManager instanceof MachineManager);
         $this->machineManager = $machineManager;
-
-        $machineFactory = self::$container->get(MachineFactory::class);
-        \assert($machineFactory instanceof MachineFactory);
 
         $mockHandler = self::$container->get(MockHandler::class);
         if ($mockHandler instanceof MockHandler) {
@@ -273,12 +270,11 @@ class MachineManagerTest extends AbstractBaseFunctionalTest
 
     private function createMachineProvider(): MachineProviderInterface
     {
-        $machineProviderFactory = self::$container->get(MachineProviderFactory::class);
-        \assert($machineProviderFactory instanceof MachineProviderFactory);
+        $machineProviderStore = self::$container->get(MachineProviderStore::class);
+        \assert($machineProviderStore instanceof MachineProviderStore);
+        $machineProvider = new MachineProvider(self::MACHINE_ID, ProviderInterface::NAME_DIGITALOCEAN);
+        $machineProviderStore->store($machineProvider);
 
-        return $machineProviderFactory->create(
-            self::MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN
-        );
+        return $machineProvider;
     }
 }

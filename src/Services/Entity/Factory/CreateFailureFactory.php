@@ -2,8 +2,8 @@
 
 namespace App\Services\Entity\Factory;
 
+use App\Entity\CreateFailure;
 use App\Services\Entity\Store\CreateFailureStore;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\ApiLimitExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\AuthenticationExceptionInterface;
 use webignition\BasilWorkerManagerInterfaces\Exception\MachineProvider\CurlExceptionInterface;

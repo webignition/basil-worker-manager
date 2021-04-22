@@ -2,7 +2,7 @@
 
 namespace App\Services\Entity\Store;
 
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\Machine;
+use App\Entity\Machine;
 use webignition\BasilWorkerManagerInterfaces\MachineInterface;
 
 class MachineStore extends AbstractMachineEntityStore

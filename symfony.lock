@@ -578,9 +578,6 @@
     "webignition/basil-worker-manager-interfaces": {
         "version": "0.1"
     },
-    "webignition/basil-worker-manager-persistence-bundle": {
-        "version": "0.3"
-    },
     "webignition/object-reflector": {
         "version": "1.0"
     },

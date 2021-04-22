@@ -2,7 +2,7 @@
 
 namespace App\Services\Entity\Store;
 
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\CreateFailure;
+use App\Entity\CreateFailure;
 
 class CreateFailureStore extends AbstractMachineEntityStore
 {

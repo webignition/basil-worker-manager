@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Services\Entity\Store;
 
+use App\Entity\MachineProvider;
 use App\Services\Entity\Store\MachineProviderStore;
-use App\Tests\Functional\Services\Entity\AbstractEntityTest;
-use webignition\BasilWorkerManager\PersistenceBundle\Entity\MachineProvider;
+use App\Tests\Functional\AbstractEntityTest;
 use webignition\BasilWorkerManagerInterfaces\ProviderInterface;
 use webignition\ObjectReflector\ObjectReflector;
 

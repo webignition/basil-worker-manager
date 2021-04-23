@@ -123,3 +123,17 @@ services:
         arguments:
             $factories:
                 - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'
+
+    app.services.service_status_inspector.component.database:
+        class: App\Services\ServiceStatusInspector\ComponentInspector
+        arguments:
+            $name: database
+            $handler: '@App\Services\ServiceStatusInspector\DatabaseInspectionHandler'
+            $exceptionHandlers:
+                - '@App\Services\ServiceStatusInspector\DatabaseExceptionHandler'
+
+
+    App\Services\ServiceStatusInspector\ServiceStatusInspector:
+        arguments:
+            $componentInspectors:
+                - '@app.services.service_status_inspector.component.database'

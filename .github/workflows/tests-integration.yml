@@ -54,5 +54,5 @@ jobs:
           composer test-integration
 
       - name: "Debug: output messenger log"
-#        if: ${{ failure() }}
+        if: ${{ always() }}
         run: docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml logs --no-log-prefix app | grep "\[messenger\]"

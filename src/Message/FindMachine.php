@@ -11,23 +11,22 @@ class FindMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 
-    /**
-     * @param MachineRequestInterface[] $onSuccessCollection
-     * @param MachineRequestInterface[] $onFailureCollection
-     * @param Machine::STATE_* $onNotFoundState
-     */
-    public function __construct(
-        string $machineId,
-        array $onSuccessCollection = [],
-        array $onFailureCollection = [],
-        private string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND,
-    ) {
-        parent::__construct($machineId, $onSuccessCollection, $onFailureCollection);
-    }
+    private string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND;
 
     public function getAction(): string
     {
         return MachineActionInterface::ACTION_FIND;
+    }
+
+    /**
+     * @param Machine::STATE_* $onNotFoundState
+     */
+    public function withOnNotFoundState(string $onNotFoundState): self
+    {
+        $new = clone $this;
+        $new->onNotFoundState = $onNotFoundState;
+
+        return $new;
     }
 
     /**

@@ -55,4 +55,4 @@ jobs:
 
       - name: "Debug: output messenger log ..."
         if: ${{ always() }}
-        run: docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml logs --no-log-prefix app | grep "\[messenger\]"
+        run: docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml exec -T app cat /app/var/log/messenger.prod.log

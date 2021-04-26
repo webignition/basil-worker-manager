@@ -2,7 +2,10 @@
 
 namespace App\Model\ServiceStatus;
 
-interface ServiceStatusInterface
+/**
+ * @phpstan-import-type ComponentStatusShape from ComponentStatusInterface
+ */
+interface ServiceStatusInterface extends \JsonSerializable
 {
     public function isAvailable(): bool;
 
@@ -10,4 +13,9 @@ interface ServiceStatusInterface
      * @return ComponentStatusInterface[]
      */
     public function getComponentStatuses(): array;
+
+    /**
+     * @return array<string, ComponentStatusShape>
+     */
+    public function jsonSerialize(): array;
 }

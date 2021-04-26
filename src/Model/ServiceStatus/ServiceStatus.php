@@ -32,4 +32,15 @@ class ServiceStatus implements ServiceStatusInterface
     {
         return $this->componentStatuses;
     }
+
+    public function jsonSerialize(): array
+    {
+        $data = [];
+
+        foreach ($this->componentStatuses as $componentStatus) {
+            $data[$componentStatus->getName()] = $componentStatus->jsonSerialize();
+        }
+
+        return $data;
+    }
 }

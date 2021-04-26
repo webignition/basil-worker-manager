@@ -10,5 +10,14 @@ class HealthCheckTest extends AbstractIntegrationTest
     {
         $response = $this->httpClient->get('/health-check');
         self::assertSame(200, $response->getStatusCode());
+
+        self::assertSame(
+            [
+                'database' => [
+                    'is_available' => true,
+                ],
+            ],
+            json_decode($response->getBody()->getContents(), true)
+        );
     }
 }

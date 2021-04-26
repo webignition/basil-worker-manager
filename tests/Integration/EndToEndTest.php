@@ -55,13 +55,17 @@ class EndToEndTest extends TestCase
         $response = $this->httpClient->get($this->machineUrl);
         self::assertSame(200, $response->getStatusCode());
 
-        self::assertTrue(in_array(
-            $this->getMachine()->getState(),
-            [
-                MachineEntity::STATE_FIND_RECEIVED,
-                MachineEntity::STATE_FIND_FINDING,
-            ]
-        ));
+        $expectedStates = [
+            MachineEntity::STATE_FIND_RECEIVED,
+            MachineEntity::STATE_FIND_FINDING,
+        ];
+
+        $state = $this->getMachine()->getState();
+
+        self::assertTrue(
+            in_array($state, $expectedStates),
+            'Machine state not ' . implode(', ', $expectedStates) . ': ' . $state
+        );
 
         $this->assertEventualMachineState(MachineEntity::STATE_UP_ACTIVE);
         $this->deleteMachine();

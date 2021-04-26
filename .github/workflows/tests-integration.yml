@@ -44,6 +44,7 @@ jobs:
           DATABASE_URL: postgres://postgres:password!@127.0.0.1:5432/basil-worker-manager-db?charset=UTF-8
         run: |
           composer integration-setup
+          docker-compose -f tests/docker/services-compose.yml -f tests/docker/self-compose.yml exec -T app touch /app/var/log/messenger.prod.log
           sleep 10
 
       - name: Run asynchronous tests

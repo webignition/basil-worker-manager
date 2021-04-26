@@ -41,4 +41,17 @@ class ComponentStatus implements ComponentStatusInterface
     {
         return $this->unavailableReason;
     }
+
+    public function jsonSerialize(): array
+    {
+        $data = [
+            'is_available' => $this->isAvailable,
+        ];
+
+        if (is_string($this->unavailableReason)) {
+            $data['unavailable_reason'] = $this->unavailableReason;
+        }
+
+        return $data;
+    }
 }

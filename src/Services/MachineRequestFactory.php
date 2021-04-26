@@ -50,10 +50,15 @@ class MachineRequestFactory
 
     public function createDelete(string $machineId): DeleteMachine
     {
+        $findRequest = $this
+            ->createFind($machineId)
+            ->withOnNotFoundState(Machine::STATE_DELETE_DELETED)
+            ->withReDispatchOnSuccess(true);
+
         return new DeleteMachine(
             $machineId,
             [
-                $this->createFind($machineId, [], [], Machine::STATE_DELETE_DELETED),
+                $findRequest,
             ]
         );
     }
@@ -72,15 +77,12 @@ class MachineRequestFactory
      * @param string $machineId
      * @param MachineRequestInterface[] $onSuccessCollection
      * @param MachineRequestInterface[] $onFailureCollection
-     * @param string $onNotFoundState
-     * @return FindMachine
      */
     public function createFind(
         string $machineId,
         array $onSuccessCollection = [],
-        array $onFailureCollection = [],
-        string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND
+        array $onFailureCollection = []
     ): FindMachine {
-        return new FindMachine($machineId, $onSuccessCollection, $onFailureCollection, $onNotFoundState);
+        return new FindMachine($machineId, $onSuccessCollection, $onFailureCollection);
     }
 }

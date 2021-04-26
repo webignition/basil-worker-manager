@@ -84,12 +84,10 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         self::assertSame(Machine::STATE_DELETE_REQUESTED, $this->machine->getState());
 
-        $expectedMessage = $this->machineRequestFactory->createFind(
-            self::MACHINE_ID,
-            [],
-            [],
-            Machine::STATE_DELETE_DELETED
-        );
+        $expectedMessage = $this->machineRequestFactory
+            ->createFind(self::MACHINE_ID)
+            ->withOnNotFoundState(Machine::STATE_DELETE_DELETED)
+            ->withReDispatchOnSuccess(true);
 
         self::assertInstanceOf(FindMachine::class, $expectedMessage);
 

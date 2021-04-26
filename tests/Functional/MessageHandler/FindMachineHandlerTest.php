@@ -84,6 +84,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         ?MachineProvider $machineProvider,
         array $messageOnSuccessCollection,
         array $messageOnFailureCollection,
+        bool $reDispatchOnSuccess,
         array $apiResponses,
         Machine $expectedMachine,
         MachineProvider $expectedMachineProvider,
@@ -104,6 +105,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
         }
 
         $message = new FindMachine(self::MACHINE_ID, $messageOnSuccessCollection, $messageOnFailureCollection);
+        $message = $message->withReDispatchOnSuccess($reDispatchOnSuccess);
 
         ($this->handler)($message);
 
@@ -154,6 +156,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                     $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
                 ],
                 'messageOnFailureCollection' => [],
+                'reDispatchOnSuccess' => false,
                 'apiResponses' => [
                     HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity])
                 ],
@@ -180,6 +183,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                     $this->getMachineRequestFactory()->createCheckIsActive(self::MACHINE_ID),
                 ],
                 'messageOnFailureCollection' => [],
+                'reDispatchOnSuccess' => false,
                 'apiResponses' => [
                     HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity])
                 ],
@@ -206,6 +210,7 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 'messageOnFailureCollection' => [
                     $this->getMachineRequestFactory()->createCreate(self::MACHINE_ID)
                 ],
+                'reDispatchOnSuccess' => false,
                 'apiResponses' => [
                     HttpResponseFactory::fromDropletEntityCollection([])
                 ],
@@ -220,6 +225,33 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
                 'expectedQueueCount' => 1,
                 'expectedQueuedMessages' => [
                     $this->getMachineRequestFactory()->createCreate(self::MACHINE_ID),
+                ],
+            ],
+            'remote machine found, re-dispatch self' => [
+                'machine' => new Machine(self::MACHINE_ID, Machine::STATE_FIND_RECEIVED),
+                'machineProvider' => $nonDigitalOceanMachineProvider,
+                'messageOnSuccessCollection' => [],
+                'messageOnFailureCollection' => [],
+                'reDispatchOnSuccess' => true,
+                'apiResponses' => [
+                    HttpResponseFactory::fromDropletEntityCollection([$upNewDropletEntity])
+                ],
+                'expectedMachine' => new Machine(
+                    self::MACHINE_ID,
+                    Machine::STATE_UP_STARTED,
+                    [
+                        '10.0.0.1',
+                    ]
+                ),
+                'expectedMachineProvider' => new MachineProvider(
+                    self::MACHINE_ID,
+                    ProviderInterface::NAME_DIGITALOCEAN
+                ),
+                'expectedQueueCount' => 1,
+                'expectedQueuedMessages' => [
+                    (new FindMachine(self::MACHINE_ID))
+                        ->withReDispatchOnSuccess(true)
+                        ->incrementRetryCount(),
                 ],
             ],
         ];

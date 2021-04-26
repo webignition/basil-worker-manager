@@ -11,23 +11,23 @@ class FindMachine extends AbstractRemoteMachineRequest
 {
     use RetryableRequestTrait;
 
-    /**
-     * @param MachineRequestInterface[] $onSuccessCollection
-     * @param MachineRequestInterface[] $onFailureCollection
-     * @param Machine::STATE_* $onNotFoundState
-     */
-    public function __construct(
-        string $machineId,
-        array $onSuccessCollection = [],
-        array $onFailureCollection = [],
-        private string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND,
-    ) {
-        parent::__construct($machineId, $onSuccessCollection, $onFailureCollection);
-    }
+    private string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND;
+    private bool $reDispatchOnSuccess = false;
 
     public function getAction(): string
     {
         return MachineActionInterface::ACTION_FIND;
+    }
+
+    /**
+     * @param Machine::STATE_* $onNotFoundState
+     */
+    public function withOnNotFoundState(string $onNotFoundState): self
+    {
+        $new = clone $this;
+        $new->onNotFoundState = $onNotFoundState;
+
+        return $new;
     }
 
     /**
@@ -36,5 +36,18 @@ class FindMachine extends AbstractRemoteMachineRequest
     public function getOnNotFoundState(): string
     {
         return $this->onNotFoundState;
+    }
+
+    public function withReDispatchOnSuccess(bool $reDispatchOnSuccess): self
+    {
+        $new = clone $this;
+        $new->reDispatchOnSuccess = $reDispatchOnSuccess;
+
+        return $new;
+    }
+
+    public function getReDispatchOnSuccess(): bool
+    {
+        return $this->reDispatchOnSuccess;
     }
 }

@@ -12,6 +12,7 @@ class FindMachine extends AbstractRemoteMachineRequest
     use RetryableRequestTrait;
 
     private string $onNotFoundState = Machine::STATE_FIND_NOT_FOUND;
+    private bool $reDispatchOnSuccess = false;
 
     public function getAction(): string
     {
@@ -35,5 +36,18 @@ class FindMachine extends AbstractRemoteMachineRequest
     public function getOnNotFoundState(): string
     {
         return $this->onNotFoundState;
+    }
+
+    public function withReDispatchOnSuccess(bool $reDispatchOnSuccess): self
+    {
+        $new = clone $this;
+        $new->reDispatchOnSuccess = $reDispatchOnSuccess;
+
+        return $new;
+    }
+
+    public function getReDispatchOnSuccess(): bool
+    {
+        return $this->reDispatchOnSuccess;
     }
 }

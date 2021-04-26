@@ -86,7 +86,8 @@ class DeleteMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $expectedMessage = $this->machineRequestFactory
             ->createFind(self::MACHINE_ID)
-            ->withOnNotFoundState(Machine::STATE_DELETE_DELETED);
+            ->withOnNotFoundState(Machine::STATE_DELETE_DELETED)
+            ->withReDispatchOnSuccess(true);
 
         self::assertInstanceOf(FindMachine::class, $expectedMessage);
 

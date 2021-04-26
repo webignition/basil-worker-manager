@@ -3,14 +3,14 @@
 namespace App\Controller;
 
 use App\Services\ServiceStatusInspector\ServiceStatusInspector;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 class HealthCheckController
 {
     #[Route('/health-check', name: 'health-check', methods: ['GET'])]
-    public function get(ServiceStatusInspector $serviceStatusInspector): Response
+    public function get(ServiceStatusInspector $serviceStatusInspector): JsonResponse
     {
-        return new Response();
+        return new JsonResponse($serviceStatusInspector->get());
     }
 }

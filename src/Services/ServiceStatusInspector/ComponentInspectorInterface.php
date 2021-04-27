@@ -2,9 +2,7 @@
 
 namespace App\Services\ServiceStatusInspector;
 
-use App\Model\ServiceStatus\ComponentStatusInterface;
-
 interface ComponentInspectorInterface
 {
-    public function getStatus(): ComponentStatusInterface;
+    public function __invoke(): void;
 }

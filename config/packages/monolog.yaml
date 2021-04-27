@@ -1,2 +1,4 @@
 monolog:
-    channels: [messenger_audit]
+    channels:
+        - messenger_audit
+        - health_check

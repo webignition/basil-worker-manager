@@ -17,6 +17,9 @@ class DoctrineExceptionFactory
     public const DATABASE_DOES_NOT_EXIST_MESSAGE =
         '... SQLSTATE[08006] [7] FATAL:  database "basil-worker-manager-db" does not exist';
 
+    public const CONNECTION_REFUSED_MESSAGE =
+        'An exception occurred in driver: SQLSTATE[08006] [7] could not connect to server: Connection refused';
+
     public static function createConnectionException(string $message): ConnectionException
     {
         return new ConnectionException($message, \Mockery::mock(PDOException::class));
@@ -25,6 +28,11 @@ class DoctrineExceptionFactory
     public static function createAuthenticationException(): ConnectionException
     {
         return self::createConnectionException(self::AUTHENTICATION_FAILURE_MESSAGE);
+    }
+
+    public static function createConnectionRefusedException(): ConnectionException
+    {
+        return self::createConnectionException(self::CONNECTION_REFUSED_MESSAGE);
     }
 
     public static function createDatabaseDoesNotExistException(): ConnectionException

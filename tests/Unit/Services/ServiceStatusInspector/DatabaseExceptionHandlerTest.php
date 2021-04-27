@@ -51,7 +51,7 @@ class DatabaseExceptionHandlerTest extends TestCase
     /**
      * @dataProvider handleDataProvider
      */
-    public function testHandleFoo(\Throwable $exception, ?string $expectedReason): void
+    public function testHandle(\Throwable $exception, ?string $expectedReason): void
     {
         $handler = new DatabaseExceptionHandler();
 
@@ -71,6 +71,10 @@ class DatabaseExceptionHandlerTest extends TestCase
             'database does not exist' => [
                 'exception' => DoctrineExceptionFactory::createDatabaseDoesNotExistException(),
                 'expectedReason' => 'database not found',
+            ],
+            'connection refused' => [
+                'exception' => DoctrineExceptionFactory::createConnectionRefusedException(),
+                'expectedReason' => 'connection refused',
             ],
             'table not found' => [
                 'exception' => DoctrineExceptionFactory::createTableNotFoundException(),

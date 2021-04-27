@@ -7,7 +7,7 @@ use App\Entity\Machine;
 use App\Entity\MachineProvider;
 use Doctrine\ORM\EntityManagerInterface;
 
-class DatabaseInspectionHandler
+class DatabaseInspector implements ComponentInspectorInterface
 {
     public const INVALID_MACHINE_ID = 'intentionally invalid';
     public const ENTITY_CLASS_NAMES = [
@@ -17,7 +17,7 @@ class DatabaseInspectionHandler
     ];
 
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
     ) {
     }
 

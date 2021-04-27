@@ -42,6 +42,10 @@ class DatabaseExceptionHandler implements ExceptionHandlerInterface
             return 'authentication failure';
         }
 
+        if ($this->isConnectionRefusedException($exception)) {
+            return 'connection refused';
+        }
+
         return 'connection failure, unknown';
     }
 
@@ -53,5 +57,10 @@ class DatabaseExceptionHandler implements ExceptionHandlerInterface
     private function isAuthenticationException(ConnectionException $connectionException): bool
     {
         return str_contains($connectionException->getMessage(), 'authentication failed');
+    }
+
+    private function isConnectionRefusedException(ConnectionException $connectionException): bool
+    {
+        return str_contains($connectionException->getMessage(), 'Connection refused');
     }
 }

@@ -2,34 +2,44 @@
 
 namespace App\Services\ServiceStatusInspector;
 
-use App\Model\ServiceStatus\ServiceStatus;
-use App\Model\ServiceStatus\ServiceStatusInterface;
+use App\Exception\LoggableException;
+use Psr\Log\LoggerInterface;
 
 class ServiceStatusInspector
 {
     /**
-     * @var ComponentInspectorInterface[]
+     * @var array<string, bool>
      */
-    private array $componentInspectors;
+    private array $componentAvailabilities;
 
     /**
      * @param ComponentInspectorInterface[] $componentInspectors
      */
-    public function __construct(array $componentInspectors)
-    {
-        $this->componentInspectors = array_filter($componentInspectors, function ($value) {
-            return $value instanceof ComponentInspectorInterface;
-        });
+    public function __construct(
+        array $componentInspectors,
+        private LoggerInterface $healthCheckLogger
+    ) {
+        foreach ($componentInspectors as $name => $componentInspector) {
+            if ($componentInspector instanceof ComponentInspectorInterface) {
+                $componentAvailability = true;
+
+                try {
+                    ($componentInspector)();
+                } catch (\Throwable $exception) {
+                    $componentAvailability = false;
+                    $this->healthCheckLogger->error((string) (new LoggableException($exception)));
+                }
+
+                $this->componentAvailabilities[(string) $name] = $componentAvailability;
+            }
+        }
     }
 
-    public function get(): ServiceStatusInterface
+    /**
+     * @return array<string, bool>
+     */
+    public function get(): array
     {
-        $status = new ServiceStatus();
-
-        foreach ($this->componentInspectors as $componentInspector) {
-            $status = $status->addComponentStatus($componentInspector->getStatus());
-        }
-
-        return $status;
+        return $this->componentAvailabilities;
     }
 }

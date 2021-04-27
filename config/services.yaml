@@ -24,6 +24,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             $messengerAuditLogger: '@monolog.logger.messenger_audit'
+            $healthCheckLogger: '@monolog.logger.health_check'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -126,16 +127,7 @@ services:
             $factories:
                 - '@App\Services\ExceptionFactory\MachineProvider\GuzzleExceptionFactory'
 
-    app.services.service_status_inspector.component.database:
-        class: App\Services\ServiceStatusInspector\ComponentInspector
-        arguments:
-            $name: database
-            $handler: '@App\Services\ServiceStatusInspector\DatabaseInspectionHandler'
-            $exceptionHandlers:
-                - '@App\Services\ServiceStatusInspector\DatabaseExceptionHandler'
-
-
     App\Services\ServiceStatusInspector\ServiceStatusInspector:
         arguments:
             $componentInspectors:
-                - '@app.services.service_status_inspector.component.database'
+                database: '@App\Services\ServiceStatusInspector\DatabaseInspector'

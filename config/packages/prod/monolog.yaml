@@ -11,6 +11,11 @@ monolog:
             path: "%kernel.logs_dir%/messenger.%kernel.environment%.log"
             level: debug
             channels: ["messenger_audit"]
+        health_check:
+            type: stream
+            path: "%kernel.logs_dir%/health-check.%kernel.environment%.log"
+            level: debug
+            channels: ["health_check"]
         nested:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"

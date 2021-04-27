@@ -13,9 +13,7 @@ class HealthCheckTest extends AbstractIntegrationTest
 
         self::assertSame(
             [
-                'database' => [
-                    'is_available' => true,
-                ],
+                'database' => 'available',
             ],
             json_decode($response->getBody()->getContents(), true)
         );

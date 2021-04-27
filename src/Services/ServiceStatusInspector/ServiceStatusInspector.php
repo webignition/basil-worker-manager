@@ -12,6 +12,8 @@ class ServiceStatusInspector
      */
     private array $componentAvailabilities;
 
+    private bool $isAvailable = true;
+
     /**
      * @param ComponentInspectorInterface[] $componentInspectors
      */
@@ -30,9 +32,18 @@ class ServiceStatusInspector
                     $this->healthCheckLogger->error((string) (new LoggableException($exception)));
                 }
 
+                if (false === $componentAvailability) {
+                    $this->isAvailable = false;
+                }
+
                 $this->componentAvailabilities[(string) $name] = $componentAvailability;
             }
         }
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->isAvailable;
     }
 
     /**

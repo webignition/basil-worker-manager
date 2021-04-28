@@ -23,9 +23,12 @@ class HealthCheckController
     {
         $serviceStatusInspector->reset();
 
-        return new JsonResponse($this->decorateComponentAvailabilities(
-            $serviceStatusInspector->get()
-        ));
+        return new JsonResponse(
+            $this->decorateComponentAvailabilities(
+                $serviceStatusInspector->get()
+            ),
+            $serviceStatusInspector->isAvailable() ? 200 : 503
+        );
     }
 
     /**

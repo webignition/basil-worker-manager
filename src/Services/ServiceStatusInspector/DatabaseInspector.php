@@ -4,6 +4,7 @@ namespace App\Services\ServiceStatusInspector;
 
 use App\Entity\CreateFailure;
 use App\Entity\Machine;
+use App\Entity\MachineIdInterface;
 use App\Entity\MachineProvider;
 use App\Model\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +18,8 @@ class DatabaseInspector implements ComponentInspectorInterface
         MachineProvider::class,
     ];
 
+    private const MACHINE_ID_PREFIX = 'di-';
+
     public function __construct(
         private EntityManagerInterface $entityManager,
     ) {
@@ -24,17 +27,19 @@ class DatabaseInspector implements ComponentInspectorInterface
 
     public function __invoke(): void
     {
+        $machineId = $this->generateMachineId();
+
         foreach (self::ENTITY_CLASS_NAMES as $entityClassName) {
-            $this->entityManager->find($entityClassName, self::INVALID_MACHINE_ID);
+            $entity = $this->entityManager->find($entityClassName, $machineId);
+            if (null !== $entity) {
+                $this->removeEntity($entity);
+            }
         }
 
-        $this->persistAndRemoveEntity(new Machine(self::INVALID_MACHINE_ID));
-        $this->persistAndRemoveEntity(new MachineProvider(
-            self::INVALID_MACHINE_ID,
-            ProviderInterface::NAME_DIGITALOCEAN
-        ));
+        $this->persistAndRemoveEntity(new Machine($machineId));
+        $this->persistAndRemoveEntity(new MachineProvider($machineId, ProviderInterface::NAME_DIGITALOCEAN));
         $this->persistAndRemoveEntity(new CreateFailure(
-            self::INVALID_MACHINE_ID,
+            $machineId,
             CreateFailure::CODE_UNKNOWN,
             CreateFailure::REASON_UNKNOWN
         ));
@@ -42,8 +47,27 @@ class DatabaseInspector implements ComponentInspectorInterface
 
     private function persistAndRemoveEntity(object $entity): void
     {
+        $this->persistEntity($entity);
+        $this->removeEntity($entity);
+    }
+
+    private function persistEntity(object $entity): void
+    {
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
+    }
+
+    private function removeEntity(object $entity): void
+    {
         $this->entityManager->remove($entity);
+        $this->entityManager->flush();
+    }
+
+    private function generateMachineId(): string
+    {
+        $suffixLength = MachineIdInterface::LENGTH - strlen(self::MACHINE_ID_PREFIX);
+        $suffix = substr(md5((string) rand()), 0, $suffixLength);
+
+        return self::MACHINE_ID_PREFIX . $suffix;
     }
 }

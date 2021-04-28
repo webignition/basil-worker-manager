@@ -132,3 +132,4 @@ services:
             $componentInspectors:
                 database: '@App\Services\ServiceStatusInspector\DatabaseInspector'
                 message_queue: '@App\Services\ServiceStatusInspector\MessageQueueInspector'
+                machine_provider_digital_ocean: '@App\Services\ServiceStatusInspector\DigitalOceanMachineProviderInspector'

@@ -14,6 +14,7 @@ class HealthCheckTest extends AbstractIntegrationTest
             [
                 'database' => 'available',
                 'message_queue' => 'available',
+                'machine_provider_digital_ocean' => 'available',
             ],
             json_decode($response->getBody()->getContents(), true)
         );

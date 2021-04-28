@@ -131,3 +131,4 @@ services:
         arguments:
             $componentInspectors:
                 database: '@App\Services\ServiceStatusInspector\DatabaseInspector'
+                message_queue: '@App\Services\ServiceStatusInspector\MessageQueueInspector'

@@ -48,6 +48,7 @@ class ServiceStatusInspectorTest extends AbstractBaseFunctionalTest
                 'modifiedComponentInspectors' => [],
                 'expectedServiceStatus' => [
                     'database' => true,
+                    'message_queue' => true,
                 ],
             ],
             'database unavailable' => [
@@ -56,6 +57,26 @@ class ServiceStatusInspectorTest extends AbstractBaseFunctionalTest
                 ],
                 'expectedServiceStatus' => [
                     'database' => false,
+                    'message_queue' => true,
+                ],
+            ],
+            'message queue unavailable' => [
+                'modifiedComponentInspectors' => [
+                    'message_queue' => $this->createComponentInspectorThrowingException(),
+                ],
+                'expectedServiceStatus' => [
+                    'database' => true,
+                    'message_queue' => false,
+                ],
+            ],
+            'all services unavailable' => [
+                'modifiedComponentInspectors' => [
+                    'database' => $this->createComponentInspectorThrowingException(),
+                    'message_queue' => $this->createComponentInspectorThrowingException(),
+                ],
+                'expectedServiceStatus' => [
+                    'database' => false,
+                    'message_queue' => false,
                 ],
             ],
         ];

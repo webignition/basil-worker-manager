@@ -6,11 +6,19 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\HealthCheckController;
 use App\Tests\AbstractBaseFunctionalTest;
+use App\Tests\Services\HttpResponseFactory;
+use DigitalOceanV2\Entity\Droplet;
+use GuzzleHttp\Handler\MockHandler;
 
 class HealthCheckControllerTest extends AbstractBaseFunctionalTest
 {
     public function testGet(): void
     {
+        $mockHandler = self::$container->get(MockHandler::class);
+        if ($mockHandler instanceof MockHandler) {
+            $mockHandler->append(HttpResponseFactory::fromDropletEntity(new Droplet()));
+        }
+
         $this->client->request('GET', HealthCheckController::ROUTE);
 
         $response = $this->client->getResponse();
@@ -20,6 +28,7 @@ class HealthCheckControllerTest extends AbstractBaseFunctionalTest
             [
                 'database' => 'available',
                 'message_queue' => 'available',
+                'machine_provider_digital_ocean' => 'available'
             ],
             json_decode((string) $response->getContent(), true)
         );

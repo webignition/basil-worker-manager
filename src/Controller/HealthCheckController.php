@@ -21,6 +21,8 @@ class HealthCheckController
     #[Route(self::ROUTE, name: 'health-check', methods: ['GET'])]
     public function get(ServiceStatusInspector $serviceStatusInspector): JsonResponse
     {
+        $serviceStatusInspector->reset();
+
         return new JsonResponse($this->decorateComponentAvailabilities(
             $serviceStatusInspector->get()
         ));

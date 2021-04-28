@@ -13,6 +13,11 @@ class ServiceStatusInspector
     private array $componentInspectors;
 
     /**
+     * @var array<string, bool>
+     */
+    private array $componentAvailabilities = [];
+
+    /**
      * @param ComponentInspectorInterface[] $componentInspectors
      */
     public function __construct(
@@ -43,6 +48,23 @@ class ServiceStatusInspector
      * @return array<string, bool>
      */
     public function get(): array
+    {
+        if ([] === $this->componentAvailabilities) {
+            $this->componentAvailabilities = $this->findAvailabilities();
+        }
+
+        return $this->componentAvailabilities;
+    }
+
+    public function reset(): void
+    {
+        $this->componentAvailabilities = [];
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    private function findAvailabilities(): array
     {
         $availabilities = [];
 

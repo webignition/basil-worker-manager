@@ -70,7 +70,8 @@ COPY config/packages/*.yaml /app/config/packages/
 COPY config/packages/prod /app/config/packages/prod
 COPY config/routes/annotations.yaml /app/config/routes/
 
-RUN composer check-platform-reqs --ansi \
+RUN chown -R www-data:www-data /app/var/log \
+  && composer check-platform-reqs --ansi \
   && composer install --no-dev --no-scripts \
   && rm composer.lock \
   && touch /app/.env \

@@ -9,11 +9,11 @@ class HealthCheckTest extends AbstractIntegrationTest
     public function testHealthCheck(): void
     {
         $response = $this->httpClient->get('/health-check');
-        self::assertSame(200, $response->getStatusCode());
 
         self::assertSame(
             [
                 'database' => 'available',
+                'message_queue' => 'available',
             ],
             json_decode($response->getBody()->getContents(), true)
         );

@@ -8,11 +8,9 @@ use Psr\Log\LoggerInterface;
 class ServiceStatusInspector
 {
     /**
-     * @var array<string, bool>
+     * @var ComponentInspectorInterface[]
      */
-    private array $componentAvailabilities;
-
-    private bool $isAvailable = true;
+    private array $componentInspectors;
 
     /**
      * @param ComponentInspectorInterface[] $componentInspectors
@@ -23,27 +21,22 @@ class ServiceStatusInspector
     ) {
         foreach ($componentInspectors as $name => $componentInspector) {
             if ($componentInspector instanceof ComponentInspectorInterface) {
-                $componentAvailability = true;
-
-                try {
-                    ($componentInspector)();
-                } catch (\Throwable $exception) {
-                    $componentAvailability = false;
-                    $this->healthCheckLogger->error((string) (new LoggableException($exception)));
-                }
-
-                if (false === $componentAvailability) {
-                    $this->isAvailable = false;
-                }
-
-                $this->componentAvailabilities[(string) $name] = $componentAvailability;
+                $this->componentInspectors[$name] = $componentInspector;
             }
         }
     }
 
     public function isAvailable(): bool
     {
-        return $this->isAvailable;
+        $availabilities = $this->get();
+
+        foreach ($availabilities as $availability) {
+            if (false === $availability) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -51,6 +44,21 @@ class ServiceStatusInspector
      */
     public function get(): array
     {
-        return $this->componentAvailabilities;
+        $availabilities = [];
+
+        foreach ($this->componentInspectors as $name => $componentInspector) {
+            $isAvailable = true;
+
+            try {
+                ($componentInspector)();
+            } catch (\Throwable $exception) {
+                $isAvailable = false;
+                $this->healthCheckLogger->error((string) (new LoggableException($exception)));
+            }
+
+            $availabilities[(string) $name] = $isAvailable;
+        }
+
+        return $availabilities;
     }
 }

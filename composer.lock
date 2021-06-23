@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "868a9ac5442365a674b96aea7977e711",
+    "content-hash": "972ddf4e1ca8df669d7b1b383c0d87ad",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -8516,7 +8516,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2021-03-05T07:46:22+00:00"
+            "time": "2021-06-17T23:24:54+00:00"
         },
         {
             "name": "symfony/browser-kit",
@@ -9034,7 +9034,6 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=8",
-        "ext-amqp": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*"

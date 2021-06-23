@@ -14,7 +14,7 @@ class RemoteMachineTest extends TestCase
      * @dataProvider getIpAddressesDataProvider
      *
      * @param array<mixed> $dropletData
-     * @param string[] $expectedIpAddresses
+     * @param string[]     $expectedIpAddresses
      */
     public function testGetIpAddresses(array $dropletData, array $expectedIpAddresses): void
     {

@@ -57,7 +57,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testCreateSuccess(): void
     {
-        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
+        $ipAddresses = ['10.0.0.1', '127.0.0.1'];
 
         $dropletData = [
             'networks' => (object) [
@@ -85,9 +85,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
      *
-     * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
-     * @param \Exception $expectedRemoveException
      */
     public function testCreateThrowsException(
         ResponseInterface $apiResponse,
@@ -133,7 +131,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
 
     public function testGetSuccess(): void
     {
-        $ipAddresses = ['10.0.0.1', '127.0.0.1', ];
+        $ipAddresses = ['10.0.0.1', '127.0.0.1'];
 
         self::assertSame([], $this->machine->getIpAddresses());
 
@@ -172,9 +170,7 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider remoteRequestThrowsExceptionDataProvider
      *
-     * @param ResponseInterface $apiResponse
      * @param class-string $expectedExceptionClass
-     * @param \Exception $expectedRemoveException
      */
     public function testGetThrowsException(
         ResponseInterface $apiResponse,
@@ -222,29 +218,6 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
     }
 
     /**
-     * @param MachineActionInterface::ACTION_* $action
-     * @param class-string $expectedExceptionClass
-     */
-    private function doActionThrowsExceptionTest(
-        callable $callable,
-        string $action,
-        ResponseInterface $apiResponse,
-        string $expectedExceptionClass,
-        \Throwable $expectedRemoteException
-    ): void {
-        $this->mockHandler->append($apiResponse);
-
-        try {
-            $callable();
-            self::fail(ExceptionInterface::class . ' not thrown');
-        } catch (Exception $exception) {
-            self::assertSame($expectedExceptionClass, $exception::class);
-            self::assertSame($action, $exception->getAction());
-            self::assertEquals($expectedRemoteException, $exception->getRemoteException());
-        }
-    }
-
-    /**
      * @return array[]
      */
     public function remoteRequestThrowsExceptionDataProvider(): array
@@ -271,5 +244,28 @@ class DigitalOceanMachineManagerTest extends AbstractBaseFunctionalTest
                 'expectedRemoteException' => new ValidationFailedException('Bad Request', 400),
             ],
         ];
+    }
+
+    /**
+     * @param MachineActionInterface::ACTION_* $action
+     * @param class-string                     $expectedExceptionClass
+     */
+    private function doActionThrowsExceptionTest(
+        callable $callable,
+        string $action,
+        ResponseInterface $apiResponse,
+        string $expectedExceptionClass,
+        \Throwable $expectedRemoteException
+    ): void {
+        $this->mockHandler->append($apiResponse);
+
+        try {
+            $callable();
+            self::fail(ExceptionInterface::class . ' not thrown');
+        } catch (Exception $exception) {
+            self::assertSame($expectedExceptionClass, $exception::class);
+            self::assertSame($action, $exception->getAction());
+            self::assertEquals($expectedRemoteException, $exception->getRemoteException());
+        }
     }
 }

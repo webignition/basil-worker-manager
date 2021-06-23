@@ -58,8 +58,8 @@ class CreateFailure implements \JsonSerializable
     private array $context = [];
 
     /**
-     * @param self::CODE_* $code
-     * @param self::REASON_* $reason
+     * @param self::CODE_*              $code
+     * @param self::REASON_*            $reason
      * @param array<string, int|string> $context
      */
     public function __construct(string $machineId, int $code, string $reason, array $context = [])
@@ -76,7 +76,7 @@ class CreateFailure implements \JsonSerializable
     }
 
     /**
-     * @return array<string, string|int|array<string, string|int>>
+     * @return array<string, array<string, int|string>|int|string>
      */
     public function jsonSerialize(): array
     {

@@ -19,7 +19,6 @@ class MachineRequestDispatcherTest extends AbstractBaseFunctionalTest
     private MachineRequestDispatcher $dispatcher;
     private MessengerAsserter $messengerAsserter;
 
-
     protected function setUp(): void
     {
         parent::setUp();

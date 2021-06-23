@@ -14,13 +14,16 @@ class HealthCheckControllerTest extends TestCase
     {
         $serviceStatusInspector = \Mockery::mock(ServiceStatusInspector::class);
         $serviceStatusInspector
-            ->shouldReceive('reset');
+            ->shouldReceive('reset')
+        ;
         $serviceStatusInspector
             ->shouldReceive('get')
-            ->andReturn([]);
+            ->andReturn([])
+        ;
         $serviceStatusInspector
             ->shouldReceive('isAvailable')
-            ->andReturn(false);
+            ->andReturn(false)
+        ;
 
         $response = (new HealthCheckController())->get($serviceStatusInspector);
 

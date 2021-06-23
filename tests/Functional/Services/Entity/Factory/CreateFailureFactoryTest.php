@@ -60,6 +60,8 @@ class CreateFailureFactoryTest extends AbstractEntityTest
      */
     public function createDataProvider(): array
     {
+        $unprocessableReason = UnprocessableRequestExceptionInterface::REASON_REMOTE_PROVIDER_RESOURCE_LIMIT_REACHED;
+
         return [
             UnsupportedProviderException::class => [
                 'exception' => new UnsupportedProviderException(ProviderInterface::NAME_DIGITALOCEAN),
@@ -142,8 +144,7 @@ class CreateFailureFactoryTest extends AbstractEntityTest
                     CreateFailure::CODE_UNPROCESSABLE_REQUEST,
                     CreateFailure::REASON_UNPROCESSABLE_REQUEST,
                     [
-                        'provider-reason' =>
-                            UnprocessableRequestExceptionInterface::REASON_REMOTE_PROVIDER_RESOURCE_LIMIT_REACHED,
+                        'provider-reason' => $unprocessableReason,
                     ]
                 ),
             ],

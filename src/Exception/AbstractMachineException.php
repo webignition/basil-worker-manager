@@ -8,7 +8,7 @@ abstract class AbstractMachineException extends \Exception
 {
     public function __construct(
         private string $machineId,
-        string $message = "",
+        string $message = '',
         int $code = 0,
         Throwable $previous = null
     ) {

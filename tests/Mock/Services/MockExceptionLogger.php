@@ -33,7 +33,8 @@ class MockExceptionLogger
                     TestCase::assertSame($expectedException->getCode(), $exception->getCode());
 
                     return true;
-                });
+                })
+            ;
         }
 
         return $this;
@@ -43,7 +44,8 @@ class MockExceptionLogger
     {
         if ($this->mock instanceof MockInterface) {
             $this->mock
-                ->shouldNotReceive('log');
+                ->shouldNotReceive('log')
+            ;
         }
 
         return $this;

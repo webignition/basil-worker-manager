@@ -16,7 +16,7 @@ trait RetryableRequestTrait
     public function incrementRetryCount(): static
     {
         $new = clone $this;
-        $new->retryCount++;
+        ++$new->retryCount;
 
         return $new;
     }

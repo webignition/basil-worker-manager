@@ -12,10 +12,10 @@ interface RemoteRequestOutcomeInterface extends \Stringable
     /**
      * @return self::STATE_*
      */
-    public function getState(): string;
+    public function __toString(): string;
 
     /**
      * @return self::STATE_*
      */
-    public function __toString(): string;
+    public function getState(): string;
 }

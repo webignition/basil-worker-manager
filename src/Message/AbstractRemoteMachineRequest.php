@@ -19,8 +19,6 @@ abstract class AbstractRemoteMachineRequest extends AbstractMachineRequest imple
     protected array $onFailureCollection;
 
     /**
-     * @param string $machineId
-     *
      * @param MachineRequestInterface[] $onSuccessCollection
      * @param MachineRequestInterface[] $onFailureCollection
      */

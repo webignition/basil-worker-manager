@@ -135,11 +135,13 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $machineManager = (new MockMachineManager())
             ->withCreateCallThrowingException($this->machineProvider, $exception)
-            ->getMock();
+            ->getMock()
+        ;
 
         $exceptionLogger = (new MockExceptionLogger())
             ->withLogCall($exception)
-            ->getMock();
+            ->getMock()
+        ;
 
         $this->prepareHandler($machineManager, $exceptionLogger);
 
@@ -172,11 +174,13 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $machineManager = (new MockMachineManager())
             ->withCreateCallThrowingException($this->machineProvider, $exception)
-            ->getMock();
+            ->getMock()
+        ;
 
         $exceptionLogger = (new MockExceptionLogger())
             ->withoutLogCall()
-            ->getMock();
+            ->getMock()
+        ;
 
         $this->prepareHandler($machineManager, $exceptionLogger);
 
@@ -224,11 +228,13 @@ class CreateMachineHandlerTest extends AbstractBaseFunctionalTest
 
         $machineManager = (new MockMachineManager())
             ->withCreateCallThrowingException($this->machineProvider, $exception)
-            ->getMock();
+            ->getMock()
+        ;
 
         $exceptionLogger = (new MockExceptionLogger())
             ->withLogCall($exception)
-            ->getMock();
+            ->getMock()
+        ;
 
         $this->prepareHandler($machineManager, $exceptionLogger);
 

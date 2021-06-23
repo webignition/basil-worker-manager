@@ -93,12 +93,14 @@ class DigitalOceanExceptionFactoryTest extends AbstractBaseFunctionalTest
         $lastResponse
             ->shouldReceive('getHeaderLine')
             ->with('RateLimit-Reset')
-            ->andReturn((string) $resetTimestamp);
+            ->andReturn((string) $resetTimestamp)
+        ;
 
         $client = \Mockery::mock(Client::class);
         $client
             ->shouldReceive('getLastResponse')
-            ->andReturn($lastResponse);
+            ->andReturn($lastResponse)
+        ;
 
         ObjectReflector::setProperty(
             $this->factory,

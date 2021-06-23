@@ -17,8 +17,6 @@ class CheckMachineIsActive extends AbstractMachineRequest implements ChainedMach
     private array $onFailureCollection;
 
     /**
-     * @param string $machineId
-     *
      * @param MachineRequestInterface[] $onSuccessCollection
      * @param MachineRequestInterface[] $onFailureCollection
      */

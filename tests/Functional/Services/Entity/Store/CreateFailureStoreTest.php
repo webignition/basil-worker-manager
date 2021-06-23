@@ -37,7 +37,6 @@ class CreateFailureStoreTest extends AbstractEntityTest
         self::assertCount(1, $repository->findAll());
     }
 
-
     public function testFind(): void
     {
         $entity = new CreateFailure(

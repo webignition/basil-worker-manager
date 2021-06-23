@@ -59,7 +59,7 @@ class DigitalOceanMachineManager implements ProviderMachineManagerInterface
     public function remove(string $machineId, string $name): void
     {
         try {
-            $this->dropletApi->removeAll($name);
+            $this->dropletApi->removeTagged($name);
         } catch (VendorExceptionInterface $exception) {
             throw $this->exceptionFactory->create(
                 $machineId,

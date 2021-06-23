@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "139c3eb59a7604240be2c95e22323a9a",
+    "content-hash": "87e47cb4262536f9098ca416ac58c280",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -5741,16 +5741,16 @@
         },
         {
             "name": "toin0u/digitalocean-v2",
-            "version": "dev-delete-droplet-by-tag",
+            "version": "4.4.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webignition/Client.git",
-                "reference": "94a9893442bf308fee2a1079b522a72641c3e782"
+                "url": "https://github.com/DigitalOceanPHP/Client.git",
+                "reference": "5e8e5494b6ca5c19d86a84e513abead58e2b07a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/Client/zipball/94a9893442bf308fee2a1079b522a72641c3e782",
-                "reference": "94a9893442bf308fee2a1079b522a72641c3e782",
+                "url": "https://api.github.com/repos/DigitalOceanPHP/Client/zipball/5e8e5494b6ca5c19d86a84e513abead58e2b07a9",
+                "reference": "5e8e5494b6ca5c19d86a84e513abead58e2b07a9",
                 "shasum": ""
             },
             "require": {
@@ -5775,11 +5775,7 @@
                     "DigitalOceanV2\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "DigitalOceanV2\\Tests\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -5807,22 +5803,23 @@
             ],
             "description": "DigitalOcean API v2 client for PHP",
             "keywords": [
-                "API",
                 "Cloud Hosting",
-                "DigitalOcean",
                 "SSD",
-                "VPS"
+                "api",
+                "digitalocean",
+                "vps"
             ],
             "support": {
-                "source": "https://github.com/webignition/Client/tree/delete-droplet-by-tag"
+                "issues": "https://github.com/DigitalOceanPHP/Client/issues",
+                "source": "https://github.com/DigitalOceanPHP/Client/tree/4.4"
             },
             "funding": [
                 {
-                    "type": "github",
-                    "url": "https://github.com/GrahamCampbell"
+                    "url": "https://github.com/GrahamCampbell",
+                    "type": "github"
                 }
             ],
-            "time": "2021-04-13T11:02:22+00:00"
+            "time": "2021-06-07T17:57:52+00:00"
         },
         {
             "name": "webignition/symfony-messenger-message-dispatcher",
@@ -10389,7 +10386,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "toin0u/digitalocean-v2": 20,
         "squizlabs/php_codesniffer": 20
     },
     "prefer-stable": true,

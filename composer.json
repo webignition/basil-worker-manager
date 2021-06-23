@@ -27,6 +27,7 @@
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^6.5",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "mockery/mockery": "^1.4",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan": "^0.12.84",
@@ -37,7 +38,6 @@
         "squizlabs/php_codesniffer": "dev-master",
         "symfony/browser-kit": "5.2.*",
         "symfony/maker-bundle": "^1.29",
-        "symplify/easy-coding-standard": "^9.2",
         "webignition/object-reflector": "^1.0"
     },
     "config": {
@@ -80,14 +80,12 @@
         "db-destroy": [
             "php bin/console doctrine:database:drop --if-exists --force --quiet"
         ],
-        "cs-ecs": "./vendor/bin/ecs check src tests --ansi --no-progress-bar --config ecs.php",
+        "cs-fixer-dry-run": "./vendor/bin/php-cs-fixer fix --dry-run --verbose --show-progress none",
+        "cs-fixer-fix": "./vendor/bin/php-cs-fixer fix --diff",
         "cs-phpcs": "./vendor/bin/phpcs",
         "cs": [
-            "@cs-ecs",
+            "@cs-fixer-dry-run",
             "@cs-phpcs"
-        ],
-        "cs-fix": [
-            "./vendor/bin/ecs check src tests --ansi --config ecs.php --fix"
         ],
         "static-analysis": "./vendor/bin/phpstan analyse --ansi",
         "test-unit": "./vendor/bin/phpunit --colors=always tests/Unit",

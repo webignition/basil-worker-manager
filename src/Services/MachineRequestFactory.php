@@ -53,7 +53,8 @@ class MachineRequestFactory
         $findRequest = $this
             ->createFind($machineId)
             ->withOnNotFoundState(Machine::STATE_DELETE_DELETED)
-            ->withReDispatchOnSuccess(true);
+            ->withReDispatchOnSuccess(true)
+        ;
 
         return new DeleteMachine(
             $machineId,
@@ -74,7 +75,6 @@ class MachineRequestFactory
     }
 
     /**
-     * @param string $machineId
      * @param MachineRequestInterface[] $onSuccessCollection
      * @param MachineRequestInterface[] $onFailureCollection
      */

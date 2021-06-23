@@ -52,8 +52,6 @@ class MachineControllerTest extends AbstractBaseFunctionalTest
 
     /**
      * @dataProvider createSuccessDataProvider
-     *
-     * @param Machine|null $existingMachine
      */
     public function testCreateSuccess(?Machine $existingMachine): void
     {

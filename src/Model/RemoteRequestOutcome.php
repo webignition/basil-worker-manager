@@ -12,6 +12,11 @@ class RemoteRequestOutcome implements RemoteRequestOutcomeInterface
     ) {
     }
 
+    public function __toString(): string
+    {
+        return $this->state;
+    }
+
     public static function retrying(): self
     {
         return new RemoteRequestOutcome(self::STATE_RETRYING);
@@ -23,11 +28,6 @@ class RemoteRequestOutcome implements RemoteRequestOutcomeInterface
     }
 
     public function getState(): string
-    {
-        return $this->state;
-    }
-
-    public function __toString(): string
     {
         return $this->state;
     }

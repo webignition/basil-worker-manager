@@ -67,7 +67,7 @@ class Machine
 
     /**
      * @param self::STATE_* $state
-     * @param string[] $ipAddresses
+     * @param string[]      $ipAddresses
      */
     public function __construct(
         string $id,

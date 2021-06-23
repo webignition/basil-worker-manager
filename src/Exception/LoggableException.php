@@ -17,6 +17,11 @@ class LoggableException extends \Exception
         parent::__construct((string) $this);
     }
 
+    public function __toString(): string
+    {
+        return (string) json_encode($this->jsonSerialize());
+    }
+
     public function getException(): \Throwable
     {
         return $this->exception;
@@ -59,11 +64,6 @@ class LoggableException extends \Exception
         return $data;
     }
 
-    public function __toString(): string
-    {
-        return (string) json_encode($this->jsonSerialize());
-    }
-
     /**
      * @param array<mixed> $trace
      *
@@ -87,7 +87,7 @@ class LoggableException extends \Exception
     }
 
     /**
-     * @return array<string, string|int>
+     * @return array<string, int|string>
      */
     private function createLocationSectionForThrowable(\Throwable $throwable): array
     {
@@ -95,7 +95,7 @@ class LoggableException extends \Exception
     }
 
     /**
-     * @return array<string, string|int>
+     * @return array<string, int|string>
      */
     private function createLocationSection(string $file, int $line): array
     {

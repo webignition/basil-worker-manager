@@ -28,8 +28,8 @@ class CheckMachineIsActiveHandler implements MessageHandlerInterface
         $state = $machine->getState();
 
         if (
-            in_array($state, Machine::END_STATES) ||
-            !in_array($state, Machine::PRE_ACTIVE_STATES)
+            in_array($state, Machine::END_STATES)
+            || !in_array($state, Machine::PRE_ACTIVE_STATES)
         ) {
             return;
         }

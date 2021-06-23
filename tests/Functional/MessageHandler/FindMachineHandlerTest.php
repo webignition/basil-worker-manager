@@ -76,8 +76,8 @@ class FindMachineHandlerTest extends AbstractBaseFunctionalTest
      *
      * @param MachineRequestInterface[] $messageOnSuccessCollection
      * @param MachineRequestInterface[] $messageOnFailureCollection
-     * @param ResponseInterface[] $apiResponses
-     * @param object[] $expectedQueuedMessages
+     * @param ResponseInterface[]       $apiResponses
+     * @param object[]                  $expectedQueuedMessages
      */
     public function testInvokeSuccess(
         Machine $machine,

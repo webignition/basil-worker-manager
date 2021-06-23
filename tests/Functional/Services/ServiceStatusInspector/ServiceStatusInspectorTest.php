@@ -31,9 +31,9 @@ class ServiceStatusInspectorTest extends AbstractBaseFunctionalTest
     /**
      * @dataProvider getDataProvider
      *
-     * @param ResponseInterface[] $httpFixtures
+     * @param ResponseInterface[]           $httpFixtures
      * @param ComponentInspectorInterface[] $modifiedComponentInspectors
-     * @param array<string, bool> $expectedServiceStatus
+     * @param array<string, bool>           $expectedServiceStatus
      */
     public function testGet(
         array $httpFixtures,
@@ -145,7 +145,8 @@ class ServiceStatusInspectorTest extends AbstractBaseFunctionalTest
         if ($componentInspector instanceof MockInterface) {
             $componentInspector
                 ->shouldReceive('__invoke')
-                ->andThrow(new \Exception());
+                ->andThrow(new \Exception())
+            ;
         }
 
         return $componentInspector;

@@ -24,7 +24,6 @@ class LoggableExceptionTest extends TestCase
      */
     public function jsonSerializeDataProvider(): array
     {
-        //
         return [
             'without context, without previous, with real trace' => [
                 'exception' => (function () {
@@ -120,8 +119,8 @@ class LoggableExceptionTest extends TestCase
     }
 
     /**
-     * @param array<string, string|int> $expected
-     * @param array<string, string|int> $actual
+     * @param array<string, int|string> $expected
+     * @param array<string, int|string> $actual
      */
     private static function assertLocationSection(array $expected, array $actual): void
     {

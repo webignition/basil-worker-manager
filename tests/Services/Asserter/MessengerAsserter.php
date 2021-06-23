@@ -78,7 +78,6 @@ class MessengerAsserter
     }
 
     /**
-     * @param Envelope $envelope
      * @param array<string, array<int, StampInterface>> $expectedEnvelopeContainsStampCollections
      */
     public function assertEnvelopeContainsStampCollections(

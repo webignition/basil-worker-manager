@@ -93,7 +93,7 @@ class CreateFailureFactory
     }
 
     /**
-     * @return array<string, string|int>
+     * @return array<string, int|string>
      */
     private function createContext(ExceptionInterface | UnsupportedProviderException $exception): array
     {

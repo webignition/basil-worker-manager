@@ -53,7 +53,8 @@ class MockMachineManager
             $this->mock
                 ->shouldReceive($method)
                 ->with($machineProvider)
-                ->andThrow($exception);
+                ->andThrow($exception)
+            ;
         }
 
         return $this;

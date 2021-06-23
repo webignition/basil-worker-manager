@@ -26,7 +26,8 @@ class MockArgumentMetadata
         if ($this->argumentMetadata instanceof MockInterface) {
             $this->argumentMetadata
                 ->shouldReceive('getType')
-                ->andReturn($type);
+                ->andReturn($type)
+            ;
         }
 
         return $this;

@@ -4,7 +4,7 @@ WORKDIR /app
 
 ARG APP_ENV=prod
 ARG DATABASE_URL=postgresql://database_user:database_password@0.0.0.0:5432/database_name?serverVersion=12&charset=utf8
-ARG MESSENGER_TRANSPORT_DSN=amqp://rabbitmq_user:rabbitmq_password@rabbitmq_host:5672/%2f/messages
+ARG MESSENGER_TRANSPORT_DSN=doctrine://default
 ARG APP_MACHINE_NAME_PREFIX=dev
 ARG APP_DIGITALOCEAN_ACCESS_TOKEN=digitalocean_access_token
 ARG APP_DIGITALOCEAN_REGION=lon1
@@ -35,10 +35,8 @@ ENV MACHINE_IS_ACTIVE_DISPATCH_DELAY=$APP_MACHINE_IS_ACTIVE_DISPATCH_DELAY
 ENV DOCKERIZE_VERSION="v2.1.0"
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
 
 RUN apt-get -qq update && apt-get -qq -y install  \
-  librabbitmq-dev \
   libpq-dev \
   libzip-dev \
   supervisor \
@@ -46,9 +44,6 @@ RUN apt-get -qq update && apt-get -qq -y install  \
   && docker-php-ext-install \
   pdo_pgsql \
   zip \
-  && install-php-extensions amqp \
-  && rm /usr/bin/install-php-extensions \
-  && docker-php-ext-enable amqp \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -77,4 +72,4 @@ RUN chown -R www-data:www-data /app/var/log \
   && touch /app/.env \
   && php bin/console cache:clear --env=prod
 
-CMD dockerize -wait tcp://rabbitmq:5672 -timeout 30s -wait tcp://postgres:5432 -timeout 30s supervisord -c /etc/supervisor/supervisord.conf
+CMD dockerize -wait tcp://postgres:5432 -timeout 30s supervisord -c /etc/supervisor/supervisord.conf

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8a9f8e669dab37ec9cdd432ca62deabf",
+    "content-hash": "972ddf4e1ca8df669d7b1b383c0d87ad",
     "packages": [
         {
             "name": "clue/stream-filter",
@@ -3413,16 +3413,16 @@
         },
         {
             "name": "symfony/doctrine-messenger",
-            "version": "v5.2.4",
+            "version": "v5.2.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/doctrine-messenger.git",
-                "reference": "0b983f2db726ea39aa4884b24f52b9f990f2f864"
+                "reference": "bb7e21cce826e627ba1683b628d09b70a3b6d5ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/0b983f2db726ea39aa4884b24f52b9f990f2f864",
-                "reference": "0b983f2db726ea39aa4884b24f52b9f990f2f864",
+                "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/bb7e21cce826e627ba1683b628d09b70a3b6d5ba",
+                "reference": "bb7e21cce826e627ba1683b628d09b70a3b6d5ba",
                 "shasum": ""
             },
             "require": {
@@ -3466,7 +3466,7 @@
             "description": "Symfony Doctrine Messenger Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/doctrine-messenger/tree/v5.2.4"
+                "source": "https://github.com/symfony/doctrine-messenger/tree/v5.3.0"
             },
             "funding": [
                 {
@@ -3482,7 +3482,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-04T17:38:24+00:00"
+            "time": "2021-05-26T17:33:56+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -8516,7 +8516,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2021-03-05T07:46:22+00:00"
+            "time": "2021-06-17T23:24:54+00:00"
         },
         {
             "name": "symfony/browser-kit",
@@ -9034,7 +9034,6 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=8",
-        "ext-amqp": "*",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*"
